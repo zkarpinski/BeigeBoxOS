@@ -1,0 +1,107 @@
+/* Winamp styles */
+.winamp-window {
+  width: 275px;
+  background-color: #000;
+  border: 1px solid #111;
+  font-family: 'Arial', sans-serif;
+  color: #00FF00;
+  border-radius: 4px;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  z-index: 100;
+}
+
+.winamp-title-bar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: white;
+  padding: 2px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: move;
+  border-bottom: 1px solid #000;
+}
+
+.winamp-title-bar .title-bar-controls button {
+  background: #ccc;
+  border: 1px solid #fff;
+  border-right-color: #666;
+  border-bottom-color: #666;
+  font-size: 8px;
+  padding: 0 4px;
+  margin-left: 2px;
+  cursor: pointer;
+  color: #000;
+}
+
+.winamp-body {
+  padding: 10px;
+  background: #222;
+  border-top: 1px solid #444;
+}
+
+.winamp-display {
+  background: #000;
+  border: 2px solid #555;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  padding: 4px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.winamp-time {
+  font-family: monospace;
+  font-size: 20px;
+  color: #00FF00;
+  margin-right: 10px;
+}
+
+.winamp-marquee {
+  font-family: monospace;
+  font-size: 10px;
+  color: #00FF00;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 150px;
+  text-transform: uppercase;
+}
+
+.winamp-controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.winamp-btn {
+  background: #333;
+  color: #ccc;
+  border: 1px solid #666;
+  border-top-color: #999;
+  border-left-color: #999;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.winamp-btn:active {
+  border-color: #999;
+  border-top-color: #333;
+  border-left-color: #333;
+  background: #222;
+}
+
+.winamp-viz {
+  display: block;
+  width: 100%;
+  height: 36px;
+  background: #000;
+  margin-bottom: 8px;
+  cursor: default;
+}

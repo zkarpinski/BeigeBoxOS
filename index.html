@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>Windows 98 | Zachary Karpinski</title>
+    <meta name="description" content="A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Pinball, Winamp, Napster, AIM, Navigator, and more. By Zachary Karpinski.">
+    <meta name="keywords" content="Windows 98, retro, browser, Clippy, Zachary Karpinski, portfolio, Winamp, Napster, AIM, Navigator, Tony Hawk's Pro Skater 2, Minesweeper, Paint, The Incredible Machine, Notepad, Paint, Minesweeper, The Incredible Machine">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Zachary Karpinski">
+    <link rel="canonical" href="https://zkarpinski.com">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Windows 98 in the Browser | Zachary Karpinski">
+    <meta property="og:description" content="A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Pinball, Winamp, Napster, AIM, Navigator, and more.">
+    <meta property="og:url" content="https://zkarpinski.com/">
+    <meta property="og:site_name" content="Windows 98 in the Browser">
+    <meta property="og:image" content="https://zkarpinski.com/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Windows 98 in the Browser | Zachary Karpinski">
+    <meta name="twitter:description" content="A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Pinball, Winamp, Napster, AIM, Navigator, and more.">
+    <meta name="twitter:image" content="https://zkarpinski.com/android-chrome-512x512.png">
+
+    <!-- Structured data for search -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"Windows 98 in the Browser","description":"A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Pinball, Winamp, Napster, AIM, Navigator, and more.","url":"https://zkarpinski.com","author":{"@type":"Person","name":"Zachary Karpinski"},"applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    </script>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Shell -->
+    <link rel="stylesheet" href="shell/shell.css">
+    <link rel="stylesheet" href="shell/taskbar.css">
+    <link rel="stylesheet" href="shell/desktop.css">
+    <link rel="stylesheet" href="shell/dialog.css">
+    <link rel="stylesheet" href="shell/run.css">
+    <link rel="stylesheet" href="shell/boot.css">
+    <link rel="stylesheet" href="shell/shutdown.css">
+    <link rel="stylesheet" href="shell/bsod.css">
+    <!-- Apps -->
+    <link rel="stylesheet" href="apps/word/word.css">
+    <link rel="stylesheet" href="apps/thps2/thps2.css">
+    <link rel="stylesheet" href="apps/vb6/vb6.css">
+    <link rel="stylesheet" href="apps/napster/napster.css">
+    <link rel="stylesheet" href="apps/aim/aim.css">
+    <link rel="stylesheet" href="apps/navigator/navigator.css">
+    <link rel="stylesheet" href="apps/winamp/winamp.css">
+    <link rel="stylesheet" href="apps/pinball/pinball.css">
+    <link rel="stylesheet" href="apps/notepad/notepad.css">
+    <link rel="stylesheet" href="apps/minesweeper/minesweeper.css">
+    <link rel="stylesheet" href="apps/paint/paint.css">
+    <link rel="stylesheet" href="apps/the_incredible_machine/tim.css">
+    <link rel="stylesheet" href="apps/calculator/calculator.css">
+    <link rel="stylesheet" href="apps/ie5/ie5.css">
+    <link rel="stylesheet" href="apps/defrag/defrag.css">
+    <link rel="stylesheet" href="apps/mycomputer/mycomputer.css">
+    <link rel="stylesheet" href="apps/controlpanel/controlpanel.css">
+    <link rel="stylesheet" href="apps/msdos/msdos.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/clippyjs/dist/clippy.css">
+    <script>
+        // Hide boot screen before first paint if user booted within 30 days.
+        // Must run in <head> to prevent flash.
+        try {
+            var _ts = localStorage.getItem('word97-booted');
+            if (_ts && (Date.now() - parseInt(_ts, 10)) < 30 * 24 * 60 * 60 * 1000) {
+                document.write('<style>#boot-screen{display:none!important}</style>');
+            }
+        } catch (_) {}
+    </script>
+</head>
+<body class="booting">
+    <!-- Crawlable content for search engines (visually hidden, single-page) -->
+    <div class="seo-intro" aria-hidden="true">
+        <h1>Windows 98 in the Browser</h1>
+        <p>A nostalgic Windows 98 desktop in your browser. Open Word, Clippy, Pinball, Winamp, Napster, AIM, Netscape Navigator, Minesweeper, Paint, Notepad, Calculator, and more. By Zachary Karpinski.</p>
+    </div>
+    <!-- Windows 98 Boot Screen -->
+    <div id="boot-screen">
+        <div class="boot-inner">
+            <img src="shell/images/win98-boot.jpg" class="boot-splash" alt="Windows 98">
+            <div class="boot-bar-wrap">
+                <div class="boot-bar-track">
+                    <div id="boot-bar-fill" class="boot-bar-fill"></div>
+                </div>
+            </div>
+            <div id="boot-click-prompt" class="boot-click-prompt" hidden>Click anywhere to continue</div>
+        </div>
+    </div>
+    <audio id="boot-sound" src="shell/sounds/startup.wav" preload="auto"></audio>
+
+    <!-- Desktop icons -->
+    <div id="desktop-icons">
+        <div class="desktop-icon" id="mycomputer-desktop-icon" title="My Computer">
+            <img src="assets/icons/computer_explorer.png" alt="My Computer">
+            <span>My Computer</span>
+        </div>
+        <div class="desktop-icon" id="resume-desktop-icon" title="My Resume.doc">
+            <img src="apps/word/resume-icon.png" alt="My Resume.doc">
+            <span>My Resume.doc</span>
+        </div>
+        <div class="desktop-icon" id="thps2-desktop-icon" title="Tony Hawk's Pro Skater 2">
+            <img src="apps/thps2/thps2-icon.png" alt="THPS2">
+            <span>Tony Hawk's Pro Skater 2</span>
+        </div>
+        <div class="desktop-icon" id="notepad-desktop-icon" title="Notepad">
+            <img src="assets/icons/notepad-1.png" alt="Notepad">
+            <span>Notepad</span>
+        </div>
+        <div class="desktop-icon" id="minesweeper-desktop-icon" title="Minesweeper">
+            <img src="assets/icons/minesweeper-0.png" alt="Minesweeper">
+            <span>Minesweeper</span>
+        </div>
+        <div class="desktop-icon" id="paint-desktop-icon" title="Paint">
+            <img src="assets/icons/paint_file-1.png" alt="Paint">
+            <span>Paint</span>
+        </div>
+        <div class="desktop-icon" id="tim-desktop-icon" title="The Incredible Machine">
+            <img src="apps/the_incredible_machine/tim-icon.png" alt="The Incredible Machine">
+            <span>The Incredible Machine</span>
+        </div>
+        <div class="desktop-icon" id="calculator-desktop-icon" title="Calculator">
+            <img src="assets/icons/calculator-1.png" alt="Calculator">
+            <span>Calculator</span>
+        </div>
+        <div class="desktop-icon" id="ie5-desktop-icon" title="Internet Explorer">
+            <img src="assets/icons/msie1-2.png" alt="Internet Explorer">
+            <span>Internet Explorer</span>
+        </div>
+    </div>
+
+    <!-- Minesweeper Window -->
+    <div id="minesweeper-window" class="minesweeper-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/minesweeper-0.png" alt="Minesweeper" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">Minesweeper</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="minesweeper-menu-bar">
+            <div class="minesweeper-menu-item">
+                <u>G</u>ame
+                <div class="minesweeper-menu-dropdown">
+                    <div class="minesweeper-dropdown-item" id="ms-menu-new"><span><u>N</u>ew</span><span class="notepad-shortcut">F2</span></div>
+                    <div class="minesweeper-dropdown-divider"></div>
+                    <div class="minesweeper-dropdown-item checked" id="ms-menu-beginner"><span><u>B</u>eginner</span></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-intermediate"><span><u>I</u>ntermediate</span></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-expert"><span><u>E</u>xpert</span></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-custom"><span><u>C</u>ustom...</span></div>
+                    <div class="minesweeper-dropdown-divider"></div>
+                    <div class="minesweeper-dropdown-item checked" id="ms-menu-marks"><span><u>M</u>arks (?)</span></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-color"><span>Co<u>l</u>or</span></div>
+                    <div class="minesweeper-dropdown-divider"></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-best"><span>Best...</span></div>
+                    <div class="minesweeper-dropdown-divider"></div>
+                    <div class="minesweeper-dropdown-item" id="ms-menu-exit"><span>E<u>x</u>it</span></div>
+                </div>
+            </div>
+            <div class="minesweeper-menu-item">
+                <u>H</u>elp
+                <div class="minesweeper-menu-dropdown">
+                    <div class="minesweeper-dropdown-item"><span>Help <u>T</u>opics</span></div>
+                    <div class="minesweeper-dropdown-divider"></div>
+                    <div class="minesweeper-dropdown-item"><span><u>A</u>bout Minesweeper</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="minesweeper-body">
+            <div class="minesweeper-header">
+                <div class="minesweeper-display" id="ms-mine-count">010</div>
+                <div class="minesweeper-face" id="ms-face">
+                    <div class="minesweeper-face-icon face-smile"></div>
+                </div>
+                <div class="minesweeper-display" id="ms-timer">000</div>
+            </div>
+            <div class="minesweeper-grid" id="ms-grid"></div>
+      </div>
+    </div>
+
+    <!-- Paint Window -->
+    <div id="paint-window" class="paint-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/paint_file-1.png" alt="Paint" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">untitled - Paint</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="paint-menu-bar">
+            <div class="paint-menu-item"><u>F</u>ile</div>
+            <div class="paint-menu-item"><u>E</u>dit</div>
+            <div class="paint-menu-item"><u>V</u>iew</div>
+            <div class="paint-menu-item"><u>I</u>mage</div>
+            <div class="paint-menu-item"><u>O</u>ptions</div>
+            <div class="paint-menu-item"><u>H</u>elp</div>
+        </div>
+        <div class="paint-body">
+            <div class="paint-toolbox">
+                <button class="paint-tool" data-tool="select" title="Select"><span class="paint-tool-icon">⬚</span></button>
+                <button class="paint-tool" data-tool="eraser" title="Eraser/Color Eraser"><span class="paint-tool-icon" style="color: #ffb6c1">▰</span></button>
+                <button class="paint-tool" data-tool="fill" title="Fill With Color"><span class="paint-tool-icon">🪣</span></button>
+                <button class="paint-tool" data-tool="picker" title="Pick Color"><span class="paint-tool-icon">💉</span></button>
+                <button class="paint-tool" data-tool="magnifier" title="Magnifier"><span class="paint-tool-icon">🔍</span></button>
+                <button class="paint-tool active" data-tool="pencil" title="Pencil"><span class="paint-tool-icon">✏️</span></button>
+                <button class="paint-tool" data-tool="brush" title="Brush"><span class="paint-tool-icon">🖌️</span></button>
+                <button class="paint-tool" data-tool="text" title="Text"><span class="paint-tool-icon">A</span></button>
+                <button class="paint-tool" data-tool="line" title="Line"><span class="paint-tool-icon" style="transform: rotate(-45deg); display: inline-block;">|</span></button>
+                <button class="paint-tool" data-tool="curve" title="Curve"><span class="paint-tool-icon">~</span></button>
+                <button class="paint-tool" data-tool="rectangle" title="Rectangle"><span class="paint-tool-icon">⬜</span></button>
+                <button class="paint-tool" data-tool="polygon" title="Polygon"><span class="paint-tool-icon">⬠</span></button>
+                <button class="paint-tool" data-tool="ellipse" title="Ellipse"><span class="paint-tool-icon">◯</span></button>
+                <button class="paint-tool" data-tool="roundrect" title="Rounded Rectangle"><span class="paint-tool-icon" style="border-radius: 4px; border: 1px solid black; width: 10px; height: 10px;"></span></button>
+            </div>
+            <div class="paint-canvas-container">
+                <div class="paint-canvas-wrap">
+                    <canvas id="paint-canvas"></canvas>
+                    <div class="paint-canvas-handle e"></div>
+                    <div class="paint-canvas-handle s"></div>
+                    <div class="paint-canvas-handle se"></div>
+                </div>
+            </div>
+        </div>
+        <div class="paint-bottom">
+            <div class="paint-color-box">
+                <div class="paint-selected-colors">
+                    <div class="paint-color-primary" id="paint-color-primary"></div>
+                    <div class="paint-color-secondary" id="paint-color-secondary"></div>
+                </div>
+                <div class="paint-palette" id="paint-palette"></div>
+            </div>
+            <div class="paint-status-bar">
+                <div class="paint-status-text" id="paint-status-text">For Help, click Help Topics on the Help Menu.</div>
+                <div class="paint-status-coord" id="paint-status-coord"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internet Explorer 5 window -->
+    <div id="ie5-window" class="ie5-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/msie1-2.png" class="ie5-title-logo" alt="Internet Explorer" style="width: 16px; height: 16px; margin-right: 4px;">
+                <span class="title-text" id="ie5-title-text">Microsoft Internet Explorer</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+
+        <!-- Menu bar -->
+        <div class="ie5-menu-bar">
+            <div class="ie5-menu-item"><u>F</u>ile</div>
+            <div class="ie5-menu-item"><u>E</u>dit</div>
+            <div class="ie5-menu-item"><u>V</u>iew</div>
+            <div class="ie5-menu-item">F<u>a</u>vorites</div>
+            <div class="ie5-menu-item"><u>T</u>ools</div>
+            <div class="ie5-menu-item" data-menu="ie5-menu-help"><u>H</u>elp</div>
+        </div>
+
+        <div id="ie5-menu-help" class="ie5-menu-dropdown hidden">
+            <div class="ie5-menu-dropdown-item disabled">Contents and Index</div>
+            <div class="ie5-menu-dropdown-item disabled">Tip of the Day</div>
+            <div class="ie5-menu-dropdown-item disabled">For Netscape Users</div>
+            <div class="ie5-menu-divider"></div>
+            <div class="ie5-menu-dropdown-item disabled">Online Support</div>
+            <div class="ie5-menu-dropdown-item disabled">Send Feedback</div>
+            <div class="ie5-menu-divider"></div>
+            <div class="ie5-menu-dropdown-item" id="ie5-menu-help-about"><u>A</u>bout Internet Explorer</div>
+        </div>
+
+        <!-- Navigation toolbar -->
+        <div class="ie5-toolbar-row">
+            <div class="ie5-grippy"></div>
+            <div class="ie5-toolbar">
+                <button class="ie5-btn disabled" title="Back">
+                    <span class="ie5-btn-icon">⬅</span>
+                    <span class="ie5-btn-label">Back</span>
+                </button>
+                <button class="ie5-btn disabled" title="Forward">
+                    <span class="ie5-btn-icon">➡</span>
+                    <span class="ie5-btn-label">Forward</span>
+                </button>
+                <button class="ie5-btn disabled" title="Stop">
+                    <span class="ie5-btn-icon">✖</span>
+                    <span class="ie5-btn-label">Stop</span>
+                </button>
+                <button class="ie5-btn disabled" title="Refresh">
+                    <span class="ie5-btn-icon">🔄</span>
+                    <span class="ie5-btn-label">Refresh</span>
+                </button>
+                <button class="ie5-btn disabled" title="Home">
+                    <span class="ie5-btn-icon">🏠</span>
+                    <span class="ie5-btn-label">Home</span>
+                </button>
+                <div class="ie5-tb-sep"></div>
+                <button class="ie5-btn disabled" title="Search">
+                    <span class="ie5-btn-icon">🔍</span>
+                    <span class="ie5-btn-label">Search</span>
+                </button>
+                <button class="ie5-btn disabled" title="Favorites">
+                    <span class="ie5-btn-icon">🗂️</span>
+                    <span class="ie5-btn-label">Favorites</span>
+                </button>
+                <button class="ie5-btn disabled" title="History">
+                    <span class="ie5-btn-icon">🕒</span>
+                    <span class="ie5-btn-label">History</span>
+                </button>
+                <div class="ie5-tb-sep"></div>
+                <button class="ie5-btn disabled" title="Mail">
+                    <span class="ie5-btn-icon">✉</span>
+                    <span class="ie5-btn-label">Mail</span>
+                </button>
+                <button class="ie5-btn disabled" title="Print">
+                    <span class="ie5-btn-icon">🖨️</span>
+                    <span class="ie5-btn-label">Print</span>
+                </button>
+            </div>
+            <div class="ie5-windows-logo">
+                <img src="assets/icons/windows_update_large-1.png" alt="Windows Logo" style="width: 22px; height: 22px;">
+            </div>
+        </div>
+
+        <!-- Address bar -->
+        <div class="ie5-toolbar-row">
+            <div class="ie5-grippy"></div>
+            <div class="ie5-address-bar">
+                <span class="ie5-address-label"><u>A</u>ddress</span>
+                <div class="ie5-url-input-container">
+                    <img src="assets/icons/msie1-2.png" alt="IE" class="ie5-url-icon">
+                    <input type="text" id="ie5-url-input" class="ie5-url-input" value="http://www.msn.com/" readonly>
+                </div>
+            </div>
+            <div class="ie5-address-go disabled">Go</div>
+            <div class="ie5-address-links disabled">Links <span>»</span></div>
+        </div>
+
+        <!-- Main Body -->
+        <div class="ie5-body">
+            <!-- Favorites Sidebar -->
+            <div class="ie5-sidebar">
+                <div class="ie5-sidebar-header">
+                    <span>Favorites</span>
+                    <button class="win-btn title-btn ie5-sidebar-close" title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+                </div>
+                <div class="ie5-sidebar-toolbar">
+                    <button class="win-btn ie5-sidebar-btn disabled">Add...</button>
+                    <button class="win-btn ie5-sidebar-btn disabled">Organize...</button>
+                </div>
+                <div class="ie5-sidebar-list">
+                    <div class="ie5-favorite-item" data-url="https://web.archive.org/web/19990221081643/http://www.msn.com/">
+                        <img src="assets/icons/msie1-2.png" alt="IE">
+                        <span>MSN</span>
+                    </div>
+                    <div class="ie5-favorite-item" data-url="https://web.archive.org/web/19990422115127/http://www.askjeeves.com/">
+                        <img src="assets/icons/msie1-2.png" alt="IE">
+                        <span>AskJeeves</span>
+                    </div>
+                    <div class="ie5-favorite-item" data-url="https://web.archive.org/web/19990508164724/http://www.aol.com/">
+                        <img src="assets/icons/msie1-2.png" alt="IE">
+                        <span>AOL</span>
+                    </div>
+                    <div class="ie5-favorite-item" data-url="https://web.archive.org/web/19990422071007/http://www.ebay.com/">
+                        <img src="assets/icons/msie1-2.png" alt="IE">
+                        <span>Ebay</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Content area -->
+            <div class="ie5-content">
+                <iframe id="ie5-iframe" src="about:blank" data-default-src="https://web.archive.org/web/19990221081643/http://www.msn.com/" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+            </div>
+        </div>
+
+        <!-- Status bar -->
+        <div class="ie5-status-bar">
+            <span class="ie5-status-icon"></span>
+            <span class="ie5-status-text" id="ie5-status-text">Done</span>
+            <div class="ie5-progress-wrap">
+                <div class="ie5-progress-bar" id="ie5-progress-bar"></div>
+            </div>
+            <div class="ie5-component-bar">
+                <div class="ie5-zone">
+                    <img src="assets/icons/msie1-2.png" alt="Internet">
+                    <span>Internet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Internet Explorer dialog -->
+        <div id="ie5-about-dialog" class="ie5-about-dialog hidden">
+            <div class="ie5-about-title-bar">
+                <span class="ie5-about-title-text">About Internet Explorer</span>
+                <button type="button" class="win-btn title-btn ie5-about-close" title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+            <div class="ie5-about-content">
+                <div class="ie5-about-logo">
+                    <img src="assets/icons/msie1-2.png" alt="IE Logo">
+                    <div class="ie5-about-logo-text">
+                        Microsoft<sup>®</sup><br>
+                        <b>Internet Explorer 5</b>
+                    </div>
+                </div>
+                <div class="ie5-about-info">
+                    Version: 5.00.2314.1003<br>
+                    Cipher Strength: 40-bit (Update Information)<br>
+                    Product ID: 50071-314-0005673-04544
+                </div>
+                <div class="ie5-about-legal">
+                    <textarea readonly>Based on NCSA Mosaic. NCSA Mosaic(TM); was developed at the National Center for Supercomputing Applications at the University of Illinois at Urbana-Champaign.</textarea>
+                </div>
+                <div class="ie5-about-bottom">
+                    <img src="assets/icons/windows_update_large-1.png" alt="Windows" style="width: 24px; height: 24px;">
+                    <span>Copyright ©1995-1999 Microsoft Corp.</span>
+                    <button class="win-btn ie5-about-ok">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notepad Window -->
+    <div id="notepad-window" class="notepad-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/notepad-1.png" alt="Notepad" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">Untitled - Notepad</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="notepad-menu-bar">
+            <div class="notepad-menu-item">
+                <u>F</u>ile
+                <div class="notepad-menu-dropdown">
+                    <div class="notepad-dropdown-item" id="notepad-file-new"><span><u>N</u>ew</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-file-open"><span><u>O</u>pen...</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-file-save"><span><u>S</u>ave</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-file-save-as"><span>Save <u>A</u>s...</span></div>
+                    <div class="notepad-dropdown-divider"></div>
+                    <div class="notepad-dropdown-item" id="notepad-file-exit"><span>E<u>x</u>it</span></div>
+                </div>
+            </div>
+            <div class="notepad-menu-item">
+                <u>E</u>dit
+                <div class="notepad-menu-dropdown">
+                    <div class="notepad-dropdown-item" id="notepad-edit-undo"><span><u>U</u>ndo</span><span class="notepad-shortcut">Ctrl+Z</span></div>
+                    <div class="notepad-dropdown-divider"></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-cut"><span>Cu<u>t</u></span><span class="notepad-shortcut">Ctrl+X</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-copy"><span><u>C</u>opy</span><span class="notepad-shortcut">Ctrl+C</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-paste"><span><u>P</u>aste</span><span class="notepad-shortcut">Ctrl+V</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-delete"><span>De<u>l</u>ete</span><span class="notepad-shortcut">Del</span></div>
+                    <div class="notepad-dropdown-divider"></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-select-all"><span>Select <u>A</u>ll</span></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-time-date"><span>Time/<u>D</u>ate</span><span class="notepad-shortcut">F5</span></div>
+                    <div class="notepad-dropdown-divider"></div>
+                    <div class="notepad-dropdown-item" id="notepad-edit-word-wrap"><span><u>W</u>ord Wrap</span></div>
+                </div>
+            </div>
+            <div class="notepad-menu-item">
+                <u>S</u>earch
+            </div>
+            <div class="notepad-menu-item">
+                <u>H</u>elp
+            </div>
+            <input type="file" id="notepad-file-input" style="display: none;" accept=".txt">
+        </div>
+        <div class="notepad-textarea-container">
+            <textarea id="notepad-textarea" class="notepad-textarea" spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <div id="word-window" class="app-window">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <div class="title-logo"><span class="w-cyan">W</span></div>
+                <span class="title-text">Microsoft Word - Document1</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+
+        <div class="menu-bar">
+            <div class="menu-left">
+                <div class="doc-icon-container">
+                    <span class="doc-icon-w">W</span>
+                </div>
+                <div class="menu-item" id="file-menu-item" data-menu="file">
+                    <span class="menu-title"><u>F</u>ile</span>
+                    <div class="menu-dropdown hidden" id="menu-file">
+                        <div class="menu-dropdown-item" id="menu-file-new"><u>N</u>ew</div>
+                        <div class="menu-dropdown-item" id="menu-file-open"><u>O</u>pen...</div>
+                        <div class="menu-dropdown-item" id="menu-file-save"><u>S</u>ave</div>
+                        <div class="menu-dropdown-divider"></div>
+                        <div class="menu-dropdown-item" id="menu-file-print"><u>P</u>rint...</div>
+                        <div class="menu-dropdown-divider"></div>
+                        <div class="menu-dropdown-item" id="menu-file-exit">E<u>x</u>it</div>
+                    </div>
+                </div>
+                <button type="button" class="menu-item" data-menu="edit"><span class="menu-title"><u>E</u>dit</span></button>
+                <button type="button" class="menu-item" data-menu="view"><span class="menu-title"><u>V</u>iew</span></button>
+                <button type="button" class="menu-item" data-menu="insert"><span class="menu-title"><u>I</u>nsert</span></button>
+                <button type="button" class="menu-item" data-menu="format"><span class="menu-title">F<u>o</u>rmat</span></button>
+                <button type="button" class="menu-item" data-menu="tools"><span class="menu-title"><u>T</u>ools</span></button>
+                <button type="button" class="menu-item" data-menu="table"><span class="menu-title">T<u>a</u>ble</span></button>
+                <button type="button" class="menu-item" data-menu="window"><span class="menu-title"><u>W</u>indow</span></button>
+                <button type="button" class="menu-item" data-menu="help"><span class="menu-title"><u>H</u>elp</span></button>
+                <input type="file" id="file-input" style="display: none;" accept=".txt,.html,.doc,.rtf">
+            </div>
+            <div class="menu-right">
+                <button class="win-btn doc-close-btn">X</button>
+            </div>
+        </div>
+
+        <!-- Dropdowns for Edit, View, Insert, Format, Tools, Table, Window, Help (positioned by JS) -->
+        <div id="menu-edit" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Undo</div>
+            <div class="menu-dropdown-item">Repeat</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item">Cut</div>
+            <div class="menu-dropdown-item">Copy</div>
+            <div class="menu-dropdown-item">Paste</div>
+            <div class="menu-dropdown-item">Paste Special...</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item">Find...</div>
+            <div class="menu-dropdown-item">Replace...</div>
+        </div>
+        <div id="menu-view" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Normal</div>
+            <div class="menu-dropdown-item">Online Layout</div>
+            <div class="menu-dropdown-item">Page Layout</div>
+            <div class="menu-dropdown-item">Outline</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item">Toolbars</div>
+            <div class="menu-dropdown-item">Ruler</div>
+            <div class="menu-dropdown-item">Document Map</div>
+            <div class="menu-dropdown-item">Zoom...</div>
+        </div>
+        <div id="menu-insert" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Break...</div>
+            <div class="menu-dropdown-item">Page Numbers...</div>
+            <div class="menu-dropdown-item">Picture</div>
+            <div class="menu-dropdown-item">Object...</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item" data-cmd="hyperlink">Hyperlink...</div>
+            <div class="menu-dropdown-item" data-cmd="table">Table...</div>
+        </div>
+        <div id="menu-format" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Font...</div>
+            <div class="menu-dropdown-item">Paragraph...</div>
+            <div class="menu-dropdown-item">Bullets and Numbering...</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item">Columns...</div>
+            <div class="menu-dropdown-item">Tabs...</div>
+        </div>
+        <div id="menu-tools" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Spelling and Grammar...</div>
+            <div class="menu-dropdown-item">Word Count...</div>
+            <div class="menu-dropdown-item">Options...</div>
+        </div>
+        <div id="menu-table" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Insert Table...</div>
+            <div class="menu-dropdown-item">Delete Cells...</div>
+            <div class="menu-dropdown-item">Merge Cells</div>
+        </div>
+        <div id="menu-window" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">New Window</div>
+            <div class="menu-dropdown-item">Arrange All</div>
+            <div class="menu-dropdown-divider"></div>
+            <div class="menu-dropdown-item">Document1</div>
+        </div>
+        <div id="menu-help" class="menu-dropdown menu-dropdown-fixed hidden">
+            <div class="menu-dropdown-item">Microsoft Word Help</div>
+            <div class="menu-dropdown-item" id="menu-about-word">About Microsoft Word</div>
+        </div>
+
+        <!-- About Microsoft Word dialog -->
+        <div id="about-dialog" class="about-dialog" hidden>
+            <div class="about-dialog-inner">
+                <div class="about-title">Microsoft Word 97</div>
+                <div class="about-version">Copyright © 1983-1996 Microsoft Corp.</div>
+                <button type="button" class="about-word-icon" id="about-word-icon" title="Word icon (Ctrl+Shift+click for Pinball)">
+                    <span class="about-word-icon-w">W</span>
+                </button>
+                <div class="about-ok-wrap">
+                    <button type="button" class="about-ok-btn" id="about-ok-btn">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar-row">
+            <div class="toolbar-gripper"></div>
+            <div class="standard-toolbar toolbar">
+                <button class="tb-btn" id="cmd-new" title="New"><span class="icon">📄</span></button>
+                <button class="tb-btn" id="cmd-open" title="Open"><span class="icon">📂</span></button>
+                <button class="tb-btn" id="cmd-save" title="Save"><span class="icon">💾</span></button>
+                <button class="tb-btn" id="cmd-print" title="Print"><span class="icon">🖨️</span></button>
+                <button class="tb-btn" id="cmd-preview" title="Print Preview"><span class="icon">🔍</span></button>
+                <button class="tb-btn" id="cmd-spelling" title="Spelling"><span class="icon" style="font-size: 8px;">abc<br>✓</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-cut" title="Cut"><span class="icon">✂️</span></button>
+                <button class="tb-btn" id="cmd-copy" title="Copy"><span class="icon">📄</span></button>
+                <button class="tb-btn" id="cmd-paste" title="Paste"><span class="icon">📋</span></button>
+                <button class="tb-btn" id="cmd-format-painter" title="Format Painter"><span class="icon">🖌️</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-undo" title="Undo"><span class="icon">↩️</span></button>
+                <button class="tb-btn" id="cmd-redo" title="Redo"><span class="icon">↪️</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-hyperlink" title="Insert Hyperlink"><span class="icon">🔗</span></button>
+                <button class="tb-btn" id="cmd-table" title="Insert Table"><span class="icon">🌐</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn"><span class="icon">▦</span></button>
+                <button class="tb-btn"><span class="icon">⊞</span></button>
+                <button class="tb-btn"><span class="icon">📗</span></button>
+                <button class="tb-btn"><span class="icon" style="transform: rotate(90deg);">≡</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn"><span class="icon">△</span></button>
+                <button class="tb-btn"><span class="icon">🗺️</span></button>
+                <button class="tb-btn"><span class="icon">¶</span></button>
+                <div class="tb-sep"></div>
+                <select class="tb-select zoom-select" id="zoom-select" title="Zoom">
+                    <option value="100" selected>100%</option>
+                    <option value="75">75%</option>
+                    <option value="50">50%</option>
+                    <option value="150">150%</option>
+                    <option value="200">200%</option>
+                </select>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-help" title="Help"><span class="icon">?</span></button>
+            </div>
+        </div>
+
+        <div class="toolbar-row">
+            <div class="toolbar-gripper"></div>
+            <div class="formatting-toolbar toolbar">
+                <select class="tb-select style-select" id="style-select" title="Style">
+                    <option>Normal</option>
+                    <option>Heading 1</option>
+                    <option>Heading 2</option>
+                </select>
+                <select class="tb-select font-select" id="font-select" title="Font">
+                    <option>Times New Roman</option>
+                    <option>Arial</option>
+                    <option>Courier New</option>
+                    <option>Georgia</option>
+                    <option>Verdana</option>
+                </select>
+                <select class="tb-select size-select" id="font-size-select" title="Font Size">
+                    <option>8</option>
+                    <option>9</option>
+                    <option value="10" selected>10</option>
+                    <option>11</option>
+                    <option>12</option>
+                    <option>14</option>
+                    <option>16</option>
+                    <option>18</option>
+                    <option>24</option>
+                </select>
+                <div class="tb-sep"></div>
+                <button class="tb-btn format-btn" id="cmd-bold" title="Bold" style="font-weight:900; font-family: 'Times New Roman';">B</button>
+                <button class="tb-btn format-btn" id="cmd-italic" title="Italic" style="font-style:italic; font-family: 'Times New Roman'; font-weight:bold;">I</button>
+                <button class="tb-btn format-btn" id="cmd-underline" title="Underline" style="text-decoration:underline; font-family: 'Times New Roman'; font-weight:bold;">U</button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn align-btn" id="cmd-align-left" title="Align Left"><span class="icon align-icon">≣</span></button>
+                <button class="tb-btn align-btn" id="cmd-align-center" title="Center"><span class="icon align-icon">≡</span></button>
+                <button class="tb-btn align-btn" id="cmd-align-right" title="Align Right"><span class="icon align-icon">≣</span></button>
+                <button class="tb-btn align-btn" id="cmd-justify" title="Justify"><span class="icon align-icon">≣</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-numbering" title="Numbering"><span class="icon list-icon">1≡</span></button>
+                <button class="tb-btn" id="cmd-bullets" title="Bullets"><span class="icon list-icon">•≡</span></button>
+                <button class="tb-btn" id="cmd-indent-decrease" title="Decrease Indent"><span class="icon list-icon">←≡</span></button>
+                <button class="tb-btn" id="cmd-indent-increase" title="Increase Indent"><span class="icon list-icon">→≡</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn"><span class="icon box-icon">□</span></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="cmd-font-color" title="Font Color"><span class="icon">🖍️</span><span class="dropdown-arrow">▼</span></button>
+                <button class="tb-btn"><span class="icon" style="color:blue; font-weight:bold; font-family:'Times New Roman'; border-bottom: 2px solid blue;">A</span><span class="dropdown-arrow">▼</span></button>
+            </div>
+        </div>
+
+        <div class="ruler-container">
+            <div class="ruler-left-controls">
+                <div class="ruler-btn">L</div>
+            </div>
+            <div class="ruler">
+                <div class="ruler-indent-left">
+                    <div class="indent-top"></div>
+                    <div class="indent-bottom"></div>
+                    <div class="indent-box"></div>
+                </div>
+                <div class="ruler-ticks">
+                    <div class="ruler-tick-group"><span>1</span></div>
+                    <div class="ruler-tick-group"><span>2</span></div>
+                    <div class="ruler-tick-group"><span>3</span></div>
+                    <div class="ruler-tick-group"><span>4</span></div>
+                    <div class="ruler-tick-group"><span>5</span></div>
+                    <div class="ruler-tick-group"><span>6</span></div>
+                    <div class="ruler-tick-group"><span>7</span></div>
+                    <div class="ruler-tick-group"><span>8</span></div>
+                    <div class="ruler-tick-group"><span>9</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>10</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>11</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>12</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>13</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>14</span></div>
+                    <div class="ruler-tick-group" style="width: 25px;"><span>15</span></div>
+                </div>
+                <div class="ruler-indent-right">
+                    <div class="indent-top"></div>
+                </div>
+            </div>
+            <div class="ruler-right-padding"></div>
+        </div>
+
+        <div class="workspace-area">
+            <div class="editor-container">
+                <div id="editor" contenteditable="true">
+                    <p><br></p>
+                </div>
+            </div>
+            <div class="scrollbar-v">
+                <button class="scroll-btn up">▲</button>
+                <div class="scroll-track-v">
+                    <div class="scroll-thumb-v"></div>
+                </div>
+                <button class="scroll-btn down">▼</button>
+                <button class="scroll-btn double-up">⇞</button>
+                <button class="scroll-btn circle">⚪</button>
+                <button class="scroll-btn double-down">⇟</button>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="view-buttons">
+                <button class="view-btn active" id="view-normal" title="Normal View"><span class="icon">≡</span></button>
+                <button class="view-btn" id="view-web" title="Online Layout View"><span class="icon">🌐</span></button>
+                <button class="view-btn" id="view-print" title="Page Layout View"><span class="icon">📄</span></button>
+                <button class="view-btn" id="view-outline" title="Outline View"><span class="icon">≣</span></button>
+            </div>
+            <div class="scrollbar-h">
+                <button class="scroll-btn left">◀</button>
+                <div class="scroll-track-h">
+                    <div class="scroll-thumb-h"></div>
+                </div>
+                <button class="scroll-btn right">▶</button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-panel w-page" id="status-page">Page 1</div>
+            <div class="status-panel w-sec" id="status-sec">Sec 1</div>
+            <div class="status-panel w-frac" id="status-pages">1/1</div>
+            <div class="status-panel w-at" id="status-at">At 2.5cm</div>
+            <div class="status-panel w-ln" id="status-ln">Ln 1</div>
+            <div class="status-panel w-col" id="status-col">Col 1</div>
+            <div class="status-panel right-panel" id="mode-rec">REC</div>
+            <div class="status-panel right-panel" id="mode-trk">TRK</div>
+            <div class="status-panel right-panel" id="mode-ext">EXT</div>
+            <div class="status-panel right-panel" id="mode-ovr">OVR</div>
+            <div class="status-panel right-panel" id="mode-wph">WPH</div>
+            <div class="status-panel empty-panel"></div>
+        </div>
+
+        <!-- Clippy 97 (classic flat style, draggable, from word branch) -->
+        <div id="clippy-97-window" class="clippy-97-window">
+            <div class="clippy-97-title-bar" id="clippy-97-title-bar">
+                <span class="clippy-97-title-text">Clippy (97)</span>
+                <button type="button" class="clippy-97-close" id="clippy-97-close" title="Close" aria-label="Close">×</button>
+            </div>
+            <div class="clippy-97-body" id="clippy-97-body">
+                <div class="clippy-97-character" id="clippy-97-character">
+                    <svg class="clippy-97-svg" viewBox="0 0 70 90" xmlns="http://www.w3.org/2000/svg">
+                        <g class="clippy-97-paperclip">
+                            <path class="clippy-97-path" d="M 35 10 A 10 13 0 0 1 35 34 A 10 13 0 0 1 35 10 L 35 38 A 12 19 0 0 1 35 74 A 12 19 0 0 1 35 38 L 35 34" fill="#b8bcc4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                        <ellipse class="clippy-97-eye" cx="27" cy="26" rx="6" ry="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/>
+                        <ellipse class="clippy-97-eye" cx="43" cy="26" rx="6" ry="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/>
+                        <circle class="clippy-97-pupil" cx="25" cy="24" r="2" fill="#000"/>
+                        <circle class="clippy-97-pupil" cx="41" cy="24" r="2" fill="#000"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="clippy-97-popup" id="clippy-97-popup" hidden>
+                <button type="button" class="clippy-97-popup-x" id="clippy-97-popup-x" aria-label="Close">×</button>
+                <div class="clippy-97-popup-title">What would you like to do?</div>
+                <input type="text" class="clippy-97-popup-input" id="clippy-97-popup-input" placeholder="" autocomplete="off">
+                <button type="button" class="clippy-97-popup-btn clippy-97-popup-search" id="clippy-97-popup-search"><span class="clippy-97-popup-dot clippy-97-popup-dot-on"></span><u>S</u>earch</button>
+                <div class="clippy-97-popup-row">
+                    <button type="button" class="clippy-97-popup-btn" id="clippy-97-popup-tips"><span class="clippy-97-popup-dot"></span><u>T</u>ips</button>
+                    <button type="button" class="clippy-97-popup-btn" id="clippy-97-popup-options"><span class="clippy-97-popup-dot clippy-97-popup-dot-on"></span><u>O</u>ptions</button>
+                    <button type="button" class="clippy-97-popup-btn" id="clippy-97-popup-close"><span class="clippy-97-popup-dot clippy-97-popup-dot-on"></span><u>C</u>lose</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskbar">
+        <button id="start-button" class="win-btn-start">
+            <img src="assets/icons/start-button.png" alt="Start" style="height: 18px; display: block;">
+        </button>
+        <div class="taskbar-divider"></div>
+        <div class="taskbar-tasks">
+            <div class="taskbar-task active" id="taskbar-word">
+                <span class="task-icon-w-cyan">W</span>
+                <span class="task-text">Microsoft Word - Doc...</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-napster">
+                <span class="task-icon-napster">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+                        <circle cx="50" cy="50" r="45" fill="#000080" />
+                        <path d="M 25 35 L 50 65 L 75 35 Z" fill="#00ff00" />
+                        <rect x="35" y="45" width="10" height="10" fill="#ffffff" />
+                        <rect x="55" y="45" width="10" height="10" fill="#ffffff" />
+                        <rect x="37" y="47" width="4" height="4" fill="#000000" />
+                        <rect x="57" y="47" width="4" height="4" fill="#000000" />
+                    </svg>
+                </span>
+                <span class="task-text">Napster</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-aim">
+                <span class="task-icon-aim">A</span>
+                <span class="task-text">AIM</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-navigator">
+                <img src="apps/navigator/netscape-logo.png" class="task-icon-nav" alt="Netscape">
+                <span class="task-text">Netscape</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-ie5">
+                <img src="assets/icons/msie1-2.png" alt="IE" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Microsoft Internet...</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-vb6">
+                <span class="task-icon-w-cyan">VB</span>
+                <span class="task-text">Microsoft Visual Basic</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-winamp">
+                <span class="task-text" style="font-weight:bold;color:#f90;background:#333;padding:0 2px;border-radius:2px;margin-right:4px;">W</span>
+                <span class="task-text">Winamp</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-pinball">
+                <span class="task-text" style="font-weight:bold;color:#fff;background:#000;padding:0 2px;border-radius:2px;margin-right:4px;border:1px solid #666;">P</span>
+                <span class="task-text">3D Pinball</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-notepad">
+                <img src="assets/icons/notepad-1.png" alt="Notepad" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Untitled - Notepad</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-minesweeper">
+                <img src="assets/icons/minesweeper-0.png" alt="Minesweeper" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Minesweeper</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-paint">
+                <img src="assets/icons/paint_file-1.png" alt="Paint" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">untitled - Paint</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-calculator">
+                <img src="assets/icons/calculator-1.png" alt="Calculator" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Calculator</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-defrag">
+                <img src="apps/defrag/defrag-icon.png" alt="Defrag" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Defragmenting Dri...</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-mycomputer">
+                <img src="assets/icons/computer_explorer.png" alt="My Computer" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">My Computer</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-controlpanel">
+                <img src="assets/icons/settings_gear-0.png" alt="Control Panel" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">Control Panel</span>
+            </div>
+            <div class="taskbar-task app-taskbar-hidden" id="taskbar-msdos">
+                <img src="assets/icons/console_prompt-0.png" alt="MS-DOS Prompt" style="width:16px; height:16px; margin-right:4px;">
+                <span class="task-text">MS-DOS Prompt</span>
+            </div>
+        </div>
+        <div class="system-tray">
+            <div id="tray-volume" class="tray-icon tray-volume-icon" title="Volume">🔊</div>
+            <div class="tray-divider"></div>
+            <span id="clock">12:00</span>
+        </div>
+    </div>
+
+    <div id="start-menu" class="hidden">
+        <div class="start-menu-sidebar">
+            <span class="start-menu-title"><b>Windows</b>98</span>
+        </div>
+        <div class="start-menu-items">
+
+            <!-- Windows Update -->
+            <div class="start-menu-item" id="start-windows-update">
+                <img src="assets/icons/windows_update_large-1.png" class="sm-icon" alt="">
+                <span class="sm-label">Windows Update</span>
+            </div>
+
+            <div class="start-menu-divider"></div>
+
+            <!-- Programs -->
+            <div class="start-menu-item has-submenu">
+                <img src="assets/icons/directory.png" class="sm-icon" alt="">
+                <span class="sm-label">Programs</span>
+                <span class="sm-arrow">▶</span>
+                <div class="submenu">
+
+                    <!-- Accessories -->
+                    <div class="start-menu-item has-submenu">
+                        <img src="assets/icons/directory.png" class="sm-icon" alt="">
+                        <span class="sm-label">Accessories</span>
+                        <span class="sm-arrow">▶</span>
+                        <div class="submenu">
+                            <div class="start-menu-item" id="start-menu-calculator">
+                                <img src="assets/icons/calculator-1.png" class="sm-icon" alt="">
+                                <span class="sm-label">Calculator</span>
+                            </div>
+                            <div class="start-menu-item" id="start-menu-notepad">
+                                <img src="assets/icons/notepad-1.png" class="sm-icon" alt="">
+                                <span class="sm-label">Notepad</span>
+                            </div>
+                            <div class="start-menu-item" id="start-menu-paint">
+                                <img src="assets/icons/paint_file-1.png" class="sm-icon" alt="">
+                                <span class="sm-label">Paint</span>
+                            </div>
+                            <div class="start-menu-item" id="start-menu-msdos">
+                                <img src="assets/icons/console_prompt-0.png" class="sm-icon" alt="">
+                                <span class="sm-label">MS-DOS Prompt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entertainment -->
+                    <div class="start-menu-item has-submenu">
+                        <img src="assets/icons/directory.png" class="sm-icon" alt="">
+                        <span class="sm-label">Entertainment</span>
+                        <span class="sm-arrow">▶</span>
+                        <div class="submenu">
+                            <div class="start-menu-item" id="start-winamp">
+                                <img src="assets/icons/winamp.png" class="sm-icon" alt="">
+                                <span class="sm-label">Winamp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Games -->
+                    <div class="start-menu-item has-submenu">
+                        <img src="assets/icons/directory.png" class="sm-icon" alt="">
+                        <span class="sm-label">Games</span>
+                        <span class="sm-arrow">▶</span>
+                        <div class="submenu">
+                            <div class="start-menu-item" id="start-minesweeper">
+                                <img src="assets/icons/minesweeper-0.png" class="sm-icon" alt="">
+                                <span class="sm-label">Minesweeper</span>
+                            </div>
+                            <div class="start-menu-item" id="start-pinball-game">
+                                <img src="assets/icons/executable-0.png" class="sm-icon" alt="">
+                                <span class="sm-label">3D Pinball Space Cadet</span>
+                            </div>
+                            <div class="start-menu-item" id="start-thps2">
+                                <img src="apps/thps2/thps2-icon.png" class="sm-icon" alt="">
+                                <span class="sm-label">Tony Hawk's Pro Skater 2</span>
+                            </div>
+                            <div class="start-menu-item" id="start-tim">
+                                <img src="apps/the_incredible_machine/tim-icon.png" class="sm-icon" alt="">
+                                <span class="sm-label">The Incredible Machine</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Internet -->
+                    <div class="start-menu-item has-submenu">
+                        <img src="assets/icons/ie.png" class="sm-icon" alt="">
+                        <span class="sm-label">Internet</span>
+                        <span class="sm-arrow">▶</span>
+                        <div class="submenu">
+                            <div class="start-menu-item" id="start-aim">
+                                <img src="assets/icons/aim.png" class="sm-icon" alt="">
+                                <span class="sm-label">AIM</span>
+                            </div>
+                            <div class="start-menu-item" id="start-menu-ie">
+                                <img src="assets/icons/ie.png"" class="sm-icon" alt="">
+                                <span class="sm-label">Internet Explorer 5</span>
+                            </div>
+                            <div class="start-menu-item" id="start-napster">
+                                <img src="assets/icons/executable-0.png" class="sm-icon" alt="">
+                                <span class="sm-label">Napster</span>
+                            </div>
+                            <div class="start-menu-item" id="start-navigator">
+                                <img src="apps/navigator/netscape-logo.png" class="sm-icon" alt="">
+                                <span class="sm-label">Netscape Navigator</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Tools -->
+                    <div class="start-menu-item has-submenu">
+                        <img src="assets/icons/system_tools-0.png" class="sm-icon" alt="">
+                        <span class="sm-label">System Tools</span>
+                        <span class="sm-arrow">▶</span>
+                        <div class="submenu">
+                            <div class="start-menu-item" id="start-menu-defrag">
+                                <img src="apps/defrag/defrag-icon.png" class="sm-icon" alt="">
+                                <span class="sm-label">Disk Defragmenter</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="start-menu-divider"></div>
+
+                    <div class="start-menu-item" id="start-menu-word">
+                        <img src="assets/icons/microsoft_word-2.png" class="sm-icon" alt="">
+                        <span class="sm-label">Microsoft Word</span>
+                    </div>
+                    <div class="start-menu-item" id="start-vb6">
+                        <img src="assets/icons/executable-0.png" class="sm-icon" alt="">
+                        <span class="sm-label">Microsoft Visual Basic 6</span>
+                    </div>
+                    <div class="start-menu-item" id="start-pinball">
+                        <img src="assets/icons/executable-0.png" class="sm-icon" alt="">
+                        <span class="sm-label">Word 97 Pinball</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="start-menu-item">
+                <img src="assets/icons/my_documents.png" class="sm-icon" alt="">
+                <span class="sm-label">Documents</span>
+                <span class="sm-arrow">▶</span>
+            </div>
+
+            <!-- Settings -->
+            <div class="start-menu-item has-submenu">
+                <img src="assets/icons/settings_gear-0.png" class="sm-icon" alt="">
+                <span class="sm-label">Settings</span>
+                <span class="sm-arrow">▶</span>
+                <div class="submenu">
+                    <div class="start-menu-item" id="start-controlpanel">
+                        <img src="assets/icons/settings_gear-0.png" class="sm-icon" alt="">
+                        <span class="sm-label">Control Panel</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Find -->
+            <div class="start-menu-item">
+                <img src="assets/icons/search-0.png" class="sm-icon" alt="">
+                <span class="sm-label">Find</span>
+                <span class="sm-arrow">▶</span>
+            </div>
+
+            <!-- Help -->
+            <div class="start-menu-item">
+                <img src="assets/icons/help.png" class="sm-icon" alt="Help">
+                <span class="sm-label">Help</span>
+            </div>
+
+            <!-- Run -->
+            <div class="start-menu-item" id="start-run">
+                <img src="assets/icons/run.png" class="sm-icon" alt="Run">
+                <span class="sm-label">Run...</span>
+            </div>
+
+            <div class="start-menu-divider"></div>
+
+            <!-- Shut Down -->
+            <div class="start-menu-item" id="start-shutdown">
+                <img src="assets/icons/shut_down.png" class="sm-icon" alt="Shut Down">
+                <span class="sm-label">Shut Down...</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Control Panel window -->
+    <div id="controlpanel-window" class="controlpanel-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/settings_gear.png" alt="Settings" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;image-rendering:pixelated;">
+                Control Panel
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min>_</button>
+                <button type="button" class="win-btn title-btn" data-win-max>❐</button>
+                <button type="button" class="win-btn title-btn" data-win-close>X</button>
+            </div>
+        </div>
+        <div class="cp-menu-bar">
+            <span class="cp-menu-item"><u>F</u>ile</span>
+            <span class="cp-menu-item"><u>E</u>dit</span>
+            <span class="cp-menu-item"><u>V</u>iew</span>
+            <span class="cp-menu-item"><u>G</u>o</span>
+            <span class="cp-menu-item"><u>F</u>avorites</span>
+            <span class="cp-menu-item"><u>H</u>elp</span>
+        </div>
+        <div class="cp-toolbar">
+            <button class="cp-toolbar-btn" disabled title="Back">◀</button>
+            <button class="cp-toolbar-btn" disabled title="Forward">▶</button>
+            <div class="cp-toolbar-sep"></div>
+            <button class="cp-toolbar-btn" disabled title="Up">↑</button>
+        </div>
+        <div class="cp-address-bar">
+            <span class="cp-address-label">Address</span>
+            <div class="cp-address-field">Control Panel</div>
+        </div>
+        <div class="cp-icons-area">
+            <div class="cp-applet-icon" id="cp-applet-display" title="Display">
+                <img src="assets/icons/display_properties-0.png" alt="Display" class="cp-applet-img">
+                <span class="cp-applet-label">Display</span>
+            </div>
+            <div class="cp-applet-icon" id="cp-applet-datetime" title="Date/Time">
+                <img src="assets/icons/time_and_date-0.png" alt="Date/Time" class="cp-applet-img">
+                <span class="cp-applet-label">Date/Time</span>
+            </div>
+            <div class="cp-applet-icon" id="cp-applet-sounds" title="Sounds">
+                <img src="assets/icons/sound-0.png" alt="Sounds" class="cp-applet-img">
+                <span class="cp-applet-label">Sounds</span>
+            </div>
+            <div class="cp-applet-icon" id="cp-applet-mouse" title="Mouse">
+                <img src="assets/icons/mouse-0.png" alt="Mouse" class="cp-applet-img">
+                <span class="cp-applet-label">Mouse</span>
+            </div>
+            <div class="cp-applet-icon" id="cp-applet-system" title="System">
+                <img src="assets/icons/properties_system-0.png" alt="System" class="cp-applet-img">
+                <span class="cp-applet-label">System</span>
+            </div>
+        </div>
+        <div class="cp-status-bar">
+            <div class="cp-status-text">5 object(s)</div>
+        </div>
+    </div>
+
+    <!-- Display Properties dialog -->
+    <div id="display-properties-dialog" hidden>
+        <div class="dp-titlebar">
+            <span class="dp-titlebar-text">
+                <img src="assets/icons/display_properties-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                Display Properties
+            </span>
+            <div class="dp-titlebar-btns">
+                <button class="dp-titlebtn" id="dp-help-btn" title="Help">?</button>
+                <button class="dp-titlebtn" id="dp-close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="dp-tabs">
+            <button class="dp-tab active">Background</button>
+            <button class="dp-tab disabled" disabled>Screen Saver</button>
+            <button class="dp-tab disabled" disabled>Appearance</button>
+            <button class="dp-tab disabled" disabled>Effects</button>
+            <button class="dp-tab disabled" disabled>Web</button>
+            <button class="dp-tab disabled" disabled>Settings</button>
+        </div>
+        <div class="dp-panel-border">
+            <div class="dp-monitor-wrap">
+                <div class="dp-monitor">
+                    <div class="dp-monitor-outer">
+                        <div class="dp-monitor-screen" id="dp-monitor-screen">
+                            <img id="dp-monitor-img" src="" alt="">
+                        </div>
+                    </div>
+                    <div class="dp-monitor-stand"></div>
+                    <div class="dp-monitor-base"></div>
+                </div>
+            </div>
+            <div class="dp-wallpaper-section">
+                <div class="dp-wallpaper-label">Wallpaper</div>
+                <div class="dp-wallpaper-sublabel">Select an HTML Document or a picture:</div>
+                <div class="dp-wallpaper-row">
+                    <ul class="dp-wallpaper-list" id="dp-wallpaper-list"></ul>
+                    <div class="dp-wallpaper-btns">
+                        <button class="dp-btn" disabled>Browse...</button>
+                        <button class="dp-btn" disabled>Pattern...</button>
+                        <div class="dp-display-label">Display:</div>
+                        <select class="dp-display-select" disabled><option>Center</option></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dp-footer">
+            <button class="dp-footer-btn default-btn" id="dp-ok-btn">OK</button>
+            <button class="dp-footer-btn" id="dp-cancel-btn">Cancel</button>
+            <button class="dp-footer-btn" id="dp-apply-btn" disabled>Apply</button>
+        </div>
+    </div>
+
+    <!-- MS-DOS Prompt Window -->
+    <div id="msdos-window" class="msdos-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/console_prompt-0.png" alt="MS-DOS Prompt" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">MS-DOS Prompt</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="msdos-console" id="msdos-console">
+            <div class="msdos-history" id="msdos-history">Microsoft(R) Windows 98<br>   (C)Copyright Microsoft Corp 1981-1999.<br><br></div>
+            <div class="msdos-input-line">
+                <span class="msdos-prompt">C:\WINDOWS&gt;</span>
+                <input type="text" class="msdos-input" spellcheck="false" autocomplete="off" id="msdos-input-field">
+            </div>
+        </div>
+    </div>
+
+    <!-- Date/Time Properties dialog -->
+    <div id="datetime-dialog" hidden>
+        <div class="dp-titlebar">
+            <span class="dp-titlebar-text">
+                <img src="assets/icons/time_and_date-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                Date/Time Properties
+            </span>
+            <div class="dp-titlebar-btns">
+                <button class="dp-titlebtn" id="dt-help-btn" title="Help">?</button>
+                <button class="dp-titlebtn" id="dt-close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="dp-tabs">
+            <button class="dp-tab active">Date &amp; Time</button>
+            <button class="dp-tab disabled" disabled>Time Zone</button>
+        </div>
+        <div class="dp-panel-border">
+            <div class="dt-panel">
+                <div class="dt-left">
+                    <div class="dt-section-label">Date</div>
+                    <div class="dt-month-row">
+                        <select id="dt-month-select" class="dt-select-month"></select>
+                        <input type="number" id="dt-year-input" class="dt-year-input" min="1900" max="2099">
+                    </div>
+                    <table class="dt-calendar" id="dt-calendar">
+                        <thead>
+                            <tr>
+                                <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dt-calendar-body"></tbody>
+                    </table>
+                </div>
+                <div class="dt-right">
+                    <div class="dt-section-label">Time</div>
+                    <canvas id="dt-clock-canvas" width="120" height="120" class="dt-clock-canvas"></canvas>
+                    <input type="text" id="dt-time-input" class="dt-time-input" placeholder="12:00:00">
+                </div>
+            </div>
+        </div>
+        <div class="dp-footer">
+            <button class="dp-footer-btn default-btn" id="dt-ok-btn">OK</button>
+            <button class="dp-footer-btn" id="dt-cancel-btn">Cancel</button>
+            <button class="dp-footer-btn" id="dt-apply-btn">Apply</button>
+        </div>
+    </div>
+
+    <!-- Sounds Properties dialog -->
+    <div id="sounds-dialog" hidden>
+        <div class="dp-titlebar">
+            <span class="dp-titlebar-text">
+                <img src="assets/icons/sound-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                Sounds Properties
+            </span>
+            <div class="dp-titlebar-btns">
+                <button class="dp-titlebtn" id="snd-help-btn" title="Help">?</button>
+                <button class="dp-titlebtn" id="snd-close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="dp-tabs">
+            <button class="dp-tab active">Sounds</button>
+        </div>
+        <div class="dp-panel-border">
+            <div class="snd-scheme-row">
+                <label class="snd-label">Sound Scheme:</label>
+                <select id="snd-scheme-select" class="snd-select">
+                    <option value="win98">Windows Default</option>
+                    <option value="none">No Sounds</option>
+                </select>
+                <button class="dp-btn snd-scheme-btn" disabled>Save As...</button>
+                <button class="dp-btn snd-scheme-btn" disabled>Delete</button>
+            </div>
+            <div class="snd-events-label">Events:</div>
+            <ul class="snd-events-list" id="snd-events-list"></ul>
+            <div class="snd-sound-row">
+                <label class="snd-label">Name:</label>
+                <select id="snd-sound-select" class="snd-select snd-sound-select">
+                    <option value="">(None)</option>
+                    <option value="chord">Chord</option>
+                    <option value="ding">Ding</option>
+                    <option value="tada">Tada</option>
+                    <option value="notify">Notify</option>
+                    <option value="exclamation">Exclamation</option>
+                </select>
+                <button class="dp-btn snd-preview-btn" id="snd-preview-btn" disabled>&#9654; Preview</button>
+                <button class="dp-btn" disabled>Browse...</button>
+            </div>
+        </div>
+        <div class="dp-footer">
+            <button class="dp-footer-btn default-btn" id="snd-ok-btn">OK</button>
+            <button class="dp-footer-btn" id="snd-cancel-btn">Cancel</button>
+            <button class="dp-footer-btn" id="snd-apply-btn">Apply</button>
+        </div>
+    </div>
+
+    <!-- Mouse Properties dialog -->
+    <div id="mouse-dialog" hidden>
+        <div class="dp-titlebar">
+            <span class="dp-titlebar-text">
+                <img src="assets/icons/mouse-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                Mouse Properties
+            </span>
+            <div class="dp-titlebar-btns">
+                <button class="dp-titlebtn" id="ms-help-btn" title="Help">?</button>
+                <button class="dp-titlebtn" id="ms-close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="dp-tabs">
+            <button class="dp-tab active ms-tab-btn" id="ms-tab-buttons-btn">Buttons</button>
+            <button class="dp-tab ms-tab-btn" id="ms-tab-motion-btn">Motion</button>
+        </div>
+        <div class="dp-panel-border" style="padding:0;">
+            <div id="ms-panel-buttons" class="ms-panel">
+                <div class="ms-section">
+                    <div class="ms-section-label">Button configuration</div>
+                    <div class="ms-hand-row">
+                        <div class="ms-hand-radios">
+                            <label class="ms-radio-label">
+                                <input type="radio" name="ms-hand" value="right" id="ms-hand-right" checked>
+                                Right-handed
+                            </label>
+                            <label class="ms-radio-label">
+                                <input type="radio" name="ms-hand" value="left" id="ms-hand-left">
+                                Left-handed
+                            </label>
+                        </div>
+                        <svg id="ms-mouse-svg" width="60" height="80" viewBox="0 0 60 80" class="ms-mouse-svg">
+                            <ellipse cx="30" cy="40" rx="22" ry="34" fill="#ccc" stroke="#888" stroke-width="1.5"/>
+                            <line x1="30" y1="6" x2="30" y2="42" stroke="#888" stroke-width="1"/>
+                            <ellipse id="ms-left-btn" cx="19" cy="24" rx="11" ry="15" fill="#1084d0" stroke="#888" stroke-width="1"/>
+                            <ellipse id="ms-right-btn" cx="41" cy="24" rx="11" ry="15" fill="#e8e8e8" stroke="#888" stroke-width="1"/>
+                            <ellipse cx="30" cy="34" rx="5" ry="4" fill="#aaa" stroke="#888" stroke-width="1"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ms-section">
+                    <div class="ms-section-label">Double-click speed</div>
+                    <div class="ms-slider-row">
+                        <span class="ms-slider-label">Slow</span>
+                        <input type="range" id="ms-dblclick-slider" min="1" max="10" value="5" class="ms-slider">
+                        <span class="ms-slider-label">Fast</span>
+                        <div id="ms-dblclick-test" class="ms-dblclick-test" title="Double-click to test">🐰</div>
+                    </div>
+                </div>
+            </div>
+            <div id="ms-panel-motion" class="ms-panel" style="display:none;">
+                <div class="ms-section">
+                    <div class="ms-section-label">Pointer speed</div>
+                    <div class="ms-slider-row">
+                        <span class="ms-slider-label">Slow</span>
+                        <input type="range" id="ms-speed-slider" min="1" max="10" value="5" class="ms-slider">
+                        <span class="ms-slider-label">Fast</span>
+                    </div>
+                </div>
+                <div class="ms-section">
+                    <div class="ms-section-label">Pointer trails</div>
+                    <label class="ms-radio-label">
+                        <input type="checkbox" id="ms-trails-check">
+                        Show pointer trails
+                    </label>
+                    <div class="ms-slider-row" style="margin-top:6px;">
+                        <span class="ms-slider-label">Short</span>
+                        <input type="range" id="ms-trails-slider" min="1" max="10" value="3" class="ms-slider" disabled>
+                        <span class="ms-slider-label">Long</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dp-footer">
+            <button class="dp-footer-btn default-btn" id="ms-ok-btn">OK</button>
+            <button class="dp-footer-btn" id="ms-cancel-btn">Cancel</button>
+            <button class="dp-footer-btn" id="ms-apply-btn">Apply</button>
+        </div>
+    </div>
+
+    <!-- System Properties dialog -->
+    <div id="system-dialog" hidden>
+        <div class="dp-titlebar">
+            <span class="dp-titlebar-text">
+                <img src="assets/icons/properties_system-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                System Properties
+            </span>
+            <div class="dp-titlebar-btns">
+                <button class="dp-titlebtn" id="sys-help-btn" title="Help">?</button>
+                <button class="dp-titlebtn" id="sys-close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="dp-tabs">
+            <button class="dp-tab active">General</button>
+            <button class="dp-tab disabled" disabled>Device Manager</button>
+            <button class="dp-tab disabled" disabled>Hardware Profiles</button>
+            <button class="dp-tab disabled" disabled>Performance</button>
+        </div>
+        <div class="dp-panel-border">
+            <div class="sys-general-panel">
+                <div class="sys-top-row">
+                    <svg class="sys-win-logo" width="48" height="48" viewBox="0 0 48 48">
+                        <rect x="2" y="2" width="20" height="20" fill="#f35325"/>
+                        <rect x="26" y="2" width="20" height="20" fill="#80bb01"/>
+                        <rect x="2" y="26" width="20" height="20" fill="#05a6f0"/>
+                        <rect x="26" y="26" width="20" height="20" fill="#ffba08"/>
+                    </svg>
+                    <div class="sys-ms-text">
+                        <div class="sys-ms-line1">Microsoft Windows 98</div>
+                        <div class="sys-ms-line2">4.10.2222 A</div>
+                        <div class="sys-ms-line3">Second Edition</div>
+                    </div>
+                </div>
+                <div class="sys-divider"></div>
+                <div class="sys-info-section">
+                    <div class="sys-info-label">Registered to:</div>
+                    <div class="sys-info-value">Windows User</div>
+                    <div class="sys-info-value sys-serial">55274-OEM-0000007-00000</div>
+                </div>
+                <div class="sys-divider"></div>
+                <div class="sys-info-section">
+                    <div class="sys-info-label">Computer:</div>
+                    <div class="sys-info-value">GenuineIntel</div>
+                    <div class="sys-info-value">Pentium(r) II Processor</div>
+                    <div class="sys-info-value">400 MHz</div>
+                    <div class="sys-info-value">128.0 MB RAM</div>
+                </div>
+            </div>
+        </div>
+        <div class="dp-footer">
+            <button class="dp-footer-btn default-btn" id="sys-ok-btn">OK</button>
+            <button class="dp-footer-btn" id="sys-cancel-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Calculator Window -->
+    <div id="calculator-window" class="calculator-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/calculator-1.png" alt="Calculator" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">Calculator</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="calculator-menu-bar">
+            <div class="calculator-menu-item"><u>E</u>dit</div>
+            <div class="calculator-menu-item"><u>V</u>iew</div>
+            <div class="calculator-menu-item"><u>H</u>elp</div>
+        </div>
+        <div class="calculator-body">
+            <div class="calculator-display-container">
+                <input type="text" id="calc-display" class="calculator-display" value="0" readonly>
+            </div>
+            <div class="calculator-keypad">
+                <div class="calculator-row-top">
+                    <div class="calculator-spacer"></div>
+                    <button class="calculator-btn calc-btn-red calc-btn-top" data-action="backspace">Backspace</button>
+                    <button class="calculator-btn calc-btn-red calc-btn-top" data-action="clear-entry">CE</button>
+                    <button class="calculator-btn calc-btn-red calc-btn-top" data-action="clear">C</button>
+                </div>
+                <div class="calculator-main-keys">
+                    <div class="calculator-memory-keys">
+                        <div class="calc-memory-indicator" id="calc-memory-indicator"></div>
+                        <button class="calculator-btn calc-btn-red calc-btn-memory" data-action="mc">MC</button>
+                        <button class="calculator-btn calc-btn-red calc-btn-memory" data-action="mr">MR</button>
+                        <button class="calculator-btn calc-btn-red calc-btn-memory" data-action="ms">MS</button>
+                        <button class="calculator-btn calc-btn-red calc-btn-memory" data-action="m-plus">M+</button>
+                    </div>
+                    <div class="calculator-num-keys">
+                        <div class="calculator-row">
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="7">7</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="8">8</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="9">9</button>
+                            <button class="calculator-btn calc-btn-red" data-action="divide">/</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="sqrt">sqrt</button>
+                        </div>
+                        <div class="calculator-row">
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="4">4</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="5">5</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="6">6</button>
+                            <button class="calculator-btn calc-btn-red" data-action="multiply">*</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="percent">%</button>
+                        </div>
+                        <div class="calculator-row">
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="1">1</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="2">2</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="3">3</button>
+                            <button class="calculator-btn calc-btn-red" data-action="subtract">-</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="reciprocal">1/x</button>
+                        </div>
+                        <div class="calculator-row">
+                            <button class="calculator-btn calc-btn-blue" data-action="num" data-val="0">0</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="sign">+/-</button>
+                            <button class="calculator-btn calc-btn-blue" data-action="decimal">.</button>
+                            <button class="calculator-btn calc-btn-red" data-action="add">+</button>
+                            <button class="calculator-btn calc-btn-red" data-action="equals">=</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Pinball window -->
+    <div id="pinball-app-window" class="pinball-app-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">3D Pinball for Windows - Space Cadet</div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min>_</button>
+                <button type="button" class="win-btn title-btn" data-win-close>X</button>
+            </div>
+        </div>
+        <div class="pinball-app-body" tabindex="0">
+            <div class="pinball-score-board">
+                <div class="pinball-score-title">SCORE</div>
+                <div id="pinball-score-display" class="pinball-score-display">0</div>
+            </div>
+            <canvas id="pinball-app-canvas" width="480" height="400"></canvas>
+            <div class="pinball-instructions">
+                Controls: Z = Left Flipper, M = Right Flipper
+            </div>
+        </div>
+    </div>
+
+    <!-- Winamp window -->
+    <div id="winamp-window" class="winamp-window app-window app-window-hidden">
+        <div class="title-bar winamp-title-bar">
+            <div class="title-bar-text">WINAMP</div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min>_</button>
+                <button type="button" class="win-btn title-btn" data-win-close>X</button>
+            </div>
+        </div>
+        <div class="winamp-body">
+            <div class="winamp-display">
+                <div class="winamp-time" id="winamp-time">00:00</div>
+                <div class="winamp-marquee" id="winamp-marquee">WINAMP: IT REALLY WHIPS THE LLAMA'S ASS</div>
+            </div>
+            <canvas id="winamp-viz" class="winamp-viz" width="255" height="36"></canvas>
+            <div class="winamp-controls">
+                <button id="winamp-prev" class="winamp-btn" title="Previous">⏮</button>
+                <button id="winamp-play" class="winamp-btn" title="Play">▶</button>
+                <button id="winamp-pause" class="winamp-btn" title="Pause">⏸</button>
+                <button id="winamp-stop" class="winamp-btn" title="Stop">⏹</button>
+                <button id="winamp-next" class="winamp-btn" title="Next">⏭</button>
+            </div>
+            <audio id="winamp-audio" src="apps/winamp/llama.mp3" preload="auto"></audio>
+        </div>
+    </div>
+
+    <!-- Word 97 Pinball easter egg -->
+    <div id="pinball-overlay" class="pinball-overlay" hidden tabindex="-1">
+        <div class="pinball-layout">
+            <div class="pinball-game-area">
+                <canvas id="pinball-canvas" width="480" height="400"></canvas>
+            </div>
+            <div class="pinball-credits-window">
+                <div class="pinball-credits-title">Word 97 Pinball</div>
+                <div class="pinball-credits-list-wrap">
+                    <div class="pinball-credits-list" id="pinball-credits-list">
+                        <div>SA DEV. TEAM</div>
+                        <div>ANTOINE LEBLOND</div>
+                        <div>CLAY BALIGA</div>
+                        <div>JOHN PILAKIDIS</div>
+                        <div>RICK SCHAUP</div>
+                        <div>CHRIS SILVERTON</div>
+                        <div>B. THARP</div>
+                        <div>IGOR PAPRA</div>
+                        <div>JOE YAP</div>
+                        <div>REALLY COOL DEV. TEAM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Napster v2.0 BETA -->
+    <div id="napster-window" class="napster-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <svg width="14" height="14" viewBox="0 0 100 100" style="margin-right:4px;flex-shrink:0" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#000080" />
+                    <path d="M 25 35 L 50 65 L 75 35 Z" fill="#00ff00" />
+                    <rect x="35" y="45" width="10" height="10" fill="#ffffff" />
+                    <rect x="55" y="45" width="10" height="10" fill="#ffffff" />
+                    <rect x="37" y="47" width="4" height="4" fill="#000000" />
+                    <rect x="57" y="47" width="4" height="4" fill="#000000" />
+                </svg>
+                <span class="title-text">Napster v2.0 BETA 5</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="napster-menu-bar">
+            <span class="napster-menu-item"><u>F</u>ile</span>
+            <span class="napster-menu-item"><u>A</u>ctions</span>
+            <span class="napster-menu-item"><u>H</u>elp</span>
+        </div>
+        <div class="napster-tab-bar">
+            <div class="napster-tab" data-tab="home"><span class="napster-tab-icon">🏠</span> Home</div>
+            <div class="napster-tab" data-tab="chat"><span class="napster-tab-icon">💬</span> Chat</div>
+            <div class="napster-tab" data-tab="library"><span class="napster-tab-icon">📚</span> Library</div>
+            <div class="napster-tab active" data-tab="search"><span class="napster-tab-icon">🔍</span> Search</div>
+            <div class="napster-tab" data-tab="hotlist"><span class="napster-tab-icon">🔥</span> Hot List</div>
+            <div class="napster-tab" data-tab="transfer"><span class="napster-tab-icon">⬇️</span> Transfer</div>
+            <div class="napster-tab" data-tab="help"><span class="napster-tab-icon">❓</span> Help</div>
+        </div>
+        <!-- HOME -->
+        <div class="napster-panel" data-panel="home">
+            <div class="napster-home-content">
+                <div class="napster-home-logo">
+                    <svg viewBox="0 0 240 70" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="240" height="70" fill="#000"/>
+                        <g transform="translate(10, 10) scale(0.5)">
+                            <circle cx="50" cy="50" r="45" fill="#000080" />
+                            <path d="M 25 35 L 50 65 L 75 35 Z" fill="#00ff00" />
+                            <rect x="35" y="45" width="10" height="10" fill="#ffffff" />
+                            <rect x="55" y="45" width="10" height="10" fill="#ffffff" />
+                            <rect x="37" y="47" width="4" height="4" fill="#000000" />
+                            <rect x="57" y="47" width="4" height="4" fill="#000000" />
+                        </g>
+                        <text x="70" y="52" font-size="16" fill="#00ff00" font-family="Arial Black,Arial" font-weight="900" letter-spacing="-1">napster</text>
+                    </svg>
+                </div>
+                <div class="napster-home-stats">
+                    <b>Welcome to Napster!</b><br>
+                    You are sharing <b>0 songs</b> with the Napster community.<br>
+                    Currently <b>709,082 songs</b> [2,845 gigabytes] available in <b>4,708 libraries</b>.<br><br>
+                    <b>Hot Searches:</b> blink 182 &nbsp;•&nbsp; eminem &nbsp;•&nbsp; nsync &nbsp;•&nbsp; britney spears &nbsp;•&nbsp; linkin park
+                </div>
+                <p style="font-size:11px;color:#555;">Click the <b>Search</b> tab to find and download music.</p>
+            </div>
+        </div>
+        <!-- CHAT -->
+        <div class="napster-panel" data-panel="chat">
+            <div style="padding:16px;font-size:11px;color:#555;"><b>Chat Rooms</b><br><br>Chat is not available in this version.</div>
+        </div>
+        <!-- LIBRARY -->
+        <div class="napster-panel" data-panel="library">
+            <div class="napster-library-toolbar">
+                <button class="napster-btn napster-btn-primary" id="nap-lib-play">▶ Play on Spotify</button>
+                <button class="napster-btn" id="nap-lib-clear">Remove Selected</button>
+                <button class="napster-btn" id="nap-lib-clear-all">Clear All</button>
+                <span id="nap-lib-count" style="margin-left:8px;font-size:11px;color:#555;"></span>
+            </div>
+            <div class="napster-library-table-wrap">
+                <div class="napster-library-header">
+                    <div class="napster-lib-th lcol-filename">Filename</div>
+                    <div class="napster-lib-th lcol-filesize">Size</div>
+                    <div class="napster-lib-th lcol-bitrate">Bitrate</div>
+                    <div class="napster-lib-th lcol-freq">Freq</div>
+                    <div class="napster-lib-th lcol-length">Length</div>
+                    <div class="napster-lib-th lcol-path">Path</div>
+                </div>
+                <div id="nap-library-body">
+                    <div class="napster-lib-empty">No songs yet. Download songs using the Search tab.</div>
+                </div>
+            </div>
+        </div>
+        <!-- SEARCH -->
+        <div class="napster-panel active" data-panel="search">
+            <div class="napster-search-top">
+                <div class="napster-group-box">
+                    <span class="napster-group-label">Search Fields</span>
+                    <div class="napster-search-row">
+                        <span class="napster-search-label">Artist:</span>
+                        <input type="text" id="nap-artist" class="napster-search-input" autocomplete="off">
+                    </div>
+                    <div class="napster-search-row">
+                        <span class="napster-search-label">Song Title:</span>
+                        <input type="text" id="nap-title" class="napster-search-input" autocomplete="off">
+                    </div>
+                    <div class="napster-search-row">
+                        <span class="napster-search-label">Max Results:</span>
+                        <select class="napster-search-select" style="width:60px"><option>100</option><option>50</option><option>25</option></select>
+                    </div>
+                    <div class="napster-search-btns" style="margin-top:4px;">
+                        <button class="napster-btn" id="nap-clear">Clear Fields</button>
+                        <button class="napster-btn napster-btn-primary" id="nap-find">Find It!</button>
+                    </div>
+                </div>
+                <div class="napster-group-box">
+                    <span class="napster-group-label">Advanced Fields (OPTIONAL)</span>
+                    <div class="napster-adv-row">
+                        <span class="napster-adv-label">Bitrate must be:</span>
+                        <select class="napster-search-select" style="width:68px"><option>AT LEAST</option><option>EQUAL TO</option><option>AT MOST</option></select>
+                        <select class="napster-search-select" style="width:62px"><option>128 KB/S</option><option>96 KB/S</option><option>192 KB/S</option></select>
+                    </div>
+                    <div class="napster-adv-row">
+                        <span class="napster-adv-label">Frequency must be:</span>
+                        <select class="napster-search-select" style="width:68px"><option>EQUAL TO</option><option>AT LEAST</option></select>
+                        <select class="napster-search-select" style="width:62px"><option>44100 HZ</option><option>22050 HZ</option></select>
+                    </div>
+                    <div class="napster-adv-row">
+                        <span class="napster-adv-label">Ping Time must be:</span>
+                        <select class="napster-search-select" style="width:68px"><option></option><option>LESS THAN</option></select>
+                        <select class="napster-search-select" style="width:62px"><option></option><option>100</option><option>500</option></select>
+                    </div>
+                    <div class="napster-adv-row">
+                        <span class="napster-adv-label">Line Speed must be:</span>
+                        <select class="napster-search-select" style="width:68px"><option></option><option>AT LEAST</option></select>
+                        <select class="napster-search-select" style="width:62px"><option></option><option>Cable</option><option>DSL</option><option>T1</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="napster-results-wrap">
+                <div class="napster-table-container">
+                    <table class="napster-table">
+                        <thead><tr>
+                            <th class="col-filename">Filename</th>
+                            <th class="col-filesize">Filesize</th>
+                            <th class="col-bitrate">Bitrate</th>
+                            <th class="col-freq">Freq</th>
+                            <th class="col-length">Length</th>
+                            <th class="col-user">User</th>
+                            <th class="col-linespeed">Line Speed</th>
+                            <th class="col-ping">Ping</th>
+                        </tr></thead>
+                        <tbody id="nap-results-body"></tbody>
+                    </table>
+                </div>
+                <div class="napster-results-count" id="nap-results-count"></div>
+            </div>
+            <div class="napster-results-actions">
+                <button class="napster-btn" id="nap-get-song">Get Selected Song(s)</button>
+                <button class="napster-btn" id="nap-hotlist">Add Selected Song to Hot List</button>
+            </div>
+        </div>
+        <!-- HOT LIST -->
+        <div class="napster-panel" data-panel="hotlist">
+            <div style="padding:16px;font-size:11px;color:#555;"><b>Hot List</b><br><br>Your hot list is empty.</div>
+        </div>
+        <!-- TRANSFER -->
+        <div class="napster-panel" data-panel="transfer">
+            <div class="napster-transfer-wrap">
+                <div class="napster-transfer-section">
+                    <div class="napster-transfer-header-row">
+                        <div class="napster-th tcol-icon"></div>
+                        <div class="napster-th tcol-filename">Filename</div>
+                        <div class="napster-th tcol-filesize">File Size</div>
+                        <div class="napster-th tcol-user">User</div>
+                        <div class="napster-th tcol-status">Status</div>
+                        <div class="napster-th tcol-speed">Speed</div>
+                        <div class="napster-th tcol-progress">Progress</div>
+                        <div class="napster-th tcol-rate">Rate</div>
+                        <div class="napster-th tcol-timeleft">Time Left</div>
+                    </div>
+                    <div class="napster-transfer-body" id="nap-transfer-body"></div>
+                </div>
+            </div>
+            <div class="napster-transfer-stats">
+                <span id="nap-dl-count">Concurrent Downloads: 0</span>
+                <span>Concurrent Uploads: 0</span>
+            </div>
+            <div class="napster-transfer-actions">
+                <button class="napster-btn" id="nap-clear-finished">Clear Finished</button>
+                <button class="napster-btn" id="nap-cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- HELP -->
+        <div class="napster-panel" data-panel="help">
+            <div style="padding:16px;font-size:11px;">
+                <b>Napster v2.0 BETA Help</b><br><br>
+                <b>Search:</b> Enter an artist or song title and click Find It!<br>
+                <b>Download:</b> Select a result and click "Get Selected Song(s)" or double-click<br>
+                <b>Transfer:</b> Monitor download progress in the Transfer tab
+            </div>
+        </div>
+        <!-- Status bar -->
+        <div class="napster-status-bar">
+            <div class="napster-status-left" id="nap-status-left">Online [F4$tRunn3r200] Sharing 0 Songs.</div>
+            <div class="napster-status-right" id="nap-status-right"></div>
+        </div>
+    </div>
+
+    <!-- AIM – AOL Instant Messenger -->
+    <div id="aim-window" class="aim-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <!-- Running man icon -->
+                <svg width="14" height="14" viewBox="0 0 14 14" style="margin-right:4px;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="14" height="14" fill="#00006b"/>
+                    <circle cx="9" cy="3" r="2" fill="#FFB900"/>
+                    <line x1="9" y1="5" x2="7" y2="9" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                    <line x1="8" y1="7" x2="5.5" y2="6" stroke="#FFB900" stroke-width="1" stroke-linecap="round"/>
+                    <line x1="8" y1="7" x2="10.5" y2="8" stroke="#FFB900" stroke-width="1" stroke-linecap="round"/>
+                    <line x1="7" y1="9" x2="5" y2="12" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                    <line x1="7" y1="9" x2="9.5" y2="11.5" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+                <span class="title-text">F4$tRunn3r200</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min title="Minimize"><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max title="Maximize"><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close title="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+
+        <!-- Menu bar -->
+        <div class="aim-menu-bar">
+            <span class="aim-menu-item" data-menu="aim-menu-myaim"><u>M</u>y AIM</span>
+            <span class="aim-menu-item" data-menu="aim-menu-people"><u>P</u>eople</span>
+            <span class="aim-menu-item" data-menu="aim-menu-help"><u>H</u>elp</span>
+        </div>
+
+        <!-- Dropdowns -->
+        <div id="aim-menu-myaim" class="aim-menu-dropdown">
+            <div class="aim-menu-dd-item" data-action="aim-edit-profile"><u>E</u>dit Profile...</div>
+            <div class="aim-menu-dd-divider"></div>
+            <div class="aim-menu-dd-item" data-action="aim-set-away">Set <u>A</u>way Message...</div>
+            <div class="aim-menu-dd-item" data-action="aim-cancel-away">Cancel Away Message</div>
+            <div class="aim-menu-dd-divider"></div>
+            <div class="aim-menu-dd-item disabled">Preferences...</div>
+            <div class="aim-menu-dd-divider"></div>
+            <div class="aim-menu-dd-item" data-action="aim-sign-off">Sign <u>O</u>ff</div>
+        </div>
+        <div id="aim-menu-people" class="aim-menu-dropdown">
+            <div class="aim-menu-dd-item" data-action="aim-send-im">Send Instant <u>M</u>essage...</div>
+            <div class="aim-menu-dd-item" data-action="aim-add-buddy"><u>A</u>dd a Buddy...</div>
+            <div class="aim-menu-dd-divider"></div>
+            <div class="aim-menu-dd-item disabled">Find a Buddy...</div>
+        </div>
+        <div id="aim-menu-help" class="aim-menu-dropdown">
+            <div class="aim-menu-dd-item disabled">AIM Help</div>
+            <div class="aim-menu-dd-divider"></div>
+            <div class="aim-menu-dd-item disabled">About AIM</div>
+        </div>
+
+        <!-- AOL Banner -->
+        <div class="aim-banner">
+            <svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                <!-- Background -->
+                <rect width="220" height="60" fill="#00006b"/>
+                <!-- Blue triangle spike -->
+                <polygon points="130,0 220,0 220,60 100,60" fill="#003399"/>
+                <!-- Lighter blue highlight triangle -->
+                <polygon points="155,0 185,0 220,35 220,0" fill="#0055cc" opacity="0.5"/>
+                <!-- Running man -->
+                <circle cx="185" cy="18" r="8" fill="#FFB900"/>
+                <line x1="185" y1="26" x2="181" y2="42" stroke="#FFB900" stroke-width="3" stroke-linecap="round"/>
+                <line x1="183" y1="32" x2="175" y2="29" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="183" y1="32" x2="191" y2="35" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="181" y1="42" x2="175" y2="55" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="181" y1="42" x2="190" y2="51" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- AOL text -->
+                <text x="8" y="32" font-size="26" fill="#FFD700" font-family="Arial Black, Arial, sans-serif" font-weight="900">AOL</text>
+                <!-- Instant Messenger -->
+                <text x="8" y="46" font-size="10" fill="#ffffff" font-family="Arial, sans-serif" font-style="italic">Instant</text>
+                <text x="8" y="57" font-size="10" fill="#ffffff" font-family="Arial, sans-serif" font-style="italic">Messenger™</text>
+            </svg>
+        </div>
+
+        <!-- Online status strip -->
+        <div class="aim-status-strip">
+            <span><span class="aim-status-strip-dot"></span><span class="aim-status-strip-name">F4$tRunn3r200</span></span>
+            <span style="font-size:10px; color:#008800;">Online</span>
+        </div>
+
+        <!-- Buddy list -->
+        <div class="aim-buddy-list">
+            <!-- Buddies group -->
+            <div class="aim-group">
+                <div class="aim-group-header">
+                    <span class="aim-group-arrow">▼</span>Buddies (1/1)
+                </div>
+                <div class="aim-group-body">
+                    <div class="aim-buddy-item away" data-buddy="zkarpinski">
+                        <!-- Away running man icon -->
+                        <span class="aim-buddy-icon">
+                            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="8" cy="2.5" r="2" fill="#FFB900"/>
+                                <line x1="8" y1="4.5" x2="6.5" y2="8" stroke="#FFB900" stroke-width="1.2"/>
+                                <line x1="7.5" y1="6" x2="5" y2="5" stroke="#FFB900" stroke-width="1"/>
+                                <line x1="7.5" y1="6" x2="10" y2="7" stroke="#FFB900" stroke-width="1"/>
+                                <line x1="6.5" y1="8" x2="4.5" y2="11" stroke="#FFB900" stroke-width="1.2"/>
+                                <line x1="6.5" y1="8" x2="9" y2="10.5" stroke="#FFB900" stroke-width="1.2"/>
+                            </svg>
+                        </span>
+                        zkarpinski
+                    </div>
+                </div>
+            </div>
+            <!-- Offline group (collapsed by default) -->
+            <div class="aim-group collapsed">
+                <div class="aim-group-header">
+                    <span class="aim-group-arrow">▼</span>Offline (4)
+                </div>
+                <div class="aim-group-body">
+                    <div class="aim-buddy-item offline" data-buddy="sk8erBoi99">
+                        <span class="aim-buddy-icon">
+                            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="6" cy="3" r="2" fill="#888"/>
+                                <line x1="6" y1="5" x2="6" y2="9" stroke="#888" stroke-width="1.5"/>
+                                <line x1="6" y1="7" x2="3.5" y2="6" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="7" x2="8.5" y2="6" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="9" x2="4" y2="12" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="9" x2="8" y2="12" stroke="#888" stroke-width="1.2"/>
+                            </svg>
+                        </span>
+                        sk8erBoi99
+                    </div>
+                    <div class="aim-buddy-item offline" data-buddy="xXDarkAngelXx">
+                        <span class="aim-buddy-icon">
+                            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="6" cy="3" r="2" fill="#888"/><line x1="6" y1="5" x2="6" y2="9" stroke="#888" stroke-width="1.5"/>
+                                <line x1="6" y1="7" x2="3.5" y2="6" stroke="#888" stroke-width="1.2"/><line x1="6" y1="7" x2="8.5" y2="6" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="9" x2="4" y2="12" stroke="#888" stroke-width="1.2"/><line x1="6" y1="9" x2="8" y2="12" stroke="#888" stroke-width="1.2"/>
+                            </svg>
+                        </span>
+                        xXDarkAngelXx
+                    </div>
+                    <div class="aim-buddy-item offline" data-buddy="NSync4ever_gurl">
+                        <span class="aim-buddy-icon">
+                            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="6" cy="3" r="2" fill="#888"/><line x1="6" y1="5" x2="6" y2="9" stroke="#888" stroke-width="1.5"/>
+                                <line x1="6" y1="7" x2="3.5" y2="6" stroke="#888" stroke-width="1.2"/><line x1="6" y1="7" x2="8.5" y2="6" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="9" x2="4" y2="12" stroke="#888" stroke-width="1.2"/><line x1="6" y1="9" x2="8" y2="12" stroke="#888" stroke-width="1.2"/>
+                            </svg>
+                        </span>
+                        NSync4ever_gurl
+                    </div>
+                    <div class="aim-buddy-item offline" data-buddy="TRL_addict_2003">
+                        <span class="aim-buddy-icon">
+                            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="6" cy="3" r="2" fill="#888"/><line x1="6" y1="5" x2="6" y2="9" stroke="#888" stroke-width="1.5"/>
+                                <line x1="6" y1="7" x2="3.5" y2="6" stroke="#888" stroke-width="1.2"/><line x1="6" y1="7" x2="8.5" y2="6" stroke="#888" stroke-width="1.2"/>
+                                <line x1="6" y1="9" x2="4" y2="12" stroke="#888" stroke-width="1.2"/><line x1="6" y1="9" x2="8" y2="12" stroke="#888" stroke-width="1.2"/>
+                            </svg>
+                        </span>
+                        TRL_addict_2003
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom icon bar -->
+        <div class="aim-bottom-bar">
+            <button class="aim-bottom-btn" title="Setup">
+                <span class="aim-bottom-icon">⚙️</span>
+                <span>Setup</span>
+            </button>
+            <button class="aim-bottom-btn" id="aim-im-btn" title="Send Instant Message">
+                <span class="aim-bottom-icon">💬</span>
+                <span>IM</span>
+            </button>
+            <button class="aim-bottom-btn" title="Chat Rooms">
+                <span class="aim-bottom-icon">👥</span>
+                <span>Chat</span>
+            </button>
+            <button class="aim-bottom-btn" id="aim-away-btn" title="Set Away">
+                <span class="aim-bottom-icon">🏃</span>
+                <span>Away</span>
+            </button>
+            <button class="aim-bottom-btn" id="aim-signoff-btn" title="Sign Off">
+                <span class="aim-bottom-icon">🚪</span>
+                <span>Sign Off</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AIM Chat Window (internal, not shell-registered) -->
+    <div id="aim-chat-window" class="aim-chat-window" style="display:none;">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <svg width="14" height="14" viewBox="0 0 14 14" style="margin-right:4px;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="14" height="14" fill="#00006b"/>
+                    <circle cx="9" cy="3" r="2" fill="#FFB900"/>
+                    <line x1="9" y1="5" x2="7" y2="9" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                    <line x1="8" y1="7" x2="5.5" y2="6" stroke="#FFB900" stroke-width="1" stroke-linecap="round"/>
+                    <line x1="8" y1="7" x2="10.5" y2="8" stroke="#FFB900" stroke-width="1" stroke-linecap="round"/>
+                    <line x1="7" y1="9" x2="5" y2="12" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                    <line x1="7" y1="9" x2="9.5" y2="11.5" stroke="#FFB900" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+                <span class="title-text">zkarpinski - Instant Message</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min title="Minimize"><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max title="Maximize"><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close title="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+
+        <!-- Chat menu bar -->
+        <div class="aim-chat-menu-bar">
+            <span class="aim-chat-menu-item"><u>F</u>ile</span>
+            <span class="aim-chat-menu-item"><u>E</u>dit</span>
+            <span class="aim-chat-menu-item"><u>I</u>nsert</span>
+            <span class="aim-chat-warning-label">zkarpinski's Warning Level: 0%</span>
+        </div>
+
+        <!-- Chat log -->
+        <div class="aim-chat-log" id="aim-chat-log"></div>
+
+        <!-- Typing indicator -->
+        <div class="aim-typing-indicator" id="aim-typing-indicator"></div>
+
+        <!-- Formatting toolbar -->
+        <div class="aim-format-bar">
+            <button class="aim-fmt-btn" id="aim-fmt-font-up" title="Increase font size"><b>A</b></button>
+            <button class="aim-fmt-btn" id="aim-fmt-font-dn" title="Decrease font size" style="font-size:9px;"><b>A</b></button>
+            <div class="aim-fmt-sep"></div>
+            <button class="aim-fmt-btn" title="Font color" style="color:#cc0000;"><b>A</b></button>
+            <button class="aim-fmt-btn" title="Background color">A</button>
+            <button class="aim-fmt-btn" id="aim-fmt-bold" title="Bold"><b>B</b></button>
+            <button class="aim-fmt-btn" id="aim-fmt-italic" title="Italic"><i>I</i></button>
+            <button class="aim-fmt-btn" id="aim-fmt-underline" title="Underline"><u>U</u></button>
+            <div class="aim-fmt-sep"></div>
+            <button class="aim-fmt-btn aim-fmt-link" title="Insert Link">link</button>
+            <button class="aim-fmt-btn" title="Insert Image">🖼️</button>
+            <button class="aim-fmt-btn" title="Insert Smiley">🙂</button>
+            <button class="aim-fmt-btn" title="Insert Smiley 2">😄</button>
+        </div>
+
+        <!-- Input area -->
+        <textarea class="aim-chat-input" id="aim-chat-input" placeholder="Type a message and press Enter to send..."></textarea>
+
+        <!-- Action buttons -->
+        <div class="aim-chat-actions">
+            <button class="aim-action-btn" id="aim-action-warn" title="Warn">
+                <span class="aim-action-icon">⚡</span>
+                <span><u>W</u>arn</span>
+            </button>
+            <button class="aim-action-btn" id="aim-action-block" title="Block">
+                <span class="aim-action-icon">🚫</span>
+                <span><u>B</u>lock</span>
+            </button>
+            <button class="aim-action-btn" id="aim-action-addbuddy" title="Add Buddy">
+                <span class="aim-action-icon">➕</span>
+                <span>Add Buddy</span>
+            </button>
+            <button class="aim-action-btn" title="Talk">
+                <span class="aim-action-icon">📞</span>
+                <span><u>T</u>alk</span>
+            </button>
+            <button class="aim-action-btn" id="aim-action-getinfo" title="Get Info">
+                <span class="aim-action-icon">🪪</span>
+                <span>Get Info</span>
+            </button>
+            <div class="aim-action-sep"></div>
+            <div class="aim-send-wrap">
+                <button class="aim-send-btn" id="aim-send-btn">
+                    <span class="aim-send-icon">📨</span>
+                    <span>Send</span>
+                </button>
+                <div class="aim-warn-meter">
+                    <div class="aim-warn-meter-red"></div>
+                    <div class="aim-warn-meter-green"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AIM Set Away Message dialog -->
+    <div id="aim-away-dialog" class="aim-away-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text"><span class="title-text">Set Away Message</span></div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" title="Close" onclick="document.getElementById('aim-away-dialog').classList.remove('open')"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="aim-away-dialog-body">
+            <label for="aim-away-textarea">Away message:</label>
+            <textarea id="aim-away-textarea" class="aim-away-textarea">brb!! back in a few :-)</textarea>
+        </div>
+        <div class="aim-away-dialog-footer">
+            <button class="aim-dialog-btn" id="aim-away-ok">OK</button>
+            <button class="aim-dialog-btn" id="aim-away-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- AIM Profile / Get Info dialog -->
+    <div id="aim-profile-dialog" class="aim-profile-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text"><span class="title-text">Get Info</span></div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" title="Close" onclick="document.getElementById('aim-profile-dialog').classList.remove('open')"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="aim-profile-content" id="aim-profile-content"></div>
+    </div>
+
+    <!-- Netscape Navigator window -->
+    <div id="navigator-window" class="nav-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="apps/navigator/netscape-logo.png" class="nav-title-logo" alt="Netscape">
+                <span class="title-text">Netscape</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+
+        <!-- Menu bar -->
+        <div class="nav-menu-bar">
+            <div class="nav-menu-item" data-menu="nav-menu-file"><u>F</u>ile</div>
+            <div class="nav-menu-item" data-menu="nav-menu-edit"><u>E</u>dit</div>
+            <div class="nav-menu-item" data-menu="nav-menu-view"><u>V</u>iew</div>
+            <div class="nav-menu-item" data-menu="nav-menu-go"><u>G</u>o</div>
+            <div class="nav-menu-item" data-menu="nav-menu-communicator"><u>C</u>ommunicator</div>
+            <div class="nav-menu-item" data-menu="nav-menu-help"><u>H</u>elp</div>
+        </div>
+
+        <!-- Menu dropdowns -->
+        <div id="nav-menu-file" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-new"><u>N</u>ew Window</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-open"><u>O</u>pen Page...</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-save"><u>S</u>ave As...</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-print"><u>P</u>rint...</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-offline">Go Offli<u>n</u>e</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-file-close">Clos<u>e</u></div>
+        </div>
+        <div id="nav-menu-edit" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item disabled">Cu<u>t</u></div>
+            <div class="nav-menu-dropdown-item disabled"><u>C</u>opy</div>
+            <div class="nav-menu-dropdown-item disabled"><u>P</u>aste</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-edit-find"><u>F</u>ind in Page...</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-edit-prefs">Prefere<u>n</u>ces...</div>
+        </div>
+        <div id="nav-menu-view" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-view-reload"><u>R</u>eload</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-view-stop"><u>S</u>top</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-view-source">Page Sour<u>c</u>e</div>
+            <div class="nav-menu-dropdown-item disabled">Page In<u>f</u>o</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item disabled"><u>N</u>avigation Toolbar</div>
+            <div class="nav-menu-dropdown-item disabled"><u>L</u>ocation Toolbar</div>
+            <div class="nav-menu-dropdown-item disabled">Personal <u>T</u>oolbar</div>
+        </div>
+        <div id="nav-menu-go" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-go-back"><u>B</u>ack</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-go-forward"><u>F</u>orward</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-go-home"><u>H</u>ome</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-go-search"><u>S</u>earch the Web</div>
+        </div>
+        <div id="nav-menu-communicator" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-comm-navigator"><u>N</u>avigator</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-comm-word">Microsoft <u>W</u>ord</div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-comm-vb6">Visual Basic <u>6</u></div>
+        </div>
+        <div id="nav-menu-help" class="nav-menu-dropdown">
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-help-contents">Help <u>C</u>ontents</div>
+            <div class="nav-menu-dropdown-item disabled">Release <u>N</u>otes</div>
+            <div class="nav-menu-divider"></div>
+            <div class="nav-menu-dropdown-item" data-action="nav-menu-help-about"><u>A</u>bout Netscape...</div>
+        </div>
+
+        <!-- Navigation toolbar -->
+        <div class="nav-toolbar-row">
+            <div class="nav-grippy"></div>
+            <div class="nav-toolbar">
+                <button class="nav-btn" id="nav-btn-back" title="Back" disabled>
+                    <span class="nav-btn-icon">◀</span>
+                    <span class="nav-btn-label">Back</span>
+                </button>
+                <button class="nav-btn" id="nav-btn-forward" title="Forward" disabled>
+                    <span class="nav-btn-icon">▶</span>
+                    <span class="nav-btn-label">Forward</span>
+                </button>
+                <button class="nav-btn" id="nav-btn-reload" title="Reload">
+                    <span class="nav-btn-icon">↺</span>
+                    <span class="nav-btn-label">Reload</span>
+                </button>
+                <button class="nav-btn" id="nav-btn-home" title="Home">
+                    <span class="nav-btn-icon">🏠</span>
+                    <span class="nav-btn-label">Home</span>
+                </button>
+                <button class="nav-btn" id="nav-btn-search" title="Search">
+                    <span class="nav-btn-icon">🔍</span>
+                    <span class="nav-btn-label">Search</span>
+                </button>
+                <div class="nav-tb-sep"></div>
+                <button class="nav-btn" id="nav-btn-print" title="Print">
+                    <span class="nav-btn-icon">🖨️</span>
+                    <span class="nav-btn-label">Print</span>
+                </button>
+                <button class="nav-btn" id="nav-btn-security" title="Security">
+                    <span class="nav-btn-icon" id="nav-security-icon">🔓</span>
+                    <span class="nav-btn-label">Security</span>
+                </button>
+                <div class="nav-tb-sep"></div>
+                <button class="nav-btn nav-btn-stop" id="nav-btn-stop" title="Stop">
+                    <span class="nav-btn-icon">✖</span>
+                    <span class="nav-btn-label">Stop</span>
+                </button>
+                <!-- Animated Netscape N throbber -->
+                <div class="nav-throbber" id="nav-throbber" title="Netscape Navigator – click to go home">
+                    <svg class="nav-throbber-svg" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Comet streak -->
+                        <g class="nav-throbber-comet">
+                            <line x1="10" y1="6" x2="30" y2="28" stroke="#FFD700" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+                            <circle cx="10" cy="6" r="3" fill="#ffffff"/>
+                        </g>
+                        <!-- Twinkle star -->
+                        <g class="nav-throbber-star">
+                            <circle cx="30" cy="8" r="2" fill="#FFD700"/>
+                            <line x1="30" y1="4" x2="30" y2="6" stroke="#FFD700" stroke-width="1.5"/>
+                            <line x1="30" y1="10" x2="30" y2="12" stroke="#FFD700" stroke-width="1.5"/>
+                            <line x1="26" y1="8" x2="28" y2="8" stroke="#FFD700" stroke-width="1.5"/>
+                            <line x1="32" y1="8" x2="34" y2="8" stroke="#FFD700" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location toolbar -->
+        <div class="nav-toolbar-row">
+            <div class="nav-grippy"></div>
+            <div class="nav-location-bar">
+                <span class="nav-location-label">Location:</span>
+                <input type="text" id="nav-url-input" class="nav-url-input" value="about:home" autocomplete="off" spellcheck="false">
+                <button class="nav-bookmark-btn" id="nav-bookmark-btn" title="Add bookmark">🔖</button>
+            </div>
+        </div>
+
+        <!-- Personal toolbar -->
+        <div class="nav-toolbar-row">
+            <div class="nav-grippy"></div>
+            <div class="nav-personal-toolbar">
+                <button class="nav-personal-btn" id="nav-personal-btn-home">Home</button>
+                <button class="nav-personal-btn" id="nav-personal-btn-linkedin">LinkedIn</button>
+                <button class="nav-personal-btn" id="nav-personal-btn-github">GitHub</button>
+                <button class="nav-personal-btn" id="nav-personal-btn-news">Hacker News</button>
+            </div>
+        </div>
+
+        <!-- Content area -->
+        <div class="nav-content">
+            <iframe id="nav-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+        </div>
+
+        <!-- Status bar -->
+        <div class="nav-status-bar">
+            <span class="nav-security-icon" id="nav-status-security-icon" title="Connection not encrypted">🔓</span>
+            <span class="nav-status-text" id="nav-status-text"></span>
+            <div class="nav-progress-wrap">
+                <div class="nav-progress-bar" id="nav-progress-bar"></div>
+            </div>
+            <div class="nav-component-bar">
+                <button class="nav-component-btn" title="Navigator">🧭</button>
+                <button class="nav-component-btn" title="Messenger">✉</button>
+                <button class="nav-component-btn" title="Newsgroups">💬</button>
+                <button class="nav-component-btn" title="Composer">✏</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VB6 window (shell shows/hides) - uses shared window theme -->
+    <div id="vb6-window" class="vb6-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <div class="title-logo"><span class="title-app-icon vb-icon">VB</span></div>
+                <span id="vb6-ide-title" class="title-text">Project1 - Microsoft Visual Basic [design]</span>
+            </div>
+            <div class="title-bar-controls">
+                <button type="button" class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button type="button" class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button type="button" class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="vb6-menu-bar">
+            <button type="button" class="vb6-menu-item"><u>F</u>ile</button>
+            <button type="button" class="vb6-menu-item"><u>E</u>dit</button>
+            <button type="button" class="vb6-menu-item"><u>V</u>iew</button>
+            <button type="button" class="vb6-menu-item"><u>P</u>roject</button>
+            <button type="button" class="vb6-menu-item">F<u>o</u>rmat</button>
+            <button type="button" class="vb6-menu-item"><u>D</u>ebug</button>
+            <button type="button" class="vb6-menu-item"><u>R</u>un</button>
+            <button type="button" class="vb6-menu-item"><u>Q</u>uery</button>
+            <button type="button" class="vb6-menu-item">Dia<u>g</u>ram</button>
+            <button type="button" class="vb6-menu-item"><u>T</u>ools</button>
+            <button type="button" class="vb6-menu-item"><u>A</u>dd-Ins</button>
+            <button type="button" class="vb6-menu-item"><u>W</u>indow</button>
+            <button type="button" class="vb6-menu-item"><u>H</u>elp</button>
+        </div>
+        <div class="vb6-toolbar">
+            <button type="button" class="vb6-tb-btn" title="Add File"><span class="vb6-tb-icon-add"></span></button>
+            <button type="button" class="vb6-tb-btn" title="Open"><span class="vb6-tb-icon-open"></span></button>
+            <button type="button" class="vb6-tb-btn" title="Save"><span class="vb6-tb-icon-save"></span></button>
+            <span class="vb6-tb-sep"></span>
+            <button type="button" id="vb6-tb-start" class="vb6-tb-btn" title="Start"><span class="vb6-tb-icon-start">▶</span></button>
+            <button type="button" id="vb6-tb-break" class="vb6-tb-btn" title="Break"><span class="vb6-tb-icon-break">| |</span></button>
+            <button type="button" id="vb6-tb-end" class="vb6-tb-btn" title="End"><span class="vb6-tb-icon-end">■</span></button>
+        </div>
+        <div class="vb6-main">
+            <div class="vb6-panel vb6-project-panel">
+                <div class="vb6-panel-title">Project - Project1</div>
+                <div class="vb6-project-tree">
+                    <div class="vb6-tree-node">
+                        <div class="vb6-tree-item vb6-tree-folder open">
+                            <span class="vb6-tree-toggle">−</span>
+                            <span class="vb6-tree-icon">📁</span>
+                            <span>Project1 (Project1.vbp)</span>
+                        </div>
+                        <div class="vb6-tree-children">
+                            <div class="vb6-tree-node">
+                                <div class="vb6-tree-item vb6-tree-folder open">
+                                    <span class="vb6-tree-toggle">−</span>
+                                    <span class="vb6-tree-icon">📄</span>
+                                    <span>Forms</span>
+                                </div>
+                                <div class="vb6-tree-children">
+                                    <div class="vb6-tree-item">
+                                        <span class="vb6-tree-pad"></span>
+                                        <span class="vb6-tree-icon">📋</span>
+                                        <span>Form1 (Form1.frm)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vb6-tree-item vb6-tree-folder">
+                                <span class="vb6-tree-toggle">+</span>
+                                <span class="vb6-tree-icon">📄</span>
+                                <span>Modules</span>
+                            </div>
+                            <div class="vb6-tree-item vb6-tree-folder">
+                                <span class="vb6-tree-toggle">+</span>
+                                <span class="vb6-tree-icon">📄</span>
+                                <span>Class Modules</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="vb6-panel vb6-form-panel">
+                <div class="vb6-panel-title">Project1 - Form1 (Form)</div>
+                <div class="vb6-form-design">
+                    <!-- Code Window -->
+                    <div class="vb6-mdi-window vb6-code-window">
+                        <div class="vb6-mdi-title">
+                            <span class="vb6-mdi-title-text">Project1 - Form1 (Code)</span>
+                            <div class="vb6-mdi-controls">
+                                <button type="button" class="win-btn title-btn">_</button>
+                                <button type="button" class="win-btn title-btn">❐</button>
+                                <button type="button" class="win-btn title-btn">X</button>
+                            </div>
+                        </div>
+                        <div class="vb6-code-top">
+                            <select class="vb6-code-select"><option>Command1</option><option>Form</option></select>
+                            <select class="vb6-code-select"><option>Click</option><option>Load</option></select>
+                        </div>
+                        <textarea class="vb6-code-area" readonly spellcheck="false">
+Private Sub Command1_Click()
+    Label1.Caption = "hello world"
+End Sub
+                        </textarea>
+                    </div>
+
+                    <!-- Form Window -->
+                    <div class="vb6-mdi-window vb6-form-window">
+                        <div class="vb6-mdi-title">
+                            <span class="vb6-mdi-title-text">Project1 - Form1 (Form)</span>
+                            <div class="vb6-mdi-controls">
+                                <button type="button" class="win-btn title-btn">_</button>
+                                <button type="button" class="win-btn title-btn">❐</button>
+                                <button type="button" class="win-btn title-btn">X</button>
+                            </div>
+                        </div>
+                        <div class="vb6-form-surface">
+                            <div class="vb6-form-grid">
+                                <div id="vb6-lbl-text" class="vb6-designer-label">Label1</div>
+                                <button id="vb6-cmd-click" class="win-btn vb6-designer-btn">
+                                    Command1
+                                    <div class="vb6-resize-handle nw"></div>
+                                    <div class="vb6-resize-handle n"></div>
+                                    <div class="vb6-resize-handle ne"></div>
+                                    <div class="vb6-resize-handle e"></div>
+                                    <div class="vb6-resize-handle se"></div>
+                                    <div class="vb6-resize-handle s"></div>
+                                    <div class="vb6-resize-handle sw"></div>
+                                    <div class="vb6-resize-handle w"></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Run Window -->
+                    <div id="vb6-run-window" class="vb6-mdi-window vb6-run-window hidden">
+                        <div class="vb6-mdi-title">
+                            <span class="vb6-mdi-title-text">Form1</span>
+                            <div class="vb6-mdi-controls">
+                                <button type="button" class="win-btn title-btn">_</button>
+                                <button type="button" class="win-btn title-btn">❐</button>
+                                <button type="button" id="vb6-run-close" class="win-btn title-btn">X</button>
+                            </div>
+                        </div>
+                        <div class="vb6-run-surface">
+                            <div id="vb6-run-lbl-text" class="vb6-designer-label">Label1</div>
+                            <button id="vb6-run-cmd-click" class="win-btn vb6-designer-btn">
+                                Command1
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="vb6-panel vb6-props-panel">
+                <div class="vb6-panel-title">Properties - Form1</div>
+                <div class="vb6-props-list">
+                    <div class="vb6-props-row"><span class="vb6-props-name">(Name)</span><span class="vb6-props-value">Form1</span></div>
+                    <div class="vb6-props-row"><span class="vb6-props-name">Caption</span><span class="vb6-props-value">Form1</span></div>
+                    <div class="vb6-props-row"><span class="vb6-props-name">BackColor</span><span class="vb6-props-value">&amp;H8000000F&amp;</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disk Defragmenter Window -->
+    <div id="defrag-window" class="defrag-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="apps/defrag/defrag-icon.png" alt="Defrag" style="width:16px;height:16px;margin-right:4px;">
+                <span class="title-text">Defragmenting Drive C</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="defrag-body">
+            <div class="defrag-details-area">
+                <div id="defrag-grid" class="defrag-grid"></div>
+                <div class="defrag-scrollbar-wrap">
+                    <button class="scroll-btn up">▲</button>
+                    <div class="scroll-track-v">
+                        <div class="scroll-thumb-v"></div>
+                    </div>
+                    <button class="scroll-btn down">▼</button>
+                </div>
+            </div>
+            <div class="defrag-controls">
+                <div class="defrag-status-area">
+                    <div id="defrag-status-text" class="defrag-status-text">Ready to defragment.</div>
+                    <div class="defrag-progress-bar-wrap">
+                        <div id="defrag-progress-bar" class="defrag-progress-bar"></div>
+                    </div>
+                    <div id="defrag-percent-text" class="defrag-percent-text">0% Complete</div>
+                </div>
+                <div class="defrag-buttons">
+                    <div class="defrag-buttons-row">
+                        <button id="defrag-btn-start" class="win-btn defrag-btn">Start</button>
+                        <button id="defrag-btn-stop" class="win-btn defrag-btn">Stop</button>
+                    </div>
+                    <div class="defrag-buttons-row">
+                        <button id="defrag-btn-pause" class="win-btn defrag-btn">Pause</button>
+                        <button id="defrag-btn-details" class="win-btn defrag-btn">Hide Details</button>
+                    </div>
+                    <div class="defrag-buttons-row">
+                        <button id="defrag-btn-legend" class="win-btn defrag-btn">Legend</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shut Down (Windows 95 style) -->
+    <div id="volume-popup" class="volume-popup hidden">
+        <div class="volume-popup-label">Volume</div>
+        <div class="volume-popup-track">
+            <input type="range" id="volume-slider" min="0" max="100" value="75" orient="vertical">
+        </div>
+        <div class="volume-popup-icon">🔊</div>
+    </div>
+
+    <div id="desktop-context-menu" class="desktop-context-menu hidden">
+        <div class="ctx-item has-submenu">
+            <span class="ctx-label">Arrange Icons</span><span class="ctx-arrow">▶</span>
+            <div class="ctx-submenu">
+                <div class="ctx-item" id="ctx-arrange-name">by Name</div>
+                <div class="ctx-item" id="ctx-arrange-type">by Type</div>
+                <div class="ctx-item" id="ctx-arrange-date">by Date</div>
+            </div>
+        </div>
+        <div class="ctx-item" id="ctx-refresh">Refresh</div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item has-submenu">
+            <span class="ctx-label">New</span><span class="ctx-arrow">▶</span>
+            <div class="ctx-submenu">
+                <div class="ctx-item" id="ctx-new-folder">Folder</div>
+                <div class="ctx-item" id="ctx-new-shortcut">Shortcut</div>
+                <div class="ctx-divider"></div>
+                <div class="ctx-item" id="ctx-new-text">Text Document</div>
+            </div>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item" id="ctx-properties">Properties</div>
+    </div>
+
+    <!-- My Computer Window -->
+    <div id="mycomputer-window" class="mycomputer-window app-window app-window-hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/icons/computer_explorer.png" alt="" style="width:16px;height:16px;margin-right:4px;image-rendering:pixelated;">
+                <span id="mc-title-text" class="title-text">My Computer</span>
+            </div>
+            <div class="title-bar-controls">
+                <button class="win-btn title-btn" data-win-min title="Minimize" aria-label="Minimize"><span class="icon-min">_</span></button>
+                <button class="win-btn title-btn" data-win-max title="Maximize" aria-label="Maximize"><span class="icon-max">❐</span></button>
+                <button class="win-btn title-btn" data-win-close title="Close" aria-label="Close"><span class="icon-close">X</span></button>
+            </div>
+        </div>
+        <div class="mc-menu-bar">
+            <span class="mc-menu-item"><u>F</u>ile</span>
+            <span class="mc-menu-item"><u>E</u>dit</span>
+            <span class="mc-menu-item"><u>V</u>iew</span>
+            <span class="mc-menu-item"><u>G</u>o</span>
+            <span class="mc-menu-item">F<u>a</u>vorites</span>
+            <span class="mc-menu-item"><u>H</u>elp</span>
+        </div>
+        <div class="mc-toolbar">
+            <button class="mc-tb-btn" id="mc-btn-back" disabled title="Back">
+                <span class="mc-tb-icon">←</span>
+                <span class="mc-tb-label">Back</span>
+            </button>
+            <button class="mc-tb-btn" id="mc-btn-fwd" disabled title="Forward">
+                <span class="mc-tb-icon">→</span>
+                <span class="mc-tb-label">Forward</span>
+            </button>
+            <div class="mc-tb-sep"></div>
+            <button class="mc-tb-btn" id="mc-btn-up" disabled title="Up">
+                <span class="mc-tb-icon">↑</span>
+                <span class="mc-tb-label">Up</span>
+            </button>
+        </div>
+        <div class="mc-address-bar">
+            <span class="mc-address-label">Address</span>
+            <div class="mc-address-field" id="mc-address">My Computer</div>
+        </div>
+        <div class="mc-content" id="mc-content"></div>
+        <div class="mc-status-bar">
+            <div class="mc-status-text" id="mc-status-text">3 object(s)</div>
+        </div>
+    </div>
+
+    <!-- Run Dialog -->
+    <div id="run-dialog" class="run-dialog hidden">
+        <div class="run-titlebar">
+            <span class="run-titlebar-text">
+                <img src="assets/icons/run-0.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;">
+                Run
+            </span>
+            <button class="run-titlebtn" id="run-close-btn" title="Close">✕</button>
+        </div>
+        <div class="run-body">
+            <img class="run-icon" id="run-icon" src="assets/icons/run-0.png" alt="">
+            <p class="run-desc">Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.</p>
+        </div>
+        <div class="run-input-row">
+            <label class="run-label" for="run-input">Open:</label>
+            <input type="text" id="run-input" class="run-input" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="run-footer">
+            <button class="run-btn run-btn-default" id="run-ok-btn">OK</button>
+            <button class="run-btn" id="run-cancel-btn">Cancel</button>
+            <button class="run-btn" id="run-browse-btn" disabled>Browse...</button>
+        </div>
+    </div>
+
+    <div id="shutdown-overlay" class="shutdown-overlay" hidden>
+        <div class="shutdown-screen">
+            <p class="shutdown-message">It is now safe to turn off your computer.</p>
+            <p class="shutdown-hint">Click anywhere to return</p>
+        </div>
+    </div>
+
+    <script src="shell/windows97.js"></script>
+    <script src="shell/windowChrome.js"></script>
+    <script src="shell/taskbar.js"></script>
+    <script src="shell/desktopMenu.js"></script>
+    <script src="shell/run.js"></script>
+    <script src="shell/shutdown.js"></script>
+    <script src="shell/windowManager.js"></script>
+    <script src="shell/state.js"></script>
+    <script src="shell/dialog.js"></script>
+    <script src="shell/bsod.js"></script>
+    <script src="apps/word/word.js"></script>
+    <script src="apps/word/sanitizer.js"></script>
+    <script src="apps/word/editor.js"></script>
+    <script src="apps/word/toolbar.js"></script>
+    <script src="apps/word/resume.js"></script>
+    <script src="apps/word/statusBar.js"></script>
+    <script src="apps/word/window.js"></script>
+    <script src="apps/word/fileMenu.js"></script>
+    <script src="apps/word/menus.js"></script>
+    <script src="apps/word/clippy97.js"></script>
+    <script src="apps/word/pinball.js"></script>
+    <script src="apps/word/editor-ui.js"></script>
+    <script src="apps/vb6/window.js"></script>
+    <script src="apps/napster/napster.js"></script>
+    <script src="apps/napster/window.js"></script>
+    <script src="apps/napster/tabs.js"></script>
+    <script src="apps/napster/search.js"></script>
+    <script src="apps/napster/transfer.js"></script>
+    <script src="apps/aim/aim.js"></script>
+    <script src="apps/aim/window.js"></script>
+    <script src="apps/aim/buddylist.js"></script>
+    <script src="apps/aim/chat.js"></script>
+    <script src="apps/navigator/navigator.js"></script>
+    <script src="apps/navigator/window.js"></script>
+    <script src="apps/navigator/toolbar.js"></script>
+    <script src="apps/navigator/menus.js"></script>
+    <script src="apps/thps2/thps2.js"></script>
+    <script src="apps/winamp/winamp.js"></script>
+    <script src="apps/winamp/window.js"></script>
+    <script src="apps/pinball/pinball.js"></script>
+    <script src="apps/pinball/window.js"></script>
+    <script src="apps/notepad/notepad.js"></script>
+    <script src="apps/notepad/window.js"></script>
+    <script src="apps/minesweeper/minesweeper.js"></script>
+    <script src="apps/minesweeper/window.js"></script>
+    <script src="apps/paint/paint.js"></script>
+    <script src="apps/paint/window.js"></script>
+    <script src="apps/the_incredible_machine/tim.js"></script>
+    <script src="apps/calculator/calculator.js"></script>
+    <script src="apps/calculator/window.js"></script>
+    <script src="apps/ie5/ie5.js"></script>
+    <script src="apps/ie5/window.js"></script>
+    <script src="apps/ie5/windowsupdate.js"></script>
+    <script src="apps/defrag/defrag.js"></script>
+    <script src="apps/defrag/window.js"></script>
+    <script src="apps/mycomputer/mycomputer.js"></script>
+    <script src="apps/mycomputer/window.js"></script>
+    <script src="apps/controlpanel/controlpanel.js"></script>
+    <script src="apps/controlpanel/window.js"></script>
+    <script src="apps/controlpanel/display.js"></script>
+    <script src="apps/msdos/msdos.js"></script>
+    <script src="apps/msdos/window.js"></script>
+    <script src="apps/controlpanel/datetime.js"></script>
+    <script src="apps/controlpanel/sounds.js"></script>
+    <script src="apps/controlpanel/mouse.js"></script>
+    <script src="apps/controlpanel/system.js"></script>
+
+    <!-- Clippy 98: newer 3D version (clippyjs CDN). Expose agent on window for shutdown hide/show. -->
+    <script type="module">
+        import { initAgent } from "https://cdn.jsdelivr.net/npm/clippyjs/dist/index.mjs";
+        import * as agents from "https://cdn.jsdelivr.net/npm/clippyjs/dist/agents/index.mjs";
+
+        const CLIPPY_STATEMENTS = [
+            "It looks like you're writing a letter. Would you like help with that?",
+            "Tip: Double-click the Tony Hawk's Pro Skater 2 icon on the desktop. I dare you. 🛹",
+            "Did you know? You can download songs on Napster completely free! The record labels love it.",
+            "It looks like you're away. Remember to set your AIM away message!",
+            "You've got mail! Just kidding. But have you tried AIM?",
+            "Tip: Use Shut Down from the Start menu to clear your session and start fresh.",
+            "Did you find the Pinball easter egg hidden inside Word?",
+            "It looks like you're browsing the web. Netscape Navigator 4 is the best browser — don't let anyone tell you otherwise.",
+            "Tip: You can resize windows by dragging the bottom-right corner grip.",
+            "Sharing 0 songs with the Napster community. Very generous of you.",
+            "Have you tried turning it off and on again?",
+            "It looks like you're searching for *NSYNC songs. Bye Bye Bye is already in the results!",
+        ];
+
+        // Expose on window so the non-module boot script can call them
+        window._loadClippy98 = async function () {
+            try {
+                const agent = await initAgent(agents.Clippy);
+                window.Clippy98Agent = agent;
+                agent.show();
+
+                // Move to left side of screen
+                const el = agent.el || agent._el;
+                if (el) {
+                    el.style.right = 'auto';
+                    el.style.left  = '20px';
+                }
+
+                // Rotate through statements
+                let idx = 0;
+                agent.speak(CLIPPY_STATEMENTS[idx]);
+                agent.animate();
+
+                setInterval(function () {
+                    idx = (idx + 1) % CLIPPY_STATEMENTS.length;
+                    agent.speak(CLIPPY_STATEMENTS[idx]);
+                }, 12000);
+
+            } catch (error) {
+                console.error("Failed to load Clippy 98:", error);
+            }
+        };
+
+        window._loadBonzi = async function () {
+            try {
+                const agent = await initAgent(agents.Bonzi);
+                window.BonziAgent = agent;
+                agent.show();
+                agent.speak("Hello there! I'm Bonzi!");
+                agent.animate();
+            } catch (error) {
+                console.error("Failed to load Bonzi:", error);
+            }
+        };
+    </script>
+
+    <script>
+        // Staged desktop reveal — defined here (regular script) so it always
+        // runs even when the CDN module script is blocked (e.g. in tests).
+        window._onDesktopReady = function (instant) {
+            var taskbar    = document.getElementById('taskbar');
+            var icons      = document.getElementById('desktop-icons');
+            var appWindows = Array.prototype.slice.call(
+                document.querySelectorAll('.app-window:not(.app-window-hidden)')
+            );
+
+            function show(el) {
+                el.style.opacity = '1';
+                el.style.pointerEvents = 'auto';
+            }
+
+            if (instant) {
+                if (taskbar) show(taskbar);
+                if (icons) show(icons);
+                appWindows.forEach(show);
+                document.body.classList.remove('booting');
+                // Module scripts (+ their CDN imports) are deferred and may not
+                // be ready yet. Poll until the functions exist (up to ~6s).
+                var _ci = 0;
+                (function _tryCompanions() {
+                    if (window._loadClippy98 || window._loadBonzi) {
+                        if (window._loadClippy98) window._loadClippy98();
+                        if (window._loadBonzi) window._loadBonzi();
+                    } else if (++_ci < 30) {
+                        setTimeout(_tryCompanions, 200);
+                    }
+                })();
+                return;
+            }
+
+            function fadeIn(el) {
+                el.style.transition = 'opacity 0.5s ease';
+                el.offsetHeight; // force reflow so transition fires
+                show(el);
+            }
+
+            // t=0  — plain desktop background only (body.booting hides everything)
+
+            // t=600ms — taskbar / start menu
+            setTimeout(function () { if (taskbar) fadeIn(taskbar); }, 600);
+
+            // t=1200ms — desktop icons
+            setTimeout(function () { if (icons) fadeIn(icons); }, 1200);
+
+            // t=1800ms — default open apps
+            setTimeout(function () { appWindows.forEach(fadeIn); }, 1800);
+
+            // t=2800ms — companions + lift booting class
+            setTimeout(function () {
+                document.body.classList.remove('booting');
+                if (window._loadClippy98) window._loadClippy98();
+                if (window._loadBonzi) window._loadBonzi();
+            }, 2800);
+        };
+
+        (function () {
+            var BOOT_KEY   = 'word97-booted';
+            var bootScreen = document.getElementById('boot-screen');
+            var sound      = document.getElementById('boot-sound');
+            var prompt     = document.getElementById('boot-click-prompt');
+            var fill       = document.getElementById('boot-bar-fill');
+            if (!bootScreen) return;
+
+            // Skip boot screen if user booted within the last 30 days
+            var THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+            try {
+                var stored = localStorage.getItem(BOOT_KEY);
+                if (stored) {
+                    var ts = parseInt(stored, 10);
+                    if (!isNaN(ts) && (Date.now() - ts) < THIRTY_DAYS_MS) {
+                        bootScreen.style.display = 'none';
+                        window._onDesktopReady(true);
+                        return;
+                    } else {
+                        localStorage.removeItem(BOOT_KEY); // expired
+                    }
+                }
+            } catch (_) {}
+
+            var dismissed = false;
+
+            function dismiss() {
+                if (dismissed) return;
+                dismissed = true;
+                try { localStorage.setItem(BOOT_KEY, String(Date.now())); } catch (_) {}
+                if (sound) sound.play().catch(function () {});
+                bootScreen.style.transition = 'opacity 0.5s ease';
+                bootScreen.style.opacity = '0';
+                setTimeout(function () {
+                    bootScreen.style.display = 'none';
+                    window._onDesktopReady();
+                }, 550);
+            }
+
+            // After 2s: stop bar, show click prompt
+            setTimeout(function () {
+                if (fill) fill.style.animationPlayState = 'paused';
+                if (prompt) prompt.removeAttribute('hidden');
+                bootScreen.addEventListener('click', dismiss);
+                bootScreen.addEventListener('keydown', dismiss);
+                bootScreen.setAttribute('tabindex', '0');
+                bootScreen.focus();
+            }, 2000);
+        })();
+    </script>
+
+    <script>
+        /* My Resume.doc desktop icon — double-click opens Word with resume */
+        (function () {
+            var icon = document.getElementById('resume-desktop-icon');
+            if (!icon) return;
+
+            var clicks = 0, timer = null;
+
+            icon.addEventListener('click', function (e) {
+                e.stopPropagation();
+                icon.classList.add('selected');
+                clicks++;
+                if (clicks === 1) {
+                    timer = setTimeout(function () { clicks = 0; }, 350);
+                } else {
+                    clearTimeout(timer);
+                    clicks = 0;
+                    if (window.Windows97) window.Windows97.showApp('word');
+                }
+            });
+
+            icon.addEventListener('touchend', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                icon.classList.add('selected');
+                clearTimeout(timer);
+                clicks = 0;
+                if (window.Windows97) window.Windows97.showApp('word');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!icon.contains(e.target)) icon.classList.remove('selected');
+            });
+        })();
+    </script>
+
+    <script>
+        /* Start menu handlers for easter-egg apps (THPS2, TIM) */
+        (function () {
+            var thps2Item = document.getElementById('start-thps2');
+            if (thps2Item) {
+                thps2Item.addEventListener('click', function () {
+                    if (window.launchThps2) window.launchThps2();
+                });
+            }
+            var timItem = document.getElementById('start-tim');
+            if (timItem) {
+                timItem.addEventListener('click', function () {
+                    if (window.launchTim) window.launchTim();
+                });
+            }
+        })();
+    </script>
+    <!-- Cloudflare Web Analytics: replace token with yours from dash.cloudflare.com → Web Analytics → Manage site -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "PASTE_YOUR_TOKEN_HERE"}'></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+/* Defrag - Windows 98 Theme */
+.defrag-window {
+    position: fixed;
+    top: 50px;
+    left: 50px;
+    width: 600px;
+    height: 340px;
+    background: var(--win-bg);
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-black);
+    border-bottom: 1px solid var(--win-black);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+    font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;
+    font-size: 11px;
+}
+.defrag-window.app-window-hidden,
+.defrag-window.minimized {
+    display: none !important;
+}
+
+.defrag-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    gap: 6px;
+}
+
+.defrag-details-area {
+    flex: 1;
+    border-top: 1px solid var(--win-dark);
+    border-left: 1px solid var(--win-dark);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    background: var(--win-white);
+    display: flex;
+    overflow: hidden;
+    padding: 2px;
+}
+
+.defrag-grid {
+    flex: 1;
+    display: grid;
+    /* 59 columns in the picture */
+    grid-template-columns: repeat(59, 1fr);
+    grid-auto-rows: 9px;
+    gap: 1px;
+    background: var(--win-black); /* grid lines are black */
+    padding: 1px;
+}
+
+.defrag-block {
+    width: 100%;
+    height: 100%;
+    /* inner block border to look like 3D blocks */
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-dark);
+    border-bottom: 1px solid var(--win-dark);
+}
+
+.defrag-block.unoptimized {
+    background: #00ffff; /* cyan */
+}
+.defrag-block.optimized {
+    background: #0080ff; /* lighter blue, close to picture */
+    border-top: 1px solid #80c0ff;
+    border-left: 1px solid #80c0ff;
+    border-right: 1px solid #004080;
+    border-bottom: 1px solid #004080;
+}
+.defrag-block.reading {
+    background: #ff0000; /* red */
+}
+.defrag-block.writing {
+    background: #ff0000; /* red */
+}
+.defrag-block.free {
+    background: var(--win-white);
+    /* Free blocks in screenshot look like white background with black grid around them,
+       but wait, in the screenshot they all have blocks. Let's make free blocks just white/blank */
+    border: none;
+}
+
+.defrag-scrollbar-wrap {
+    width: 16px;
+    background: var(--win-bg);
+    border-left: 1px solid var(--win-white);
+    display: flex;
+    flex-direction: column;
+}
+
+.defrag-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.defrag-status-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.defrag-status-text {
+    font-size: 11px;
+}
+.defrag-percent-text {
+    font-size: 11px;
+}
+
+.defrag-progress-bar-wrap {
+    width: 100%;
+    height: 16px;
+    border-top: 1px solid var(--win-dark);
+    border-left: 1px solid var(--win-dark);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    background: var(--win-white);
+    padding: 1px;
+}
+
+.defrag-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: repeating-linear-gradient(
+        to right,
+        #000080 0px, #000080 8px,
+        transparent 8px, transparent 10px
+    );
+}
+
+.defrag-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 10px;
+    width: 170px;
+}
+
+.defrag-buttons-row {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.defrag-btn {
+    width: 80px;
+    height: 22px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+/* Hide details mode */
+.defrag-window.hide-details {
+    height: 150px !important;
+}
+.defrag-window.hide-details .defrag-details-area {
+    display: none;
+}

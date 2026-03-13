@@ -1,0 +1,640 @@
+/* AOL Instant Messenger – AIM 5.x era (Windows 98) */
+
+/* ── Buddy List Window ── */
+.aim-window {
+  position: fixed;
+  top: 10px;
+  left: auto;
+  right: 10px;
+  width: 220px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+/* ── AIM Banner (AOL logo) ── */
+.aim-banner {
+  flex-shrink: 0;
+  height: 60px;
+  background: #00006b;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.aim-banner svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Online status strip ── */
+.aim-status-strip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 6px;
+  background: #d4d0c8;
+  border-bottom: 1px solid var(--win-dark);
+  font-size: 10px;
+}
+.aim-status-strip-name {
+  font-weight: bold;
+  color: #000;
+}
+.aim-status-strip-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00cc00;
+  margin-right: 4px;
+  box-shadow: 0 0 2px #00aa00;
+}
+.aim-status-away .aim-status-strip-dot {
+  background: #FFB900;
+}
+
+/* ── Buddy list area ── */
+.aim-buddy-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border: inset 1px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  margin: 2px 3px;
+}
+
+/* Group headers */
+.aim-group-header {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  background: #d4d0c8;
+  border-bottom: 1px solid var(--win-dark);
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+}
+.aim-group-header:hover {
+  background: #c0bdb5;
+}
+.aim-group-arrow {
+  display: inline-block;
+  width: 10px;
+  text-align: center;
+  margin-right: 4px;
+  font-size: 9px;
+  transition: transform 0.15s;
+}
+.aim-group.collapsed .aim-group-arrow {
+  transform: rotate(-90deg);
+}
+.aim-group.collapsed .aim-group-body {
+  display: none;
+}
+
+/* Buddy rows */
+.aim-buddy-item {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px 2px 18px;
+  cursor: default;
+  user-select: none;
+  font-size: 11px;
+  gap: 4px;
+}
+.aim-buddy-item:hover {
+  background: #0000a0;
+  color: #fff;
+}
+.aim-buddy-item:hover .aim-buddy-icon svg path,
+.aim-buddy-item:hover .aim-buddy-icon svg circle,
+.aim-buddy-item:hover .aim-buddy-icon svg line {
+  stroke: #fff;
+  fill: #fff;
+}
+.aim-buddy-item.online {
+  color: #000;
+  font-weight: bold;
+}
+.aim-buddy-item.offline {
+  color: #888;
+  font-weight: normal;
+}
+.aim-buddy-item.away {
+  color: #886600;
+  font-style: italic;
+}
+.aim-buddy-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── AIM Menu bar ── */
+.aim-menu-bar {
+  display: flex;
+  align-items: center;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 1px 2px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.aim-menu-item {
+  padding: 1px 6px;
+  cursor: default;
+  font-size: 11px;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+}
+.aim-menu-item:hover,
+.aim-menu-item.active {
+  background: #0000a0;
+  color: #fff;
+}
+.aim-menu-dropdown {
+  display: none;
+  position: fixed;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  z-index: 300;
+  min-width: 160px;
+  padding: 2px 0;
+}
+.aim-menu-dropdown.open { display: block; }
+.aim-menu-dd-item {
+  padding: 3px 20px 3px 24px;
+  cursor: default;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.aim-menu-dd-item:hover {
+  background: #0000a0;
+  color: #fff;
+}
+.aim-menu-dd-item.disabled {
+  color: var(--win-dark);
+}
+.aim-menu-dd-item.disabled:hover {
+  background: transparent;
+  color: var(--win-dark);
+}
+.aim-menu-dd-divider {
+  height: 1px;
+  background: var(--win-dark);
+  margin: 3px 4px;
+  box-shadow: 0 1px 0 var(--win-white);
+}
+
+/* ── Bottom icon bar ── */
+.aim-bottom-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 3px 4px;
+  border-top: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  height: 44px;
+}
+.aim-bottom-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  cursor: default;
+  border: 1px solid transparent;
+  font-size: 9px;
+  min-width: 32px;
+  background: transparent;
+}
+.aim-bottom-btn:hover {
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+}
+.aim-bottom-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+.aim-bottom-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ── Chat Window ── */
+.aim-chat-window {
+  position: fixed;
+  top: 40px;
+  left: 280px;
+  width: 420px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+/* Chat menu bar with right-aligned warning level */
+.aim-chat-menu-bar {
+  display: flex;
+  align-items: center;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 1px 2px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.aim-chat-menu-item {
+  padding: 1px 6px;
+  cursor: default;
+  font-size: 11px;
+  user-select: none;
+  white-space: nowrap;
+}
+.aim-chat-menu-item:hover {
+  background: #0000a0;
+  color: #fff;
+}
+.aim-chat-warning-label {
+  margin-left: auto;
+  padding-right: 6px;
+  font-size: 10px;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* Chat log area */
+.aim-chat-log {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  margin: 3px 3px 2px 3px;
+  padding: 4px 6px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  min-height: 80px;
+}
+.aim-msg {
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+.aim-msg-name {
+  font-weight: bold;
+}
+.aim-msg.sent .aim-msg-name   { color: #cc0000; }
+.aim-msg.received .aim-msg-name { color: #0000cc; }
+.aim-msg.system {
+  color: #666;
+  font-style: italic;
+  font-size: 11px;
+  margin: 4px 0;
+}
+.aim-msg.away-response {
+  color: #666;
+  font-size: 11px;
+  margin: 2px 0;
+}
+.aim-msg.away-response .aim-msg-name {
+  color: #886600;
+}
+
+/* Typing indicator */
+.aim-typing-indicator {
+  color: #888;
+  font-size: 10px;
+  font-style: italic;
+  padding: 0 6px 2px;
+  min-height: 14px;
+}
+
+/* Formatting toolbar */
+.aim-format-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  gap: 1px;
+  height: 24px;
+}
+.aim-fmt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 2px;
+  font-size: 11px;
+  background: var(--win-bg);
+  border: 1px solid transparent;
+  cursor: default;
+  font-family: 'Times New Roman', serif;
+}
+.aim-fmt-btn:hover {
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+}
+.aim-fmt-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--win-dark);
+  box-shadow: 1px 0 0 var(--win-white);
+  margin: 0 2px;
+}
+.aim-fmt-link {
+  color: #0000cc;
+  text-decoration: underline;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+}
+
+/* Chat input */
+.aim-chat-input {
+  flex-shrink: 0;
+  height: 52px;
+  margin: 0 3px 2px 3px;
+  padding: 3px 4px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  resize: none;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  outline: none;
+  color: #000;
+}
+.aim-chat-input:focus {
+  background: #fff;
+}
+
+/* Action button bar */
+.aim-chat-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 2px 3px;
+  border-top: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  gap: 2px;
+  height: 52px;
+}
+.aim-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 6px;
+  min-width: 44px;
+  height: 44px;
+  background: var(--win-bg);
+  border: 1px solid transparent;
+  cursor: default;
+  font-size: 9px;
+  user-select: none;
+}
+.aim-action-btn:hover {
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+}
+.aim-action-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+.aim-action-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.aim-action-sep {
+  flex: 1;
+}
+
+/* Send button – special, right-aligned */
+.aim-send-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.aim-send-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 3px 8px;
+  height: 38px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+  cursor: default;
+  font-size: 10px;
+  font-weight: bold;
+  user-select: none;
+}
+.aim-send-btn:hover {
+  background: var(--win-light);
+}
+.aim-send-btn:active {
+  border-top: 2px solid var(--win-dark);
+  border-left: 2px solid var(--win-dark);
+  border-right: 2px solid var(--win-white);
+  border-bottom: 2px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+  padding-top: 4px;
+  padding-left: 9px;
+}
+.aim-send-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Warning meter (below Send) */
+.aim-warn-meter {
+  display: flex;
+  width: 52px;
+  height: 6px;
+  border: 1px solid var(--win-dark);
+  background: #fff;
+  overflow: hidden;
+}
+.aim-warn-meter-red {
+  width: 30%;
+  background: #cc0000;
+}
+.aim-warn-meter-green {
+  flex: 1;
+  background: #00aa00;
+}
+
+/* Away message dialog overlay */
+.aim-away-dialog {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 500;
+  background: var(--win-bg);
+  width: 340px;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+}
+.aim-away-dialog.open { display: block; }
+.aim-away-dialog-body {
+  padding: 12px;
+}
+.aim-away-dialog-body label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+.aim-away-textarea {
+  width: 100%;
+  height: 70px;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  padding: 4px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  outline: none;
+}
+.aim-away-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 4px 12px 12px;
+}
+.aim-dialog-btn {
+  padding: 3px 16px;
+  font-size: 11px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+  cursor: default;
+}
+.aim-dialog-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+/* Profile info popup */
+.aim-profile-dialog {
+  display: none;
+  position: fixed;
+  top: 120px;
+  left: 300px;
+  z-index: 400;
+  background: #fff;
+  width: 300px;
+  min-height: 120px;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+.aim-profile-dialog.open { display: block; }
+.aim-profile-content {
+  padding: 10px;
+  color: #000;
+  line-height: 1.6;
+}
+.aim-profile-content b { color: #0000cc; }
+
+/* Taskbar icon for AIM */
+.task-icon-aim {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #00006b;
+  color: #FFB900;
+  font-size: 9px;
+  font-weight: 900;
+  font-family: 'Arial Black', Arial, sans-serif;
+  border-radius: 1px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Sound notification flash */
+@keyframes aim-flash {
+  0%, 100% { background: var(--win-bg); }
+  50% { background: #ffff99; }
+}
+.aim-buddy-item.flash {
+  animation: aim-flash 0.3s ease 3;
+}

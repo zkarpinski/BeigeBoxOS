@@ -1,0 +1,6 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap (update base URL if your site is hosted elsewhere)
+Sitemap: https://zkarpinski.com/sitemap.xml

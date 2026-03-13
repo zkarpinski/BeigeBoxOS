@@ -1,0 +1,155 @@
+/* ── Windows 98 Base Shell Styles ─────────────────────────────────────────── */
+
+.seo-intro { display: none; }
+
+:root {
+    --win-bg: #c0c0c0;
+    --win-dark: #808080;
+    --win-black: #000000;
+    --win-light: #dfdfdf;
+    --win-white: #ffffff;
+    --title-active: #0000a0;
+    --taskbar-bg: #c0c0c0;
+    --toolbar-bg: #c0c0c0;
+    --ruler-bg: #e0e0e0;
+    --desktop-bg: #008080; /* Windows 98 default teal */
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;
+    font-size: 11px;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--desktop-bg);
+}
+
+/* 3D Borders */
+.win-border-outset {
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-black);
+    border-bottom: 1px solid var(--win-black);
+    box-shadow:
+        inset 1px 1px var(--win-light),
+        inset -1px -1px var(--win-dark);
+}
+
+.win-border-inset {
+    border-top: 1px solid var(--win-dark);
+    border-left: 1px solid var(--win-dark);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    box-shadow:
+        inset 1px 1px var(--win-black),
+        inset -1px -1px var(--win-light);
+}
+
+.win-btn {
+    background-color: var(--win-bg);
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-black);
+    border-bottom: 1px solid var(--win-black);
+    box-shadow:
+        inset 1px 1px var(--win-light),
+        inset -1px -1px var(--win-dark);
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px;
+}
+
+.win-btn:active {
+    border-top: 1px solid var(--win-black);
+    border-left: 1px solid var(--win-black);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    box-shadow:
+        inset 1px 1px var(--win-dark),
+        inset -1px -1px var(--win-light);
+    padding: 2px 0 0 2px;
+}
+
+/* Shell: hide app window/taskbar button when closed */
+.app-window-hidden {
+    display: none !important;
+}
+
+/* Minimize animation: window shrinks toward bottom (taskbar) */
+.win-minimizing {
+    transition: transform 0.28s ease-out, opacity 0.28s ease-out !important;
+    transform: scale(0.35) translateY(120px) !important;
+    opacity: 0 !important;
+    transform-origin: 50% 100% !important;
+}
+
+/* Resize grip – bottom-right corner, added by attachWindowChrome when allowResize:true */
+.win-resize-grip {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: se-resize;
+    z-index: 10;
+    background-image:
+        radial-gradient(circle, var(--win-white) 1px, transparent 1px),
+        radial-gradient(circle, var(--win-dark)  1px, transparent 1px);
+    background-size: 4px 4px;
+    background-position: 2px 2px, 3px 3px;
+}
+
+.app-taskbar-hidden {
+    display: none !important;
+}
+
+/* Title Bar */
+.title-bar {
+    background-color: var(--title-active);
+    color: var(--win-white);
+    padding: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 22px;
+    cursor: move;
+}
+
+.title-bar-text {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.title-text {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.title-bar-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.title-btn {
+    width: 16px;
+    height: 14px;
+    padding: 0;
+    font-size: 10px;
+    font-weight: bold;
+    background-color: var(--win-bg);
+}
+
+.icon-min { position: relative; top: -3px; font-weight: 900; }
+.icon-max { font-size: 14px; line-height: 1; margin-top: -2px; }
+.icon-close { font-size: 11px; }

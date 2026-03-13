@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+dist/
+.env
+playwright-report/
+test-results/
+.next/
+out/
+

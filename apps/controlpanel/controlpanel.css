@@ -1,0 +1,893 @@
+/* Control Panel – App styles */
+
+/* ── Control Panel Window ── */
+.controlpanel-window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - 28px) !important;
+}
+
+.controlpanel-window {
+  position: fixed;
+  top: 40px;
+  left: 80px;
+  width: 480px;
+  height: 360px;
+  min-width: 320px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  overflow: hidden;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  z-index: 200;
+}
+
+/* ── Menu bar ── */
+.cp-menu-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 0 2px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.cp-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  cursor: default;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--win-black);
+  user-select: none;
+}
+.cp-menu-item:hover {
+  background: var(--title-active);
+  color: #fff;
+}
+
+/* ── Toolbar ── */
+.cp-toolbar {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 2px 4px;
+  gap: 2px;
+}
+.cp-toolbar-btn {
+  width: 22px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: var(--win-bg);
+  border: 1px solid transparent;
+  cursor: default;
+}
+.cp-toolbar-btn:hover:not(:disabled) {
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+}
+.cp-toolbar-btn:disabled {
+  opacity: 0.45;
+}
+.cp-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--win-dark);
+  box-shadow: 1px 0 0 var(--win-white);
+  margin: 0 2px;
+}
+
+/* ── Address bar ── */
+.cp-address-bar {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 2px 4px;
+  gap: 4px;
+  font-size: 11px;
+}
+.cp-address-label {
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cp-address-field {
+  flex: 1;
+  height: 18px;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  padding: 0 4px;
+  font-size: 11px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Icons area ── */
+.cp-icons-area {
+  flex: 1;
+  overflow: auto;
+  background: #fff;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 16px;
+}
+
+/* ── Applet icon ── */
+.cp-applet-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  padding: 4px;
+  cursor: default;
+  user-select: none;
+  border: 1px solid transparent;
+}
+.cp-applet-icon:hover {
+  border: 1px dotted var(--win-dark);
+  background: rgba(0, 0, 128, 0.08);
+}
+.cp-applet-icon.selected {
+  background: var(--title-active);
+  border: 1px dotted #fff;
+}
+.cp-applet-icon.selected .cp-applet-label {
+  color: #fff;
+  background: var(--title-active);
+}
+.cp-applet-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 4px;
+  image-rendering: pixelated;
+}
+.cp-applet-label {
+  font-size: 10px;
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.3;
+  color: var(--win-black);
+}
+
+/* ── Status bar ── */
+.cp-status-bar {
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 2px;
+}
+.cp-status-text {
+  flex: 1;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 10px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+/* ══════════════════════════════════════════
+   Display Properties Dialog
+   ══════════════════════════════════════════ */
+#display-properties-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 420px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark), 4px 4px 12px rgba(0,0,0,0.4);
+  z-index: 10200;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+}
+#display-properties-dialog[hidden] {
+  display: none;
+}
+
+/* Title bar */
+.dp-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to right, var(--title-active), #1084d0);
+  padding: 3px 4px 3px 6px;
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+}
+.dp-titlebar-text {
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dp-titlebar-btns {
+  display: flex;
+  gap: 2px;
+}
+.dp-titlebtn {
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  font-size: 9px;
+  line-height: 1;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dp-titlebtn:active {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+/* Tabs */
+.dp-tabs {
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 6px 0;
+  background: var(--win-bg);
+  gap: 2px;
+  flex-shrink: 0;
+}
+.dp-tab {
+  padding: 3px 10px 4px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: none;
+  cursor: default;
+  user-select: none;
+  position: relative;
+  color: var(--win-black);
+  min-width: 56px;
+  text-align: center;
+  margin-top: 2px; /* inactive tabs sit slightly lower (Win98 look) */
+}
+.dp-tab.active {
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 1px solid var(--win-bg); /* hides bottom border, merges with panel */
+  z-index: 1;
+  margin-top: 0; /* active tab pops up above inactive tabs */
+  margin-bottom: -1px;
+  font-weight: bold;
+}
+.dp-tab.disabled {
+  color: var(--win-dark);
+  cursor: default;
+}
+
+/* Tab panel border */
+.dp-panel-border {
+  margin: 0 6px;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Monitor preview */
+.dp-monitor-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+.dp-monitor {
+  width: 130px;
+  height: 96px;
+  position: relative;
+}
+.dp-monitor-outer {
+  width: 130px;
+  height: 84px;
+  background: #aaa;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.dp-monitor-screen {
+  width: 108px;
+  height: 68px;
+  background: #008080;
+  border-top: 2px solid var(--win-black);
+  border-left: 2px solid var(--win-black);
+  border-right: 2px solid var(--win-white);
+  border-bottom: 2px solid var(--win-white);
+  overflow: hidden;
+}
+.dp-monitor-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.dp-monitor-screen img.visible {
+  display: block;
+}
+.dp-monitor-stand {
+  width: 50px;
+  height: 8px;
+  background: #aaa;
+  margin: 0 auto;
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+}
+.dp-monitor-base {
+  width: 70px;
+  height: 4px;
+  background: #bbb;
+  margin: 0 auto;
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  border-radius: 0 0 2px 2px;
+}
+
+/* Wallpaper section */
+.dp-wallpaper-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dp-wallpaper-label {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.dp-wallpaper-sublabel {
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: var(--win-black);
+}
+.dp-wallpaper-row {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+.dp-wallpaper-list {
+  flex: 1;
+  height: 100px;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 1px 0;
+}
+.dp-wallpaper-list li {
+  padding: 2px 4px;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.dp-wallpaper-list li:hover {
+  background: var(--title-active);
+  color: #fff;
+}
+.dp-wallpaper-list li.selected {
+  background: var(--title-active);
+  color: #fff;
+}
+.dp-wallpaper-list li svg {
+  flex-shrink: 0;
+}
+
+/* Right side buttons */
+.dp-wallpaper-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.dp-btn {
+  height: 22px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+  cursor: default;
+  min-width: 70px;
+  text-align: center;
+}
+.dp-btn:active {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+}
+.dp-btn:disabled {
+  color: var(--win-dark);
+  cursor: default;
+}
+.dp-display-label {
+  font-size: 11px;
+  margin-top: 6px;
+  color: var(--win-dark);
+}
+.dp-display-select {
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  padding: 0 2px;
+  opacity: 0.5;
+  pointer-events: none;
+  width: 70px;
+}
+
+/* Bottom buttons */
+.dp-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 10px 8px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.dp-footer-btn {
+  height: 22px;
+  padding: 0 16px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+  cursor: default;
+  min-width: 60px;
+}
+.dp-footer-btn:active {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+}
+.dp-footer-btn:disabled {
+  color: var(--win-dark);
+  cursor: default;
+}
+.dp-footer-btn.default-btn {
+  border: 2px solid var(--win-black);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+}
+
+/* ══════════════════════════════════════════
+   Shared: new applet dialogs
+   ══════════════════════════════════════════ */
+#datetime-dialog,
+#sounds-dialog,
+#mouse-dialog,
+#system-dialog {
+  position: fixed;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark), 4px 4px 12px rgba(0,0,0,0.4);
+  z-index: 10200;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+}
+#datetime-dialog[hidden],
+#sounds-dialog[hidden],
+#mouse-dialog[hidden],
+#system-dialog[hidden] {
+  display: none;
+}
+#datetime-dialog { width: 370px; }
+#sounds-dialog   { width: 360px; }
+#mouse-dialog    { width: 390px; }
+#system-dialog   { width: 420px; }
+
+/* ══════════════════════════════════════════
+   Date/Time dialog (dt-*)
+   ══════════════════════════════════════════ */
+.dt-panel {
+  display: flex;
+  gap: 12px;
+}
+.dt-left {
+  flex: 1;
+}
+.dt-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.dt-section-label {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.dt-month-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.dt-select-month {
+  flex: 1;
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+}
+.dt-year-input {
+  width: 50px;
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  padding: 0 2px;
+  text-align: center;
+}
+.dt-calendar {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+}
+.dt-calendar th {
+  text-align: center;
+  font-weight: bold;
+  font-size: 10px;
+  padding: 1px 3px;
+  color: var(--win-dark);
+}
+.dt-calendar td {
+  text-align: center;
+  padding: 2px 3px;
+  cursor: default;
+  min-width: 18px;
+}
+.dt-calendar td:hover:not(.dt-empty) {
+  background: var(--title-active);
+  color: #fff;
+}
+.dt-calendar td.dt-selected {
+  background: var(--title-active);
+  color: #fff;
+  font-weight: bold;
+}
+.dt-calendar td.dt-today {
+  font-weight: bold;
+}
+.dt-clock-canvas {
+  border: 1px inset var(--win-dark);
+  display: block;
+}
+.dt-time-input {
+  width: 90px;
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  padding: 0 4px;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   Sounds dialog (snd-*)
+   ══════════════════════════════════════════ */
+.snd-scheme-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.snd-label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.snd-select {
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  flex: 1;
+  min-width: 80px;
+}
+.snd-scheme-btn {
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.snd-events-label {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.snd-events-list {
+  list-style: none;
+  margin: 0 0 8px 0;
+  padding: 1px;
+  height: 130px;
+  overflow-y: auto;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+}
+.snd-events-list li {
+  padding: 2px 4px;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.snd-events-list li:hover {
+  background: var(--title-active);
+  color: #fff;
+}
+.snd-events-list li.snd-selected {
+  background: var(--title-active);
+  color: #fff;
+}
+.snd-event-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.snd-sound-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.snd-sound-select {
+  flex: 1;
+  min-width: 80px;
+}
+.snd-preview-btn {
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   Mouse dialog (ms-*)
+   ══════════════════════════════════════════ */
+.ms-panel {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ms-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ms-section-label {
+  font-size: 11px;
+  font-weight: bold;
+}
+.ms-hand-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ms-hand-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ms-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  cursor: default;
+  user-select: none;
+}
+.ms-mouse-svg {
+  flex-shrink: 0;
+}
+.ms-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ms-slider-label {
+  font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ms-slider {
+  flex: 1;
+}
+.ms-dblclick-test {
+  font-size: 20px;
+  cursor: default;
+  user-select: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: #fff;
+  flex-shrink: 0;
+}
+@keyframes ms-hop {
+  0%   { transform: translateY(0) scaleX(1); }
+  40%  { transform: translateY(-14px) scaleX(0.85); }
+  100% { transform: translateY(0) scaleX(1); }
+}
+.ms-hopping {
+  animation: ms-hop 0.4s ease-out;
+}
+
+/* ══════════════════════════════════════════
+   System dialog (sys-*)
+   ══════════════════════════════════════════ */
+.sys-general-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sys-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sys-win-logo {
+  flex-shrink: 0;
+}
+.sys-ms-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sys-ms-line1 {
+  font-weight: bold;
+  font-size: 12px;
+}
+.sys-ms-line2,
+.sys-ms-line3 {
+  font-size: 11px;
+}
+.sys-divider {
+  height: 1px;
+  background: var(--win-dark);
+  box-shadow: 0 1px 0 var(--win-white);
+  margin: 2px 0;
+}
+.sys-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.sys-info-label {
+  font-size: 11px;
+  font-weight: bold;
+}
+.sys-info-value {
+  font-size: 11px;
+  padding-left: 8px;
+}
+.sys-serial {
+  color: var(--win-dark);
+}

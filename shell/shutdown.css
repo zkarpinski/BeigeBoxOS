@@ -1,0 +1,64 @@
+/* ── Shutdown Overlay ────────────────────────────────────────────────────── */
+
+@keyframes shutdown-dim {
+    0%   { background: rgba(0,0,0,0); }
+    100% { background: rgba(0,0,0,1); }
+}
+
+@keyframes shutdown-message-in {
+    0%   { opacity: 0; }
+    80%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.shutdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2500;
+}
+
+.shutdown-overlay:not([hidden]) {
+    display: flex;
+    animation: shutdown-dim 2s ease-out forwards;
+}
+
+.shutdown-screen {
+    background: transparent;
+    color: var(--win-white);
+    padding: 40px;
+    text-align: center;
+    border: none;
+    animation: shutdown-message-in 2.5s ease-out forwards;
+    opacity: 0;
+}
+
+.shutdown-overlay:not([hidden]) .shutdown-screen {
+    opacity: 1;
+    animation: shutdown-message-in 2.5s ease-out forwards;
+}
+
+.shutdown-message {
+    font-size: 14px;
+    margin: 0 0 16px 0;
+}
+
+.shutdown-hint {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Hide Clippy during shutdown (97 and CDN 98) */
+body.shutdown-active #clippy-97-window {
+    display: none !important;
+}
+
+body.shutdown-active [id^="clippy"],
+body.shutdown-active [class*="clippy-agent"] {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

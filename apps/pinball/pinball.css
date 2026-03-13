@@ -1,0 +1,65 @@
+.pinball-app-window {
+    width: 600px;
+    height: 480px;
+    background-color: var(--win-bg);
+    border-top: 2px solid var(--win-white);
+    border-left: 2px solid var(--win-white);
+    border-right: 2px solid var(--win-black);
+    border-bottom: 2px solid var(--win-black);
+    box-shadow: 1px 1px 0 var(--win-dark);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50px;
+    left: 200px;
+    z-index: 100;
+}
+
+.pinball-app-body {
+    flex-grow: 1;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-top: 1px solid var(--win-dark);
+    outline: none;
+}
+
+.pinball-score-board {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #111;
+    border: 2px solid #333;
+    padding: 10px;
+    text-align: right;
+    width: 100px;
+}
+
+.pinball-score-title {
+    color: #f00;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.pinball-score-display {
+    color: #f00;
+    font-family: monospace;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.pinball-instructions {
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    color: #888;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+}
+
+#pinball-app-canvas {
+    border: 1px solid #333;
+}

@@ -1,0 +1,532 @@
+/* AOL 4.0 App Base Window */
+.aol-window {
+  width: 800px;
+  height: 600px;
+  min-width: 320px;
+  min-height: 200px;
+  background-color: #c0c0c0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title bar icon (top left) */
+#aol-window .aol-title-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.aol-app-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+.aol-content-area {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background-color: #7f7f7f;
+  overflow: hidden;
+}
+
+/* Common titlebar */
+.aol-signon-titlebar,
+.aol-channels-titlebar,
+.aol-mock-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: white;
+  padding: 2px 4px;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.aol-signon-titlebar-controls,
+.aol-channels-titlebar-controls,
+.aol-mock-titlebar-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.aol-win-btn {
+  background: #c0c0c0;
+  border: 1px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  padding: 0 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.aol-win-btn:active {
+  border: 1px solid #000;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+}
+
+/* Sign On Screen */
+.aol-signon-container {
+  position: relative;
+  height: 100%;
+  background-color: #7f7f7f;
+}
+
+.aol-signon-dialog {
+  width: 450px;
+  background-color: #c0c0c0;
+  border: 2px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.aol-signon-dialog.aol-draggable-window {
+  position: absolute;
+}
+
+/* Draggable title bars */
+.aol-signon-titlebar,
+.aol-channels-titlebar,
+.aol-mock-titlebar {
+  cursor: move;
+}
+
+.aol-signon-body {
+  display: flex;
+  height: 250px;
+}
+
+.aol-signon-left {
+  width: 120px;
+  background-color: #006699;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 20px;
+  color: white;
+  border-right: 2px solid #fff;
+}
+
+.aol-logo-large {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.aol-logo-large .aol-logo-img {
+  max-width: 100px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.aol-version {
+  font-size: 10px;
+  margin-top: 50px;
+}
+
+.aol-signon-right {
+  flex: 1;
+  background-color: #fffff0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.aol-form-group {
+  margin-bottom: 20px;
+}
+
+.aol-form-group label {
+  display: block;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.aol-form-group select {
+  width: 200px;
+  padding: 2px;
+  border: 2px inset #fff;
+}
+
+.aol-signon-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.aol-btn {
+  background-color: #006699;
+  color: white;
+  border: 2px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  padding: 5px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.aol-btn:active {
+  border: 2px solid #000;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+}
+
+.aol-connecting-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #7f7f7f;
+}
+
+.aol-progress-bar {
+  width: 80%;
+  height: 15px;
+  background: #fff;
+  border: 2px inset #ccc;
+  margin-top: 10px;
+}
+
+.aol-progress-fill {
+  height: 100%;
+  background: #0000a0;
+  width: 0%;
+  animation: aolProgress 1.5s linear forwards;
+}
+
+@keyframes aolProgress {
+  to {
+    width: 100%;
+  }
+}
+
+/* Main Interface / Toolbar */
+.aol-main-interface {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  background-color: #c0c0c0;
+  overflow: hidden;
+}
+
+.aol-menubar {
+  background-color: #c0c0c0;
+  padding: 2px 10px;
+  border-bottom: 1px solid #808080;
+  font-size: 12px;
+}
+
+.aol-menubar span {
+  margin-right: 15px;
+  cursor: default;
+}
+
+.aol-toolbar {
+  display: flex;
+  background: linear-gradient(to bottom, #008888, #004488);
+  padding: 2px;
+  align-items: center;
+  color: white;
+}
+
+.aol-toolbar-group {
+  display: flex;
+}
+
+.aol-tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.aol-tool-btn:hover {
+  border: 1px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+}
+
+.aol-tool-btn .icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.aol-toolbar-divider {
+  width: 2px;
+  height: 30px;
+  background-color: #000;
+  margin: 0 5px;
+  border-right: 1px solid #fff;
+}
+
+/* Address bar */
+.aol-addressbar {
+  background-color: #d4d0c8;
+  display: flex;
+  padding: 2px;
+  align-items: center;
+  border-bottom: 2px solid #808080;
+}
+
+.aol-address-nav {
+  display: flex;
+  margin-right: 5px;
+}
+
+.aol-nav-btn {
+  width: 20px;
+  height: 20px;
+  margin-right: 2px;
+  background: #c0c0c0;
+  border: 1px solid #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  font-size: 10px;
+}
+
+.aol-address-input-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.aol-address-find {
+  background: #c0c0c0;
+  border: 1px solid #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  font-size: 12px;
+}
+
+.aol-address-input {
+  flex: 1;
+  margin: 0 5px;
+  border: 2px inset #fff;
+  padding: 2px;
+  font-size: 12px;
+}
+
+.aol-address-go,
+.aol-address-keyword {
+  background: #c0c0c0;
+  border: 1px solid #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+/* Workspace and Channels Window */
+.aol-workspace {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #7f7f7f;
+}
+
+.aol-channels-window {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 480px;
+  background-color: #c0c0c0;
+  border: 2px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.aol-channels-body {
+  display: flex;
+  background-color: #e6e6cc;
+  padding: 5px;
+}
+
+.aol-channels-left {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.aol-channels-logo .aol-logo-img {
+  max-width: 90px;
+  height: auto;
+  display: block;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
+
+.aol-channels-logo h2 {
+  margin: 5px 0;
+  color: #0000a0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.aol-channels-return {
+  font-size: 10px;
+  color: #0000a0;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.aol-channels-find-btn {
+  background: #6699cc;
+  border: 2px solid #fff;
+  border-radius: 20px;
+  padding: 5px 20px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.aol-channels-right {
+  display: flex;
+  flex: 1;
+  padding: 5px;
+  gap: 5px;
+}
+
+.aol-channels-grid-left,
+.aol-channels-grid-right {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.aol-channel-btn {
+  border: 2px solid #fff;
+  border-right-color: #888;
+  border-bottom-color: #888;
+  font-weight: bold;
+  padding: 3px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.aol-channel-btn:active {
+  border: 2px solid #888;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+}
+
+/* Button specific styling to mimic AOL colorful buttons */
+.btn-aol-today {
+  background: linear-gradient(to bottom, #ffcccc, #cc6666);
+  color: #fff;
+  text-shadow: 1px 1px #000;
+  text-transform: none;
+}
+.btn-news {
+  background: linear-gradient(to bottom, #ccddff, #3366cc);
+  color: #fff;
+  text-shadow: 1px 1px #000;
+}
+.btn-sports {
+  background: #e0e0e0;
+  color: #000;
+  font-style: italic;
+  font-family: Impact, sans-serif;
+}
+.btn-games {
+  background: linear-gradient(to bottom, #ffcc66, #cc3300);
+  color: #990000;
+  font-family:
+    Comic Sans MS,
+    cursive;
+}
+.btn-interests {
+  background: linear-gradient(to bottom, #66ccff, #006699);
+  color: #fff;
+  font-style: italic;
+}
+.btn-computing {
+  background: linear-gradient(to bottom, #ffcc99, #cc6600);
+  color: #000;
+}
+.btn-research {
+  background: linear-gradient(to bottom, #ccccff, #6666cc);
+  color: #000;
+  text-transform: none;
+}
+.btn-entertainment {
+  background: linear-gradient(to bottom, #cc99ff, #6600cc);
+  color: #fff;
+  font-style: italic;
+  text-transform: lowercase;
+}
+.btn-lifestyles {
+  background: #e0e0e0;
+  color: #000;
+}
+.btn-shopping {
+  background: linear-gradient(to bottom, #ff6666, #cc0000);
+  color: #fff;
+  font-style: italic;
+}
+.btn-health {
+  background: linear-gradient(to bottom, #ccffcc, #339933);
+  color: #fff;
+  text-shadow: 1px 1px #000;
+  text-transform: none;
+}
+.btn-families {
+  background: #e0e0e0;
+  color: #006666;
+  font-style: italic;
+  text-transform: lowercase;
+}
+.btn-kidsonly {
+  background: linear-gradient(to bottom, #3333cc, #000099);
+  color: #ffff00;
+  font-family:
+    Comic Sans MS,
+    cursive;
+}
+.btn-local {
+  background: linear-gradient(to bottom, #66ccff, #3399cc);
+  color: #ffff00;
+}
+
+.aol-mock-window {
+  position: absolute;
+  width: 300px;
+  background-color: #fffff0;
+  border: 2px solid #fff;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.aol-mock-body {
+  padding: 15px;
+  font-size: 14px;
+}

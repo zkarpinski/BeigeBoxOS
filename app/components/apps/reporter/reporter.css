@@ -1,0 +1,146 @@
+/* Feature Request & Bug Reporter — Mozilla Crash Reporter–style dialog */
+
+.reporter-window {
+  position: fixed;
+  top: 80px;
+  left: 120px;
+  width: 420px;
+  min-height: 380px;
+  z-index: 10;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reporter-body {
+  padding: 12px 14px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+
+.reporter-heading {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--win-black);
+}
+
+.reporter-intro,
+.reporter-cta,
+.reporter-notice {
+  margin: 0;
+  color: var(--win-black);
+  line-height: 1.35;
+}
+
+.reporter-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reporter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  user-select: none;
+}
+
+.reporter-checkbox input {
+  margin: 0;
+  width: 13px;
+  height: 13px;
+}
+
+.reporter-details-btn {
+  padding: 2px 10px;
+  min-height: 22px;
+}
+
+.reporter-details-panel {
+  padding: 8px 10px;
+  background: var(--win-white);
+  border: 1px solid var(--win-dark);
+  border-left-color: var(--win-black);
+  border-top-color: var(--win-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reporter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reporter-label {
+  font-weight: normal;
+  color: var(--win-black);
+}
+
+.reporter-textarea,
+.reporter-input,
+.reporter-select {
+  background: var(--win-white);
+  border: 1px solid var(--win-dark);
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--win-black);
+}
+
+.reporter-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.reporter-textarea-small {
+  min-height: 50px;
+}
+
+.reporter-textarea:focus,
+.reporter-input:focus,
+.reporter-select:focus {
+  outline: 1px dotted var(--win-black);
+  outline-offset: 0;
+}
+
+.reporter-email-field {
+  margin-left: 20px;
+}
+
+.reporter-input,
+.reporter-select {
+  max-width: 280px;
+}
+
+.reporter-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+
+.reporter-btn {
+  padding: 4px 14px;
+  min-height: 24px;
+}
+
+.reporter-btn-primary {
+  margin-left: auto;
+}

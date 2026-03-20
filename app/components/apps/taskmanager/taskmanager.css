@@ -1,0 +1,403 @@
+/* Windows Task Manager */
+
+.taskmanager-window {
+  position: fixed;
+  top: 60px;
+  left: 320px;
+  width: 420px;
+  background: var(--win-bg);
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* Menu bar */
+.tm-menu-bar {
+  display: flex;
+  padding: 1px 2px;
+  border-bottom: 1px solid var(--win-dark);
+  gap: 0;
+}
+.tm-menu-item {
+  padding: 2px 6px;
+  cursor: default;
+}
+.tm-menu-item:hover {
+  background: var(--title-active);
+  color: #fff;
+}
+
+/* Tabs */
+.tm-tabs {
+  display: flex;
+  padding: 4px 4px 0;
+  gap: 2px;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+}
+.tm-tab {
+  padding: 3px 10px;
+  cursor: default;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: none;
+  background: var(--win-bg);
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+}
+.tm-tab.active {
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-bg);
+  padding-top: 4px;
+  z-index: 2;
+}
+.tm-tab:not(.active) {
+  top: 2px;
+  background: #c8c8c8;
+}
+
+/* Content area */
+.tm-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  min-height: 0;
+}
+
+/* ── Applications tab ── */
+.tm-applications {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+.tm-app-table {
+  flex: 1;
+  border: 2px inset var(--win-dark);
+  background: #fff;
+  overflow-y: auto;
+  min-height: 180px;
+}
+.tm-app-header {
+  display: flex;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  position: sticky;
+  top: 0;
+}
+.tm-app-header span {
+  padding: 2px 6px;
+  border-right: 1px solid var(--win-dark);
+  font-weight: bold;
+  cursor: default;
+}
+.tm-app-col-task {
+  flex: 1;
+}
+.tm-app-col-status {
+  width: 80px;
+}
+.tm-app-row {
+  display: flex;
+  padding: 1px 0;
+  cursor: default;
+}
+.tm-app-row:hover {
+  background: #cde;
+}
+.tm-app-row.selected {
+  background: var(--title-active);
+  color: #fff;
+}
+.tm-app-row span {
+  padding: 1px 6px;
+}
+.tm-app-empty {
+  padding: 6px;
+  color: #808080;
+}
+.tm-app-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+/* ── Processes tab ── */
+.tm-processes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+.tm-proc-table {
+  flex: 1;
+  border: 2px inset var(--win-dark);
+  background: #fff;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 200px;
+  max-height: 260px;
+}
+.tm-proc-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  min-width: max-content;
+}
+.tm-proc-header span {
+  padding: 2px 4px;
+  border-right: 1px solid var(--win-dark);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-dark);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.tm-proc-header span:hover {
+  background: #d0d0d0;
+}
+.tm-proc-row {
+  display: flex;
+  cursor: default;
+  min-width: max-content;
+}
+.tm-proc-row:nth-child(even) {
+  background: #f8f8f8;
+}
+.tm-proc-row:hover {
+  background: #ddeeff;
+}
+.tm-proc-row.selected {
+  background: var(--title-active);
+  color: #fff;
+}
+.tm-proc-row span {
+  padding: 1px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tm-col-name {
+  width: 130px;
+}
+.tm-col-pid {
+  width: 44px;
+  text-align: right;
+}
+.tm-col-user {
+  width: 110px;
+}
+.tm-col-cpu {
+  width: 38px;
+  text-align: right;
+}
+.tm-col-mem {
+  width: 76px;
+  text-align: right;
+}
+
+.tm-proc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.tm-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+.tm-checkbox input {
+  cursor: default;
+}
+
+/* ── Performance tab ── */
+.tm-performance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tm-perf-top {
+  display: flex;
+  gap: 8px;
+}
+.tm-perf-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tm-perf-label {
+  font-size: 10px;
+  color: #000;
+}
+.tm-perf-graph-wrap {
+  border: 2px inset var(--win-dark);
+  background: #000;
+  padding: 0;
+  line-height: 0;
+}
+.tm-perf-canvas {
+  display: block;
+  width: 100%;
+  height: 70px;
+}
+
+.tm-perf-bar-container {
+  border: 2px inset var(--win-dark);
+  background: #000;
+  height: 70px;
+  display: flex;
+  align-items: flex-end;
+}
+.tm-perf-bar-fill {
+  width: 100%;
+  background: #00ff00;
+  transition: height 0.5s;
+}
+.tm-perf-bar-fill.tm-mem-bar {
+  background: #ffff00;
+}
+
+.tm-perf-stats {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.tm-perf-stat-group {
+  flex: 1;
+  border: 2px inset var(--win-dark);
+  padding: 3px;
+  background: var(--win-bg);
+}
+.tm-perf-stat-title {
+  font-weight: bold;
+  margin-bottom: 3px;
+  border-bottom: 1px solid var(--win-dark);
+  padding-bottom: 1px;
+}
+.tm-perf-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1px 0;
+}
+
+/* ── Networking tab ── */
+.tm-networking {
+  display: flex;
+  flex-direction: column;
+}
+.tm-net-header-row,
+.tm-net-row {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+.tm-net-header-row {
+  background: var(--win-bg);
+  font-weight: bold;
+  border: 2px inset var(--win-dark);
+  border-bottom: none;
+}
+.tm-net-col {
+  flex: 1;
+  padding: 2px 6px;
+  border-right: 1px solid var(--win-dark);
+}
+.tm-net-body {
+  border: 2px inset var(--win-dark);
+  border-top: none;
+  background: #fff;
+}
+
+/* ── Users tab ── */
+.tm-users {
+  display: flex;
+  flex-direction: column;
+}
+.tm-user-header-row,
+.tm-user-row {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+.tm-user-header-row {
+  background: var(--win-bg);
+  font-weight: bold;
+  border: 2px inset var(--win-dark);
+  border-bottom: none;
+}
+.tm-user-col {
+  flex: 1;
+  padding: 2px 6px;
+  border-right: 1px solid var(--win-dark);
+}
+.tm-user-body {
+  border: 2px inset var(--win-dark);
+  border-top: none;
+  background: #fff;
+}
+.tm-user-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* Shared button */
+.tm-btn {
+  padding: 3px 12px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+  cursor: default;
+  font-size: 11px;
+}
+.tm-btn:active:not(:disabled) {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+  padding: 4px 11px 2px 13px;
+}
+.tm-btn:disabled {
+  color: var(--win-dark);
+  cursor: default;
+}
+
+/* Status bar */
+.tm-status-bar {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid var(--win-dark);
+  padding: 2px 4px;
+  background: var(--win-bg);
+}
+.tm-status-bar span {
+  flex: 1;
+  padding: 1px 4px;
+  border-right: 1px solid var(--win-dark);
+}
+.tm-status-bar span:last-child {
+  border-right: none;
+}

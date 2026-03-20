@@ -1,29 +1,96 @@
 # AGENTS.md — Windows 98 Desktop Site
 
-A nostalgic Windows 98 desktop simulator. Static site: vanilla HTML/CSS/JS, no framework, no build step required, deployable to S3.
+A nostalgic Windows 98 desktop simulator. **React/Next.js** app with static export. Apps and shell are React components.
+
+---
+
+## Architecture
+
+- **Shell state** — `WindowManagerContext` (`app/context/WindowManagerContext.tsx`): visibility, focus, minimize, bounds. Use `useWindowManager()` for `showApp`, `hideApp`, `focusApp`, `minimizeApp`, `setBounds`.
+- **App windows** — React components wrapped in **`AppWindow`** (`app/components/win98/`), which handles title bar, drag, resize, min/max/close, z-index.
+- **Registry** — `app/registry.ts` holds `appRegistry` (array of `AppConfig`). Page renders all windows + shell (BootScreen, DesktopIcons, Taskbar, ShellOverlays) inside `WindowManagerProvider`.
+- **Shared Win98 UI** — `app/components/win98/`: `AppWindow`, `TitleBar`, `MenuBar`, and **toolbar** (`ToolbarRow`, `Toolbar`, `ToolbarButton`, `ToolbarSeparator`, `ToolbarSelect`).
 
 ---
 
 ## Project Structure
 
 ```
-index.html              — Single-page app; all windows and menus live here
-style.css               — Global styles and shell CSS (taskbar, start menu, desktop)
-shell/                  — Core OS shell scripts
-  windows97.js          — App registry (registerApp / showApp / hideApp)
-  windowChrome.js       — Reusable window chrome (title bar, drag, resize, taskbar wiring)
-  taskbar.js            — Taskbar and Start menu logic
-  shutdown.js           — Shutdown dialog
-  state.js              — localStorage persistence (Word editor state + booted flag)
-  bsod.js               — Blue Screen of Death overlay
-  dialog.js             — Generic modal dialogs
-apps/<name>/            — One folder per app
-  <name>.css            — App-specific styles
-  <name>.js             — App logic (IIFE, exports namespace to window)
-  window.js             — Shell registration (attachWindowChrome + registerApp)
-scripts/build.js        — Minify/bundle to dist/. --bundle inlines everything.
-e2e/apps.spec.js        — Playwright end-to-end tests
+app/
+  layout.tsx            — Metadata, global CSS imports (style, shell, win98/toolbar, apps)
+  page.tsx              — Client page: WindowManagerProvider, all app windows, BootScreen, DesktopIcons, Taskbar, ShellOverlays
+  style.css             — Global styles, CSS variables, app-window base (e.g. position for z-index)
+  globals.css           — Minimal baseline
+  context/
+    WindowManagerContext.tsx  — Shell state: apps visibility, focus, bounds, dialogs, BSOD
+  components/
+    shell/              — React shell (BootScreen, Taskbar, DesktopIcons, StartMenuTree, ShellOverlays) + CSS
+    win98/               — Shared Win98 UI
+      AppWindow.tsx      — Window chrome: drag, resize, min/max/close, z-index
+      TitleBar.tsx       — Title bar with optional min/max/close
+      MenuBar.tsx        — Menu bar with dropdowns
+      toolbar/           — Shared toolbar components (see below)
+        Toolbar.tsx      — ToolbarRow, Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSelect
+        toolbar.css      — Win98 toolbar styles (imported in layout)
+        index.ts
+    apps/<name>/        — One folder per app: <Name>Window.tsx, app config, CSS, tests
+  registry.ts           — appRegistry: AppConfig[] (used by Taskbar, DesktopIcons, page)
+  types/app-config.ts   — AppConfig interface
+public/                 — Static assets
+  shell/, apps/<name>/  — Icons, images, sounds per shell or app
+e2e/                    — Playwright E2E tests
+test/                   — Jest unit tests (e.g. word, shell, calculator)
 ```
+
+**Build & run:** `npm run build` → static export (e.g. `out/`). `npm run dev` → Next.js dev server.
+
+---
+
+## Shared Components (win98)
+
+### AppWindow
+
+Wraps each app window; handles visibility, z-index, bounds, and attaches drag/resize/min/max/close to the title bar.
+
+- **Props:** `id`, `appId`, `className`, `titleBar`, `children`, `allowResize`, `maximizedClass`, `onClose`, `getCanDrag`.
+- **Drag:** Active only when `getCanDrag(el)` is true (default: element does not have `maximizedClass`). To be draggable on load, include the enabling class in initial `className` (e.g. Word: `windowed`).
+
+### TitleBar, MenuBar
+
+- **TitleBar:** Renders the title bar; `AppWindow` finds `.title-bar` and `[data-win-min]` / `[data-win-max]` / `[data-win-close]` to wire minimize/maximize/close and drag.
+- **MenuBar:** Optional menu bar with dropdowns; see existing apps for `MenuItemConfig` / `MenuDropdownItem`.
+
+### Toolbar (win98/toolbar)
+
+Shared toolbar primitives for Word, VB6, and other apps. Styles live in `app/components/win98/toolbar/toolbar.css` (imported in `layout.tsx`).
+
+| Component            | Purpose                                                                                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ToolbarRow**       | One row; optional left gripper. Props: `children`, `showGripper?` (default true), `className?`.                                                    |
+| **Toolbar**          | Flex container for buttons/selects. Props: `children`, `className?` (e.g. `"standard-toolbar"`, `"vb6-toolbar"`).                                  |
+| **ToolbarButton**    | Single button. Props: `children`, `title?`, `onClick?`, `active?`, `className?`, `style?`. Use `<span className="icon">…</span>` for icon content. |
+| **ToolbarSeparator** | Vertical divider between groups.                                                                                                                   |
+| **ToolbarSelect**    | `<select>` in toolbar. Props: `children`, `value?`, `defaultValue?`, `onChange?`, `title?`, `className?`.                                          |
+
+**Example (add a toolbar to an app):**
+
+```tsx
+import { ToolbarRow, Toolbar, ToolbarButton, ToolbarSeparator } from '@/app/components/win98';
+
+<ToolbarRow>
+  <Toolbar>
+    <ToolbarButton title="New" onClick={onNew}>
+      <span className="icon">📄</span>
+    </ToolbarButton>
+    <ToolbarSeparator />
+    <ToolbarButton title="Bold" active={bold} onClick={onBold}>
+      B
+    </ToolbarButton>
+  </Toolbar>
+</ToolbarRow>;
+```
+
+Use `showGripper={false}` on `ToolbarRow` for a bar without the gripper (e.g. VB6). App-specific classes (e.g. Word’s `format-btn`, `zoom-select`) can be passed via `className` and styled in the app’s CSS.
 
 ---
 
@@ -32,90 +99,42 @@ e2e/apps.spec.js        — Playwright end-to-end tests
 Every new app must complete **all** of these steps:
 
 ### 1. Create app files
-- `apps/<name>/<name>.css` — window and app styles
-- `apps/<name>/<name>.js` — app logic wrapped in IIFE, exports `window.AppName`
-- `apps/<name>/window.js` — shell registration (see pattern below)
 
-### 2. Add HTML to `index.html`
-- Window div with `id="<name>-window"` and class `app-window`
-- Taskbar button with `id="taskbar-<name>"`
-- `<link>` for the CSS in the `<head>` alongside the other app stylesheets
-- `<script>` tags at the bottom for each JS file, in order: `<name>.js` then `window.js`
+- `app/components/apps/<name>/<Name>Window.tsx` — React component that renders inside `AppWindow` (from win98) with `TitleBar` and app content.
+- `app/components/apps/<name>/<name>.css` — window and app-specific styles.
+- Export `{Name}Window` and `{Name}AppConfig` from `app/components/apps/<name>/index.ts` (or from the window file and re-export).
 
-### 3. Register with the shell (`window.js` pattern)
-```js
-(function () {
-  'use strict';
+### 2. Wire up shell and layout
 
-  const win = document.getElementById('<name>-window');
-  if (!win) return;
+- **Registry:** Add the app’s `AppConfig` to the `appRegistry` array in `app/registry.ts`.
+- **Page:** Import and render `<{Name}Window />` in `app/page.tsx` (inside `WindowManagerProvider`).
+- **CSS:** Import the app’s CSS in `app/layout.tsx` (e.g. `'./components/apps/<name>/<name>.css'`).
+- **Assets:** Put images/audio in `public/apps/<name>/` and reference with root-relative paths (e.g. `apps/<name>/icon.png`).
 
-  if (window.attachWindowChrome) {
-    attachWindowChrome({
-      windowEl: win,
-      appId: '<name>',
-      taskbarId: 'taskbar-<name>',
-      minimizedClass: 'minimized',
-      maximizedClass: 'maximized',
-      allowResize: true,          // false if the window should not be resizable
-      onClose: function () {
-        if (window.Windows97) window.Windows97.hideApp('<name>');
-      },
-      getCanDrag: function (el) {
-        return !el.classList.contains('maximized');
-      },
-    });
-  }
+### 3. Use AppWindow and shell state
 
-  if (window.Windows97) {
-    window.Windows97.registerApp({
-      id: '<name>',
-      windowId: '<name>-window',
-      taskbarId: 'taskbar-<name>',
-      startMenuId: 'start-menu-<name>',  // matches the Start menu item id
-      openByDefault: false,
-    });
-  }
-})();
-```
+- In `<Name>Window.tsx`, wrap content with `<AppWindow id="<name>-window" appId="<name>" className="app-window ..." titleBar={<TitleBar ... />} ...>`. Use `useWindowManager()` for `hideApp`, `showApp`, etc. as needed.
+- Ensure the window has a stable `id` and `appId` that match the `AppConfig.id` used in the registry (so Taskbar and Start menu can show/focus the correct window).
 
-### 4. Add to Start menu under Programs (`index.html`)
+### 4. Add to Start menu under Programs
+
 All apps must appear under **Programs** in the Start menu. Place them in the appropriate subfolder:
 
-| Subfolder | Apps |
-|-----------|------|
-| Accessories | Calculator, Notepad, Paint |
-| Entertainment | Winamp |
-| Games | Minesweeper, 3D Pinball, THPS2, TIM |
-| Internet | AIM, IE5, Napster, Netscape Navigator |
-| System Tools | Defrag |
-| _(Programs root)_ | Word, VB6 |
+| Subfolder         | Apps                                  |
+| ----------------- | ------------------------------------- |
+| Accessories       | Calculator, Notepad, Paint            |
+| Entertainment     | Winamp                                |
+| Games             | Minesweeper, 3D Pinball, THPS2, TIM   |
+| Internet          | AIM, IE5, Napster, Netscape Navigator |
+| System Tools      | Defrag                                |
+| _(Programs root)_ | Word, VB6                             |
 
-Start menu item pattern:
-```html
-<div class="start-menu-item" id="start-menu-<name>">
-    <img src="..." class="sm-icon" alt="">
-    <span class="sm-label">App Name</span>
-</div>
-```
-Use `assets/icons/executable-0.png` as a placeholder icon when no proper icon exists.
+Set `AppConfig.startMenu` (e.g. `{ path: ['Programs', 'Accessories'] }`) so the app appears in the Start menu.
 
-### 5. Add to `scripts/build.js`
-- CSS path → `localCss` array
-- JS files → `localScripts` array (in dependency order; `window.js` after `<name>.js`)
-- If the app exports a global → add it to the `reserved` array so it isn't mangled
-- **Every local image, audio, or other binary asset used by the app must be added to `staticAssets`** — this is what gets copied into `dist/` on build. Missing entries will cause broken images/audio in the deployed build.
+### 5. Add to Playwright tests (`e2e/apps.spec.js`)
 
-```js
-// In scripts/build.js staticAssets array:
-'apps/<name>/<name>-icon.png',
-'apps/<name>/some-audio.mp3',
-```
-
-The rule: if it's referenced by a local path in HTML, CSS, or JS (i.e. not an `https://` CDN URL), it must be in `staticAssets`. Icons from `win98icons.alexmeub.com` and other CDN URLs are exempt — they load at runtime.
-
-### 6. Add to Playwright tests (`e2e/apps.spec.js`)
 Every new app must be added to the `apps` array in the test:
+
 ```js
 {
   subFolder: 'Accessories',              // Start menu subfolder (null if directly under Programs)
@@ -130,15 +149,13 @@ Every new app must be added to the `apps` array in the test:
 
 ## Code Style
 
-### JavaScript
-- All JS wrapped in `(function () { 'use strict'; ... })();` IIFEs
-- Apps export a single namespace: `window.AppName = { ... }`
-- No frameworks, no ES modules (except the ClippyJS CDN import which is unavoidable)
-- Prefer `var` in shell/window registration scripts; `const`/`let` fine inside app logic IIFEs
-- DOM queries via `document.getElementById` — no jQuery
+### TypeScript / React
+
+- Use `AppConfig` from `app/types/app-config`. Prefer `const`/`let`. Path alias `@/` for app imports when configured.
 
 ### CSS
-- All app windows use CSS variables from `style.css`:
+
+- All app windows use CSS variables from `app/style.css`:
   - `--win-bg` — standard window background (grey)
   - `--win-dark` — dark shadow border color
   - `--win-black` — darkest border
@@ -150,75 +167,68 @@ Every new app must be added to the `apps` array in the test:
 - Win98 inset border (reverse): `border-top/left: 1px solid var(--win-dark); border-right/bottom: 1px solid var(--win-white)`
 - App windows must hide when minimized: `.app-window-hidden, .minimized { display: none !important; }`
 - Font: `'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif` at `11px`
+- Asset URLs in CSS must be absolute: `url('/apps/<name>/image.png')` not relative paths
 
 ### Z-index hierarchy
-| Layer | Z-index |
-|-------|---------|
-| App windows (base) | 10 |
-| App windows (focused) | 11 |
-| Taskbar | 1000 |
-| ClippyJS agents (CDN) | 10001 |
-| Start menu | 10100 |
-| Start menu submenus | 10101 |
-| Control Panel dialog | 10200 |
-| BSOD | 99999 |
-| Boot screen | 999999 |
+
+- **App windows** use inline `zIndex` from `WindowManagerContext` (base 10, focused 11). The base class `.app-window` has `position: relative` in `style.css` so that `z-index` takes effect and windows stack above the desktop icons (z-index 1).
+  | Layer | Z-index |
+  |-------|---------|
+  | Desktop icons | 1 |
+  | App windows (base) | 10 |
+  | App windows (focused) | 11 |
+  | Taskbar | 1000 |
+  | ClippyJS agents (CDN) | 10001 |
+  | Start menu | 10100 |
+  | Start menu submenus | 10101 |
+  | Control Panel dialog | 10200 |
+  | BSOD | 99999 |
+  | Boot screen | 999999 |
 
 ---
 
-## Shell API Reference
+## Shell API Reference (WindowManagerContext)
 
-### `Windows97.registerApp(config)`
-Registers an app with the shell. Must be called from `window.js` after the DOM is ready.
-- `id` — unique app identifier
-- `windowId` — id of the window element
-- `taskbarId` — id of the taskbar button
-- `startMenuId` — id of the Start menu item
-- `openByDefault` — `true` to show the window on page load
+Use **`useWindowManager()`** from `app/context/WindowManagerContext` inside any component under `WindowManagerProvider`. It provides:
 
-### `Windows97.showApp(id)` / `Windows97.hideApp(id)`
-Show or hide a registered app window and update the taskbar.
+| Method / state                                                           | Description                                                                                    |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| **showApp(id)**                                                          | Show the app window and bring it to front.                                                     |
+| **hideApp(id)**                                                          | Hide the app window (and update taskbar).                                                      |
+| **focusApp(id)**                                                         | Bring the app to front (higher z-index). Called by `AppWindow` on mousedown inside the window. |
+| **minimizeApp(id)**                                                      | Hide the window but keep it on the taskbar (visible/minimized state).                          |
+| **setBounds(id, bounds)**                                                | Update stored position/size (used by `AppWindow` after drag/resize).                           |
+| **apps**                                                                 | `Record<string, AppState>` — visibility, minimized, zIndex, bounds per app.                    |
+| **openDialog**, **openBsod**, **openFatalError**, **shutdownOpen**, etc. | Shell overlays and dialogs.                                                                    |
 
-### `attachWindowChrome(config)`
-Attaches title bar, drag, resize grip, minimize/maximize/close buttons to a window element.
-- `allowResize: true` adds a bottom-right resize grip
-- `getCanDrag(el)` — return `false` to disable dragging (e.g. when maximized)
-- `onClose` — called when the X button is clicked
+Add **`AppConfig`** to **`appRegistry`** in `app/registry.ts` to register an app.
 
-### `Windows97.bsod([options])`
-Triggers the BSOD overlay. Pass `{ clearStorage: true, reload: true }` to wipe state and reload.
+Use `getCanDrag` and `maximizedClass` on `AppWindow` to control draggability. **BSOD:** `openBsod({ clearStorage: true, reload: true })`.
 
 ---
 
 ## Testing
 
-Run tests: `npx playwright test`
+- **Unit (Jest):** `npm run test:unit` — tests live under `test/` and next to app code (e.g. `app/components/apps/word/*.test.ts(x)`).
+- **E2E (Playwright):** `npx playwright test` — `e2e/apps.spec.js` opens each app from the Start menu, interacts, then closes. `e2e/performance.spec.js` checks load and paint timings.
 
-The test (`e2e/apps.spec.js`) blocks all external HTTPS requests to prevent CDN and iframe resources from hanging the `load` event. It then:
-1. Dismisses the boot screen
-2. For each app: opens via Start menu (navigating the Programs subfolder hierarchy), verifies the window is visible, interacts with the app, closes it, and verifies it's hidden
+### Adding tests
 
-**New apps must be added to the test** — do not ship an untested app.
+**Unit / functional (Jest)**
 
----
+- Add `*.test.ts` or `*.test.tsx` next to the module or under `test/`. Use React Testing Library for components (`render`, `screen`, `userEvent`). Mock browser APIs in `test/setup.js` if needed (e.g. `document.execCommand`). Run with `npm run test:unit` or `npm run test:unit -- --testPathPattern=word`.
+- Cover core behavior: rendering, user actions, and any non-trivial logic (e.g. sanitizer, persistence). Path alias `@/` is resolved via Jest `moduleNameMapper` in `package.json`.
 
-## Build & Deploy
+**E2E (Playwright)**
 
-```bash
-node scripts/build.js              # Lint/validate local files → dist/
-node scripts/build.js --bundle     # Inline all CSS+JS into a single HTML file
-node scripts/build.js --obfuscate  # Bundle + mangle JS identifiers
-```
-
-Deploys to S3 as a static site. The `dist/` directory is the deployable artifact.
+- Add the app to the `apps` array in `e2e/apps.spec.js`. Each entry needs: `subFolder` (e.g. `'Accessories'`, `'Games'`, or `null` for Programs root), `startId` (e.g. `'#start-menu-<appId>'`), `windowId` (e.g. `'#<appId>-window'`), optional `titleSelector`, and `interact(page)` — at least one meaningful action (click, fill) inside the window. The spec closes the window via the title bar `[data-win-close]` button. See the comment at the top of `e2e/apps.spec.js` for the full template.
 
 ---
 
 ## Key Conventions
 
-- **No auto-start**: Apps should not start running on `showApp` — wait for user interaction (e.g. a Start button)
-- **No resize by default**: Set `allowResize: false` unless the app genuinely benefits from resizing
-- **Desktop icon double-click**: Implement a 350ms double-click timer (see any `window.js` for the pattern)
-- **Avoid inline styles**: Use CSS classes; only set `style` for dynamic values (position, size, wallpaper)
-- **Don't touch `shell/windows97.js` for new apps**: The shell is generic — apps register themselves
-- **Icons**: Prefer icons from `https://win98icons.alexmeub.com/icons/png/<name>.png`; fall back to `assets/icons/executable-0.png`
+- **Registry:** Add `AppConfig` to `appRegistry`; shell uses it for Taskbar, Start menu, Desktop.
+- **AppWindow:** `allowResize: false` by default. If using `getCanDrag`, include the enabling class in initial `className` so the window is draggable on load (e.g. Word’s `windowed`).
+- **Icons:** `public/apps/<name>/` or `public/shell/icons/`. See `MISSING_ICONS.md` if present.
+- **Styles:** Prefer CSS classes; `style` only for dynamic values (position, size).
+- **Tests:** Add new apps to E2E `apps` array; add unit tests as needed.

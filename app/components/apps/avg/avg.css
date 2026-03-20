@@ -1,0 +1,265 @@
+/* ── AVG Anti-Virus System 6 faithful recreation ─────────────────────────── */
+
+.avg-window {
+  position: fixed;
+  top: 55px;
+  left: 80px;
+  width: 580px;
+  height: 440px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  box-shadow: 1px 1px 0 var(--win-black);
+  font-family: 'MS Sans Serif', Tahoma, Arial, sans-serif;
+  color: #000;
+}
+
+/* ── Menu Bar Override ── */
+.avg-window .menu-bar {
+  background: #c0c0c0;
+  border-bottom: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+.avg-window .menu-bar > div {
+  padding: 0 6px;
+}
+
+/* ── Main Body ── */
+.avg-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 4px;
+  gap: 4px;
+}
+
+/* ── Left Panel ── */
+.avg-left-panel {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  background: #c0c0c0;
+  border-right: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+/* Logo Section */
+.avg-logo-section {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avg-shield-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #f0f0f0;
+  /* Add actual image back in real use */
+  border: 1px inset #888;
+}
+
+.avg-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.avg-logo-main {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fbd600;
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1;
+}
+
+.avg-logo-sub {
+  font-size: 14px;
+  color: #ff9900;
+  font-weight: bold;
+}
+
+.avg-logo-slogan {
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* Status Section */
+.avg-status-section {
+  padding: 0 10px;
+  flex: 1;
+}
+
+.avg-status-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.avg-status-box {
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+  padding: 5px;
+  background: #c0c0c0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.avg-status-item {
+  display: flex;
+  align-items: center;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  padding: 5px;
+  gap: 8px;
+}
+
+.avg-status-icon.check-icon {
+  width: 16px;
+  height: 16px;
+  background: #008000; /* Green box */
+  position: relative;
+}
+
+.avg-status-icon.check-icon::after {
+  content: '✓';
+  color: white;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.avg-status-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.avg-status-name {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.avg-status-desc {
+  font-size: 10px;
+}
+
+/* ── Right Panel ── */
+.avg-right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background: #c0c0c0;
+}
+
+.avg-tests-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.avg-test-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.avg-test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.avg-test-title-col {
+  flex: 1;
+}
+
+.avg-test-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000080;
+  margin: 0 0 5px 0;
+}
+
+.avg-test-desc {
+  font-size: 11px;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+.avg-test-btn {
+  background: #000080;
+  color: white;
+  border: 2px solid;
+  border-color: #888 #333 #333 #888;
+  padding: 4px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.avg-test-btn:active {
+  border-color: #333 #888 #888 #333;
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.avg-test-icon {
+  width: 64px;
+  height: 64px;
+  background: #d0d0d0;
+  border: 1px inset #888;
+  margin-left: 10px;
+}
+
+/* ── Bottom Buttons ── */
+.avg-bottom-buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+.avg-bottom-btn {
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  padding: 5px 0;
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.avg-bottom-btn:active {
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+.avg-btn-icon {
+  width: 24px;
+  height: 24px;
+  background: #d0d0d0;
+  border: 1px inset #aaa;
+}
+
+/* ── Status Bar ── */
+.avg-statusbar {
+  background: #c0c0c0;
+  border-top: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+  padding: 2px 4px;
+  font-size: 11px;
+}

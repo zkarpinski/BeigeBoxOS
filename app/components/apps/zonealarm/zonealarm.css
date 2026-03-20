@@ -1,0 +1,799 @@
+/* ── ZoneAlarm 3.x faithful recreation ─────────────────────────────────────── */
+
+.zonealarm-window {
+  position: fixed;
+  top: 55px;
+  left: 80px;
+  width: 516px;
+  height: 440px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  box-shadow: 1px 1px 0 var(--win-black);
+}
+
+/* ── Header banner ── */
+.za-header {
+  background: linear-gradient(to bottom, #f8cb00 0%, #e8a800 100%);
+  display: flex;
+  align-items: center;
+  padding: 5px 8px 4px;
+  gap: 8px;
+  min-height: 52px;
+  border-bottom: 2px solid #7a5800;
+  flex-shrink: 0;
+}
+
+/* Logo */
+.za-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.za-logo-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #6ee06e, #1a8a1a 60%, #0d5a0d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 7.5px;
+  font-weight: bold;
+  letter-spacing: 0px;
+  border: 1px solid #085808;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 1.15;
+  padding: 2px;
+}
+
+.za-logo-labs {
+  font-size: 8px;
+  font-weight: bold;
+  color: #3a2400;
+  text-align: center;
+  letter-spacing: 1.5px;
+}
+
+/* Traffic section */
+.za-traffic {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 1px solid #a07800;
+}
+
+.za-internet-label {
+  font-size: 8.5px;
+  font-weight: bold;
+  color: #2a1800;
+  letter-spacing: 0.5px;
+  writing-mode: horizontal-tb;
+}
+
+.za-traffic-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.za-traffic-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.za-traffic-lbl {
+  font-size: 7.5px;
+  font-weight: bold;
+  color: #2a1800;
+  width: 18px;
+}
+
+.za-bar-track {
+  width: 72px;
+  height: 8px;
+  background: #111;
+  border: 1px solid #6a4a00;
+  border-top-color: #000;
+  border-left-color: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.za-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #00aa00, #00ff00);
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+.za-bar-fill.active-in {
+  animation: za-in-anim 1.1s ease-in-out infinite alternate;
+}
+
+.za-bar-fill.active-out {
+  animation: za-out-anim 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes za-in-anim {
+  0% {
+    width: 12%;
+  }
+  40% {
+    width: 60%;
+  }
+  70% {
+    width: 28%;
+  }
+  100% {
+    width: 75%;
+  }
+}
+
+@keyframes za-out-anim {
+  0% {
+    width: 8%;
+  }
+  50% {
+    width: 45%;
+  }
+  100% {
+    width: 20%;
+  }
+}
+
+/* STOP button */
+.za-stop-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #ff6644, #cc0000 55%, #880000);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border: 2px outset #ff8866;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.za-stop-btn:active {
+  border-style: inset;
+}
+
+.za-stop-btn.za-btn-start {
+  background: radial-gradient(circle at 42% 38%, #88ff88, #00aa00 55%, #006600);
+  border-color: #88ff88;
+}
+
+/* Header right: icons + status */
+.za-header-right {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.za-header-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.za-hdr-icon {
+  font-size: 14px;
+  line-height: 1;
+  cursor: default;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
+}
+
+.za-programs-lbl {
+  font-size: 10px;
+  font-weight: bold;
+  color: #3a2600;
+  letter-spacing: 1.5px;
+}
+
+.za-all-active {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cc5500;
+}
+
+.za-all-stopped {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cc0000;
+}
+
+/* ── Body: nav + content ── */
+.za-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Left nav sidebar ── */
+.za-nav {
+  width: 90px;
+  background: #8b6010;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 1px solid #5a3a00;
+}
+
+.za-nav-btn {
+  background: #c49020;
+  border: none;
+  border-bottom: 1px solid #7a5400;
+  border-top: 1px solid #e8c050;
+  color: #1a0800;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 8px 6px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  line-height: 1.25;
+}
+
+.za-nav-btn:hover {
+  background: #d8a830;
+}
+
+.za-nav-btn.za-nav-active {
+  background: #f8cb00;
+  color: #000;
+  border-left: 3px solid #cc5500;
+}
+
+/* ── Right content area ── */
+.za-content {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Content top bar: help + tabs */
+.za-content-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 4px 8px 0;
+  background: #f0eee8;
+  border-bottom: 2px solid #aaa;
+  flex-shrink: 0;
+}
+
+.za-help-link {
+  font-size: 10px;
+  color: #0000cc;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: 3px;
+}
+
+.za-help-link:hover {
+  text-decoration: underline;
+}
+
+.za-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.za-tab {
+  background: #d0ccc4;
+  border: 1px solid #999;
+  border-bottom: none;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 14px;
+  cursor: pointer;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  bottom: -1px;
+  color: #333;
+}
+
+.za-tab:hover {
+  background: #e0dcd4;
+}
+
+.za-tab.za-tab-active {
+  background: white;
+  color: #000;
+  border-bottom-color: white;
+  z-index: 1;
+}
+
+/* Content body scroll area */
+.za-content-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px;
+}
+
+/* ── Section heading ── */
+.za-section-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #cc3300;
+  border-bottom: 1px solid #cc9900;
+  padding-bottom: 3px;
+  margin-bottom: 8px;
+}
+
+/* ── Firewall section layout ── */
+.za-fw-layout {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.za-fw-text {
+  width: 118px;
+  flex-shrink: 0;
+  font-size: 9.5px;
+  line-height: 1.55;
+  color: #111;
+}
+
+.za-fw-text p {
+  margin: 0 0 7px 0;
+}
+
+.za-fw-zones {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Zone security box */
+.za-zone-box {
+  border: 1px solid #cc3300;
+}
+
+.za-zone-box-title {
+  background: #cc3300;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 8px;
+  letter-spacing: 0.3px;
+}
+
+.za-zone-box-content {
+  padding: 6px 8px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* Slider widget (display-only) */
+.za-slider-widget {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.za-slider-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+
+.za-slider-lbl {
+  font-size: 8.5px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+  /* reset button defaults */
+  background: none;
+  border: none;
+  padding-left: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.za-slider-lbl:hover {
+  text-decoration: underline;
+}
+
+.za-slider-lbl.za-lbl-dim {
+  color: #aaa;
+}
+
+.za-slider-lbl.za-lbl-active {
+  font-weight: bold;
+  color: #000;
+}
+
+.za-slider-track-area {
+  position: relative;
+  width: 28px;
+  height: 72px; /* 3 × 24 px labels */
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.za-track-line {
+  position: absolute;
+  left: 12px;
+  top: 12px; /* starts at center of first label */
+  width: 4px;
+  height: 48px; /* spans from first label center to last */
+  background: #c8c8c8;
+  border: 1px solid;
+  border-color: #888 #ccc #ccc #888;
+}
+
+.za-tick {
+  position: absolute;
+  left: 8px;
+  width: 10px;
+  height: 2px;
+  background: #999;
+}
+
+/* Center of each label row: 12px, 36px, 60px */
+.za-tick-high {
+  top: 11px;
+}
+.za-tick-mid {
+  top: 35px;
+}
+.za-tick-low {
+  top: 59px;
+}
+
+.za-slider-thumb {
+  position: absolute;
+  left: 3px;
+  width: 22px;
+  height: 16px;
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  box-shadow: 1px 1px 0 var(--win-black);
+  z-index: 1;
+  transition: top 0.12s ease;
+  /* THUMB_TOP values in component: high=4, medium=28, low=52 */
+  /* These center the thumb (height 16px → center +8px) on the tick rows */
+}
+
+.za-zone-desc {
+  font-size: 9px;
+  line-height: 1.55;
+  color: #111;
+  flex: 1;
+}
+
+.za-zone-desc strong {
+  color: #cc3300;
+}
+
+.za-fw-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.za-advanced-btn {
+  font-size: 10px;
+  padding: 2px 10px;
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  cursor: pointer;
+}
+
+.za-advanced-btn:active {
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+/* ── Zones tab content ── */
+.za-zones-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+}
+
+.za-zones-table th {
+  background: #e8e0d0;
+  border: 1px solid #ccc;
+  padding: 3px 6px;
+  text-align: left;
+  font-size: 9px;
+}
+
+.za-zones-table td {
+  border: 1px solid #ddd;
+  padding: 3px 6px;
+  font-size: 9px;
+}
+
+.za-zones-table tr:nth-child(even) td {
+  background: #f5f5ee;
+}
+
+.za-zones-btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.za-zones-btn {
+  font-size: 10px;
+  padding: 2px 10px;
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  cursor: pointer;
+}
+
+.za-zones-btn:active {
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+/* ── Overview section ── */
+.za-ov-headline {
+  font-size: 15px;
+  font-weight: bold;
+  color: #cc5500;
+  text-align: center;
+  margin: 8px 0 14px;
+}
+
+.za-ov-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.za-ov-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: #f8f8f0;
+  border: 1px solid #c8c0a0;
+  font-size: 10px;
+}
+
+.za-ov-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00bb00;
+  flex-shrink: 0;
+}
+
+.za-ov-dot.za-dot-red {
+  background: #cc0000;
+}
+
+.za-ov-stat-row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 10px;
+  font-size: 10px;
+  background: #f0f0e8;
+  border: 1px solid #c8c0a0;
+}
+
+.za-ov-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.za-ov-stat-num {
+  font-size: 16px;
+  font-weight: bold;
+  color: #cc5500;
+}
+
+.za-ov-stat-lbl {
+  font-size: 8.5px;
+  color: #666;
+}
+
+/* ── Program Control section ── */
+.za-pc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+}
+
+.za-pc-table th {
+  background: #e8e0d0;
+  border: 1px solid #ccc;
+  padding: 3px 6px;
+  text-align: center;
+  font-size: 9px;
+}
+
+.za-pc-table td {
+  border: 1px solid #ddd;
+  padding: 3px 6px;
+  font-size: 9px;
+}
+
+.za-pc-table tr:nth-child(even) td {
+  background: #f5f5ee;
+}
+
+.za-pc-allow {
+  color: #007700;
+  font-weight: bold;
+}
+.za-pc-block {
+  color: #cc0000;
+  font-weight: bold;
+}
+.za-pc-ask {
+  color: #cc6600;
+  font-weight: bold;
+}
+
+.za-pc-btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.za-pc-btn {
+  font-size: 10px;
+  padding: 2px 10px;
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  cursor: pointer;
+}
+
+.za-pc-btn:active {
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}
+
+/* ── Alerts & Logs section ── */
+.za-al-summary {
+  display: flex;
+  gap: 16px;
+  padding: 6px 10px;
+  background: #f8f8f0;
+  border: 1px solid #c8c0a0;
+  margin-bottom: 8px;
+}
+
+.za-al-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.za-al-count-num {
+  font-size: 18px;
+  font-weight: bold;
+  color: #cc2200;
+}
+
+.za-al-count-lbl {
+  font-size: 8px;
+  color: #555;
+}
+
+.za-al-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+}
+
+.za-al-table th {
+  background: #e8e0d0;
+  border: 1px solid #ccc;
+  padding: 2px 5px;
+  font-size: 9px;
+}
+
+.za-al-table td {
+  border: 1px solid #ddd;
+  padding: 2px 5px;
+  font-size: 9px;
+}
+
+.za-al-table tr:nth-child(even) td {
+  background: #f5f5ee;
+}
+
+/* ── E-mail Protection section ── */
+.za-em-section {
+  font-size: 10px;
+}
+
+.za-em-desc {
+  padding: 6px 0 10px;
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.za-em-group {
+  margin-bottom: 6px;
+}
+
+.za-em-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  padding: 3px 0;
+  cursor: pointer;
+}
+
+/* ── Status bar ── */
+.za-statusbar {
+  background: var(--win-bg);
+  border-top: 2px solid;
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 20px;
+}
+
+.za-statusbar-text {
+  flex: 1;
+  font-size: 9px;
+  color: #333;
+}
+
+.za-statusbar-btn {
+  font-size: 9px;
+  padding: 1px 7px;
+  background: var(--win-bg);
+  border: 1px solid;
+  border-color: var(--win-white) var(--win-dark) var(--win-dark) var(--win-white);
+  cursor: pointer;
+  color: #666;
+}
+
+.za-statusbar-btn:active {
+  border-color: var(--win-dark) var(--win-white) var(--win-white) var(--win-dark);
+}

@@ -1,0 +1,695 @@
+/* ── Word 97 Application Styles ──────────────────────────────────────────── */
+
+/* Main Window Container */
+#word-window {
+  width: 100%;
+  height: calc(100% - 28px);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--win-bg);
+}
+
+/* View modes */
+#word-window.view-print .editor-container {
+  max-width: 8.5in;
+  margin: 0 auto;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.2);
+}
+#word-window.view-web .editor-container {
+  max-width: 100%;
+  background-color: #f5f5f0;
+}
+#word-window.view-outline #editor {
+  padding-left: 1.5in;
+}
+#word-window.view-outline #editor h1,
+#word-window.view-outline #editor h2,
+#word-window.view-outline #editor h3 {
+  margin-left: -0.5in;
+}
+
+#word-window.minimized {
+  display: none !important;
+}
+
+#word-window.windowed {
+  position: absolute;
+  width: 80%;
+  height: 70%;
+  min-width: 320px;
+  min-height: 280px;
+  top: 50px;
+  left: 50px;
+  z-index: 500;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  resize: both;
+  overflow: hidden;
+}
+
+/* Word "W" icon in title bar */
+.title-logo {
+  width: 16px;
+  height: 16px;
+  background-color: black;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid gray;
+}
+
+.w-cyan {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 14px;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  line-height: 1;
+}
+
+.title-app-icon {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Word "W" icon in taskbar button */
+.task-icon-w-cyan {
+  color: #00ffff;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 14px;
+  background: black;
+  padding: 0 2px;
+  border: 1px solid gray;
+}
+
+/* Menu Bar */
+.menu-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 2px 2px 0;
+  border-bottom: 1px solid var(--win-dark);
+  height: 24px;
+  border-top: 1px solid var(--win-white);
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.doc-icon-container {
+  padding: 0 4px;
+  margin-right: 4px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--win-dark);
+}
+
+.doc-icon-w {
+  color: var(--title-active);
+  font-family: 'Times New Roman', serif;
+  font-weight: bold;
+  font-size: 14px;
+  background: white;
+  padding: 0 1px;
+  border: 1px solid var(--win-dark);
+}
+
+.menu-item {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-title {
+  padding: 2px 5px;
+  margin: 0 1px;
+  cursor: default;
+}
+
+.menu-title:hover {
+  background-color: var(--title-active);
+  color: var(--win-white);
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  min-width: 120px;
+  padding: 2px;
+}
+
+.menu-dropdown.hidden {
+  display: none;
+}
+
+.menu-dropdown-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+}
+
+button.menu-item {
+  appearance: none;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  padding: 0;
+}
+
+button.menu-item:hover .menu-title {
+  background-color: var(--title-active);
+  color: var(--win-white);
+}
+
+.menu-dropdown-item {
+  padding: 3px 15px 3px 10px;
+  cursor: default;
+}
+
+.menu-dropdown-item:hover {
+  background-color: var(--title-active);
+  color: var(--win-white);
+}
+
+.menu-dropdown-divider {
+  height: 2px;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-white);
+  margin: 2px 0;
+}
+
+.menu-right {
+  display: flex;
+  gap: 2px;
+  padding-right: 2px;
+}
+
+.doc-close-btn {
+  width: 16px;
+  height: 14px;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 0;
+}
+
+/* About Microsoft Word dialog */
+.about-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.about-dialog:not([hidden]) {
+  display: flex;
+}
+
+.about-dialog-inner {
+  background: var(--toolbar-bg);
+  border: 2px solid var(--win-dark);
+  border-top-color: var(--win-white);
+  border-left-color: var(--win-white);
+  padding: 20px 24px;
+  min-width: 320px;
+  text-align: center;
+}
+
+.about-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.about-version {
+  font-size: 11px;
+  color: var(--win-dark);
+  margin-bottom: 16px;
+}
+
+.about-word-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border: 2px solid var(--win-dark);
+  background: #0a246a;
+  color: var(--win-white);
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.about-word-icon:hover {
+  background: #1084d0;
+}
+
+.about-ok-wrap {
+  margin-top: 8px;
+}
+
+.about-ok-btn {
+  padding: 4px 20px;
+  border: 1px solid var(--win-dark);
+  border-top-color: var(--win-white);
+  border-left-color: var(--win-white);
+  background: var(--toolbar-bg);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.about-ok-btn:hover {
+  background: var(--win-light);
+}
+
+/* Word toolbar: select widths (base toolbar styles in win98/toolbar) */
+#word-window .zoom-select {
+  width: 60px;
+}
+#word-window .style-select {
+  width: 90px;
+}
+#word-window .font-select {
+  width: 130px;
+}
+#word-window .size-select {
+  width: 45px;
+}
+
+/* Ruler */
+.ruler-container {
+  display: flex;
+  height: 20px;
+  border-top: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-black);
+  background-color: var(--win-bg);
+}
+
+.ruler-left-controls {
+  width: 25px;
+  border-right: 1px solid var(--win-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ruler-btn {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--win-dark);
+  border-right-color: var(--win-white);
+  border-bottom-color: var(--win-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-family: 'Times New Roman', serif;
+  font-size: 10px;
+}
+
+.ruler {
+  flex-grow: 1;
+  background-color: var(--win-white);
+  position: relative;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-white);
+  margin-left: 1px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.ruler-ticks {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 100%;
+  display: flex;
+}
+
+.ruler-tick-group {
+  width: 38px;
+  height: 100%;
+  position: relative;
+  border-right: 1px solid #a0a0a0;
+}
+
+.ruler-tick-group::before {
+  content: '';
+  position: absolute;
+  left: 25%;
+  bottom: 0;
+  height: 3px;
+  border-left: 1px solid #a0a0a0;
+}
+
+.ruler-tick-group::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 5px;
+  border-left: 1px solid #a0a0a0;
+}
+
+.ruler-tick-group span {
+  position: absolute;
+  top: 1px;
+  right: -4px;
+  font-size: 9px;
+  color: #404040;
+}
+
+.ruler-indent-left {
+  position: absolute;
+  left: 8px;
+  top: 0;
+  width: 9px;
+  height: 100%;
+  z-index: 10;
+}
+
+.indent-top {
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  border-top: 5px solid #606060;
+  position: absolute;
+  top: 0;
+}
+
+.indent-bottom {
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  border-bottom: 5px solid #606060;
+  position: absolute;
+  bottom: 4px;
+}
+
+.indent-box {
+  width: 7px;
+  height: 4px;
+  background-color: #606060;
+  position: absolute;
+  bottom: 0;
+  left: 1px;
+}
+
+.ruler-indent-right {
+  position: absolute;
+  right: 8px;
+  top: 0;
+  width: 9px;
+  height: 100%;
+  z-index: 10;
+}
+
+.ruler-right-padding {
+  width: 17px;
+  background-color: var(--win-bg);
+  border-left: 1px solid var(--win-dark);
+}
+
+/* Workspace & Editor */
+.workspace-area {
+  display: flex;
+  flex-grow: 1;
+  background-color: var(--win-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex-grow: 1;
+  background-color: var(--win-white);
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  margin: 2px;
+  overflow: auto;
+  position: relative;
+}
+
+#editor {
+  width: 100%;
+  min-height: 100%;
+  padding: 1in;
+  outline: none;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12pt;
+  line-height: 1.2;
+  color: var(--win-black);
+  cursor: text;
+  user-select: text;
+}
+
+#editor p {
+  margin: 0 0 0.5em 0;
+  padding: 0;
+}
+
+#editor h1 {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 0 0 0.25em 0;
+  padding: 0;
+}
+
+#editor h2 {
+  font-size: 13pt;
+  font-weight: bold;
+  margin: 0.75em 0 0.25em 0;
+  padding: 0;
+}
+
+#editor h2:first-of-type {
+  margin-top: 0;
+}
+
+#editor h3 {
+  font-size: 10pt;
+  font-weight: bold;
+  margin: 0.5em 0 0.15em 0;
+  padding: 0;
+}
+
+#editor ul {
+  margin: 0.25em 0 0.5em 1.25em;
+  padding: 0;
+}
+
+#editor li {
+  margin: 0.1em 0;
+  padding: 0;
+}
+
+/* Vertical Scrollbar */
+.scrollbar-v {
+  width: 17px;
+  background-color: var(--win-bg);
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--win-white);
+}
+
+.scroll-btn {
+  width: 16px;
+  height: 16px;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  padding: 0;
+  margin: 1px 0;
+}
+
+.scroll-btn:active {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+.scroll-track-v {
+  flex-grow: 1;
+  background: repeating-linear-gradient(45deg, #dfdfdf, #dfdfdf 2px, #ffffff 2px, #ffffff 4px);
+  width: 16px;
+  position: relative;
+}
+
+.scroll-thumb-v {
+  width: 16px;
+  height: 30px;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  position: absolute;
+  top: 0;
+}
+
+.double-up,
+.double-down {
+  font-size: 10px;
+  height: 14px;
+}
+.circle {
+  font-size: 8px;
+  height: 14px;
+}
+
+/* Bottom Bar & View Buttons */
+.bottom-bar {
+  display: flex;
+  height: 18px;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+}
+
+.view-buttons {
+  display: flex;
+  width: 80px;
+  border-right: 1px solid var(--win-dark);
+}
+
+.view-btn {
+  width: 20px;
+  height: 17px;
+  background-color: var(--win-bg);
+  border: 1px solid transparent;
+  border-right-color: var(--win-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  background-color: var(--win-light);
+}
+
+.view-btn.active {
+  background-color: var(--win-dark);
+  color: var(--win-white);
+  border-color: var(--win-black);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Horizontal Scrollbar */
+.scrollbar-h {
+  flex-grow: 1;
+  display: flex;
+  border-top: 1px solid var(--win-dark);
+  margin-right: 17px;
+}
+
+.scroll-track-h {
+  flex-grow: 1;
+  background: repeating-linear-gradient(45deg, #dfdfdf, #dfdfdf 2px, #ffffff 2px, #ffffff 4px);
+  height: 16px;
+  position: relative;
+}
+
+.scroll-thumb-h {
+  height: 16px;
+  width: 40px;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  position: absolute;
+  left: 0;
+}
+
+/* Status Bar */
+.status-bar {
+  display: flex;
+  height: 22px;
+  background-color: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  padding: 2px;
+  gap: 2px;
+}
+
+.status-panel {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  color: var(--win-black);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.w-page {
+  width: 50px;
+}
+.w-sec {
+  width: 45px;
+}
+.w-frac {
+  width: 40px;
+}
+.w-at {
+  width: 60px;
+}
+.w-ln {
+  width: 40px;
+}
+.w-col {
+  width: 40px;
+}
+
+.right-panel {
+  width: 32px;
+  justify-content: center;
+  color: var(--win-dark);
+}
+
+.status-panel.right-panel.active {
+  color: var(--win-black);
+}
+
+.empty-panel {
+  flex-grow: 1;
+}

@@ -1,0 +1,20 @@
+# Cloudflare Pages headers
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Security headers for all routes
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Long-term cache for hashed Next.js static assets (fingerprinted filenames — safe to cache forever)
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Long-term cache for shell/app static assets (images, sounds, icons)
+/shell/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/apps/*
+  Cache-Control: public, max-age=31536000, immutable

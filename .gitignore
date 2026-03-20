@@ -1,9 +1,13 @@
 node_modules/
 .DS_Store
+tsconfig.tsbuildinfo
 dist/
+out/
+.next/
 .env
+.env.local
 playwright-report/
 test-results/
-.next/
-out/
 
+# Coverage
+coverage/

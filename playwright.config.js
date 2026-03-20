@@ -13,17 +13,28 @@ module.exports = defineConfig({
   reporter: 'html',
   use: {
     trace: 'on-first-retry',
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:3000',
   },
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'mobile',
+      use: {
+        ...devices['Pixel 5'],
+        viewport: { width: 393, height: 851 },
+        isMobile: true,
+        hasTouch: true,
+        defaultBrowserType: 'chromium',
+      },
+    },
   ],
   webServer: {
-    command: 'python3 -m http.server 8080',
-    url: 'http://localhost:8080',
-    reuseExistingServer: !process.env.CI,
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 120000,
   },
 });

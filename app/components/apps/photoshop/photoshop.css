@@ -1,0 +1,299 @@
+/* ── Photoshop 5 Window ───────────────────────────────────────────────────── */
+
+.photoshop-window {
+  position: fixed;
+  top: 80px;
+  left: 120px;
+  width: 400px;
+  height: 280px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* ── Splash Screen ────────────────────────────────────────────────────────── */
+
+.ps5-splash {
+  background: #000;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.ps5-splash-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.ps5-feather {
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px #1a6bb5);
+}
+
+.ps5-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.ps5-adobe {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.ps5-product {
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: -1px;
+}
+
+.ps5-version {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.ps5-progress-wrap {
+  width: 78%;
+  margin-bottom: 6px;
+  min-height: 12px;
+}
+
+.ps5-progress-track {
+  background: #1a1a1a;
+  height: 10px;
+  border: 1px solid #444;
+  overflow: hidden;
+}
+
+.ps5-progress-fill {
+  background: linear-gradient(90deg, #0a4a8c, #1a6bb5 50%, #4da6ff);
+  height: 100%;
+  width: 0%;
+  animation: ps5-load 2.2s ease-in-out forwards;
+}
+
+@keyframes ps5-load {
+  0% {
+    width: 0%;
+  }
+  15% {
+    width: 12%;
+  }
+  35% {
+    width: 30%;
+  }
+  50% {
+    width: 48%;
+  }
+  65% {
+    width: 63%;
+  }
+  80% {
+    width: 79%;
+  }
+  95% {
+    width: 96%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.ps5-status {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+  min-height: 14px;
+  letter-spacing: 0.3px;
+}
+
+.ps5-copyright {
+  position: absolute;
+  bottom: 8px;
+  font-size: 9px;
+  color: #3a3a3a;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+/* ── Virus Phase Screen ───────────────────────────────────────────────────── */
+
+.ps5-virus-screen {
+  background: #000;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+  user-select: none;
+}
+
+.ps5-virus-skull {
+  font-size: 52px;
+  animation: ps5-blink 0.4s step-end infinite;
+}
+
+@keyframes ps5-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.ps5-virus-text {
+  font-size: 11px;
+  color: #cc0000;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+
+/* ── Virus Popups (injected into document.body) ───────────────────────────── */
+
+.ps5-virus-popup {
+  position: fixed;
+  width: 290px;
+  background: var(--win-bg, #c0c0c0);
+  border-top: 2px solid var(--win-white, #fff);
+  border-left: 2px solid var(--win-white, #fff);
+  border-right: 2px solid var(--win-dark, #808080);
+  border-bottom: 2px solid var(--win-dark, #808080);
+  box-shadow: 2px 2px 0 var(--win-black, #000);
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  animation: ps5-popup-in 0.06s ease-out;
+}
+
+@keyframes ps5-popup-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ps5-popup-title {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+}
+
+.ps5-popup-title > span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ps5-popup-close {
+  background: var(--win-bg, #c0c0c0);
+  border-top: 1px solid var(--win-white, #fff);
+  border-left: 1px solid var(--win-white, #fff);
+  border-right: 1px solid var(--win-dark, #808080);
+  border-bottom: 1px solid var(--win-dark, #808080);
+  color: #000;
+  font-size: 9px;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ps5-popup-close:active {
+  border-top: 1px solid var(--win-dark, #808080);
+  border-left: 1px solid var(--win-dark, #808080);
+  border-right: 1px solid var(--win-white, #fff);
+  border-bottom: 1px solid var(--win-white, #fff);
+}
+
+.ps5-popup-body {
+  padding: 10px 12px 8px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-height: 56px;
+}
+
+.ps5-popup-body-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.ps5-popup-body p {
+  margin: 0;
+  line-height: 1.55;
+  color: #000;
+}
+
+.ps5-popup-footer {
+  padding: 2px 8px 8px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ps5-popup-btn {
+  background: var(--win-bg, #c0c0c0);
+  border-top: 2px solid var(--win-white, #fff);
+  border-left: 2px solid var(--win-white, #fff);
+  border-right: 2px solid var(--win-dark, #808080);
+  border-bottom: 2px solid var(--win-dark, #808080);
+  min-width: 75px;
+  height: 23px;
+  font-size: 11px;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.ps5-popup-btn:active {
+  border-top: 2px solid var(--win-dark, #808080);
+  border-left: 2px solid var(--win-dark, #808080);
+  border-right: 2px solid var(--win-white, #fff);
+  border-bottom: 2px solid var(--win-white, #fff);
+}

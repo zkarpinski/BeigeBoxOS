@@ -1,0 +1,55 @@
+/* ── Blue Screen of Death ────────────────────────────────────────────────── */
+
+.w97-bsod {
+  position: fixed;
+  inset: 0;
+  background: #0000aa;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.w97-bsod-inner {
+  max-width: 640px;
+  width: 90%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #fff;
+}
+
+.w97-bsod-header {
+  display: inline-block;
+  background: #aaaaaa;
+  color: #0000aa;
+  padding: 1px 10px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.w97-bsod-msg {
+  margin: 0 0 20px;
+  white-space: pre-wrap;
+}
+
+.w97-bsod-prompt {
+  margin: 0;
+  color: #fff;
+}
+
+@keyframes bsod-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.w97-bsod-cursor {
+  animation: bsod-blink 1s step-start infinite;
+}

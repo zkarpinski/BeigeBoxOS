@@ -108,7 +108,7 @@ export function Desktop({ openAppId }: DesktopProps) {
     const bootScreen = document.getElementById('boot-screen');
     const sound = document.getElementById('boot-sound') as HTMLAudioElement | null;
     const prompt = document.getElementById('boot-click-prompt');
-if (!bootScreen) return;
+    if (!bootScreen) return;
 
     // Direct app URLs should behave like the boot screen was already dismissed.
     if (skipBoot) {
@@ -158,7 +158,7 @@ if (!bootScreen) return;
     }
 
     setTimeout(() => {
-if (prompt) prompt.removeAttribute('hidden');
+      if (prompt) prompt.removeAttribute('hidden');
       bootScreen.addEventListener('click', dismiss);
       bootScreen.addEventListener('keydown', dismiss);
       bootScreen.setAttribute('tabindex', '0');

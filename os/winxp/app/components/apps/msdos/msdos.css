@@ -1,0 +1,61 @@
+.msdos-window {
+  width: 600px;
+  height: 400px;
+  background-color: var(--win-bg, #c0c0c0);
+  box-shadow:
+    inset 1px 1px #dfdfdf,
+    1px 0 #000,
+    0 1px #000,
+    1px 1px #000,
+    inset -1px -1px #808080;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.msdos-console {
+  background-color: black;
+  color: #c0c0c0;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 4px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  cursor: text;
+}
+
+.msdos-history {
+  white-space: pre-wrap;
+}
+
+.msdos-input-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.msdos-prompt {
+  margin-right: 4px;
+  white-space: pre;
+}
+
+.msdos-input {
+  background: transparent;
+  color: inherit;
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+}

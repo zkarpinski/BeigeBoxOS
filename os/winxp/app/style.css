@@ -1,0 +1,396 @@
+:root {
+  --win-bg: #ece9d8;
+  --win-dark: #a0a0a0;
+  --win-black: #000000;
+  --win-light: #f0f0f0;
+  --win-white: #ffffff;
+  --title-active: #0a246a;
+  --title-active-end: #a6caf0;
+  --title-inactive: #7a96df;
+  --title-inactive-end: #c8d8f0;
+  --taskbar-bg: #245edb;
+  --toolbar-bg: #ece9d8;
+  --desktop-bg: #3a6ea5;
+  /* Default wallpaper (Windows XP Bliss) — overridden by Display Properties when set */
+  --desktop-wallpaper: url('/shell/wallpapers/bliss.png');
+  --btn-radius: 3px;
+  --title-font: 'Tahoma', 'MS Sans Serif', sans-serif;
+  --title-font-size: 11px;
+  --title-font-weight: bold;
+  --title-color: #ffffff;
+  --title-bar-height: 30px;
+  --start-btn-bg: #3c8c3c;
+  --start-btn-hover: #4cac4c;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  font-family: var(--title-font);
+  font-size: var(--title-font-size);
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--desktop-bg);
+  background-image: var(--desktop-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.seo-intro {
+  display: none;
+}
+
+/* ── Windows XP Luna title bar (active window) ─────────────────────────────── */
+.title-bar.winxp-title-bar {
+  /*
+   * Authentic Luna Blue gradient — pixel-sampled from real XP at 96 DPI.
+   * The top 3–4 px are a brighter “rim”, then it drops into the rich cobalt
+   * body and darkens steadily toward the bottom edge.
+   */
+  background: linear-gradient(
+    to bottom,
+    #5a94d8 0%,
+    #4284d0 4%,
+    #2870cc 18%,
+    #1e64c8 40%,
+    #1858c0 65%,
+    #1248b4 85%,
+    #0c3ca8 100%
+  );
+  border-radius: 6px 6px 0 0;
+  height: var(--title-bar-height);
+  min-height: var(--title-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 0 6px;
+  color: #ffffff;
+  font-family: Tahoma, 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: move;
+  /* Inner white rim along top + left edge (XP “plastic” look) */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.15);
+  border: none;
+  border-bottom: 1px solid #0a246a;
+}
+
+.title-bar.winxp-title-bar .title-bar-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+  padding-right: 8px;
+}
+
+.title-bar.winxp-title-bar .title-bar-text > img {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  object-fit: fill !important;
+  flex-shrink: 0;
+  display: block;
+}
+
+.title-bar.winxp-title-bar .title-text {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #ffffff;
+  /* Real XP Luna has no text shadow on the title — clean white */
+  text-shadow: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title-bar.winxp-title-bar .title-bar-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* 3D Borders (softer for XP) */
+.win-border-outset {
+  border: 1px solid #aca899;
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+}
+
+.win-border-inset {
+  border: 1px solid #aca899;
+  box-shadow: inset 1px 1px var(--win-dark), inset -1px -1px var(--win-light);
+}
+
+.win-btn {
+  background-color: var(--win-bg);
+  border: 1px solid #aca899;
+  border-radius: var(--btn-radius);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+}
+
+.win-btn:active {
+  box-shadow: inset 1px 1px var(--win-dark), inset -1px -1px var(--win-light);
+  padding: 2px 0 0 2px;
+}
+
+/*
+ * XP Luna window control buttons.
+ * Min/Max: 22×21 px blue gel. Close: 24×21 px red gel (slightly wider in real XP).
+ * Each has a top-highlight inner glow and a dark bottom shadow — the "gel pill" look.
+ */
+.title-bar.winxp-title-bar .title-btn {
+  height: 21px;
+  min-height: 21px;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  /* Top inner-glow highlight */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.title-bar.winxp-title-bar .xp-btn-min,
+.title-bar.winxp-title-bar .xp-btn-max {
+  width: 22px;
+  min-width: 22px;
+  background: linear-gradient(
+    to bottom,
+    #78b4f4 0%,
+    #4a96ec 20%,
+    #2878e0 55%,
+    #1460d0 100%
+  );
+  border-color: #0a3aa0;
+  color: #ffffff;
+}
+
+.title-bar.winxp-title-bar .xp-btn-close {
+  /* Close is ~2px wider than min/max in real XP */
+  width: 24px;
+  min-width: 24px;
+  background: linear-gradient(
+    to bottom,
+    #f48090 0%,
+    #e84050 20%,
+    #d41830 55%,
+    #b00818 100%
+  );
+  border-color: #880010;
+  color: #ffffff;
+}
+
+.title-bar.winxp-title-bar .xp-btn-min:hover,
+.title-bar.winxp-title-bar .xp-btn-max:hover {
+  background: linear-gradient(
+    to bottom,
+    #90c8ff 0%,
+    #60a8f8 20%,
+    #3888f0 55%,
+    #1c6ee0 100%
+  );
+}
+
+.title-bar.winxp-title-bar .xp-btn-close:hover {
+  background: linear-gradient(
+    to bottom,
+    #ff9090 0%,
+    #ff5060 20%,
+    #e42840 55%,
+    #c00820 100%
+  );
+}
+
+.title-bar.winxp-title-bar .xp-btn-min:active,
+.title-bar.winxp-title-bar .xp-btn-max:active,
+.title-bar.winxp-title-bar .xp-btn-close:active {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Button icons ─────────────────────────────────────────────────────────────── */
+
+/* Minimize: a horizontal bar near the bottom of the button (XP style) */
+.title-bar.winxp-title-bar .icon-min {
+  display: block;
+  width: 8px;
+  height: 2px;
+  background: #ffffff;
+  margin-top: 6px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Maximize: hollow square with a thicker top border */
+.title-bar.winxp-title-bar .icon-max {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #ffffff;
+  border-top-width: 2px;
+  box-sizing: border-box;
+}
+
+/* Close: bold × from font */
+.title-bar.winxp-title-bar .icon-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+}
+
+/* App window base — Luna outer frame */
+.app-window {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--win-bg);
+  /* 3px outer frame: dark navy on top/sides, matching Luna border color */
+  border: 3px solid #0a3898;
+  border-radius: 6px 6px 0 0;
+  box-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.15) inset,
+    3px 3px 10px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  min-height: 100px;
+}
+
+.app-window-hidden {
+  display: none !important;
+}
+
+.app-window.maximized {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: calc(100dvh - 40px) !important;
+  border-radius: 0;
+}
+
+/* WinXP-style resize: thin edges + corners (like real OS), pointer hit layer above content */
+.win-resize-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.win-resize-hit {
+  position: absolute;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.win-resize-n {
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.win-resize-s {
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.win-resize-e {
+  top: 8px;
+  right: 0;
+  bottom: 8px;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.win-resize-w {
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.win-resize-ne {
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  cursor: nesw-resize;
+}
+
+.win-resize-nw {
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  cursor: nwse-resize;
+}
+
+.win-resize-sw {
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  cursor: nesw-resize;
+}
+
+.win-resize-se {
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    var(--win-dark) 30%,
+    var(--win-dark) 40%,
+    transparent 40%,
+    transparent 55%,
+    var(--win-dark) 55%,
+    var(--win-dark) 65%,
+    transparent 65%,
+    transparent 80%,
+    var(--win-dark) 80%,
+    var(--win-dark) 90%,
+    transparent 90%
+  );
+}
+
+/* Minimize animation */
+.win-minimizing {
+  transform: scale(0.8);
+  opacity: 0;
+  transition:
+    transform 0.25s,
+    opacity 0.25s;
+}

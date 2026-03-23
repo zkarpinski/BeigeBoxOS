@@ -1,0 +1,688 @@
+/* ── Windows XP Luna Taskbar, System Tray & Start Menu ────────────────────── */
+
+/* ── Taskbar ──────────────────────────────────────────────────────────────── */
+
+#taskbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(
+    to bottom,
+    #2c68ca 0%,
+    #245edb 8%,
+    #1b56d4 50%,
+    #1245c0 92%,
+    #0e3db8 100%
+  );
+  border-top: 2px solid #4b89f5;
+  display: flex;
+  align-items: center;
+  padding: 2px 4px 2px 0;
+  z-index: 1000;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* ── Start Button ─────────────────────────────────────────────────────────── */
+
+#start-button {
+  height: 36px;
+  padding: 0 16px 0 8px;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', Tahoma, sans-serif;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  cursor: default;
+  border: none;
+  border-radius: 0 16px 16px 0;
+  outline: none;
+  position: relative;
+  /* Outer dark border */
+  box-shadow:
+    0 0 0 1px #1a5c10,
+    1px 0 3px rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  /* Green gradient — matches XP Luna */
+  background: linear-gradient(
+    to bottom,
+    #6abf35 0%,
+    #52aa1e 12%,
+    #3e9414 35%,
+    #358010 65%,
+    #2e700c 88%,
+    #2a6809 100%
+  );
+}
+
+#start-button::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 6px;
+  right: 14px;
+  height: 40%;
+  border-radius: 0 6px 50% 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45), transparent);
+  pointer-events: none;
+}
+
+#start-button:active,
+#start-button.active {
+  background: linear-gradient(
+    to bottom,
+    #2a6809 0%,
+    #2e700c 12%,
+    #358010 35%,
+    #3e9414 65%,
+    #52aa1e 88%,
+    #6abf35 100%
+  );
+  box-shadow:
+    0 0 0 1px #1a5c10,
+    inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Quick Launch ─────────────────────────────────────────────────────────── */
+
+.quick-launch {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 40, 0.3);
+  margin-right: 2px;
+  height: 30px;
+}
+
+.quick-launch-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  cursor: default;
+  padding: 2px;
+}
+
+.quick-launch-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.quick-launch-btn:active {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.35);
+}
+
+/* ── Taskbar Divider ──────────────────────────────────────────────────────── */
+
+.taskbar-divider {
+  width: 3px;
+  height: 32px;
+  border-left: 1px solid rgba(0, 30, 80, 0.6);
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+/* ── Taskbar Tasks ────────────────────────────────────────────────────────── */
+
+.taskbar-tasks {
+  flex-grow: 1;
+  display: flex;
+  gap: 3px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.taskbar-task {
+  max-width: 160px;
+  min-width: 100px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px 0 6px;
+  font-family: Tahoma, 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  cursor: default;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  /* Raised XP task button */
+  background: linear-gradient(
+    to bottom,
+    #4a7fd4 0%,
+    #3a6cc8 50%,
+    #2c5ab8 100%
+  );
+  border-top-color: rgba(255, 255, 255, 0.35);
+  border-left-color: rgba(255, 255, 255, 0.2);
+  border-right-color: rgba(0, 0, 60, 0.35);
+  border-bottom-color: rgba(0, 0, 60, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.taskbar-task:hover {
+  background: linear-gradient(
+    to bottom,
+    #5a8fe4 0%,
+    #4a7cd8 50%,
+    #3c6ac8 100%
+  );
+}
+
+.taskbar-task.active {
+  background: linear-gradient(
+    to bottom,
+    #1a3f8c 0%,
+    #2252aa 50%,
+    #2a5cb8 100%
+  );
+  border-top-color: rgba(0, 0, 60, 0.5);
+  border-left-color: rgba(0, 0, 60, 0.35);
+  border-right-color: rgba(255, 255, 255, 0.15);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.taskbar-task img {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  flex-shrink: 0;
+  display: block;
+  object-fit: fill !important;
+}
+
+.task-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ── System Tray / Notification Area ─────────────────────────────────────── */
+
+.system-tray {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 6px;
+  background: linear-gradient(
+    to bottom,
+    #1640b0 0%,
+    #0e38a8 50%,
+    #0c34a0 100%
+  );
+  border: 1px solid rgba(0, 30, 100, 0.7);
+  border-radius: 3px;
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.tray-icon {
+  font-size: 9px;
+  padding: 0 2px;
+  user-select: none;
+}
+
+.tray-volume-icon {
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  opacity: 0.9;
+}
+
+.tray-volume-icon:hover {
+  opacity: 1;
+}
+
+.tray-app-icon {
+  cursor: pointer;
+  display: block;
+  user-select: none;
+  opacity: 0.9;
+}
+
+.tray-app-icon:hover {
+  opacity: 1;
+}
+
+.tray-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 2px;
+}
+
+/* ── Clock ────────────────────────────────────────────────────────────────── */
+
+#clock,
+#taskbar-clock {
+  font-family: Tahoma, sans-serif;
+  font-size: 11px;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+}
+
+/* ── Volume popup ─────────────────────────────────────────────────────────── */
+
+.volume-popup {
+  position: fixed;
+  bottom: 44px;
+  right: 8px;
+  width: 36px;
+  padding: 8px 4px;
+  background: var(--win-bg);
+  border: 1px solid #7f9db9;
+  border-radius: 3px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.35);
+  z-index: 10102;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.volume-popup.hidden {
+  display: none;
+}
+
+#volume-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 20px;
+  height: 80px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   XP Start Menu — two-column Luna panel
+   ════════════════════════════════════════════════════════════════════════════ */
+
+#xp-start-menu {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 390px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #0a2490;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6), 0 -2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 10100;
+  /* Allow All Programs fly-out and cascading submenus to extend past the panel */
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  font-family: Tahoma, 'MS Sans Serif', sans-serif;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.xp-sm-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  height: 54px;
+  background: linear-gradient(135deg, #1c3fa4 0%, #2460d0 40%, #4e90e8 100%);
+  border-bottom: 2px solid #1035a8;
+  flex-shrink: 0;
+}
+
+.xp-sm-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xp-sm-username {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  font-family: 'Franklin Gothic Medium', Tahoma, sans-serif;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.xp-sm-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: visible;
+}
+
+/* ── Left Panel ──────────────────────────────────────────────────────────── */
+
+.xp-sm-left {
+  width: 210px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Pinned zone */
+.xp-sm-pinned-zone {
+  padding: 2px 0;
+}
+
+.xp-sm-pinned {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  cursor: default;
+}
+
+.xp-sm-pinned:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+.xp-sm-pinned-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.xp-sm-pinned-name {
+  font-weight: bold;
+  font-size: 11px;
+  color: inherit;
+}
+
+/* MFU / programs list */
+.xp-sm-mfu {
+  flex: 1;
+  overflow: hidden;
+}
+
+.xp-sm-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: default;
+  white-space: nowrap;
+  color: #000000;
+  position: relative;
+}
+
+.xp-sm-item:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+.xp-sm-item-sm {
+  padding: 3px 8px;
+}
+
+/* Folder with submenu */
+.xp-sm-has-sub {
+  position: relative;
+}
+
+.xp-sm-submenu {
+  display: none;
+  position: absolute;
+  top: -2px;
+  left: 100%;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid #0a2490;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.35);
+  z-index: 10102;
+  padding: 2px 0;
+  flex-direction: column;
+}
+
+.xp-sm-has-sub:hover > .xp-sm-submenu {
+  display: flex;
+  flex-direction: column;
+}
+
+/* All Programs button */
+.xp-sm-all-programs-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: default;
+  color: #000000;
+  border-top: 1px solid #d4d0c8;
+  margin-top: auto;
+  white-space: nowrap;
+}
+
+.xp-sm-all-programs-btn:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+/* All Programs expanded — button stays highlighted like XP */
+.xp-sm-all-programs-btn.is-open {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+/* Fly-out panel to the right of the white column (overlays the blue panel) */
+.xp-sm-all-programs-flyout {
+  position: absolute;
+  left: 210px;
+  top: 0;
+  bottom: 0;
+  width: 248px;
+  z-index: 6;
+  background: #ffffff;
+  border: 1px solid #0a2490;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  pointer-events: auto;
+}
+
+.xp-sm-all-programs-flyout .xp-sm-programs-tree {
+  flex: 1;
+  min-height: 0;
+  overflow-x: visible;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+
+/* Folder chevrons in the fly-out (dark until row hover) */
+.xp-sm-all-programs-flyout .xp-sm-has-sub .xp-sm-arrow {
+  color: #000000;
+  opacity: 1;
+  font-size: 9px;
+}
+
+/* Back button */
+.xp-sm-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: default;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.xp-sm-back-btn:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+.xp-sm-back-arrow {
+  font-size: 9px;
+}
+
+/* Separators */
+.xp-sm-separator {
+  height: 1px;
+  background: linear-gradient(to right, #d4d0c8, #e8e4e0 50%, #d4d0c8);
+  margin: 3px 4px;
+}
+
+/* ── Right Panel ─────────────────────────────────────────────────────────── */
+
+.xp-sm-right {
+  flex: 1;
+  background: #d3e5fa;
+  padding: 4px 0;
+  border-left: 1px solid #a8c8f0;
+  overflow: hidden;
+}
+
+.xp-sm-right-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: default;
+  white-space: nowrap;
+  color: #000000;
+}
+
+.xp-sm-right-item:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+.xp-sm-right-separator {
+  height: 1px;
+  background: linear-gradient(to right, #9cbce4, #b8d4f0 50%, #9cbce4);
+  margin: 3px 6px;
+}
+
+/* ── Shared icon helpers ─────────────────────────────────────────────────── */
+
+.xp-sm-icon-lg {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  flex-shrink: 0;
+  object-fit: fill !important;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.xp-sm-icon {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  flex-shrink: 0;
+  object-fit: fill !important;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.xp-sm-icon-sm {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  flex-shrink: 0;
+  object-fit: fill !important;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.xp-sm-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xp-sm-arrow {
+  flex-shrink: 0;
+  font-size: 8px;
+  opacity: 0.8;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.xp-sm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: linear-gradient(to bottom, #1248c0 0%, #0a38a8 50%, #0830a0 100%);
+  border-top: 1px solid #0a34a8;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.xp-sm-footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 6px;
+  font-family: Tahoma, 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  cursor: default;
+  background: linear-gradient(to bottom, #3a6bcc 0%, #2a58c0 50%, #1e48b4 100%);
+  border: 1px solid #0a2890;
+  border-top-color: rgba(255, 255, 255, 0.25);
+  border-left-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.xp-sm-footer-btn:hover {
+  background: linear-gradient(to bottom, #4a7bdc 0%, #3a68d0 50%, #2e58c4 100%);
+}
+
+.xp-sm-footer-btn:active {
+  background: linear-gradient(to bottom, #1e48b4 0%, #2a58c0 50%, #3a6bcc 100%);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Legacy class aliases kept for any existing references */
+#start-menu { display: none; }

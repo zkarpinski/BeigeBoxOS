@@ -1,0 +1,10 @@
+{
+  "name": "@retro-web/config",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./next": "./next.config.base.js",
+    "./tsconfig": "./tsconfig.base.json",
+    "./eslint": "./eslint.js"
+  }
+}

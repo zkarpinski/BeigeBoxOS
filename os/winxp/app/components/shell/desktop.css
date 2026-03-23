@@ -1,0 +1,120 @@
+/* ── Desktop Icons & Right-Click Context Menu ────────────────────────────── */
+
+#desktop-icons {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: calc(100dvh - 50px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 76px;
+  padding: 4px 4px 3px;
+  cursor: pointer;
+  pointer-events: all;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.desktop-icon img {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  object-fit: fill;
+  display: block;
+}
+
+.desktop-icon span {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #fff;
+  text-align: center;
+  text-shadow:
+    1px 1px 2px #000,
+    -1px -1px 2px #000;
+  padding: 1px 3px;
+  line-height: 1.3;
+  word-break: break-word;
+  display: block;
+}
+
+.desktop-icon.selected img {
+  filter: brightness(0.55) sepia(1) saturate(6) hue-rotate(190deg) opacity(0.85);
+}
+
+.desktop-icon.selected span {
+  background: var(--title-active);
+  color: #fff;
+  outline: 1px dotted rgba(255, 255, 255, 0.7);
+}
+
+/* Desktop right-click context menu */
+.desktop-context-menu {
+  position: fixed;
+  z-index: 10102;
+  background: var(--win-bg);
+  min-width: 160px;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 2px 0;
+  font-size: 11px;
+}
+.desktop-context-menu.hidden {
+  display: none;
+}
+.ctx-item {
+  padding: 3px 20px 3px 24px;
+  cursor: default;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  user-select: none;
+}
+.ctx-item:hover {
+  background: var(--title-active);
+  color: white;
+}
+.ctx-item:hover .ctx-submenu {
+  display: block;
+}
+.ctx-arrow {
+  font-size: 8px;
+  margin-left: 10px;
+}
+.ctx-divider {
+  height: 1px;
+  background: var(--win-dark);
+  margin: 3px 2px;
+}
+.ctx-submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: -2px;
+  background: var(--win-bg);
+  min-width: 140px;
+  z-index: 10103;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 2px 0;
+}
+.ctx-submenu .ctx-item {
+  color: var(--win-black);
+}

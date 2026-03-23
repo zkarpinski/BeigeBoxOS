@@ -1,0 +1,16 @@
+{
+  "name": "@retro-web/app-winamp",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "peerDependencies": {
+    "react": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0"
+  },
+  "dependencies": {
+    "@retro-web/core": "workspace:*"
+  }
+}

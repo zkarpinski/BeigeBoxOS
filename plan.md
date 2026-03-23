@@ -17,7 +17,7 @@ Taskbar and Start menu are pure React views over this state. No `windows97.js` o
   - Exposes `showApp`, `hideApp`, `focusApp`, `isAppVisible`.
   - Initializes app state from a `registry` (array of `AppConfig`) passed into the provider.
   - Also owns dialogs, BSOD, Run dialog, and Shutdown dialog state.
-  - Sets `window.Windows97` as a shim so any remaining legacy callers can still call `showApp`/`hideApp`.
+  - Sets `window.Windows98` as a shim so any remaining legacy callers can still call `showApp`/`hideApp`.
 
 - **Taskbar** (`app/components/shell/Taskbar.tsx`)
   - Pure React. Uses `useWindowManager()` and `registry`.
@@ -56,7 +56,7 @@ So: the shell is already **mostly** in React. The main gaps are (1) **minimized 
    Today, `AppWindow` applies drag/resize by mutating `el.style` only. Positions/sizes are not in context, so they are lost on re-render or refresh. To have “one place that owns” them, the store should hold per-window bounds (e.g. `left`, `top`, `width`, `height`) and `AppWindow` should read/update the store on drag/resize.
 
 3. **Explicit “no legacy shell”**  
-   Ensure no code path in the Next.js app loads or depends on `windows97.js` or `windowChrome.js`. Remove or narrow the `window.Windows97` shim once no callers need it.
+   Ensure no code path in the Next.js app loads or depends on `windows97.js` or `windowChrome.js`. Remove or narrow the `window.Windows98` shim once no callers need it.
 
 4. **Registration as single source of truth**  
    The registry (`appRegistry`) is already the single list of apps. The context should continue to derive initial app state from this registry (no separate legacy `registerApp`). Any new “registration” would only be “add to registry and pass to provider.”
@@ -106,13 +106,13 @@ So: the shell is already **mostly** in React. The main gaps are (1) **minimized 
 
 - **3.1** Search the app (and any remaining legacy entry points) for:
   - Dynamic imports or script tags that load `windows97.js` or `windowChrome.js`.
-  - Any logic that assumes `window.Windows97.registerApp` or `attachWindowChrome` to have been called for the shell to work.
+  - Any logic that assumes `window.Windows98.registerApp` or `attachWindowChrome` to have been called for the shell to work.
 
 - **3.2** Remove or guard such loads in the Next.js app so the only source of truth is `WindowManagerContext` and `AppWindow`.
 
-- **3.3** List every caller of `window.Windows97` (e.g. Run dialog, shutdown, or legacy app code). Either:
+- **3.3** List every caller of `window.Windows98` (e.g. Run dialog, shutdown, or legacy app code). Either:
   - Migrate them to `useWindowManager()`, or
-  - Keep a minimal `window.Windows97` shim that delegates to the context (as today) until those callers are removed. Document that the real state lives in React.
+  - Keep a minimal `window.Windows98` shim that delegates to the context (as today) until those callers are removed. Document that the real state lives in React.
 
 - **3.4** Update comments (e.g. in `TitleBar.tsx`) that reference `windowChrome.js` to say that chrome is handled by `AppWindow` and the shell context.
 

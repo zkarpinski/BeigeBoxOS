@@ -1,0 +1,42 @@
+{
+  "name": "@retro-web/core",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^18.3.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*.test.tsx"],
+    "setupFilesAfterEnv": ["<rootDir>/test/setup.ts"],
+    "transform": {
+      "\\.(ts|tsx)$": ["ts-jest", {"tsconfig": "<rootDir>/tsconfig.jest.json"}],
+      "\\.css$": "<rootDir>/test/cssTransform.js"
+    },
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/test/cssTransform.js"
+    }
+  }
+}

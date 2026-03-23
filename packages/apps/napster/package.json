@@ -1,0 +1,11 @@
+{
+  "name": "@retro-web/app-napster",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "@retro-web/core": "workspace:*",
+    "react": "^18.3.0"
+  }
+}

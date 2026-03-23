@@ -1,0 +1,11 @@
+{
+  "name": "@retro-web/assets",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared Windows-era static assets (icons, sounds) — source of truth for win98/winxp",
+  "files": [
+    "icons/",
+    "sounds/",
+    "README.md"
+  ]
+}

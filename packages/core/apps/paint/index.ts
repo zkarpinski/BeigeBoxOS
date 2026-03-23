@@ -1,0 +1,1 @@
+export { PaintContent } from './PaintContent';

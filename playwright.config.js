@@ -1,9 +1,6 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
 
-/**
- * @see https://playwright.dev/docs/test-configuration
- */
 module.exports = defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -13,26 +10,31 @@ module.exports = defineConfig({
   reporter: 'html',
   use: {
     trace: 'on-first-retry',
-    baseURL: 'http://localhost:3000',
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'win98-chromium',
+      testMatch: ['**/shared/**/*.spec.js', '**/os/win98/**/*.spec.js'],
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.WIN98_URL || 'http://localhost:3000',
+      },
     },
     {
-      name: 'mobile',
+      name: 'win98-mobile',
+      testMatch: ['**/shared/**/*.spec.js', '**/os/win98/**/*.spec.js'],
       use: {
         ...devices['Pixel 5'],
         viewport: { width: 393, height: 851 },
         isMobile: true,
         hasTouch: true,
         defaultBrowserType: 'chromium',
+        baseURL: process.env.WIN98_URL || 'http://localhost:3000',
       },
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'pnpm dev:win98',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     timeout: 120000,

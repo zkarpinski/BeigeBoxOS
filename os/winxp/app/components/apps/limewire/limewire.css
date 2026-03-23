@@ -1,0 +1,1168 @@
+/* LimeWire – early 2000s Gnutella P2P client (WinXP recreation) */
+
+/* ── Main window ── */
+.limewire-window {
+  position: fixed;
+  top: 360px;
+  left: auto;
+  right: 10px;
+  width: 820px;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+.limewire-window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100dvh - 28px) !important;
+}
+
+/* ── Menu bar ── */
+.limewire-menu-bar {
+  display: flex;
+  align-items: center;
+  padding: 1px 2px;
+  border-bottom: 1px solid var(--win-dark);
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+}
+.limewire-menu-item {
+  padding: 1px 8px;
+  cursor: default;
+  font-size: 11px;
+  user-select: none;
+}
+.limewire-menu-item:hover {
+  background: #0000a0;
+  color: #fff;
+}
+
+/* ── Main nav: Search | Monitor | Library + logo (classic LimeWire) ── */
+.limewire-nav-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 4px 6px 0 4px;
+  background: linear-gradient(180deg, #ece9e4 0%, #d8d4cc 100%);
+  border-bottom: 1px solid var(--win-dark);
+  flex-shrink: 0;
+  gap: 8px;
+}
+.limewire-main-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.limewire-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 4px;
+  cursor: default;
+  user-select: none;
+  font-size: 11px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: none;
+  background: #b8b4ac;
+  color: #444;
+  margin: 0;
+  position: relative;
+  top: 1px;
+}
+.limewire-tab-main {
+  padding: 5px 14px 6px;
+  font-weight: bold;
+}
+.limewire-tab:hover {
+  background: #c8c4bc;
+  color: #000;
+}
+.limewire-tab.active {
+  background: #f5f3ef;
+  color: #000;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid #f5f3ef;
+  z-index: 2;
+  top: 0;
+  padding-bottom: 6px;
+  margin-bottom: -1px;
+}
+.limewire-tab-icon {
+  font-size: 13px;
+}
+.limewire-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 6px 4px;
+  flex-shrink: 0;
+}
+.limewire-nav-logo-img {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+.limewire-nav-logo-text {
+  font-family: 'Arial Black', 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #1a3d1a;
+  text-shadow: 1px 1px 0 #fff;
+}
+.limewire-nav-logo-dots {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #b8ff6a 0%, #4a9a1a 45%, #1a5a0a 100%);
+  box-shadow:
+    inset -2px -2px 4px rgba(0, 0, 0, 0.35),
+    0 0 0 1px #2d5a14;
+}
+
+/* ── Tab panels ── */
+.limewire-panel {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+.limewire-panel.active {
+  display: flex;
+}
+
+/* ── Group boxes (Search Fields, Advanced Fields) ── */
+.limewire-group-box {
+  border: 1px solid var(--win-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win-white),
+    inset 1px 1px 0 var(--win-dark);
+  margin: 4px;
+  padding: 14px 8px 8px 8px;
+  position: relative;
+}
+.limewire-group-label {
+  position: absolute;
+  top: -7px;
+  left: 8px;
+  background: var(--win-bg);
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* ── Search form row ── */
+.limewire-search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 4px;
+}
+.limewire-search-label {
+  width: 68px;
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+.limewire-search-input {
+  flex: 1;
+  height: 18px;
+  font-size: 11px;
+  padding: 1px 3px;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  outline: none;
+}
+.limewire-search-select {
+  height: 18px;
+  font-size: 10px;
+  padding: 0 2px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  background: #fff;
+  outline: none;
+}
+
+/* ── Search top section ── */
+.limewire-search-top {
+  display: flex;
+  flex-shrink: 0;
+}
+.limewire-search-top .limewire-group-box:first-child {
+  flex: 1.2;
+}
+.limewire-search-top .limewire-group-box:last-child {
+  flex: 1;
+}
+
+/* ── Advanced fields ── */
+.limewire-adv-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+  gap: 3px;
+  font-size: 10px;
+}
+.limewire-adv-label {
+  width: 110px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Search buttons ── */
+.limewire-search-btns {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 12px;
+}
+.limewire-btn {
+  padding: 3px 14px;
+  font-size: 11px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+  cursor: default;
+  user-select: none;
+}
+.limewire-btn:hover {
+  background: var(--win-light);
+}
+.limewire-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+  padding: 4px 13px 2px 15px;
+}
+.limewire-btn-primary {
+  border: 2px solid var(--win-black);
+}
+
+/* ── Results table ── */
+.limewire-results-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0 4px 2px 4px;
+}
+.limewire-table-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: #fff;
+}
+.limewire-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.limewire-table th {
+  background: var(--win-bg);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  padding: 2px 4px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.limewire-table th:hover {
+  background: var(--win-light);
+}
+.limewire-table td {
+  padding: 1px 4px;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 0;
+  cursor: default;
+}
+.limewire-table tr:hover {
+  background: #d0d8f0;
+}
+.limewire-table tr.selected {
+  background: #0000a0;
+  color: #fff;
+}
+.limewire-table tr.selected td {
+  color: #fff;
+}
+
+/* Column widths */
+.col-filename {
+  width: 240px;
+  max-width: 240px;
+}
+.col-filesize {
+  width: 72px;
+  text-align: right;
+}
+.col-bitrate {
+  width: 44px;
+  text-align: right;
+}
+.col-freq {
+  width: 44px;
+  text-align: right;
+}
+.col-length {
+  width: 40px;
+  text-align: center;
+}
+.col-user {
+  width: 72px;
+}
+.col-linespeed {
+  width: 64px;
+}
+.col-ping {
+  width: 36px;
+  text-align: right;
+}
+
+/* Availability dot */
+.limewire-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.dot-green {
+  background: #00cc00;
+  box-shadow: 0 0 1px #008800;
+}
+.dot-yellow {
+  background: #ddaa00;
+}
+.dot-red {
+  background: #cc0000;
+}
+
+/* Results count bar */
+.limewire-results-count {
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  padding: 2px 6px;
+  text-align: center;
+  font-size: 11px;
+  color: #000080;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Search action buttons row */
+.limewire-results-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 4px;
+  flex-shrink: 0;
+}
+
+/* ── Transfer tab ── */
+.limewire-transfer-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 4px;
+  gap: 4px;
+}
+.limewire-transfer-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: #fff;
+}
+.limewire-transfer-header-row {
+  display: flex;
+  background: var(--win-bg);
+  border-bottom: 2px solid var(--win-dark);
+  flex-shrink: 0;
+}
+.limewire-th {
+  padding: 2px 4px;
+  font-size: 11px;
+  font-weight: bold;
+  border-right: 1px solid var(--win-dark);
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+}
+.limewire-transfer-body {
+  flex: 1;
+  overflow-y: auto;
+}
+.limewire-transfer-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 11px;
+  cursor: default;
+}
+.limewire-transfer-row:hover {
+  background: #d0d8f0;
+}
+.limewire-transfer-row.selected {
+  background: #0000a0;
+  color: #fff;
+}
+.limewire-td {
+  padding: 1px 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 1px solid #e0e0e0;
+}
+
+/* Transfer column widths */
+.tcol-icon {
+  width: 18px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.tcol-filename {
+  flex: 1;
+  min-width: 0;
+}
+.tcol-filesize {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.tcol-user {
+  width: 72px;
+  flex-shrink: 0;
+}
+.tcol-status {
+  width: 88px;
+  flex-shrink: 0;
+}
+.tcol-speed {
+  width: 54px;
+  flex-shrink: 0;
+}
+.tcol-progress {
+  width: 78px;
+  flex-shrink: 0;
+  padding: 1px 2px !important;
+}
+.tcol-rate {
+  width: 52px;
+  flex-shrink: 0;
+}
+.tcol-timeleft {
+  width: 52px;
+  flex-shrink: 0;
+}
+
+/* Progress bar cell */
+.limewire-progress-cell {
+  position: relative;
+  height: 14px;
+  background: #fff;
+  border: 1px solid #888;
+  overflow: hidden;
+  width: 74px;
+}
+.limewire-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #3366cc;
+  transition: width 0.4s linear;
+}
+.limewire-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: #000;
+  mix-blend-mode: difference;
+  filter: invert(0);
+  z-index: 1;
+}
+
+/* Transfer stats bar */
+.limewire-transfer-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding: 3px;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.limewire-transfer-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 4px;
+  flex-shrink: 0;
+}
+
+/* Transfer download icon */
+.limewire-dl-icon {
+  color: #0000cc;
+  font-size: 11px;
+}
+.limewire-ul-icon {
+  color: #cc6600;
+  font-size: 11px;
+}
+
+/* ── Home tab ── */
+.limewire-home-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #fff;
+  margin: 4px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  font-family: Arial, sans-serif;
+}
+.limewire-home-logo {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.limewire-home-logo svg {
+  width: 180px;
+  height: 60px;
+}
+.limewire-home-stats {
+  background: #f0f4ff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.limewire-home-stats b {
+  color: #000080;
+}
+
+/* ── Status bar ── */
+.limewire-status-bar {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  border-top: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.limewire-status-left {
+  flex: 1;
+  padding: 0 6px;
+  border-right: 1px solid var(--win-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.limewire-status-right {
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+/* Taskbar icon */
+.task-icon-limewire {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #000;
+  color: #00ccff;
+  font-size: 8px;
+  font-weight: 900;
+  font-family: 'Arial Black', Arial, sans-serif;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Library tab ── */
+.limewire-library-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  flex-shrink: 0;
+  gap: 4px;
+}
+.limewire-library-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+}
+.limewire-library-header {
+  display: flex;
+  background: var(--win-bg);
+  border-bottom: 2px solid var(--win-dark);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+}
+.limewire-lib-th {
+  padding: 2px 6px;
+  font-weight: bold;
+  font-size: 11px;
+  border-right: 1px solid var(--win-dark);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  white-space: nowrap;
+  cursor: default;
+  background: var(--win-bg);
+  user-select: none;
+}
+.limewire-library-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 11px;
+}
+.limewire-library-row:hover {
+  background: #c3d0e0;
+}
+.limewire-library-row.selected {
+  background: #000080;
+  color: #fff;
+}
+.limewire-lib-td {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.limewire-lib-empty {
+  padding: 16px;
+  color: #888;
+  font-size: 11px;
+}
+/* Library column widths */
+.lcol-filename {
+  width: 260px;
+  min-width: 160px;
+}
+.lcol-filesize {
+  width: 60px;
+}
+.lcol-bitrate {
+  width: 60px;
+}
+.lcol-freq {
+  width: 60px;
+}
+.lcol-length {
+  width: 60px;
+}
+.lcol-path {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ── Classic LimeWire search layout (sidebar + results) ── */
+.limewire-panel-search {
+  min-height: 0;
+}
+.limewire-search-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #ebe8e3;
+}
+
+/* Left: Filter Results */
+.limewire-filter-sidebar {
+  width: 198px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid var(--win-dark);
+  background: #e8e4df;
+  padding: 4px 6px 6px;
+  overflow: hidden;
+}
+.limewire-filter-title {
+  font-weight: bold;
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: #222;
+}
+.limewire-filter-section {
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.lw-filter-header {
+  padding: 3px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #2a2a00;
+  background: linear-gradient(180deg, #ffeaa0 0%, #e8c040 45%, #c9a020 100%);
+  border: 1px solid #a08020;
+  border-bottom: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.lw-filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  background: #f5f2ed;
+  border: 1px solid #a08020;
+  border-top: none;
+}
+.lw-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  padding: 3px 6px;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  cursor: default;
+  font-family: inherit;
+  color: #111;
+}
+.lw-filter-chip:hover {
+  background: #d8e8ff;
+}
+.lw-filter-chip.selected {
+  background: #000080;
+  color: #fff;
+}
+.lw-filter-chip-icon {
+  width: 14px;
+  text-align: center;
+}
+.lw-filter-scroll {
+  max-height: 88px;
+  overflow-y: auto;
+  padding: 2px 0;
+  background: #f5f2ed;
+  border: 1px solid #a08020;
+  border-top: none;
+}
+.lw-filter-line {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 2px 8px;
+  font-size: 10px;
+  border: none;
+  background: transparent;
+  cursor: default;
+  font-family: inherit;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lw-filter-line:hover {
+  background: #cce0ff;
+}
+.lw-filter-line.selected {
+  background: #000080;
+  color: #fff;
+}
+.lw-btn-back-search {
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  width: 100%;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  cursor: default;
+  font-family: inherit;
+}
+.lw-btn-magnet {
+  margin-top: 4px;
+  padding: 5px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  width: 100%;
+  color: #ddd;
+  background: linear-gradient(180deg, #5a5a5a 0%, #2a2a2a 100%);
+  border: 1px solid #111;
+  cursor: default;
+  font-family: inherit;
+}
+.lw-btn-magnet:hover {
+  background: linear-gradient(180deg, #6a6a6a 0%, #3a3a3a 100%);
+}
+
+/* Main search column */
+.limewire-search-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #f0ede8;
+}
+.limewire-search-toolbar-compact {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--win-dark);
+  background: #ebe8e3;
+  flex-shrink: 0;
+}
+.limewire-search-label-inline {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.lw-input-sm {
+  width: 120px;
+  flex: 1;
+  min-width: 80px;
+  max-width: 200px;
+}
+.lw-btn-find {
+  font-weight: bold;
+}
+
+.lw-search-tab-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 8px 0;
+  background: #e0ddd8;
+  border-bottom: 1px solid #999;
+  flex-shrink: 0;
+}
+.lw-search-tab-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+.lw-search-tab-close {
+  border: none;
+  background: transparent;
+  color: #c60;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: default;
+  font-family: inherit;
+}
+.lw-search-tab-close:hover {
+  color: #a40;
+}
+
+.lw-results-table-wrap {
+  flex: 1;
+  min-height: 80px;
+}
+.lw-results-table {
+  min-width: 520px;
+}
+.lw-results-table tbody tr:nth-child(even) {
+  background: #f0f8ff;
+}
+.lw-results-table tbody tr:nth-child(odd) {
+  background: #fff;
+}
+.lw-results-table tbody tr:hover {
+  background: #d0e0f8 !important;
+}
+.lw-results-table tbody tr.selected {
+  background: #0000a0 !important;
+  color: #fff;
+}
+.lw-results-table tbody tr.selected td {
+  color: #fff;
+}
+.lw-results-table tbody tr.selected .lw-stars {
+  color: #ffe066;
+  text-shadow: none;
+}
+.lw-col-quality {
+  width: 72px;
+  text-align: center;
+}
+.lw-stars {
+  color: #c9a010;
+  font-size: 10px;
+  letter-spacing: -1px;
+  text-shadow: 0 1px 0 #fff8d0;
+}
+.lw-col-icon {
+  width: 28px;
+  text-align: center;
+}
+.lw-file-icon {
+  font-size: 12px;
+}
+.lw-col-name {
+  min-width: 160px;
+}
+.lw-col-type {
+  width: 40px;
+  text-transform: lowercase;
+}
+.lw-col-size {
+  width: 72px;
+  text-align: right;
+}
+.lw-col-speed {
+  width: 88px;
+}
+.lw-col-bitrate {
+  width: 48px;
+  text-align: right;
+}
+.lw-results-empty {
+  text-align: center;
+  padding: 12px 8px;
+  color: #888;
+}
+
+.lw-results-status {
+  flex-shrink: 0;
+}
+
+/* Big action buttons (Download / Browse / Stop / Junk) */
+.lw-action-bar-big {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--win-white);
+  background: linear-gradient(180deg, #ddd9d2 0%, #c8c4bc 100%);
+  flex-shrink: 0;
+}
+.lw-big-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 72px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: bold;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  cursor: default;
+  font-family: inherit;
+  color: #111;
+}
+.lw-big-action:hover:not(:disabled) {
+  background: var(--win-light);
+}
+.lw-big-action:active:not(:disabled) {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+}
+.lw-big-action.disabled,
+.lw-big-action:disabled {
+  opacity: 0.45;
+  color: #666;
+  cursor: not-allowed;
+}
+.lw-big-action-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.lw-icon-stop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #c00;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+.lw-act-stop .lw-big-action-icon {
+  margin-bottom: 2px;
+}
+
+/* Footer: signal / PRO / player */
+.limewire-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+  padding: 2px 6px;
+  border-top: 1px solid var(--win-white);
+  background: #e8e4df;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.limewire-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.lw-signal-meter {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.lw-signal-bar {
+  width: 4px;
+  background: linear-gradient(180deg, #8f8 0%, #080 100%);
+  border: 1px solid #060;
+  border-radius: 1px;
+}
+.lw-signal-bar:nth-child(1) {
+  height: 4px;
+}
+.lw-signal-bar:nth-child(2) {
+  height: 7px;
+}
+.lw-signal-bar:nth-child(3) {
+  height: 10px;
+}
+.lw-signal-bar:nth-child(4) {
+  height: 12px;
+}
+.lw-signal-bar:nth-child(5) {
+  height: 14px;
+}
+.lw-footer-globe {
+  font-size: 14px;
+  opacity: 0.85;
+}
+.lw-footer-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 50%;
+  background: #2a8a2a;
+  color: #fff;
+  font-weight: bold;
+  font-size: 10px;
+}
+.limewire-footer-promo {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+.lw-pro-link {
+  background: none;
+  border: none;
+  color: #00c;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: inherit;
+  padding: 0 4px;
+}
+.lw-pro-link:hover {
+  color: #008;
+}
+.limewire-footer-player {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.lw-player-label {
+  font-size: 9px;
+  color: #444;
+  white-space: nowrap;
+}
+.lw-player-btns {
+  display: flex;
+  gap: 2px;
+}
+.lw-pl-btn {
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  font-size: 10px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  cursor: default;
+  font-family: inherit;
+}
+.lw-pl-btn:hover {
+  background: var(--win-light);
+}

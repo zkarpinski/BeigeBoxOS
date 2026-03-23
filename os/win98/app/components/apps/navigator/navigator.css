@@ -1,0 +1,520 @@
+/* Netscape Navigator 4.x - App styles */
+
+/* ── Window container ── */
+.nav-window {
+  position: fixed;
+  top: 4px;
+  left: 100px;
+  width: 900px;
+  height: 640px;
+  min-width: 400px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  overflow: hidden;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+}
+
+.nav-window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - 28px) !important;
+}
+
+/* Title bar – re-use Win98 global .title-bar styles; just add NS logo */
+.nav-title-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  margin-right: 4px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* ── Menu bar ── */
+.nav-menu-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-dark);
+  padding: 0 2px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.nav-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  cursor: default;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--win-black);
+  user-select: none;
+  height: 100%;
+}
+.nav-menu-item:hover,
+.nav-menu-item.active {
+  background: var(--title-active);
+  color: #fff;
+}
+.nav-menu-dropdown {
+  display: none;
+  position: fixed;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+  z-index: 200;
+  min-width: 180px;
+  padding: 2px 0;
+}
+.nav-menu-dropdown.open {
+  display: block;
+}
+.nav-menu-dropdown-item {
+  padding: 3px 20px 3px 24px;
+  cursor: default;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--win-black);
+}
+.nav-menu-dropdown-item:hover {
+  background: var(--title-active);
+  color: #fff;
+}
+.nav-menu-dropdown-item.disabled {
+  color: var(--win-dark);
+  cursor: default;
+}
+.nav-menu-dropdown-item.disabled:hover {
+  background: transparent;
+  color: var(--win-dark);
+}
+.nav-menu-divider {
+  height: 1px;
+  background: var(--win-dark);
+  margin: 3px 4px;
+  box-shadow: 0 1px 0 var(--win-white);
+}
+
+/* ── Toolbar rows (each has a grippy + toolbar content) ── */
+.nav-toolbar-row {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--win-dark);
+}
+.nav-grippy {
+  width: 8px;
+  flex-shrink: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--win-white) 0px,
+    var(--win-white) 1px,
+    var(--win-dark) 1px,
+    var(--win-dark) 2px
+  );
+  cursor: col-resize;
+  margin: 2px 2px;
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-dark);
+}
+
+/* ── Navigation toolbar ── */
+.nav-toolbar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 2px 2px;
+  gap: 1px;
+}
+
+/* Large icon+label buttons */
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 44px;
+  padding: 2px 6px;
+  background: var(--win-bg);
+  border: 1px solid transparent;
+  cursor: default;
+  user-select: none;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+}
+.nav-btn:hover:not(:disabled) {
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+}
+.nav-btn:active:not(:disabled) {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+  padding-top: 3px;
+  padding-left: 7px;
+}
+.nav-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.nav-btn-icon {
+  font-size: 20px;
+  line-height: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-btn-label {
+  font-size: 9px;
+  margin-top: 1px;
+  color: var(--win-black);
+  white-space: nowrap;
+}
+.nav-btn:disabled .nav-btn-label {
+  color: var(--win-dark);
+}
+
+.nav-tb-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--win-dark);
+  box-shadow: 1px 0 0 var(--win-white);
+  margin: 4px 3px;
+  flex-shrink: 0;
+}
+
+/* Stop button gets special color when active */
+.nav-btn-stop {
+  color: var(--win-black);
+}
+.nav-btn-stop.loading {
+  color: #cc0000;
+}
+
+/* Throbber – animated Netscape N logo */
+.nav-throbber {
+  margin-left: auto;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  background-image: url('/apps/navigator/navigator-icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.nav-throbber-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+}
+.nav-throbber-comet {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.nav-throbber.loading .nav-throbber-comet {
+  opacity: 1;
+  animation: nav-comet 0.8s linear infinite;
+}
+@keyframes nav-comet {
+  0% {
+    transform: translate(-8px, -8px);
+  }
+  50% {
+    transform: translate(0px, 0px);
+  }
+  100% {
+    transform: translate(8px, 8px);
+  }
+}
+.nav-throbber-star {
+  opacity: 0;
+}
+.nav-throbber.loading .nav-throbber-star {
+  opacity: 1;
+  animation: nav-star-twinkle 0.4s ease-in-out infinite alternate;
+}
+@keyframes nav-star-twinkle {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Location bar ── */
+.nav-location-bar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 3px 4px;
+  gap: 4px;
+}
+.nav-location-label {
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--win-black);
+  flex-shrink: 0;
+}
+.nav-url-input {
+  flex: 1;
+  height: 20px;
+  font-size: 11px;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  padding: 1px 4px;
+  background: #fff;
+  color: #000;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  outline: none;
+}
+.nav-url-input:focus {
+  background: #fff;
+}
+.nav-bookmark-btn {
+  width: 22px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  cursor: default;
+  flex-shrink: 0;
+}
+.nav-bookmark-btn:hover {
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+}
+.nav-bookmark-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+/* ── Personal toolbar ── */
+.nav-personal-toolbar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 2px 4px;
+  gap: 2px;
+}
+.nav-personal-btn {
+  height: 18px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  cursor: default;
+  white-space: nowrap;
+}
+.nav-personal-btn:hover {
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+}
+.nav-personal-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+/* ── Content area (iframe) ── */
+.nav-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+#nav-iframe,
+.nav-content iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  border: none;
+  display: block;
+  background: #fff;
+}
+
+/* Loading overlay */
+.nav-loading-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 20px;
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 12px;
+  color: #333;
+  z-index: 5;
+}
+.nav-loading-overlay.visible {
+  display: flex;
+}
+
+/* ── Status bar ── */
+.nav-status-bar {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  gap: 2px;
+  padding: 0 2px;
+}
+.nav-security-icon {
+  width: 20px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  cursor: default;
+  flex-shrink: 0;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset -1px -1px var(--win-light);
+}
+.nav-status-text {
+  flex: 1;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset -1px -1px var(--win-light);
+}
+.nav-progress-wrap {
+  width: 120px;
+  height: 18px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset -1px -1px var(--win-light);
+  overflow: hidden;
+  position: relative;
+  background: var(--win-bg);
+}
+.nav-progress-bar {
+  height: 100%;
+  background: var(--title-active);
+  width: 0%;
+  transition: width 0.3s;
+}
+.nav-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #000;
+  pointer-events: none;
+}
+
+/* ── Component bar ── */
+.nav-component-bar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 18px;
+  gap: 1px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset -1px -1px var(--win-light);
+  padding: 0 2px;
+}
+.nav-component-btn {
+  width: 18px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: default;
+}
+.nav-component-btn:hover {
+  border: 1px solid var(--win-dark);
+  background: var(--win-light);
+}
+
+/* Taskbar icon for navigator */
+.task-icon-nav {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  margin-right: 4px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}

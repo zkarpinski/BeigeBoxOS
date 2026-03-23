@@ -1,0 +1,8 @@
+{
+  "extends": "@retro-web/config/tsconfig",
+  "compilerOptions": {
+    "paths": { "@retro-web/core/*": ["./*"] }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

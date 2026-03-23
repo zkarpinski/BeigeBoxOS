@@ -1,0 +1,646 @@
+/* iTunes 8–style chrome (custom; not Luna). Brushed metal + Apple blue selection. */
+
+/*
+ * Without persisted bounds, AppWindow never sets inline height — the shell grows with every
+ * album row and .itunes8-table-wrap never gets a bounded flex area, so the list can't scroll.
+ * Inline height from WindowManager (saved bounds) wins over this rule; .maximized uses !important.
+ */
+.itunes8-outer.app-window:not(.maximized) {
+  max-height: calc(100dvh - 48px);
+  overflow: hidden;
+  height: min(580px, calc(100dvh - 48px));
+}
+
+.itunes8-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #d4d4d4 0%, #c8c8c8 8%, #b8b8b8 100%);
+  font-family: 'Tahoma', 'Segoe UI', 'Lucida Grande', sans-serif;
+  font-size: 11px;
+  color: #111;
+  user-select: none;
+}
+
+.itunes8-menubar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 3px 8px 4px;
+  background: linear-gradient(180deg, #e8e8e8, #d0d0d0);
+  border-bottom: 1px solid #888;
+  font-size: 11px;
+}
+
+.itunes8-menubar > span {
+  cursor: default;
+}
+
+/* Hidden file picker for File → Add File to Library */
+.itunes8-file-import-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+
+/* File menu (WinXP-style hover dropdown) */
+.itunes8-menu-item {
+  position: relative;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  cursor: default;
+  border-radius: 2px;
+}
+
+.itunes8-menu-item:hover {
+  background: rgba(10, 36, 106, 0.12);
+}
+
+.itunes8-menu-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0;
+  min-width: 240px;
+  padding: 2px 0;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  z-index: 5000;
+  color: var(--win-black);
+  text-align: left;
+}
+
+.itunes8-menu-item:hover .itunes8-menu-dropdown,
+.itunes8-menu-item:focus-within .itunes8-menu-dropdown {
+  display: block;
+}
+
+.itunes8-menu-dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+  padding: 4px 20px 4px 24px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  color: inherit;
+  text-align: left;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.itunes8-menu-dd-item:hover:not(:disabled):not(.disabled) {
+  background: var(--title-active);
+  color: var(--win-white);
+}
+
+.itunes8-menu-dd-item.disabled {
+  color: #888;
+  cursor: default;
+  pointer-events: none;
+}
+
+.itunes8-menu-dd-divider {
+  height: 1px;
+  margin: 3px 2px;
+  background: var(--win-dark);
+  border-bottom: 1px solid var(--win-white);
+}
+
+.itunes8-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: repeating-linear-gradient(90deg, #c5c5c5 0px, #c5c5c5 1px, #bdbdbd 1px, #bdbdbd 2px);
+  border-bottom: 1px solid #666;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.itunes8-transport {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.itunes8-tbtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: 1px solid #666;
+  background: linear-gradient(180deg, #f0f0f0, #b8b8b8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+
+.itunes8-tbtn:hover {
+  background: linear-gradient(180deg, #fff, #c8c8c8);
+}
+
+.itunes8-tbtn:active {
+  background: linear-gradient(180deg, #a8a8a8, #d8d8d8);
+}
+
+.itunes8-volume {
+  width: 72px;
+  height: 4px;
+  accent-color: #444;
+}
+
+.itunes8-lcd {
+  flex: 1;
+  min-width: 120px;
+  max-width: 420px;
+  margin: 0 8px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, #e4e4e4, #d0d0d0);
+  border: 1px solid #666;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.itunes8-lcd-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itunes8-lcd-sub {
+  font-size: 10px;
+  color: #444;
+  margin-top: 2px;
+}
+
+.itunes8-lcd-bar-wrap {
+  margin-top: 6px;
+  height: 10px;
+  background: #bbb;
+  border-radius: 5px;
+  border: 1px solid #888;
+  position: relative;
+  overflow: hidden;
+}
+
+.itunes8-lcd-bar-fill {
+  height: 100%;
+  background: linear-gradient(180deg, #6ae, #248);
+  border-radius: 4px;
+}
+
+.itunes8-lcd-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #333;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.itunes8-views {
+  display: flex;
+  gap: 2px;
+}
+
+.itunes8-view-btn {
+  padding: 2px 6px;
+  font-size: 10px;
+  border: 1px solid #888;
+  background: linear-gradient(180deg, #eee, #ccc);
+  border-radius: 3px;
+  cursor: default;
+}
+
+.itunes8-view-btn.active {
+  background: linear-gradient(180deg, #6ad, #248);
+  color: #fff;
+  border-color: #248;
+}
+
+.itunes8-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.itunes8-search {
+  width: 140px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid #888;
+  font-size: 11px;
+}
+
+.itunes8-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.itunes8-sidebar {
+  width: 168px;
+  min-width: 140px;
+  background: linear-gradient(90deg, #b9cce8 0%, #a8b8d4 40%, #9aaccc 100%);
+  border-right: 1px solid #678;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.itunes8-side-h {
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #345;
+  letter-spacing: 0.04em;
+}
+
+.itunes8-side-item {
+  padding: 4px 10px 4px 22px;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.itunes8-side-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.itunes8-side-item.selected {
+  background: linear-gradient(90deg, #2a4a9a, #4a7ae8);
+  color: #fff;
+}
+
+.itunes8-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0; /* allow flex child to shrink so inner list can scroll */
+  background: #fff;
+}
+
+.itunes8-viewbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #333;
+  border-bottom: 1px solid #ccc;
+  background: linear-gradient(180deg, #f8f8f8, #ebebeb);
+}
+
+.itunes8-viewbar .itunes8-breadcrumb-root {
+  font-weight: 600;
+  color: #222;
+}
+
+.itunes8-view-dropdown {
+  padding: 2px 8px;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fff, #e8e8e8);
+  cursor: default;
+  font-size: 11px;
+}
+
+.itunes8-breadcrumb {
+  padding: 4px 8px;
+  font-size: 10px;
+  color: #555;
+  border-bottom: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+.itunes8-main-inner {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.itunes8-album-group {
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+
+.itunes8-album-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px 8px;
+  background: linear-gradient(180deg, #fafafa, #f0f0f0);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.itunes8-album-art {
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #e8ecf4, #a8b8d8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #345;
+  text-align: center;
+  padding: 4px;
+  line-height: 1.2;
+}
+
+.itunes8-album-art.u2-soi {
+  background: linear-gradient(135deg, #1a1a2e, #4a4a6a);
+  color: #e8e8e8;
+}
+
+.itunes8-album-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.itunes8-album-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+}
+
+.itunes8-album-artist {
+  font-size: 11px;
+  color: #444;
+  margin-top: 2px;
+}
+
+.itunes8-album-stars {
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #48f;
+}
+
+.itunes8-album-col {
+  width: 120px;
+  padding: 8px;
+  border-right: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.itunes8-stars {
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #48f;
+}
+
+.itunes8-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.itunes8-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+/* Shared column grid: header + every album subtable use the same colgroup + table-layout:fixed */
+.itunes8-global-thead,
+.itunes8-subtable {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 640px; /* keeps columns stable when pane is narrow; horizontal scroll if needed */
+}
+
+.itunes8-track-cols .itunes8-cg-check {
+  width: 32px;
+}
+.itunes8-track-cols .itunes8-cg-name {
+  width: 34%;
+}
+.itunes8-track-cols .itunes8-cg-time {
+  width: 52px;
+}
+.itunes8-track-cols .itunes8-cg-artist {
+  width: 22%;
+}
+.itunes8-track-cols .itunes8-cg-genre {
+  width: 14%;
+}
+.itunes8-track-cols .itunes8-cg-rating {
+  width: 76px;
+}
+.itunes8-track-cols .itunes8-cg-plays {
+  width: 48px;
+}
+
+.itunes8-global-thead {
+  border-bottom: 1px solid #aaa;
+}
+
+.itunes8-global-thead thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  background: linear-gradient(180deg, #f5f5f5, #dedede);
+  border-bottom: 1px solid #aaa;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.itunes8-table th {
+  text-align: left;
+  padding: 4px 8px;
+  background: linear-gradient(180deg, #f0f0f0, #d8d8d8);
+  border-bottom: 1px solid #aaa;
+}
+
+.itunes8-subtable {
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.itunes8-subtable td {
+  padding: 3px 8px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.itunes8-col-name,
+.itunes8-col-artist,
+.itunes8-col-genre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itunes8-subtable tr:nth-child(even) td {
+  background: #f9fbff;
+}
+
+.itunes8-col-check {
+  text-align: center;
+}
+
+.itunes8-col-time,
+.itunes8-col-rating {
+  font-variant-numeric: tabular-nums;
+}
+
+.itunes8-col-plays {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #666;
+}
+
+.itunes8-table td {
+  padding: 3px 8px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.itunes8-table tr {
+  cursor: default;
+}
+
+.itunes8-table tr:hover td {
+  background: #eef4ff;
+}
+
+.itunes8-table tr.selected td {
+  background: linear-gradient(180deg, #6ad, #248);
+  color: #fff;
+}
+
+.itunes8-table tr.playing td {
+  font-weight: 600;
+}
+
+.itunes8-subtable tr {
+  cursor: default;
+}
+
+.itunes8-subtable tr:hover td {
+  background: #eef4ff;
+}
+
+.itunes8-subtable tr.selected td {
+  background: linear-gradient(180deg, #6ad, #248);
+  color: #fff;
+}
+
+.itunes8-subtable tr.playing td {
+  font-weight: 600;
+}
+
+.itunes8-col-store {
+  width: 22px;
+  text-align: center;
+}
+
+.itunes8-genius {
+  width: 168px;
+  min-width: 140px;
+  background: linear-gradient(180deg, #e2e2e2, #d0d0d0);
+  border-left: 1px solid #888;
+  padding: 8px;
+  overflow-y: auto;
+  font-size: 10px;
+  color: #333;
+}
+
+.itunes8-genius h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.itunes8-genius-atom {
+  text-align: center;
+  font-size: 36px;
+  margin: 8px 0;
+  opacity: 0.85;
+}
+
+.itunes8-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: repeating-linear-gradient(90deg, #5a5a5a 0px, #5a5a5a 1px, #525252 1px, #525252 2px);
+  border-top: 1px solid #333;
+  color: #ddd;
+  font-size: 10px;
+}
+
+.itunes8-footer-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.itunes8-fbtn {
+  width: 22px;
+  height: 20px;
+  border: 1px solid #444;
+  background: #666;
+  color: #eee;
+  border-radius: 2px;
+  cursor: default;
+  font-size: 11px;
+}
+
+.itunes8-footer-info {
+  flex: 1;
+  text-align: center;
+}
+
+.itunes8-spotify-btn {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 10px;
+  border-radius: 3px;
+  border: 1px solid #060;
+  background: linear-gradient(180deg, #8d8, #4a4);
+  color: #020;
+  cursor: pointer;
+}
+
+.itunes8-spotify-btn:hover {
+  filter: brightness(1.08);
+}

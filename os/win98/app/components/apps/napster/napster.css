@@ -1,0 +1,681 @@
+/* Napster v2.0 BETA – early 2000s P2P client */
+
+/* ── Main window ── */
+.napster-window {
+  position: fixed;
+  top: 400px;
+  left: auto;
+  right: 10px;
+  width: 700px;
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-black);
+  box-shadow: 1px 1px 0 var(--win-dark);
+  background: var(--win-bg);
+  font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+.napster-window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100dvh - 28px) !important;
+}
+
+/* ── Menu bar ── */
+.napster-menu-bar {
+  display: flex;
+  align-items: center;
+  padding: 1px 2px;
+  border-bottom: 1px solid var(--win-dark);
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--win-bg);
+}
+.napster-menu-item {
+  padding: 1px 8px;
+  cursor: default;
+  font-size: 11px;
+  user-select: none;
+}
+.napster-menu-item:hover {
+  background: #0000a0;
+  color: #fff;
+}
+
+/* ── Tab bar ── */
+.napster-tab-bar {
+  display: flex;
+  align-items: flex-end;
+  padding: 4px 4px 0 4px;
+  background: var(--win-bg);
+  border-bottom: 2px solid var(--win-white);
+  flex-shrink: 0;
+  gap: 2px;
+}
+.napster-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 4px;
+  cursor: default;
+  user-select: none;
+  font-size: 11px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: none;
+  background: #b8b4ac;
+  color: #444;
+  margin: 0px;
+  position: relative;
+  top: 1px;
+}
+.napster-tab:hover {
+  background: #c8c4bc;
+  color: #000;
+}
+.napster-tab.active {
+  background: var(--win-bg);
+  color: #000;
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-bg);
+  z-index: 2;
+  font-weight: bold;
+  top: 0;
+  padding-bottom: 5px;
+  margin-bottom: -2px;
+}
+.napster-tab-icon {
+  font-size: 13px;
+}
+
+/* ── Tab panels ── */
+.napster-panel {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+.napster-panel.active {
+  display: flex;
+}
+
+/* ── Group boxes (Search Fields, Advanced Fields) ── */
+.napster-group-box {
+  border: 1px solid var(--win-dark);
+  box-shadow:
+    inset -1px -1px 0 var(--win-white),
+    inset 1px 1px 0 var(--win-dark);
+  margin: 4px;
+  padding: 14px 8px 8px 8px;
+  position: relative;
+}
+.napster-group-label {
+  position: absolute;
+  top: -7px;
+  left: 8px;
+  background: var(--win-bg);
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* ── Search form row ── */
+.napster-search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 4px;
+}
+.napster-search-label {
+  width: 68px;
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+.napster-search-input {
+  flex: 1;
+  height: 18px;
+  font-size: 11px;
+  padding: 1px 3px;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  outline: none;
+}
+.napster-search-select {
+  height: 18px;
+  font-size: 10px;
+  padding: 0 2px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  background: #fff;
+  outline: none;
+}
+
+/* ── Search top section ── */
+.napster-search-top {
+  display: flex;
+  flex-shrink: 0;
+}
+.napster-search-top .napster-group-box:first-child {
+  flex: 1.2;
+}
+.napster-search-top .napster-group-box:last-child {
+  flex: 1;
+}
+
+/* ── Advanced fields ── */
+.napster-adv-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+  gap: 3px;
+  font-size: 10px;
+}
+.napster-adv-label {
+  width: 110px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Search buttons ── */
+.napster-search-btns {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 12px;
+}
+.napster-btn {
+  padding: 3px 14px;
+  font-size: 11px;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+  cursor: default;
+  user-select: none;
+}
+.napster-btn:hover {
+  background: var(--win-light);
+}
+.napster-btn:active {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-dark);
+  padding: 4px 13px 2px 15px;
+}
+.napster-btn-primary {
+  border: 2px solid var(--win-black);
+}
+
+/* ── Results table ── */
+.napster-results-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0 4px 2px 4px;
+}
+.napster-table-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: #fff;
+}
+.napster-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.napster-table th {
+  background: var(--win-bg);
+  border-right: 1px solid var(--win-dark);
+  border-bottom: 2px solid var(--win-dark);
+  padding: 2px 4px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.napster-table th:hover {
+  background: var(--win-light);
+}
+.napster-table td {
+  padding: 1px 4px;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 0;
+  cursor: default;
+}
+.napster-table tr:hover {
+  background: #d0d8f0;
+}
+.napster-table tr.selected {
+  background: #0000a0;
+  color: #fff;
+}
+.napster-table tr.selected td {
+  color: #fff;
+}
+
+/* Column widths */
+.col-filename {
+  width: 240px;
+  max-width: 240px;
+}
+.col-filesize {
+  width: 72px;
+  text-align: right;
+}
+.col-bitrate {
+  width: 44px;
+  text-align: right;
+}
+.col-freq {
+  width: 44px;
+  text-align: right;
+}
+.col-length {
+  width: 40px;
+  text-align: center;
+}
+.col-user {
+  width: 72px;
+}
+.col-linespeed {
+  width: 64px;
+}
+.col-ping {
+  width: 36px;
+  text-align: right;
+}
+
+/* Availability dot */
+.napster-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.dot-green {
+  background: #00cc00;
+  box-shadow: 0 0 1px #008800;
+}
+.dot-yellow {
+  background: #ddaa00;
+}
+.dot-red {
+  background: #cc0000;
+}
+
+/* Results count bar */
+.napster-results-count {
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-dark);
+  padding: 2px 6px;
+  text-align: center;
+  font-size: 11px;
+  color: #000080;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Search action buttons row */
+.napster-results-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 4px;
+  flex-shrink: 0;
+}
+
+/* ── Transfer tab ── */
+.napster-transfer-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 4px;
+  gap: 4px;
+}
+.napster-transfer-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: #fff;
+}
+.napster-transfer-header-row {
+  display: flex;
+  background: var(--win-bg);
+  border-bottom: 2px solid var(--win-dark);
+  flex-shrink: 0;
+}
+.napster-th {
+  padding: 2px 4px;
+  font-size: 11px;
+  font-weight: bold;
+  border-right: 1px solid var(--win-dark);
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+}
+.napster-transfer-body {
+  flex: 1;
+  overflow-y: auto;
+}
+.napster-transfer-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 11px;
+  cursor: default;
+}
+.napster-transfer-row:hover {
+  background: #d0d8f0;
+}
+.napster-transfer-row.selected {
+  background: #0000a0;
+  color: #fff;
+}
+.napster-td {
+  padding: 1px 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 1px solid #e0e0e0;
+}
+
+/* Transfer column widths */
+.tcol-icon {
+  width: 18px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.tcol-filename {
+  flex: 1;
+  min-width: 0;
+}
+.tcol-filesize {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.tcol-user {
+  width: 72px;
+  flex-shrink: 0;
+}
+.tcol-status {
+  width: 88px;
+  flex-shrink: 0;
+}
+.tcol-speed {
+  width: 54px;
+  flex-shrink: 0;
+}
+.tcol-progress {
+  width: 78px;
+  flex-shrink: 0;
+  padding: 1px 2px !important;
+}
+.tcol-rate {
+  width: 52px;
+  flex-shrink: 0;
+}
+.tcol-timeleft {
+  width: 52px;
+  flex-shrink: 0;
+}
+
+/* Progress bar cell */
+.napster-progress-cell {
+  position: relative;
+  height: 14px;
+  background: #fff;
+  border: 1px solid #888;
+  overflow: hidden;
+  width: 74px;
+}
+.napster-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #3366cc;
+  transition: width 0.4s linear;
+}
+.napster-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: #000;
+  mix-blend-mode: difference;
+  filter: invert(0);
+  z-index: 1;
+}
+
+/* Transfer stats bar */
+.napster-transfer-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding: 3px;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.napster-transfer-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 4px;
+  flex-shrink: 0;
+}
+
+/* Transfer download icon */
+.napster-dl-icon {
+  color: #0000cc;
+  font-size: 11px;
+}
+.napster-ul-icon {
+  color: #cc6600;
+  font-size: 11px;
+}
+
+/* ── Home tab ── */
+.napster-home-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #fff;
+  margin: 4px;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  font-family: Arial, sans-serif;
+}
+.napster-home-logo {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.napster-home-logo svg {
+  width: 180px;
+  height: 60px;
+}
+.napster-home-stats {
+  background: #f0f4ff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.napster-home-stats b {
+  color: #000080;
+}
+
+/* ── Status bar ── */
+.napster-status-bar {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  border-top: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.napster-status-left {
+  flex: 1;
+  padding: 0 6px;
+  border-right: 1px solid var(--win-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.napster-status-right {
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+/* Taskbar icon */
+.task-icon-napster {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #000;
+  color: #00ccff;
+  font-size: 8px;
+  font-weight: 900;
+  font-family: 'Arial Black', Arial, sans-serif;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Library tab ── */
+.napster-library-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--win-dark);
+  background: var(--win-bg);
+  flex-shrink: 0;
+  gap: 4px;
+}
+.napster-library-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+}
+.napster-library-header {
+  display: flex;
+  background: var(--win-bg);
+  border-bottom: 2px solid var(--win-dark);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+}
+.napster-lib-th {
+  padding: 2px 6px;
+  font-weight: bold;
+  font-size: 11px;
+  border-right: 1px solid var(--win-dark);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  white-space: nowrap;
+  cursor: default;
+  background: var(--win-bg);
+  user-select: none;
+}
+.napster-library-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 11px;
+}
+.napster-library-row:hover {
+  background: #c3d0e0;
+}
+.napster-library-row.selected {
+  background: #000080;
+  color: #fff;
+}
+.napster-lib-td {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.napster-lib-empty {
+  padding: 16px;
+  color: #888;
+  font-size: 11px;
+}
+/* Library column widths */
+.lcol-filename {
+  width: 260px;
+  min-width: 160px;
+}
+.lcol-filesize {
+  width: 60px;
+}
+.lcol-bitrate {
+  width: 60px;
+}
+.lcol-freq {
+  width: 60px;
+}
+.lcol-length {
+  width: 60px;
+}
+.lcol-path {
+  flex: 1;
+  min-width: 120px;
+}

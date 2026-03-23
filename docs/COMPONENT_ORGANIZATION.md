@@ -47,7 +47,7 @@ Reuse where it makes sense:
 - **Shared**: Title bar chrome, menu bar layout/dropdowns, toolbar layout, generic dialogs (e.g. “Save as”), window frame (min/max/close, drag, resize).
 - **App-specific**: App body (editor, canvas, buttons, address bar, etc.), menu items and actions, toolbar buttons and behavior, any custom dialogs.
 
-Keep **behavior** in the existing vanilla JS for now (or move it gradually into React). Components only need to render the **same DOM** (same ids/classes/data attributes) so `attachWindowChrome`, `Windows97.registerApp`, and app scripts still work.
+Keep **behavior** in the existing vanilla JS for now (or move it gradually into React). Components only need to render the **same DOM** (same ids/classes/data attributes) so `attachWindowChrome`, `Windows98.registerApp` (or the per-OS shim), and app scripts still work.
 
 ---
 

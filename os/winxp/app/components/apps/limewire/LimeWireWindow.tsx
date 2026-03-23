@@ -40,6 +40,9 @@ const SEARCH_CACHE = SONGS.map((s) => ({
   song: s,
 }));
 
+const CATALOG_ARTISTS = [...new Set(SONGS.map((s) => s[0]))].sort().slice(0, 18);
+const CATALOG_ALBUMS = [...new Set(SONGS.map((s) => s[3]))].sort().slice(0, 14);
+
 const USERNAMES = [
   'mp3freak2003',
   'xXlimewireXx',
@@ -225,12 +228,6 @@ export function LimeWireWindow() {
   const [selectedLibIdx, setSelectedLibIdx] = useState<number | null>(null);
   const [statusText, setStatusText] = useState('Connected to Gnutella: sharing 0 files.');
   const downloadIdRef = useRef(0);
-
-  const catalogArtists = useMemo(
-    () => [...new Set(SONGS.map((s) => s[0]))].sort().slice(0, 18),
-    [],
-  );
-  const catalogAlbums = useMemo(() => [...new Set(SONGS.map((s) => s[3]))].sort().slice(0, 14), []);
 
   const filteredResults = useMemo(() => {
     let r = results;
@@ -571,7 +568,7 @@ export function LimeWireWindow() {
             <section className="limewire-filter-section">
               <div className="lw-filter-header">Artist</div>
               <div className="lw-filter-scroll">
-                {catalogArtists.map((a) => (
+                {CATALOG_ARTISTS.map((a) => (
                   <button
                     key={a}
                     type="button"
@@ -586,7 +583,7 @@ export function LimeWireWindow() {
             <section className="limewire-filter-section">
               <div className="lw-filter-header">Album</div>
               <div className="lw-filter-scroll">
-                {catalogAlbums.map((g) => (
+                {CATALOG_ALBUMS.map((g) => (
                   <button
                     key={g}
                     type="button"

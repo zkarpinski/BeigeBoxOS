@@ -48,9 +48,9 @@ export const metadata: Metadata = {
     title: 'Windows 98 in the Browser | Zachary Karpinski',
     description:
       'A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Winamp, Napster, AIM, Navigator, and more.',
-    url: 'https://zkarpinski.com/',
+    url: 'https://win98.zkarpinski.com/',
     siteName: 'Windows 98 in the Browser',
-    images: [{ url: 'https://zkarpinski.com/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://win98.zkarpinski.com/og-image.png', width: 1200, height: 630 }],
     locale: 'en_US',
   },
   twitter: {
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Windows 98 in the Browser | Zachary Karpinski',
     description:
       'A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Winamp, Napster, AIM, Navigator, and more.',
-    images: ['https://zkarpinski.com/og-image.png'],
+    images: ['https://win98.zkarpinski.com/og-image.png'],
   },
 };
 
@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {/* Ensure relative asset URLs (e.g. "apps/…", "shell/…") resolve from the site root. */}
         <base href="/" />
-        <link rel="canonical" href="https://zkarpinski.com" />
+        <link rel="canonical" href="https://win98.zkarpinski.com" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'Windows 98 in the Browser',
               description:
                 'A nostalgic Windows 98 experience in the browser. Edit documents, Clippy, Winamp, Napster, AIM, Navigator, Minesweeper, Paint, The Incredible Machine, Notepad, Calculator, and more.',
-              url: 'https://zkarpinski.com',
+              url: 'https://win98.zkarpinski.com',
               author: { '@type': 'Person', name: 'Zachary Karpinski' },
               applicationCategory: 'MultimediaApplication',
               offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

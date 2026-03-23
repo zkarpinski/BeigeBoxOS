@@ -60,12 +60,14 @@ export function WordMuncherWindow() {
     const category = CATEGORIES[levelIdx % CATEGORIES.length];
 
     // Generate board
-    const newBoard: (CellItem | null)[][] = Array(ROWS).fill(null).map(() => Array(COLUMNS).fill(null));
+    const newBoard: (CellItem | null)[][] = Array(ROWS)
+      .fill(null)
+      .map(() => Array(COLUMNS).fill(null));
 
     // Fill board with words
     const allWords = [
-      ...category.correct.map(w => ({ word: w, isCorrect: true })),
-      ...category.incorrect.map(w => ({ word: w, isCorrect: false }))
+      ...category.correct.map((w) => ({ word: w, isCorrect: true })),
+      ...category.incorrect.map((w) => ({ word: w, isCorrect: false })),
     ].sort(() => Math.random() - 0.5);
 
     let wordIdx = 0;
@@ -85,12 +87,11 @@ export function WordMuncherWindow() {
     // Add 1 troggle per level up to 3
     const numTroggles = Math.min((levelIdx % CATEGORIES.length) + 1, 3);
     const newTroggles: Troggle[] = [];
-    for(let i=0; i<numTroggles; i++) {
+    for (let i = 0; i < numTroggles; i++) {
       // Spawn at bottom right
       newTroggles.push({ x: COLUMNS - 1 - i, y: ROWS - 1 });
     }
     setTroggles(newTroggles);
-
   }, []);
 
   const startGame = () => {
@@ -105,7 +106,7 @@ export function WordMuncherWindow() {
   };
 
   const loseLife = useCallback(() => {
-    setLives(l => {
+    setLives((l) => {
       if (l <= 1) {
         return 0;
       }
@@ -122,102 +123,111 @@ export function WordMuncherWindow() {
     setPlayerY(0);
   }, [lives]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!isPlaying) return;
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!isPlaying) return;
 
-    // Prevent default scrolling for arrow keys and space
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
-      e.preventDefault();
-    }
+      // Prevent default scrolling for arrow keys and space
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
 
-    setPlayerX(x => {
-      setPlayerY(y => {
-        let newX = x;
-        let newY = y;
+      setPlayerX((x) => {
+        setPlayerY((y) => {
+          let newX = x;
+          let newY = y;
 
-        if (e.key === 'ArrowUp') newY = Math.max(0, y - 1);
-        if (e.key === 'ArrowDown') newY = Math.min(ROWS - 1, y + 1);
-        if (e.key === 'ArrowLeft') newX = Math.max(0, x - 1);
-        if (e.key === 'ArrowRight') newX = Math.min(COLUMNS - 1, x + 1);
+          if (e.key === 'ArrowUp') newY = Math.max(0, y - 1);
+          if (e.key === 'ArrowDown') newY = Math.min(ROWS - 1, y + 1);
+          if (e.key === 'ArrowLeft') newX = Math.max(0, x - 1);
+          if (e.key === 'ArrowRight') newX = Math.min(COLUMNS - 1, x + 1);
 
-        if (e.key === ' ') {
-          // Munch!
-          setBoard(currentBoard => {
-            const cell = currentBoard[y][x];
-            if (cell) {
-              if (cell.isCorrect) {
-                setScore(s => s + 10);
-                const newBoard = [...currentBoard];
-                newBoard[y] = [...newBoard[y]];
-                newBoard[y][x] = null;
+          if (e.key === ' ') {
+            // Munch!
+            setBoard((currentBoard) => {
+              const cell = currentBoard[y][x];
+              if (cell) {
+                if (cell.isCorrect) {
+                  setScore((s) => s + 10);
+                  const newBoard = [...currentBoard];
+                  newBoard[y] = [...newBoard[y]];
+                  newBoard[y][x] = null;
 
-                // Check win condition (no correct words left)
-                const hasCorrectLeft = newBoard.some(row => row.some(c => c && c.isCorrect));
-                if (!hasCorrectLeft) {
-                  setTimeout(() => {
-                    setLevel(l => {
-                      const nextLevel = l + 1;
-                      initLevel(nextLevel);
-                      return nextLevel;
-                    });
-                  }, 500);
+                  // Check win condition (no correct words left)
+                  const hasCorrectLeft = newBoard.some((row) => row.some((c) => c && c.isCorrect));
+                  if (!hasCorrectLeft) {
+                    setTimeout(() => {
+                      setLevel((l) => {
+                        const nextLevel = l + 1;
+                        initLevel(nextLevel);
+                        return nextLevel;
+                      });
+                    }, 500);
+                  }
+
+                  return newBoard;
+                } else {
+                  // Wrong munch
+                  loseLife();
                 }
-
-                return newBoard;
-              } else {
-                // Wrong munch
-                loseLife();
               }
-            }
-            return currentBoard;
-          });
-        }
+              return currentBoard;
+            });
+          }
 
-        return newY;
+          return newY;
+        });
+        return e.key === 'ArrowLeft'
+          ? Math.max(0, x - 1)
+          : e.key === 'ArrowRight'
+            ? Math.min(COLUMNS - 1, x + 1)
+            : x;
       });
-      return e.key === 'ArrowLeft' ? Math.max(0, x - 1) : e.key === 'ArrowRight' ? Math.min(COLUMNS - 1, x + 1) : x;
-    });
-
-  }, [isPlaying, initLevel, loseLife]);
+    },
+    [isPlaying, initLevel, loseLife],
+  );
 
   // Handle troggle movement
   useEffect(() => {
     if (!isPlaying) return;
 
-    gameLoopRef.current = setInterval(() => {
-      setTroggles(currentTroggles => {
-        return currentTroggles.map(t => {
-          // Move randomly towards player sometimes, or random
-          let dx = 0;
-          let dy = 0;
+    gameLoopRef.current = setInterval(
+      () => {
+        setTroggles((currentTroggles) => {
+          return currentTroggles.map((t) => {
+            // Move randomly towards player sometimes, or random
+            let dx = 0;
+            let dy = 0;
 
-          if (Math.random() > 0.5) {
-             // Random
-             const axis = Math.random() > 0.5 ? 'x' : 'y';
-             const dir = Math.random() > 0.5 ? 1 : -1;
-             if (axis === 'x') dx = dir;
-             else dy = dir;
-          } else {
-            // Towards player (read directly from state by capturing it or we rely on a ref,
-            // but for simplicity we'll just read the current state variables which will be stale,
-            // so we should use a ref or functional update)
-          }
-          // Simple random for now to avoid stale closures
-          const axis = Math.random() > 0.5 ? 'x' : 'y';
-          const dir = Math.random() > 0.5 ? 1 : -1;
-          if (axis === 'x') dx = dir;
-          else dy = dir;
+            if (Math.random() > 0.5) {
+              // Random
+              const axis = Math.random() > 0.5 ? 'x' : 'y';
+              const dir = Math.random() > 0.5 ? 1 : -1;
+              if (axis === 'x') dx = dir;
+              else dy = dir;
+            } else {
+              // Towards player (read directly from state by capturing it or we rely on a ref,
+              // but for simplicity we'll just read the current state variables which will be stale,
+              // so we should use a ref or functional update)
+            }
+            // Simple random for now to avoid stale closures
+            const axis = Math.random() > 0.5 ? 'x' : 'y';
+            const dir = Math.random() > 0.5 ? 1 : -1;
+            if (axis === 'x') dx = dir;
+            else dy = dir;
 
-          let newX = t.x + dx;
-          let newY = t.y + dy;
+            let newX = t.x + dx;
+            let newY = t.y + dy;
 
-          newX = Math.max(0, Math.min(COLUMNS - 1, newX));
-          newY = Math.max(0, Math.min(ROWS - 1, newY));
+            newX = Math.max(0, Math.min(COLUMNS - 1, newX));
+            newY = Math.max(0, Math.min(ROWS - 1, newY));
 
-          return { x: newX, y: newY };
+            return { x: newX, y: newY };
+          });
         });
-      });
-    }, 1000 - Math.min(level * 50, 500)); // Speed up as level increases
+      },
+      1000 - Math.min(level * 50, 500),
+    ); // Speed up as level increases
 
     return () => {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
@@ -227,22 +237,22 @@ export function WordMuncherWindow() {
   // Check collision
   useEffect(() => {
     if (!isPlaying) return;
-    const hit = troggles.some(t => t.x === playerX && t.y === playerY);
+    const hit = troggles.some((t) => t.x === playerX && t.y === playerY);
     if (hit) {
       loseLife();
     }
   }, [playerX, playerY, troggles, isPlaying, loseLife]);
 
-
   // Ensure focus
   useEffect(() => {
-    if (state?.focused && isPlaying && gameContainerRef.current) {
-       gameContainerRef.current.focus();
+    // We consider the app "focused" if its zIndex is Z_FOCUSED (which is 11)
+    const isFocused = state?.zIndex === 11;
+    if (isFocused && isPlaying && gameContainerRef.current) {
+      gameContainerRef.current.focus();
     }
-  }, [state?.focused, isPlaying]);
+  }, [state?.zIndex, isPlaying]);
 
-
-  if (!state || state.hidden) return null;
+  if (!state || !state.visible) return null;
 
   const currentCategory = CATEGORIES[level % CATEGORIES.length];
 
@@ -252,12 +262,7 @@ export function WordMuncherWindow() {
       appId={appId}
       className={`app-window wordmuncher-window ${state.minimized ? 'minimized' : ''} windowed`}
       titleBar={
-        <TitleBar
-          title="Word Muncher"
-          icon={<img src="/apps/wordmuncher/icon.png" alt="" />}
-          onClose={() => hideApp(appId)}
-          onMinimize={() => minimizeApp(appId)}
-        />
+        <TitleBar title="Word Muncher" icon={<img src="/apps/wordmuncher/icon.png" alt="" />} />
       }
       allowResize={false}
       getCanDrag={() => true}
@@ -271,7 +276,9 @@ export function WordMuncherWindow() {
         {!isPlaying ? (
           <div className="wordmuncher-menu">
             <h1 className="wordmuncher-title">WORD MUNCHER</h1>
-            <button className="wordmuncher-btn" onClick={startGame}>Start Game</button>
+            <button className="wordmuncher-btn" onClick={startGame}>
+              Start Game
+            </button>
             <div className="wordmuncher-instructions">
               <p>Use Arrow Keys to move.</p>
               <p>Press Spacebar to munch words!</p>
@@ -288,25 +295,32 @@ export function WordMuncherWindow() {
             </div>
 
             <div className="wordmuncher-board">
-              {Array(ROWS).fill(null).map((_, r) => (
-                <div key={`row-${r}`} className="wordmuncher-row">
-                  {Array(COLUMNS).fill(null).map((_, c) => {
-                    const isPlayerHere = playerX === c && playerY === r;
-                    const isTroggleHere = troggles.some(t => t.x === c && t.y === r);
-                    const cell = board[r]?.[c];
+              {Array(ROWS)
+                .fill(null)
+                .map((_, r) => (
+                  <div key={`row-${r}`} className="wordmuncher-row">
+                    {Array(COLUMNS)
+                      .fill(null)
+                      .map((_, c) => {
+                        const isPlayerHere = playerX === c && playerY === r;
+                        const isTroggleHere = troggles.some((t) => t.x === c && t.y === r);
+                        const cell = board[r]?.[c];
 
-                    return (
-                      <div key={`cell-${r}-${c}`} className={`wordmuncher-cell ${isPlayerHere ? 'player' : ''} ${isTroggleHere ? 'troggle' : ''}`}>
-                        {cell ? (
-                          <div className="wordmuncher-word">{cell.word}</div>
-                        ) : null}
-                        {isPlayerHere && <div className="wordmuncher-player-sprite">M</div>}
-                        {isTroggleHere && !isPlayerHere && <div className="wordmuncher-troggle-sprite">T</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
+                        return (
+                          <div
+                            key={`cell-${r}-${c}`}
+                            className={`wordmuncher-cell ${isPlayerHere ? 'player' : ''} ${isTroggleHere ? 'troggle' : ''}`}
+                          >
+                            {cell ? <div className="wordmuncher-word">{cell.word}</div> : null}
+                            {isPlayerHere && <div className="wordmuncher-player-sprite">M</div>}
+                            {isTroggleHere && !isPlayerHere && (
+                              <div className="wordmuncher-troggle-sprite">T</div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                ))}
             </div>
           </div>
         )}

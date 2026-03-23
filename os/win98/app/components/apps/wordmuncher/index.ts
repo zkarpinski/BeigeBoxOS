@@ -3,10 +3,10 @@ import { WordMuncherWindow } from './WordMuncherWindow';
 
 export const wordMuncherAppConfig: AppConfig = {
   id: 'wordmuncher',
-  name: 'Word Muncher',
+  label: 'Word Muncher',
   icon: '/apps/wordmuncher/icon.png',
   startMenu: { path: ['Programs', 'Games'] },
-  desktopIcon: true,
+  desktop: true,
 };
 
 export { WordMuncherWindow };

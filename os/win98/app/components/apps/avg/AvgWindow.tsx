@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { AppWindow, TitleBar, MenuBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
+import type { MenuItemConfig } from '@retro-web/core/types/os-shell';
+import { useOsShell } from '@retro-web/core/context';
 
 export const avgAppConfig: AppConfig = {
   id: 'avg',
@@ -14,18 +15,19 @@ export const avgAppConfig: AppConfig = {
   taskbarLabel: 'AVG Anti-Virus System',
 };
 
-const menuItems = [
+const menuItems: MenuItemConfig[] = [
   {
     label: 'Program',
-    items: [{ label: 'Exit', action: () => console.log('Exit') }],
+    dropdown: [{ label: 'Exit', shortcutChar: 'E', onClick: () => console.log('Exit') }],
   },
-  { label: 'Tests', items: [] },
-  { label: 'Results', items: [] },
-  { label: 'Service', items: [] },
-  { label: 'Help', items: [] },
+  { label: 'Tests' },
+  { label: 'Results' },
+  { label: 'Service' },
+  { label: 'Help' },
 ];
 
 export function AvgWindow() {
+  const { AppWindow, TitleBar, MenuBar } = useOsShell();
   return (
     <AppWindow
       id="avg-window"

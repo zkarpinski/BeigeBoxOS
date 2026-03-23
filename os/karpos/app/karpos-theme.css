@@ -1,0 +1,681 @@
+/* KarpOS — neo-brutalist shell (inspired by neobrutalism.dev) */
+
+body.karpos-desktop {
+  --karp-black: #0a0a0a;
+  --karp-paper: #fffef8;
+  --karp-yellow: #fde047;
+  --karp-pink: #fb64b6;
+  --karp-cyan: #22d3ee;
+  --karp-lime: #bef264;
+  --karp-border: 4px solid var(--karp-black);
+  --karp-border-thin: 3px solid var(--karp-black);
+  /* Deeper offset shadows — card / sticker, not Win98 bevel */
+  --karp-shadow: 12px 12px 0 var(--karp-black);
+  --karp-shadow-sm: 5px 5px 0 var(--karp-black);
+  --karp-shadow-tight: 4px 4px 0 var(--karp-black);
+  /* Map Win98 tokens so shared apps pick up a cohesive palette */
+  --win-bg: var(--karp-paper);
+  --win-dark: var(--karp-black);
+  --win-black: var(--karp-black);
+  --win-light: #e5e5e5;
+  --win-white: #ffffff;
+  --title-active: var(--karp-yellow);
+  --taskbar-bg: var(--karp-lime);
+  --toolbar-bg: var(--karp-paper);
+  --ruler-bg: #f5f5f5;
+  --desktop-bg: #7dd3fc;
+  font-family:
+    'Space Grotesk',
+    'DM Sans',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+body.karpos-desktop,
+body.karpos-desktop * {
+  font-family: inherit;
+}
+
+body.karpos-desktop {
+  background-color: var(--desktop-bg);
+  background-image:
+    linear-gradient(90deg, rgba(10, 10, 10, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(10, 10, 10, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Desktop icons */
+body.karpos-desktop #desktop-icons .desktop-icon {
+  color: var(--karp-black);
+  text-shadow: 1px 1px 0 #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.selected span {
+  background: var(--karp-yellow);
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow-sm);
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon img {
+  filter: drop-shadow(2px 2px 0 var(--karp-black));
+}
+
+/* Taskbar */
+body.karpos-desktop #taskbar {
+  height: 40px;
+  padding: 6px 8px;
+  background: var(--karp-lime);
+  border-top: var(--karp-border);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  box-shadow: 0 -4px 0 var(--karp-black);
+}
+
+body.karpos-desktop .taskbar-divider {
+  width: 3px;
+  background: var(--karp-black);
+  margin: 0 6px;
+  opacity: 0.35;
+}
+
+/* APPS launcher — black frame + cyan offset shadow (neo-brutalist, not Win “Start”) */
+body.karpos-desktop .karpos-apps-launcher {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  height: 28px;
+  min-width: 76px;
+  padding: 0 12px;
+  background: var(--karp-paper);
+  color: var(--karp-black);
+  border: var(--karp-border-thin);
+  border-radius: 0;
+  box-shadow: 5px 5px 0 var(--karp-cyan);
+  cursor: pointer;
+}
+
+body.karpos-desktop .karpos-apps-launcher__inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+body.karpos-desktop .karpos-apps-launcher__label {
+  line-height: 1;
+}
+
+body.karpos-desktop .karpos-apps-launcher:hover {
+  background: var(--karp-yellow);
+}
+
+body.karpos-desktop .karpos-apps-launcher:active,
+body.karpos-desktop .karpos-apps-launcher.active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--karp-cyan);
+}
+
+body.karpos-desktop .taskbar-task {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow-sm);
+  background: var(--karp-paper);
+  font-weight: 700;
+  border-radius: 0;
+}
+
+body.karpos-desktop .taskbar-task.active {
+  background: var(--karp-pink);
+}
+
+/* System tray — drop Win98 “inset well”; keep tray open on lime */
+body.karpos-desktop .system-tray {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 0 0 6px;
+  gap: 6px;
+  align-items: center;
+}
+
+body.karpos-desktop .tray-divider {
+  width: 2px;
+  height: 18px;
+  background: var(--karp-black);
+  opacity: 0.2;
+  margin: 0 2px 0 4px;
+}
+
+/* Clock — compact chip: thin frame + small offset shadow (not a second taskbar slab) */
+body.karpos-desktop .taskbar-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  margin: 0;
+  padding: 5px 10px 6px;
+  font-weight: 800;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--karp-black);
+  background: var(--karp-paper);
+  border: 2px solid var(--karp-black);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--karp-pink);
+  line-height: 1;
+}
+
+body.karpos-desktop .taskbar-clock__hm {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+body.karpos-desktop .taskbar-clock__ampm {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  opacity: 0.72;
+  margin-left: 0;
+}
+
+/* Applications popup (macOS-style grid) — replaces Win98 start menu on KarpOS */
+/* Overlay stops above the taskbar so Start stays clickable; shell uses pointer-events:auto for reliable hit-testing. */
+body.karpos-desktop #start-menu.karpos-applications-menu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 52px;
+  z-index: 10100;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0 12px 12px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+body.karpos-desktop #start-menu.karpos-applications-menu.hidden {
+  display: none !important;
+}
+
+body.karpos-desktop #start-menu.karpos-applications-menu:not(.hidden) {
+  display: flex;
+}
+
+body.karpos-desktop .karpos-apps-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(10, 10, 10, 0.25);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  pointer-events: auto;
+  cursor: default;
+}
+
+body.karpos-desktop .karpos-apps-panel {
+  position: relative;
+  z-index: 1;
+  width: min(920px, calc(100vw - 24px));
+  max-height: min(72vh, 640px);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 14px;
+  border: var(--karp-border);
+  border-radius: 22px;
+  background: rgba(255, 254, 248, 0.82);
+  box-shadow: var(--karp-shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  pointer-events: auto;
+}
+
+/* “Speech bubble” tail toward the taskbar / start button */
+body.karpos-desktop .karpos-apps-panel-tail {
+  position: absolute;
+  bottom: -11px;
+  left: 52px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid rgba(255, 254, 248, 0.92);
+  filter: drop-shadow(0 4px 0 var(--karp-black));
+  pointer-events: none;
+}
+
+body.karpos-desktop .karpos-apps-header {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+body.karpos-desktop .karpos-apps-back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 4px 10px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  border: var(--karp-border-thin);
+  background: var(--karp-paper);
+  box-shadow: var(--karp-shadow-sm);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+body.karpos-desktop .karpos-apps-back:hover {
+  background: var(--karp-cyan);
+}
+
+body.karpos-desktop .karpos-apps-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--karp-black);
+  text-align: center;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+body.karpos-desktop .karpos-apps-header--folder .karpos-apps-title {
+  padding-left: 108px;
+}
+
+body.karpos-desktop .karpos-apps-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 4px 2px 8px;
+  pointer-events: auto;
+}
+
+body.karpos-desktop .karpos-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 14px 10px;
+  justify-items: center;
+}
+
+@media (max-width: 900px) {
+  body.karpos-desktop .karpos-apps-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  body.karpos-desktop .karpos-apps-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+body.karpos-desktop .karpos-app-tile {
+  width: 100%;
+  max-width: 88px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: var(--karp-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+body.karpos-desktop .karpos-app-tile:hover .karpos-app-squircle {
+  transform: translateY(-2px);
+  box-shadow: var(--karp-shadow-sm);
+}
+
+body.karpos-desktop .karpos-app-squircle {
+  width: 56px;
+  height: 56px;
+  border-radius: 22%;
+  border: var(--karp-border-thin);
+  background: var(--karp-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 var(--karp-black);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+body.karpos-desktop .karpos-app-squircle-folder {
+  background: linear-gradient(145deg, var(--karp-cyan), #67e8f9);
+}
+
+body.karpos-desktop .karpos-app-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+body.karpos-desktop .karpos-app-label {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+body.karpos-desktop .karpos-apps-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 3px dashed rgba(10, 10, 10, 0.2);
+}
+
+body.karpos-desktop .karpos-apps-footer-btn {
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 6px 12px;
+  border: var(--karp-border-thin);
+  background: var(--karp-yellow);
+  box-shadow: var(--karp-shadow-sm);
+  cursor: pointer;
+}
+
+body.karpos-desktop .karpos-apps-footer-btn:hover {
+  background: var(--karp-pink);
+}
+
+/* App windows — flat “card” frame: no Win98 3D bevel */
+body.karpos-desktop .karp-app-window.app-window,
+body.karpos-desktop .app-window.karp-app-window {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow);
+  background-color: var(--karp-paper);
+  /* Subtle newsprint dot — not Win98 plastic grey */
+  background-image: radial-gradient(rgba(10, 10, 10, 0.09) 0.55px, transparent 0.55px);
+  background-size: 6px 6px;
+  border-radius: 0;
+  flex-direction: column;
+  overflow: hidden;
+  /* Remove classic outset look if any rule leaks in */
+  box-sizing: border-box;
+  outline: none;
+  /* Taskbar is taller than Win98 — keep windows above dock */
+  max-height: calc(100dvh - 52px);
+}
+
+/* Second “sticker” outline inset — reads as layered paper, not Microsoft */
+body.karpos-desktop .karp-app-window.app-window::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  border: 3px dashed rgba(10, 10, 10, 0.2);
+  z-index: 0;
+}
+
+body.karpos-desktop .karp-app-window.app-window > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.karpos-desktop .karp-app-window.maximized {
+  box-shadow: none;
+}
+
+body.karpos-desktop .karp-app-window.maximized::before {
+  display: none;
+}
+
+body.karpos-desktop .win-minimizing {
+  transition:
+    transform 0.28s ease-out,
+    opacity 0.28s ease-out !important;
+  transform: scale(0.4) translateY(160px) rotate(-2deg) !important;
+  opacity: 0 !important;
+  transform-origin: 50% 100% !important;
+}
+
+/* Title bar — high-contrast blocks, not a Win98 gradient strip */
+body.karpos-desktop .title-bar.karp-title-bar {
+  min-height: 44px;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  cursor: move;
+  border-bottom: var(--karp-border);
+  background: repeating-linear-gradient(
+    -12deg,
+    var(--karp-yellow) 0,
+    var(--karp-yellow) 8px,
+    #facc15 8px,
+    #facc15 16px
+  );
+  color: var(--karp-black);
+  box-shadow: none;
+}
+
+body.karpos-desktop .karp-title-bar__lead {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 12px;
+  font-weight: 900;
+}
+
+body.karpos-desktop .karp-title-bar__iconbox {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: var(--karp-border-thin);
+  background: var(--karp-cyan);
+  box-shadow: var(--karp-shadow-tight);
+}
+
+body.karpos-desktop .karp-title-bar__iconbox > img {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  object-fit: contain !important;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 1px 0 var(--karp-black));
+}
+
+body.karpos-desktop .karp-title-bar__heading {
+  font-size: 13px !important;
+  line-height: 1.15;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 900 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--karp-black);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+body.karpos-desktop .karp-title-bar-controls {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 6px;
+  background: var(--karp-black);
+  border-left: var(--karp-border-thin);
+}
+
+/* Chunky control tiles — override Win98 .title-btn micro dimensions */
+body.karpos-desktop .karp-chrome-btn.title-btn {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 100% !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  margin: 0 4px 0 0 !important;
+  border: var(--karp-border-thin) !important;
+  border-radius: 0 !important;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  box-shadow: var(--karp-shadow-tight);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+body.karpos-desktop .karp-chrome-btn.title-btn:last-child {
+  margin-right: 0 !important;
+}
+
+body.karpos-desktop .karp-chrome-btn--min {
+  background: var(--karp-paper) !important;
+}
+
+body.karpos-desktop .karp-chrome-btn--max {
+  background: var(--karp-lime) !important;
+}
+
+body.karpos-desktop .karp-chrome-btn--close {
+  background: var(--karp-pink) !important;
+}
+
+body.karpos-desktop .karp-chrome-btn__glyph {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  position: static !important;
+  margin: 0 !important;
+  top: auto !important;
+}
+
+body.karpos-desktop .karp-chrome-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none !important;
+}
+
+/* Resize grip — chunky diagonal hatch, not Win98 pixel dots */
+body.karpos-desktop .win-resize-grip {
+  width: 20px !important;
+  height: 20px !important;
+  background-color: var(--karp-yellow);
+  background-image: linear-gradient(
+      135deg,
+      var(--karp-black) 12.5%,
+      transparent 12.5%,
+      transparent 50%,
+      var(--karp-black) 50%,
+      var(--karp-black) 62.5%,
+      transparent 62.5%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 37.5%,
+      var(--karp-black) 37.5%,
+      var(--karp-black) 50%,
+      transparent 50%
+    );
+  background-size: 8px 8px;
+  border-top: var(--karp-border-thin);
+  border-left: var(--karp-border-thin);
+  box-shadow: -3px -3px 0 var(--karp-black);
+}
+
+/* Generic Win98 buttons inside apps — brutalize */
+body.karpos-desktop .win-btn:not(.title-btn) {
+  border: 2px solid var(--karp-black);
+  box-shadow: 2px 2px 0 var(--karp-black);
+  background: var(--karp-paper);
+  font-weight: 700;
+  border-radius: 0;
+}
+
+body.karpos-desktop .win-btn:not(.title-btn):active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--karp-black);
+}
+
+/* Dialogs / overlays (shared Run, Shutdown, etc.) */
+body.karpos-desktop .w97dlg-overlay {
+  background: rgba(10, 10, 10, 0.45);
+}
+
+body.karpos-desktop .w97dlg {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow);
+  background: var(--karp-paper);
+  border-radius: 0;
+}
+
+body.karpos-desktop .w97dlg-titlebar {
+  background: var(--karp-yellow);
+  border-bottom: var(--karp-border);
+  font-weight: 800;
+}
+
+body.karpos-desktop .w97dlg-btn {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow-sm);
+  font-weight: 800;
+  background: var(--karp-cyan);
+  border-radius: 0;
+}
+
+body.karpos-desktop .w97dlg-btn-default {
+  background: var(--karp-yellow);
+}
+
+/* BSOD — keep readable but on-brand */
+body.karpos-desktop #bsod-overlay {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow);
+}

@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AppWindow } from '../../winxp/AppWindow';
-import { TitleBar } from '../../winxp/TitleBar';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, useOsShell } from '@retro-web/core/context';
 import {
   type Cell,
   type DifficultyKey,
@@ -44,6 +42,7 @@ type FaceType = 'smile' | 'surprise' | 'dead' | 'win';
 
 export function MinesweeperWindow() {
   const ctx = useWindowManager();
+  const { AppWindow, TitleBar } = useOsShell();
   const [difficulty, setDiff] = useState<DifficultyKey>('beginner');
   const [board, setBoard] = useState<Cell[][]>(() => makeBoard(9, 9));
   const [gameState, setGS] = useState<GameState>('ready');

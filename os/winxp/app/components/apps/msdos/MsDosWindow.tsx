@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, useOsShell } from '@retro-web/core/context';
 import { USER_PROFILE_PATH } from '../../../fileSystem';
 
 const ICON = 'apps/msdos/msdos-icon.png';
@@ -27,6 +26,7 @@ const INITIAL_LINES = [
 ];
 
 export function MsDosWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [lines, setLines] = useState<string[]>(INITIAL_LINES);
   const [workingDir, setWorkingDir] = useState(USER_PROFILE_PATH);
   const [inputValue, setInputValue] = useState('');

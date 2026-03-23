@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { CalculatorContent } from '@retro-web/core/apps/calculator';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, useOsShell } from '@retro-web/core/context';
 // calculator.css is imported by CalculatorContent from @retro-web/core
 
 const ICON = 'apps/calculator/calculator-icon.png';
@@ -20,6 +19,7 @@ export const calculatorAppConfig: AppConfig = {
 
 export function CalculatorWindow() {
   const { apps } = useWindowManager();
+  const { AppWindow, TitleBar } = useOsShell();
   const isVisible = apps.calculator?.visible && !apps.calculator?.minimized;
 
   return (

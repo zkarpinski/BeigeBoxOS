@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { WinampApp } from '@retro-web/app-winamp';
+import { useOsShell } from '@retro-web/core/context';
 // Note: winamp.css is imported by WinampApp from @retro-web/app-winamp
 
 export const winampAppConfig: AppConfig = {
@@ -16,6 +16,7 @@ export const winampAppConfig: AppConfig = {
 };
 
 export function WinampWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   return (
     <AppWindow
       id="winamp-window"

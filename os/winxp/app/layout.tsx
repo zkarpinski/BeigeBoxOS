@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   description:
     'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, MS-DOS, Task Manager, Control Panel, and more. By Zachary Karpinski.',
   keywords:
-    "Windows XP, retro, browser, Zachary Karpinski, portfolio, Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, MS-DOS, Task Manager, Control Panel, My Computer, Windows Media Player, Internet Explorer",
+    'Windows XP, retro, browser, Zachary Karpinski, portfolio, Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, MS-DOS, Task Manager, Control Panel, My Computer, Windows Media Player, Internet Explorer',
   robots: 'index, follow',
   authors: [{ name: 'Zachary Karpinski' }],
   openGraph: {

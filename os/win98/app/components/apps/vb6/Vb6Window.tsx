@@ -1,15 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  AppWindow,
-  TitleBar,
-  ToolbarRow,
-  Toolbar,
-  ToolbarButton,
-  ToolbarSeparator,
-} from '../../win98';
+import { ToolbarRow, Toolbar, ToolbarButton, ToolbarSeparator } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
+import { useOsShell } from '@retro-web/core/context';
 
 export const vb6AppConfig: AppConfig = {
   id: 'vb6',
@@ -21,6 +15,7 @@ export const vb6AppConfig: AppConfig = {
 };
 
 export function Vb6Window() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [running, setRunning] = useState(false);
   const [runLabel, setRunLabel] = useState('Label1');
   const formPanelRef = useRef<HTMLDivElement>(null);

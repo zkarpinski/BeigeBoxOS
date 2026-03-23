@@ -3,8 +3,8 @@
 // P2P client UI (mock search / transfers / library). Shared catalog: MOCK_STREAMING_SONGS.
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@retro-web/core/types/app-config';
+import { useOsShell } from '@retro-web/core/context';
 import {
   MOCK_STREAMING_SONGS,
   openSpotifyForTrack,
@@ -213,6 +213,7 @@ function doSearch(query: string): SearchResult[] {
 type MediaFilter = 'all' | 'audio' | 'programs' | 'video';
 
 export function LimeWireWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [activeTab, setActiveTab] = useState<'search' | 'monitor' | 'library'>('search');
   const [artistQuery, setArtistQuery] = useState('*NSYNC');
   const [titleQuery, setTitleQuery] = useState('');

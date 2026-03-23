@@ -1,0 +1,139 @@
+.wordmuncher-window {
+  background-color: var(--win-bg);
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  width: 600px;
+  height: 500px;
+}
+
+.wordmuncher-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background-color: #000;
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+  outline: none; /* remove focus outline */
+}
+
+.wordmuncher-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.wordmuncher-title {
+  font-size: 32px;
+  margin-bottom: 24px;
+  color: #00ff00;
+  text-shadow: 2px 2px 0px #008800;
+}
+
+.wordmuncher-btn {
+  background-color: var(--win-bg);
+  border-top: 2px solid var(--win-white);
+  border-left: 2px solid var(--win-white);
+  border-bottom: 2px solid var(--win-black);
+  border-right: 2px solid var(--win-black);
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.wordmuncher-btn:active {
+  border-top: 2px solid var(--win-black);
+  border-left: 2px solid var(--win-black);
+  border-bottom: 2px solid var(--win-white);
+  border-right: 2px solid var(--win-white);
+}
+
+.wordmuncher-instructions {
+  text-align: center;
+  color: #aaaaaa;
+}
+
+.wordmuncher-game {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.wordmuncher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #555;
+  margin-bottom: 8px;
+}
+
+.wordmuncher-stat {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wordmuncher-rule {
+  font-size: 14px;
+  color: #ffcc00;
+}
+
+.wordmuncher-board {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  flex: 1;
+  gap: 2px;
+}
+
+.wordmuncher-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+}
+
+.wordmuncher-cell {
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #111;
+}
+
+.wordmuncher-cell.player {
+  background-color: #003300;
+  border-color: #00ff00;
+}
+
+.wordmuncher-cell.troggle {
+  background-color: #330000;
+  border-color: #ff0000;
+}
+
+.wordmuncher-word {
+  z-index: 1;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.wordmuncher-player-sprite {
+  position: absolute;
+  font-size: 24px;
+  color: #00ff00;
+  z-index: 2;
+  opacity: 0.8;
+}
+
+.wordmuncher-troggle-sprite {
+  position: absolute;
+  font-size: 24px;
+  color: #ff0000;
+  z-index: 2;
+  opacity: 0.8;
+}

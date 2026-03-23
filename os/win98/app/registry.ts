@@ -21,6 +21,7 @@ import { reporterAppConfig } from './components/apps/reporter';
 import { zonealarmAppConfig } from './components/apps/zonealarm';
 import { taskmanagerAppConfig } from './components/apps/taskmanager';
 import { avgAppConfig } from './components/apps/avg';
+import { wordMuncherAppConfig } from './components/apps/wordmuncher';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 
 export const appRegistry: AppConfig[] = [
@@ -47,4 +48,5 @@ export const appRegistry: AppConfig[] = [
   zonealarmAppConfig,
   taskmanagerAppConfig,
   avgAppConfig,
+  wordMuncherAppConfig,
 ];

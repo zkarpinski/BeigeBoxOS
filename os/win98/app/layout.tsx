@@ -33,6 +33,7 @@ import './components/apps/reporter/reporter.css';
 import './components/apps/zonealarm/zonealarm.css';
 import './components/apps/taskmanager/taskmanager.css';
 import './components/apps/avg/avg.css';
+import './components/apps/wordmuncher/wordmuncher.css';
 import './components/apps/aol/aol.css';
 
 export const metadata: Metadata = {

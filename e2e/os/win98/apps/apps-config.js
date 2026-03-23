@@ -165,6 +165,15 @@ const apps = [
     },
   },
   {
+    subFolder: 'Games',
+    startId: '#start-menu-wordmuncher',
+    windowId: '#wordmuncher-window',
+    titleSelector: '#wordmuncher-window .title-bar-text .title-text',
+    interact: async (p) => {
+      await p.locator('#wordmuncher-window button.wordmuncher-btn').click();
+    },
+  },
+  {
     subFolder: 'System Tools',
     startId: '#start-menu-avg',
     windowId: '#avg-window',

@@ -27,6 +27,7 @@ import { ReporterWindow } from '../apps/reporter';
 import { ZonealarmWindow } from '../apps/zonealarm';
 import { TaskManagerWindow } from '../apps/taskmanager';
 import { AvgWindow } from '../apps/avg';
+import { WordMuncherWindow } from '../apps/wordmuncher';
 import { BootScreen } from '../shell/BootScreen';
 import { DesktopIcons } from '../shell/DesktopIcons';
 import { Taskbar } from '../shell/Taskbar';
@@ -223,6 +224,7 @@ export function Desktop({ openAppId }: DesktopProps) {
         <ZonealarmWindow />
         <TaskManagerWindow registry={appRegistry} />
         <AvgWindow />
+        <WordMuncherWindow />
 
         {/* Shell */}
         <DesktopIcons registry={appRegistry} />

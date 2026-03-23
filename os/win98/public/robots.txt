@@ -4,4 +4,4 @@ Allow: /
 Disallow: /run/
 
 # Sitemap (update base URL if your site is hosted elsewhere)
-Sitemap: https://zkarpinski.com/sitemap.xml
+Sitemap: https://win98.zkarpinski.com/sitemap.xml

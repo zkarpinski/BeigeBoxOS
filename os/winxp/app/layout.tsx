@@ -25,17 +25,17 @@ import './components/apps/taskmanager/taskmanager.css';
 export const metadata: Metadata = {
   title: 'Windows XP | Zachary Karpinski',
   description:
-    'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, and more. By Zachary Karpinski.',
+    'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, MS-DOS, Task Manager, Control Panel, and more. By Zachary Karpinski.',
   keywords:
-    'Windows XP, retro, browser, Zachary Karpinski, portfolio, Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator',
+    "Windows XP, retro, browser, Zachary Karpinski, portfolio, Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, MS-DOS, Task Manager, Control Panel, My Computer, Windows Media Player, Internet Explorer",
   robots: 'index, follow',
   authors: [{ name: 'Zachary Karpinski' }],
   openGraph: {
     type: 'website',
     title: 'Windows XP in the Browser | Zachary Karpinski',
     description:
-      'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, and more.',
-    url: 'https://zkarpinski.com/',
+      'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, MS-DOS, Task Manager, Control Panel, and more.',
+    url: 'https://winxp.zkarpinski.com/',
     siteName: 'Windows XP in the Browser',
     images: [{ url: 'https://zkarpinski.com/og-image.png', width: 1200, height: 630 }],
     locale: 'en_US',
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Windows XP in the Browser | Zachary Karpinski',
     description:
-      'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, and more.',
-    images: ['https://zkarpinski.com/og-image.png'],
+      'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, MS-DOS, Task Manager, Control Panel, and more.',
+    images: ['https://winxp.zkarpinski.com/og-image.png'],
   },
 };
 
@@ -59,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {/* Ensure relative asset URLs (e.g. "apps/…", "shell/…") resolve from the site root. */}
         <base href="/" />
-        <link rel="canonical" href="https://zkarpinski.com" />
+        <link rel="canonical" href="https://winxp.zkarpinski.com" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -74,8 +74,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'WebApplication',
               name: 'Windows XP in the Browser',
               description:
-                'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, Calculator, and more.',
-              url: 'https://zkarpinski.com',
+                'A nostalgic Windows XP experience in the browser. Winamp, LimeWire, AIM, Minesweeper, Paint, Notepad, MS-DOS, Task Manager, Control Panel, My Computer, and more.',
+              url: 'https://winxp.zkarpinski.com',
               author: { '@type': 'Person', name: 'Zachary Karpinski' },
               applicationCategory: 'MultimediaApplication',
               offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

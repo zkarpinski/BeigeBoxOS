@@ -570,7 +570,9 @@ body.karpos-desktop .karp-chrome-btn.title-btn {
   justify-content: center;
   font-family: inherit;
   box-shadow: var(--karp-shadow-tight);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
 }
 
 body.karpos-desktop .karp-chrome-btn.title-btn:last-child {
@@ -608,7 +610,8 @@ body.karpos-desktop .win-resize-grip {
   width: 20px !important;
   height: 20px !important;
   background-color: var(--karp-yellow);
-  background-image: linear-gradient(
+  background-image:
+    linear-gradient(
       135deg,
       var(--karp-black) 12.5%,
       transparent 12.5%,

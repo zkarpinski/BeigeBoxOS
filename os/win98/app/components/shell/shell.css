@@ -158,7 +158,7 @@ html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
 }
 
 .title-bar-controls {

@@ -1,11 +1,7 @@
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { groupKarposApplications } from './KarposApplicationsMenu';
 
-function app(
-  id: string,
-  label: string,
-  startMenu: AppConfig['startMenu'],
-): AppConfig {
+function app(id: string, label: string, startMenu: AppConfig['startMenu']): AppConfig {
   return { id, label, icon: `/apps/${id}/icon.png`, startMenu };
 }
 
@@ -51,7 +47,12 @@ describe('groupKarposApplications', () => {
       app('game', 'Pinball', { path: ['Programs', 'Games', 'Arcade'] }),
     ]);
     expect(folderKeys).toEqual(['Accessories', 'Games / Arcade']);
-    expect(folders.get('Accessories')?.map((a) => a.id).sort()).toEqual(['calc', 'ms']);
+    expect(
+      folders
+        .get('Accessories')
+        ?.map((a) => a.id)
+        .sort(),
+    ).toEqual(['calc', 'ms']);
     expect(folders.get('Games / Arcade')?.map((a) => a.id)).toEqual(['game']);
   });
 

@@ -21,6 +21,7 @@
     "test:win98": "pnpm --filter @retro-web/win98 test",
     "test:winxp": "pnpm --filter @retro-web/winxp test",
     "test:macosx": "pnpm --filter @retro-web/macosx test",
+    "test:karpos": "pnpm --filter @retro-web/karpos test",
     "lint": "turbo lint",
     "fmt": "prettier --write .",
     "e2e": "playwright test"

@@ -15,11 +15,9 @@ function TaskbarContextMenu({
   onClose: () => void;
 }) {
   const minimizeAll = () => {
-    document
-      .querySelectorAll<HTMLElement>('.app-window:not(.app-window-hidden)')
-      .forEach((el) => {
-        el.querySelector<HTMLElement>('[data-win-min]')?.click();
-      });
+    document.querySelectorAll<HTMLElement>('.app-window:not(.app-window-hidden)').forEach((el) => {
+      el.querySelector<HTMLElement>('[data-win-min]')?.click();
+    });
     onClose();
   };
 
@@ -70,7 +68,12 @@ export function Taskbar({ registry }: { registry: AppConfig[] }) {
 
   const handleTaskbarContext = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target.closest('#start-button') || target.closest('.taskbar-task') || target.closest('.system-tray')) return;
+    if (
+      target.closest('#start-button') ||
+      target.closest('.taskbar-task') ||
+      target.closest('.system-tray')
+    )
+      return;
     e.preventDefault();
     setCtxPos({ x: e.clientX, y: e.clientY });
   };

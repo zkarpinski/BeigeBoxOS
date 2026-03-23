@@ -217,14 +217,24 @@ Use `getCanDrag` and `maximizedClass` on `AppWindow` to control draggability. **
 
 ## Testing
 
-- **Unit (Jest):** `npm run test:unit` — tests live under `test/` and next to app code (e.g. `app/components/apps/word/*.test.ts(x)`).
-- **E2E (Playwright):** `npx playwright test` — `e2e/apps.spec.js` opens each app from the Start menu, interacts, then closes. `e2e/performance.spec.js` checks load and paint timings.
+- **Monorepo (Jest via Turbo):** `npm run test` — runs `turbo test` across packages (`@retro-web/core`, `@retro-web/win98`, `@retro-web/karpos`, `@retro-web/winxp`, etc.). **Do not merge** if this fails.
+- **Single package:** e.g. `pnpm --filter @retro-web/win98 test`, `pnpm --filter @retro-web/karpos test`.
+- **E2E (Playwright):** `npm run e2e` / `npx playwright test` — Win98 `e2e/os/win98/apps.spec.js` opens apps from the Start menu; `e2e/os/win98/performance.spec.js` checks load and paint timings.
+
+### Format + verify (agents & CI)
+
+Every change that touches tracked files should **pass Prettier** and **`npm run test`** before merge:
+
+1. **Prettier** — Config: `.prettierrc`. **Check (no writes):** `pnpm exec prettier --check .` — must report _All matched files use Prettier code style!_ **Fix:** `pnpm fmt` (root script: `prettier --write .`) or `pnpm exec prettier --write .` on specific paths.
+2. **Tests** — `npm run test` (see above).
+
+Run both after substantive edits; CI should enforce the same.
 
 ### Adding tests
 
 **Unit / functional (Jest)**
 
-- Add `*.test.ts` or `*.test.tsx` next to the module or under `test/`. Use React Testing Library for components (`render`, `screen`, `userEvent`). Mock browser APIs in `test/setup.js` if needed (e.g. `document.execCommand`). Run with `npm run test:unit` or `npm run test:unit -- --testPathPattern=word`.
+- Add `*.test.ts` or `*.test.tsx` next to the module or under `test/`. Use React Testing Library for components (`render`, `screen`, `userEvent`). Mock browser APIs in `test/setup.js` if needed (e.g. `document.execCommand`). Run with `pnpm --filter @retro-web/<package> test` or `npm run test` for the whole monorepo.
 - Cover core behavior: rendering, user actions, and any non-trivial logic (e.g. sanitizer, persistence). Path alias `@/` is resolved via Jest `moduleNameMapper` in `package.json`.
 
 **E2E (Playwright)**
@@ -240,4 +250,4 @@ Use `getCanDrag` and `maximizedClass` on `AppWindow` to control draggability. **
 - **AppWindow:** `allowResize: false` by default. If using `getCanDrag`, include the enabling class in initial `className` so the window is draggable on load (e.g. Word’s `windowed`).
 - **Icons:** `public/apps/<name>/` or `public/shell/icons/`. See `MISSING_ICONS.md` if present.
 - **Styles:** Prefer CSS classes; `style` only for dynamic values (position, size).
-- **Tests:** Add new apps to E2E `apps` array; add unit tests as needed.
+- **Tests:** Add new apps to E2E `apps` array; add unit tests as needed. **Prettier + `npm run test`** before merge (see **Format + verify** above).

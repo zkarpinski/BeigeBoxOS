@@ -55,15 +55,27 @@
     "setupFilesAfterEnv": [
       "<rootDir>/test/setup.js"
     ],
-    "moduleFileExtensions": ["js", "ts", "tsx"],
-    "testPathIgnorePatterns": ["/node_modules/"],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
     "transform": {
       "\\.(ts|tsx)$": [
         "ts-jest",
-        { "tsconfig": { "jsx": "react-jsx" } }
+        {
+          "tsconfig": {
+            "jsx": "react-jsx"
+          }
+        }
       ]
     },
-    "collectCoverageFrom": ["app/**/*.{ts,tsx,js}"],
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx,js}"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "\\.test\\.(ts|tsx|js)$",

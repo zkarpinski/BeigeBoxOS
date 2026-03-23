@@ -53,13 +53,30 @@
       "**/*.test.ts",
       "**/*.test.tsx"
     ],
-    "setupFilesAfterEnv": ["<rootDir>/test/setup.js"],
-    "moduleFileExtensions": ["js", "ts", "tsx"],
-    "testPathIgnorePatterns": ["/node_modules/"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setup.js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
     "transform": {
-      "\\.(ts|tsx)$": ["ts-jest", { "tsconfig": { "jsx": "react-jsx" } }]
+      "\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "jsx": "react-jsx"
+          }
+        }
+      ]
     },
-    "collectCoverageFrom": ["app/**/*.{ts,tsx,js}"],
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx,js}"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "\\.test\\.(ts|tsx|js)$",

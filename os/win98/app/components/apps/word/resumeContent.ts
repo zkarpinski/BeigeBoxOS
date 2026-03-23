@@ -9,7 +9,7 @@ export const DEFAULT_RESUME_HTML = [
   '<p>Highly technical Software Engineer with lorem ipsum dolor sit amet experience.</p>',
   '<h2>Work Experience</h2>',
   '<h3>Capital One | Wilmington, DE</h3>',
-  '<p><b>Principle Associate Software Engineer | February 2024 – Present</b></p>',
+  '<p><b>Principal Associate Software Engineer | February 2024 – Present</b></p>',
   '<ul>',
   '<li><i>Confidential</i></li>',
   '</ul>',

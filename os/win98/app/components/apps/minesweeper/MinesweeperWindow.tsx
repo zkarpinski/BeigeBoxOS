@@ -422,7 +422,7 @@ export function MinesweeperWindow() {
         </div>
         <div
           className="minesweeper-grid"
-          style={{ gridTemplateColumns: `repeat(${w}, 16px)` }}
+          style={{ gridTemplateColumns: `repeat(${w}, var(--ms-cell-size, 16px))` }}
           onContextMenu={(e) => e.preventDefault()}
         >
           {board.flat().map((cell) => {
@@ -433,6 +433,11 @@ export function MinesweeperWindow() {
                 key={`${cell.x}-${cell.y}`}
                 data-x={cell.x}
                 data-y={cell.y}
+                data-num={
+                  cell.isRevealed && !cell.isMine && cell.neighborMines > 0
+                    ? cell.neighborMines
+                    : undefined
+                }
                 className={`${cellClass(cell, gameState)}${isPressed || isChord ? ' pressed' : ''}`}
                 onMouseDown={(e) => handleCellMouseDown(e, cell.x, cell.y)}
               >

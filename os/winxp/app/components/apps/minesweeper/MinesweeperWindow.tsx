@@ -422,7 +422,7 @@ export function MinesweeperWindow() {
         </div>
         <div
           className="minesweeper-grid"
-          style={{ gridTemplateColumns: `repeat(${w}, 16px)` }}
+          style={{ gridTemplateColumns: `repeat(${w}, var(--ms-cell-size, 16px))` }}
           onContextMenu={(e) => e.preventDefault()}
         >
           {board.flat().map((cell) => {

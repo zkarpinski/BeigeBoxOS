@@ -34,6 +34,7 @@ import '../../win98/app/components/apps/avg/avg.css';
 import '../../win98/app/components/apps/aol/aol.css';
 import './karpos-theme.css';
 import './karpos-app-brutal.css';
+import './minesweeper-karpos.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://karpos.zkarpinski.com'),

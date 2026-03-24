@@ -13,6 +13,7 @@ Personal playground “OS” shell — **neo-brutalist** styling inspired by [ne
 - `app/components/karpos-shell/` — `AppWindow`, `TitleBar`, `KarpGlobalShim` (`window.KarpOS`)
 - `app/components/karpos-desktop/` — `KarpDesktop`, `DesktopIcons` (rounded neo-brutalist tiles; `karposNeoTileColors`), `KarposTaskbarTasks` (open windows only; same palette + hash), `KarposSystemTray`
 - `app/karpos-theme.css` — shell + token overrides for shared apps
-- `app/karpos-app-brutal.css` — **loaded last**; flattens Win98 bevels inside apps (Navigator, IE5, Word toolbars, `win-border-*`, etc.)
+- `app/karpos-app-brutal.css` — flattens Win98 bevels inside many shared apps
+- `app/minesweeper-karpos.css` — **after** brutal; full neo-brutalist skin for Minesweeper (same `MinesweeperWindow` + logic as Win98)
 
 Static assets live in **`os/karpos/public`**. App/game art and shell media are **symlinks** into `os/win98/public` (`apps/`, `shell/`, `boot-check.js`, etc.) so KarpOS reuses the Win98 implementations without duplicating files. **PWA icons, `site.webmanifest`, `robots.txt`, and `sitemap.xml`** are real files here (KarpOS / karpos.zkarpinski.com branding and SEO).

@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
-import { AppWindow, TitleBar, MenuBar, type MenuItemConfig } from '../../win98';
+import React, { useMemo } from 'react';
+import { AppWindow, TitleBar, MenuBar } from '../../win98';
+import type { MenuItemConfig } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
 import { useWindowManager } from '@retro-web/core/context';
 
@@ -15,20 +16,22 @@ export const avgAppConfig: AppConfig = {
   taskbarLabel: 'AVG Anti-Virus System',
 };
 
-const getMenuItems = (hideApp: (appId: string) => void): MenuItemConfig[] => [
-  {
-    label: 'Program',
-    dropdown: [{ label: 'Exit', onClick: () => hideApp('avg') }],
-  },
-  { label: 'Tests', dropdown: [] },
-  { label: 'Results', dropdown: [] },
-  { label: 'Service', dropdown: [] },
-  { label: 'Help', dropdown: [] },
-];
-
 export function AvgWindow() {
   const { hideApp } = useWindowManager();
-  const menuItems = getMenuItems(hideApp);
+
+  const menuItems: MenuItemConfig[] = useMemo(
+    () => [
+      {
+        label: 'Program',
+        dropdown: [{ label: 'Exit', onClick: () => hideApp('avg') }],
+      },
+      { label: 'Tests', dropdown: [] },
+      { label: 'Results', dropdown: [] },
+      { label: 'Service', dropdown: [] },
+      { label: 'Help', dropdown: [] },
+    ],
+    [hideApp],
+  );
 
   return (
     <AppWindow

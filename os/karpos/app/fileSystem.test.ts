@@ -13,14 +13,14 @@ import type { AppConfig } from '@retro-web/core/types/app-config';
 
 describe('fileSystem path helpers', () => {
   describe('getParentPath', () => {
-    it('returns parent for nested paths', () => {
-      expect(getParentPath('C:\\Windows\\Desktop')).toBe('C:\\Windows');
-      expect(getParentPath('C:\\Windows')).toBe('C:');
+    it('returns parent for nested POSIX paths', () => {
+      expect(getParentPath('/home/zkarpinski/Desktop')).toBe('/home/zkarpinski');
+      expect(getParentPath('/home/zkarpinski')).toBe('/home');
+      expect(getParentPath('/home')).toBe('/');
     });
 
-    it('returns empty string for drive root', () => {
-      expect(getParentPath('C:')).toBe('');
-      expect(getParentPath('C:\\')).toBe('');
+    it('returns empty string for filesystem root', () => {
+      expect(getParentPath('/')).toBe('');
     });
   });
 
@@ -50,12 +50,12 @@ describe('fileSystem init + listDir', () => {
   it('lists default desktop entries including TODO and resume', () => {
     const entries = listDir(DESKTOP_PATH);
     const names = entries.map((e) => e.name).sort();
-    expect(names).toEqual(['My Resume.doc', 'My Resume.pdf', 'TODO.txt']);
+    expect(names).toEqual(['My Resume.pdf', 'TODO.txt']);
   });
 
-  it('getDrives returns floppy, C, and CD-ROM', () => {
+  it('getDrives returns filesystem root', () => {
     const drives = getDrives();
-    expect(drives).toHaveLength(3);
-    expect(drives.map((d) => d.path)).toEqual(['A:\\', 'C:\\', 'D:\\']);
+    expect(drives).toHaveLength(1);
+    expect(drives.map((d) => d.path)).toEqual(['/']);
   });
 });

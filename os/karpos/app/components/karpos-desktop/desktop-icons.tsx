@@ -8,9 +8,11 @@ import {
   listDir,
   openFileByPath,
   getFileIconPath,
+  getAppIcon,
   type DirEntry,
 } from '../../fileSystem';
 import { karposNeoTileColor } from './karposNeoTileColors';
+import { KARPOS_DESKTOP_LINKS, type KarposDesktopLink } from './karposDesktopLinks';
 
 const FOLDER_ICON = '/karpos/folder-icon.png';
 const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
@@ -67,6 +69,57 @@ function DesktopAppIcon({
   );
 }
 
+function DesktopUrlIcon({
+  link,
+  selected,
+  onSelect,
+}: {
+  link: KarposDesktopLink;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const openUrl = () => {
+    window.open(link.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect();
+    openUrl();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onSelect();
+    openUrl();
+  };
+
+  const tileKey = `desktop:link:${link.id}`;
+
+  return (
+    <div
+      className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
+      id={`desktop-link-${link.id}`}
+      style={{ backgroundColor: karposNeoTileColor(tileKey) }}
+      title={link.label}
+      onClick={handleClick}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="karpos-desktop-tile__img-wrap">
+        <img
+          className="karpos-desktop-tile__img"
+          src={link.icon}
+          alt=""
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        />
+      </div>
+      <span className="karpos-desktop-tile__label">{link.label}</span>
+    </div>
+  );
+}
+
 function DesktopFsEntryIcon({
   entry,
   selected,
@@ -81,6 +134,8 @@ function DesktopFsEntryIcon({
   const open = () => {
     if (entry.type === 'file') {
       openFileByPath(entry.path, showApp);
+    } else if (entry.type === 'app' && entry.appId) {
+      showApp(entry.appId);
     } else {
       try {
         sessionStorage.setItem(MYCOMPUTER_PENDING_PATH_KEY, entry.path);
@@ -102,13 +157,18 @@ function DesktopFsEntryIcon({
     open();
   };
 
-  const icon = entry.type === 'folder' ? FOLDER_ICON : getFileIconPath(entry.name, entry.path);
+  const icon =
+    entry.type === 'folder'
+      ? FOLDER_ICON
+      : entry.type === 'app' && entry.appId
+        ? getAppIcon(entry.appId)
+        : getFileIconPath(entry.name, entry.path);
   const tileKey = `desktop:fs:${entry.path}`;
 
   return (
     <div
       className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
-      id={`desktop-fs-${entry.path.replace(/\\/g, '-')}`}
+      id={`desktop-fs-${entry.path.replace(/[/\\]/g, '-')}`}
       style={{ backgroundColor: karposNeoTileColor(tileKey) }}
       title={entry.name}
       onClick={handleClick}
@@ -128,7 +188,10 @@ function DesktopFsEntryIcon({
   );
 }
 
-type DesktopItem = { type: 'app'; app: AppConfig } | { type: 'fs'; entry: DirEntry };
+type DesktopItem =
+  | { type: 'app'; app: AppConfig }
+  | { type: 'fs'; entry: DirEntry }
+  | { type: 'link'; link: KarposDesktopLink };
 
 export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -156,11 +219,13 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
     return () => window.removeEventListener('karpos-fs-change', onFsChange);
   }, []);
 
-  /** KarpOS desktop: only virtual Desktop files (TODO, My Resume) — no other app shortcuts. */
-  const DESKTOP_FILE_ALLOWLIST = new Set(['TODO.txt', 'My Resume.doc', 'My Resume.pdf']);
-  const desktopEntries = listDir(DESKTOP_PATH).filter((e) => DESKTOP_FILE_ALLOWLIST.has(e.name));
+  /** Virtual Desktop folder contents (files, folders, app shortcuts) plus configured URL tiles. */
+  const desktopEntries = listDir(DESKTOP_PATH);
 
-  const items: DesktopItem[] = [...desktopEntries.map((entry) => ({ type: 'fs' as const, entry }))];
+  const items: DesktopItem[] = [
+    ...desktopEntries.map((entry) => ({ type: 'fs' as const, entry })),
+    ...KARPOS_DESKTOP_LINKS.map((link) => ({ type: 'link' as const, link })),
+  ];
 
   return (
     <div id="desktop-icons">
@@ -171,6 +236,13 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             app={item.app}
             selected={selectedId === item.app.id}
             onSelect={() => setSelectedId(item.app.id)}
+          />
+        ) : item.type === 'link' ? (
+          <DesktopUrlIcon
+            key={item.link.id}
+            link={item.link}
+            selected={selectedId === `link:${item.link.id}`}
+            onSelect={() => setSelectedId(`link:${item.link.id}`)}
           />
         ) : (
           <DesktopFsEntryIcon

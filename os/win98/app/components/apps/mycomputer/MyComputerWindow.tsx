@@ -25,9 +25,10 @@ const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
 
 function getEntryIcon(entry: DirEntry, path: string): string {
   if (entry.type === 'folder') {
-    if (path === 'C:\\') return HARD_DRIVE_ICON;
-    if (path === 'C:\\My Documents') return MY_DOCS_ICON;
-    if (path === 'C:\\Windows') return WINDOWS_ICON;
+    if (path === '/' || path === 'C:\\') return HARD_DRIVE_ICON;
+    if (path === '/home/zkarpinski/Documents' || path === 'C:\\My Documents') return MY_DOCS_ICON;
+    if (path === '/opt' || path === 'C:\\Program Files' || path === 'C:\\Windows')
+      return WINDOWS_ICON;
     return FOLDER_ICON;
   }
   if (entry.type === 'app' && entry.appId) return getAppIcon(entry.appId);
@@ -36,10 +37,11 @@ function getEntryIcon(entry: DirEntry, path: string): string {
 
 function getTitle(path: string): string {
   if (!path) return 'My Computer';
+  if (path === '/') return 'File System';
   if (path === 'C:\\') return 'Local Disk (C:)';
   if (path === 'A:\\') return '3½ Floppy (A:)';
   if (path === 'D:\\') return 'CD-ROM Drive (D:)';
-  const name = path.split('\\').pop();
+  const name = path.replace(/\\/g, '/').split('/').filter(Boolean).pop();
   return name ?? path;
 }
 
@@ -88,12 +90,8 @@ export function MyComputerWindow() {
   }
 
   function goUp() {
-    if (currentPath === 'C:\\' || currentPath === 'A:\\' || currentPath === 'D:\\') {
-      navigateToPath('');
-    } else {
-      const parent = getParentPath(currentPath);
-      navigateToPath(parent);
-    }
+    if (!canUp) return;
+    navigateToPath(getParentPath(currentPath));
   }
 
   function openItem(entry: DirEntry) {

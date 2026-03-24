@@ -112,7 +112,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
 
         <DesktopIcons registry={appRegistry} />
         <KarposTaskbar registry={appRegistry} />
-        <ShellOverlays />
+        <ShellOverlays showDesktopContextMenu={false} />
       </OsShellProvider>
     </WindowManagerProvider>
   );

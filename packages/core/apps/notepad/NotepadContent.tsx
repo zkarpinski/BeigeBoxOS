@@ -50,66 +50,38 @@ export function NotepadMenuBar({
       <div className="notepad-menu-item" tabIndex={0}>
         <u>F</u>ile
         <div className="notepad-menu-dropdown">
-          <div className="notepad-menu-dd-item" onClick={onNew}>
-            <u>N</u>ew
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onOpen}>
-            <u>O</u>pen...
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onSave}>
-            <u>S</u>ave
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onSaveAs}>
-            Save <u>A</u>s...
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onNew}><u>N</u>ew</div>
+          <div className="notepad-menu-dd-item" onClick={onOpen}><u>O</u>pen...</div>
+          <div className="notepad-menu-dd-item" onClick={onSave}><u>S</u>ave</div>
+          <div className="notepad-menu-dd-item" onClick={onSaveAs}>Save <u>A</u>s...</div>
           <div className="notepad-menu-dd-divider" />
-          <div className="notepad-menu-dd-item" onClick={onExit}>
-            E<u>x</u>it
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onExit}>E<u>x</u>it</div>
         </div>
       </div>
       <div className="notepad-menu-item" tabIndex={0}>
         <u>E</u>dit
         <div className="notepad-menu-dropdown">
-          <div className="notepad-menu-dd-item" onClick={onUndo}>
-            <u>U</u>ndo
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onUndo}><u>U</u>ndo</div>
           <div className="notepad-menu-dd-divider" />
-          <div className="notepad-menu-dd-item" onClick={onCut}>
-            Cu<u>t</u>
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onCopy}>
-            <u>C</u>opy
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onPaste}>
-            <u>P</u>aste
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onDelete}>
-            <u>D</u>elete
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onCut}>Cu<u>t</u></div>
+          <div className="notepad-menu-dd-item" onClick={onCopy}><u>C</u>opy</div>
+          <div className="notepad-menu-dd-item" onClick={onPaste}><u>P</u>aste</div>
+          <div className="notepad-menu-dd-item" onClick={onDelete}><u>D</u>elete</div>
           <div className="notepad-menu-dd-divider" />
-          <div className="notepad-menu-dd-item" onClick={onSelectAll}>
-            Select <u>A</u>ll
-          </div>
-          <div className="notepad-menu-dd-item" onClick={onTimeDate}>
-            Time/<u>D</u>ate
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onSelectAll}>Select <u>A</u>ll</div>
+          <div className="notepad-menu-dd-item" onClick={onTimeDate}>Time/<u>D</u>ate</div>
         </div>
       </div>
       <div className="notepad-menu-item" tabIndex={0}>
         <u>S</u>earch
         <div className="notepad-menu-dropdown">
-          <div className="notepad-menu-dd-item disabled">
-            <u>F</u>ind...
-          </div>
+          <div className="notepad-menu-dd-item disabled"><u>F</u>ind...</div>
         </div>
       </div>
       <div className="notepad-menu-item" tabIndex={0}>
         <u>F</u>ormat
         <div className="notepad-menu-dropdown">
-          <div className="notepad-menu-dd-item" onClick={onWordWrap}>
-            <u>W</u>ord Wrap
-          </div>
+          <div className="notepad-menu-dd-item" onClick={onWordWrap}><u>W</u>ord Wrap</div>
         </div>
       </div>
       <div className="notepad-menu-item" tabIndex={0}>

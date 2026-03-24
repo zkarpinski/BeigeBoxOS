@@ -5,10 +5,12 @@
 // alongside the AppWindow. Not yet importing from @retro-web/app-aim.
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { AppWindow } from '../../win98/AppWindow';
+import { TitleBar } from '../../win98/TitleBar';
 import { AimRunningManIcon } from './AimRunningManIcon';
 import { AimBanner } from './AimBanner';
 import type { AppConfig } from '@retro-web/core/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useWindowManager } from '@retro-web/core/context';
 
 const SCREEN_NAME = 'F4$tRunn3r200';
 
@@ -80,7 +82,6 @@ export const aimAppConfig: AppConfig = {
 
 export function AimWindow() {
   const ctx = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
 
   // Buddy list state
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(['Offline']));

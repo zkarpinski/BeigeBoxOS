@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useOsShell } from '@retro-web/core/context';
 import { DisplayApplet, DateTimeApplet, SoundsApplet, MouseApplet, SystemApplet } from './applets';
 
 const ICON = 'apps/controlpanel/controlpanel-icon.png';
@@ -32,7 +32,6 @@ const WALLPAPERS = [
 type DialogType = 'display' | 'datetime' | 'sounds' | 'mouse' | 'system' | null;
 
 export function ControlPanelWindow() {
-  const { AppWindow, TitleBar } = useOsShell();
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [appliedWallpaper, setAppliedWallpaper] = useState('none');

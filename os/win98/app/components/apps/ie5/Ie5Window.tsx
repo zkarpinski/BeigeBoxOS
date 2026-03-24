@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useWindowManager } from '@retro-web/core/context';
 
 const ICON = 'apps/ie5/ie5-icon.png';
 
@@ -109,7 +110,6 @@ export function Ie5Window() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const hasLoadedRef = useRef(false);
   const ctx = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
 
   const isVisible = ctx?.isAppVisible('ie5') ?? false;
 

@@ -6,13 +6,13 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AimWindow, aimAppConfig } from './AimWindow';
-import { Win98TestProviders } from '../../../../test/test-utils';
+import { WindowManagerProvider } from '@retro-web/core/context';
 
 function renderAim() {
   return render(
-    <Win98TestProviders registry={[aimAppConfig]}>
+    <WindowManagerProvider registry={[aimAppConfig]}>
       <AimWindow />
-    </Win98TestProviders>,
+    </WindowManagerProvider>,
   );
 }
 

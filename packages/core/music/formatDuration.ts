@@ -9,7 +9,5 @@ export function formatDurationMmSs(totalSeconds: number): string {
 /** Same as Napster legacy display: no leading zero on minutes. */
 export function formatDurationLegacy(totalSeconds: number): string {
   if (!isFinite(totalSeconds) || totalSeconds < 0) return '--:--';
-  return (
-    Math.floor(totalSeconds / 60) + ':' + String(Math.floor(totalSeconds % 60)).padStart(2, '0')
-  );
+  return Math.floor(totalSeconds / 60) + ':' + String(Math.floor(totalSeconds % 60)).padStart(2, '0');
 }

@@ -5,14 +5,14 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { WordWindow, wordAppConfig } from './WordWindow';
-import { Win98TestProviders } from '../../../../test/test-utils';
+import { WindowManagerProvider } from '@retro-web/core/context';
 
 function renderWord() {
   const config = { ...wordAppConfig, openByDefault: true };
   return render(
-    <Win98TestProviders registry={[config]}>
+    <WindowManagerProvider registry={[config]}>
       <WordWindow />
-    </Win98TestProviders>,
+    </WindowManagerProvider>,
   );
 }
 

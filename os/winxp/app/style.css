@@ -129,25 +129,19 @@ html {
 /* 3D Borders (softer for XP) */
 .win-border-outset {
   border: 1px solid #aca899;
-  box-shadow:
-    inset 1px 1px var(--win-light),
-    inset -1px -1px var(--win-dark);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
 }
 
 .win-border-inset {
   border: 1px solid #aca899;
-  box-shadow:
-    inset 1px 1px var(--win-dark),
-    inset -1px -1px var(--win-light);
+  box-shadow: inset 1px 1px var(--win-dark), inset -1px -1px var(--win-light);
 }
 
 .win-btn {
   background-color: var(--win-bg);
   border: 1px solid #aca899;
   border-radius: var(--btn-radius);
-  box-shadow:
-    inset 1px 1px var(--win-light),
-    inset -1px -1px var(--win-dark);
+  box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark);
   cursor: default;
   display: flex;
   align-items: center;
@@ -156,9 +150,7 @@ html {
 }
 
 .win-btn:active {
-  box-shadow:
-    inset 1px 1px var(--win-dark),
-    inset -1px -1px var(--win-light);
+  box-shadow: inset 1px 1px var(--win-dark), inset -1px -1px var(--win-light);
   padding: 2px 0 0 2px;
 }
 
@@ -187,7 +179,13 @@ html {
 .title-bar.winxp-title-bar .xp-btn-max {
   width: 22px;
   min-width: 22px;
-  background: linear-gradient(to bottom, #78b4f4 0%, #4a96ec 20%, #2878e0 55%, #1460d0 100%);
+  background: linear-gradient(
+    to bottom,
+    #78b4f4 0%,
+    #4a96ec 20%,
+    #2878e0 55%,
+    #1460d0 100%
+  );
   border-color: #0a3aa0;
   color: #ffffff;
 }
@@ -196,18 +194,36 @@ html {
   /* Close is ~2px wider than min/max in real XP */
   width: 24px;
   min-width: 24px;
-  background: linear-gradient(to bottom, #f48090 0%, #e84050 20%, #d41830 55%, #b00818 100%);
+  background: linear-gradient(
+    to bottom,
+    #f48090 0%,
+    #e84050 20%,
+    #d41830 55%,
+    #b00818 100%
+  );
   border-color: #880010;
   color: #ffffff;
 }
 
 .title-bar.winxp-title-bar .xp-btn-min:hover,
 .title-bar.winxp-title-bar .xp-btn-max:hover {
-  background: linear-gradient(to bottom, #90c8ff 0%, #60a8f8 20%, #3888f0 55%, #1c6ee0 100%);
+  background: linear-gradient(
+    to bottom,
+    #90c8ff 0%,
+    #60a8f8 20%,
+    #3888f0 55%,
+    #1c6ee0 100%
+  );
 }
 
 .title-bar.winxp-title-bar .xp-btn-close:hover {
-  background: linear-gradient(to bottom, #ff9090 0%, #ff5060 20%, #e42840 55%, #c00820 100%);
+  background: linear-gradient(
+    to bottom,
+    #ff9090 0%,
+    #ff5060 20%,
+    #e42840 55%,
+    #c00820 100%
+  );
 }
 
 .title-bar.winxp-title-bar .xp-btn-min:active,

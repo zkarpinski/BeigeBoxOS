@@ -1,6 +1,8 @@
 /**
- * Win98-only virtual filesystem (`win98-filesystem` in localStorage).
- * KarpOS uses `os/karpos/app/fileSystem.ts` — do not duplicate KarpOS-only files here.
+ * Virtual Windows-style filesystem. Paths use backslash (e.g. C:\Windows\Desktop).
+ * C:\Windows\Desktop is the desktop folder; its contents appear on the desktop.
+ * Program Files structure is built from the app registry so new apps appear automatically.
+ * Persisted to localStorage; call initFileSystem(registry) once at app load.
  */
 
 import type { AppConfig } from './types/app-config';

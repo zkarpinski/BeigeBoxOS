@@ -1,6 +1,0 @@
-# KarpOS — karpos.zkarpinski.com
-User-agent: *
-Allow: /
-Disallow: /run/
-
-Sitemap: https://karpos.zkarpinski.com/sitemap.xml

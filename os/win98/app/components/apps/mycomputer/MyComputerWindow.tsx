@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useWindowManager } from '@retro-web/core/context';
 import {
   getDrives,
   listDir,
@@ -11,7 +12,7 @@ import {
   getFileIconPath,
   getAppIcon,
   type DirEntry,
-} from '@/app/virtual-fs';
+} from '../../../fileSystem';
 
 const ICON = 'apps/mycomputer/mycomputer-icon.png';
 const FOLDER_ICON = 'shell/icons/directory.png';
@@ -25,10 +26,9 @@ const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
 
 function getEntryIcon(entry: DirEntry, path: string): string {
   if (entry.type === 'folder') {
-    if (path === '/' || path === 'C:\\') return HARD_DRIVE_ICON;
-    if (path === '/home/zkarpinski/Documents' || path === 'C:\\My Documents') return MY_DOCS_ICON;
-    if (path === '/opt' || path === 'C:\\Program Files' || path === 'C:\\Windows')
-      return WINDOWS_ICON;
+    if (path === 'C:\\') return HARD_DRIVE_ICON;
+    if (path === 'C:\\My Documents') return MY_DOCS_ICON;
+    if (path === 'C:\\Windows') return WINDOWS_ICON;
     return FOLDER_ICON;
   }
   if (entry.type === 'app' && entry.appId) return getAppIcon(entry.appId);
@@ -37,11 +37,10 @@ function getEntryIcon(entry: DirEntry, path: string): string {
 
 function getTitle(path: string): string {
   if (!path) return 'My Computer';
-  if (path === '/') return 'File System';
   if (path === 'C:\\') return 'Local Disk (C:)';
   if (path === 'A:\\') return '3½ Floppy (A:)';
   if (path === 'D:\\') return 'CD-ROM Drive (D:)';
-  const name = path.replace(/\\/g, '/').split('/').filter(Boolean).pop();
+  const name = path.split('\\').pop();
   return name ?? path;
 }
 
@@ -59,7 +58,6 @@ export function MyComputerWindow() {
   const [histPos, setHistPos] = useState(0);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const ctx = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
 
   const currentPath = pathHistory[histPos];
   const isRoot = currentPath === '';
@@ -90,8 +88,12 @@ export function MyComputerWindow() {
   }
 
   function goUp() {
-    if (!canUp) return;
-    navigateToPath(getParentPath(currentPath));
+    if (currentPath === 'C:\\' || currentPath === 'A:\\' || currentPath === 'D:\\') {
+      navigateToPath('');
+    } else {
+      const parent = getParentPath(currentPath);
+      navigateToPath(parent);
+    }
   }
 
   function openItem(entry: DirEntry) {

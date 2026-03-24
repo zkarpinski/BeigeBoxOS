@@ -1,5 +1,1 @@
-export {
-  CalculatorWindow,
-  calculatorAppConfig,
-  CALCULATOR_ICON_SRC,
-} from '@retro-web/app-calculator';
+export { CalculatorWindow, calculatorAppConfig } from './CalculatorWindow';

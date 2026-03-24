@@ -1,5 +1,0 @@
-# zkarpinski.com — landing / root site
-User-agent: *
-Allow: /
-
-Sitemap: https://zkarpinski.com/sitemap.xml

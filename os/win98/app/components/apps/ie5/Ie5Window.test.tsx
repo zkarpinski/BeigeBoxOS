@@ -6,17 +6,17 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Ie5Window, ie5AppConfig } from './Ie5Window';
 import { Taskbar } from '../../shell/Taskbar';
+import { WindowManagerProvider } from '@retro-web/core/context';
 import type { AppConfig } from '../../../types/app-config';
-import { Win98TestProviders } from '../../../../test/test-utils';
 
 const registry: AppConfig[] = [ie5AppConfig];
 
 function renderWithIe5() {
   return render(
-    <Win98TestProviders registry={registry}>
+    <WindowManagerProvider registry={registry}>
       <Taskbar registry={registry} />
       <Ie5Window />
-    </Win98TestProviders>,
+    </WindowManagerProvider>,
   );
 }
 

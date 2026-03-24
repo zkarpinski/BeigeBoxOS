@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useOsShell } from '@retro-web/core/context';
 
 const ICON = 'apps/defrag/defrag-icon.png';
 
@@ -53,7 +53,6 @@ export const defragAppConfig: AppConfig = {
 };
 
 export function DefragWindow() {
-  const { AppWindow, TitleBar } = useOsShell();
   const [statusText, setStatusText] = useState('Ready to defragment.');
   const [percent, setPercent] = useState(40);
   const [pauseLabel, setPauseLabel] = useState('Pause');

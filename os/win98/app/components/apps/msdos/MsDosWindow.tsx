@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useWindowManager } from '@retro-web/core/context';
 
 const ICON = 'apps/msdos/msdos-icon.png';
 
@@ -24,7 +25,6 @@ export function MsDosWindow() {
   const consoleRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const ctx = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
 
   useEffect(() => {
     if (consoleRef.current) {

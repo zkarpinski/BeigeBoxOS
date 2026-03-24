@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { PaintContent } from '@retro-web/core/apps/paint';
-import { useOsShell } from '@retro-web/core/context';
 // paint.css is imported by PaintContent from @retro-web/core
 
 const ICON = 'apps/paint/paint-icon.png';
@@ -18,7 +18,6 @@ export const paintAppConfig: AppConfig = {
 };
 
 export function PaintWindow() {
-  const { AppWindow, TitleBar } = useOsShell();
   return (
     <AppWindow
       id="paint-window"

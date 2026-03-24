@@ -2,7 +2,6 @@ import { notepadAppConfig } from '@retro-web/core/apps/notepad';
 import { aimAppConfig } from './components/apps/aim';
 import { minesweeperAppConfig } from './components/apps/minesweeper';
 import { calculatorAppConfig } from './components/apps/calculator';
-import { pdfReaderAppConfig } from '@retro-web/app-pdf-reader';
 import { paintAppConfig } from './components/apps/paint';
 import { winampAppConfig } from './components/apps/winamp';
 import { limewireAppConfig } from './components/apps/limewire';
@@ -18,7 +17,6 @@ export const appRegistry: AppConfig[] = [
   mycomputerAppConfig,
   notepadAppConfig,
   calculatorAppConfig,
-  pdfReaderAppConfig,
   paintAppConfig,
   minesweeperAppConfig,
   taskmanagerAppConfig,

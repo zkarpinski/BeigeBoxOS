@@ -1,9 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const {
-  dismissBootScreen,
-  openFromStartMenu,
-  runAppTestFromDesktop,
-} = require('../../../shared/helpers');
+const { dismissBootScreen, openFromStartMenu, runAppTestFromDesktop } = require('../../../shared/helpers');
 
 test.beforeEach(async ({ page }) => {
   await dismissBootScreen(page);

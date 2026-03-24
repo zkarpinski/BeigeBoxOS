@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useWindowManager } from '@retro-web/core/context';
 import { AppWindow, TitleBar } from '../../win98';
 
@@ -17,199 +17,177 @@ type Troggle = {
 
 const CATEGORIES = [
   {
-    name: "Short 'I' sound as in fish",
-    correct: ['wish', 'hint', 'in', 'it', 'kill', 'since', 'crib', 'milk', 'fish', 'disk'],
-    incorrect: ['bribe', 'rind', 'bide', 'pry', 'rise', 'bike', 'dine', 'quite', 'wide', 'glide'],
+    name: "Words with short 'A' sound",
+    correct: ['CAT', 'BAT', 'HAT', 'MAT', 'RAT', 'SAT', 'FAT', 'PAT', 'MAP', 'TAP'],
+    incorrect: ['COT', 'BUT', 'HIT', 'HOT', 'MUT', 'BIT', 'TOP', 'POT', 'MOP', 'PET'],
   },
   {
-    name: "Short 'A' sound as in cat",
-    correct: ['cat', 'bat', 'hat', 'mat', 'rat', 'sat', 'fat', 'pat', 'map', 'tap'],
-    incorrect: ['cake', 'bake', 'hate', 'mate', 'rate', 'safe', 'fate', 'cape', 'tape', 'wave'],
+    name: "Words with long 'E' sound",
+    correct: ['SEE', 'BEE', 'TREE', 'ME', 'WE', 'HE', 'SHE', 'FREE', 'FLEE', 'THREE'],
+    incorrect: ['SAY', 'DAY', 'MAY', 'PLAY', 'WAY', 'MY', 'BY', 'FLY', 'CRY', 'TRY'],
   },
   {
-    name: "Long 'E' sound as in bee",
-    correct: ['see', 'bee', 'tree', 'me', 'we', 'he', 'she', 'free', 'flee', 'knee'],
-    incorrect: ['say', 'day', 'may', 'play', 'way', 'my', 'by', 'fly', 'cry', 'try'],
-  },
-  {
-    name: "Words ending in '-ing'",
-    correct: ['ring', 'sing', 'king', 'wing', 'bring', 'thing', 'spring', 'string', 'swing', 'sting'],
-    incorrect: ['rink', 'sink', 'kind', 'wine', 'brim', 'thin', 'sprout', 'strip', 'swim', 'step'],
-  },
-  {
-    name: "Short 'O' sound as in top",
-    correct: ['top', 'hop', 'pot', 'dog', 'fog', 'lot', 'not', 'hot', 'got', 'mop'],
-    incorrect: ['tape', 'hope', 'pole', 'dome', 'foam', 'lone', 'note', 'home', 'goat', 'mope'],
+    name: "Words with 'OO' sound",
+    correct: ['MOON', 'SOON', 'NOON', 'SPOON', 'BOOM', 'ROOM', 'BROOM', 'ZOOM', 'LOOT', 'BOOT'],
+    incorrect: ['MAN', 'SUN', 'NONE', 'SPUN', 'BAM', 'RAM', 'BRIM', 'ZIP', 'LOT', 'BAT'],
   },
 ];
 
 export function WordMuncherWindow() {
-  const { apps } = useWindowManager();
+  const { apps, focusApp, hideApp, minimizeApp } = useWindowManager();
   const appId = 'wordmuncher';
   const state = apps[appId];
 
   // Game State
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isGameOver, setIsGameOver] = useState(false);
   const [level, setLevel] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
 
-  // Use a single position object + ref to avoid nested setState and stale closure issues
-  const [playerPos, setPlayerPos] = useState({ x: 0, y: 0 });
-  const playerPosRef = useRef({ x: 0, y: 0 });
+  // Board State
+  const [playerX, setPlayerX] = useState(0);
+  const [playerY, setPlayerY] = useState(0);
   const [board, setBoard] = useState<(CellItem | null)[][]>([]);
   const [troggles, setTroggles] = useState<Troggle[]>([]);
 
+  // Refs for loop
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Focus ref for keyboard input
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
-  // Keep ref in sync with state for use inside event handlers
-  useEffect(() => {
-    playerPosRef.current = playerPos;
-  }, [playerPos]);
+  const initLevel = useCallback((levelIdx: number) => {
+    const category = CATEGORIES[levelIdx % CATEGORIES.length];
 
-  const resetPlayerPos = useCallback(() => {
-    const pos = { x: 0, y: 0 };
-    playerPosRef.current = pos;
-    setPlayerPos(pos);
-  }, []);
+    // Generate board
+    const newBoard: (CellItem | null)[][] = Array(ROWS)
+      .fill(null)
+      .map(() => Array(COLUMNS).fill(null));
 
-  const initLevel = useCallback(
-    (levelIdx: number) => {
-      const category = CATEGORIES[levelIdx % CATEGORIES.length];
+    // Fill board with words
+    const allWords = [
+      ...category.correct.map((w) => ({ word: w, isCorrect: true })),
+      ...category.incorrect.map((w) => ({ word: w, isCorrect: false })),
+    ].sort(() => Math.random() - 0.5);
 
-      const newBoard: (CellItem | null)[][] = Array(ROWS)
-        .fill(null)
-        .map(() => Array(COLUMNS).fill(null));
-
-      const allWords = [
-        ...category.correct.map((w) => ({ word: w, isCorrect: true })),
-        ...category.incorrect.map((w) => ({ word: w, isCorrect: false })),
-      ].sort(() => Math.random() - 0.5);
-
-      let wordIdx = 0;
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLUMNS; c++) {
-          if (Math.random() > 0.15 && wordIdx < allWords.length) {
-            newBoard[r][c] = allWords[wordIdx++];
-          }
+    let wordIdx = 0;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLUMNS; c++) {
+        // Leave some empty spaces, maybe 20%
+        if (Math.random() > 0.2 && wordIdx < allWords.length) {
+          newBoard[r][c] = allWords[wordIdx++];
         }
       }
+    }
 
-      setBoard(newBoard);
-      resetPlayerPos();
+    setBoard(newBoard);
+    setPlayerX(0);
+    setPlayerY(0);
 
-      const numTroggles = Math.min(Math.floor(levelIdx / CATEGORIES.length) + 1, 3);
-      const newTroggles: Troggle[] = [];
-      for (let i = 0; i < numTroggles; i++) {
-        newTroggles.push({ x: COLUMNS - 1 - i, y: ROWS - 1 });
-      }
-      setTroggles(newTroggles);
-    },
-    [resetPlayerPos],
-  );
-
-  const loseLife = useCallback(() => {
-    setLives((l) => {
-      const newLives = l <= 1 ? 0 : l - 1;
-      if (newLives <= 0) {
-        setIsPlaying(false);
-        setIsGameOver(true);
-      }
-      return newLives;
-    });
-    resetPlayerPos();
-  }, [resetPlayerPos]);
+    // Add 1 troggle per level up to 3
+    const numTroggles = Math.min((levelIdx % CATEGORIES.length) + 1, 3);
+    const newTroggles: Troggle[] = [];
+    for (let i = 0; i < numTroggles; i++) {
+      // Spawn at bottom right
+      newTroggles.push({ x: COLUMNS - 1 - i, y: ROWS - 1 });
+    }
+    setTroggles(newTroggles);
+  }, []);
 
   const startGame = () => {
     setIsPlaying(true);
-    setIsGameOver(false);
     setScore(0);
     setLives(3);
     setLevel(0);
     initLevel(0);
-    setTimeout(() => {
-      if (gameContainerRef.current) {
-        gameContainerRef.current.focus();
-      }
-    }, 50);
+    if (gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
   };
+
+  const loseLife = useCallback(() => {
+    setLives((l) => {
+      if (l <= 1) {
+        return 0;
+      }
+      return l - 1;
+    });
+
+    // Check if we lost the game
+    if (lives <= 1) {
+      setIsPlaying(false);
+    }
+
+    // Reset player position
+    setPlayerX(0);
+    setPlayerY(0);
+  }, [lives]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!isPlaying) return;
-      // Prevent key-repeat from skipping multiple squares when key is held
-      if (e.repeat) return;
 
+      // Prevent default scrolling for arrow keys and space
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
         e.preventDefault();
       }
 
-      const { x, y } = playerPosRef.current;
+      setPlayerX((x) => {
+        setPlayerY((y) => {
+          let newX = x;
+          let newY = y;
 
-      if (e.key === 'ArrowUp') {
-        const newY = Math.max(0, y - 1);
-        if (newY !== y) {
-          const pos = { x, y: newY };
-          playerPosRef.current = pos;
-          setPlayerPos(pos);
-        }
-      } else if (e.key === 'ArrowDown') {
-        const newY = Math.min(ROWS - 1, y + 1);
-        if (newY !== y) {
-          const pos = { x, y: newY };
-          playerPosRef.current = pos;
-          setPlayerPos(pos);
-        }
-      } else if (e.key === 'ArrowLeft') {
-        const newX = Math.max(0, x - 1);
-        if (newX !== x) {
-          const pos = { x: newX, y };
-          playerPosRef.current = pos;
-          setPlayerPos(pos);
-        }
-      } else if (e.key === 'ArrowRight') {
-        const newX = Math.min(COLUMNS - 1, x + 1);
-        if (newX !== x) {
-          const pos = { x: newX, y };
-          playerPosRef.current = pos;
-          setPlayerPos(pos);
-        }
-      } else if (e.key === ' ') {
-        setBoard((currentBoard) => {
-          const { x: cx, y: cy } = playerPosRef.current;
-          const cell = currentBoard[cy]?.[cx];
-          if (cell) {
-            if (cell.isCorrect) {
-              setScore((s) => s + 10);
-              const newBoard = currentBoard.map((row) => [...row]);
-              newBoard[cy][cx] = null;
+          if (e.key === 'ArrowUp') newY = Math.max(0, y - 1);
+          if (e.key === 'ArrowDown') newY = Math.min(ROWS - 1, y + 1);
+          if (e.key === 'ArrowLeft') newX = Math.max(0, x - 1);
+          if (e.key === 'ArrowRight') newX = Math.min(COLUMNS - 1, x + 1);
 
-              const hasCorrectLeft = newBoard.some((row) => row.some((c) => c && c.isCorrect));
-              if (!hasCorrectLeft) {
-                setTimeout(() => {
-                  setLevel((l) => {
-                    const nextLevel = l + 1;
-                    initLevel(nextLevel);
-                    return nextLevel;
-                  });
-                }, 500);
+          if (e.key === ' ') {
+            // Munch!
+            setBoard((currentBoard) => {
+              const cell = currentBoard[y][x];
+              if (cell) {
+                if (cell.isCorrect) {
+                  setScore((s) => s + 10);
+                  const newBoard = [...currentBoard];
+                  newBoard[y] = [...newBoard[y]];
+                  newBoard[y][x] = null;
+
+                  // Check win condition (no correct words left)
+                  const hasCorrectLeft = newBoard.some((row) => row.some((c) => c && c.isCorrect));
+                  if (!hasCorrectLeft) {
+                    setTimeout(() => {
+                      setLevel((l) => {
+                        const nextLevel = l + 1;
+                        initLevel(nextLevel);
+                        return nextLevel;
+                      });
+                    }, 500);
+                  }
+
+                  return newBoard;
+                } else {
+                  // Wrong munch
+                  loseLife();
+                }
               }
-
-              return newBoard;
-            } else {
-              loseLife();
-            }
+              return currentBoard;
+            });
           }
-          return currentBoard;
+
+          return newY;
         });
-      }
+        return e.key === 'ArrowLeft'
+          ? Math.max(0, x - 1)
+          : e.key === 'ArrowRight'
+            ? Math.min(COLUMNS - 1, x + 1)
+            : x;
+      });
     },
     [isPlaying, initLevel, loseLife],
   );
 
-  // Troggle movement
+  // Handle troggle movement
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -217,33 +195,57 @@ export function WordMuncherWindow() {
       () => {
         setTroggles((currentTroggles) => {
           return currentTroggles.map((t) => {
+            // Move randomly towards player sometimes, or random
+            let dx = 0;
+            let dy = 0;
+
+            if (Math.random() > 0.5) {
+              // Random
+              const axis = Math.random() > 0.5 ? 'x' : 'y';
+              const dir = Math.random() > 0.5 ? 1 : -1;
+              if (axis === 'x') dx = dir;
+              else dy = dir;
+            } else {
+              // Towards player (read directly from state by capturing it or we rely on a ref,
+              // but for simplicity we'll just read the current state variables which will be stale,
+              // so we should use a ref or functional update)
+            }
+            // Simple random for now to avoid stale closures
             const axis = Math.random() > 0.5 ? 'x' : 'y';
             const dir = Math.random() > 0.5 ? 1 : -1;
-            let newX = t.x + (axis === 'x' ? dir : 0);
-            let newY = t.y + (axis === 'y' ? dir : 0);
+            if (axis === 'x') dx = dir;
+            else dy = dir;
+
+            let newX = t.x + dx;
+            let newY = t.y + dy;
+
             newX = Math.max(0, Math.min(COLUMNS - 1, newX));
             newY = Math.max(0, Math.min(ROWS - 1, newY));
+
             return { x: newX, y: newY };
           });
         });
       },
       1000 - Math.min(level * 50, 500),
-    );
+    ); // Speed up as level increases
 
     return () => {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
     };
   }, [isPlaying, level]);
 
-  // Collision detection
+  // Check collision
   useEffect(() => {
     if (!isPlaying) return;
-    const hit = troggles.some((t) => t.x === playerPos.x && t.y === playerPos.y);
-    if (hit) loseLife();
-  }, [playerPos, troggles, isPlaying, loseLife]);
+    const hit = troggles.some((t) => t.x === playerX && t.y === playerY);
+    if (hit) {
+      loseLife();
+    }
+  }, [playerX, playerY, troggles, isPlaying, loseLife]);
 
-  // Re-focus game container when window is focused
+  // Ensure focus
   useEffect(() => {
+    // We consider the app "focused" if its zIndex is Z_FOCUSED (which is 11)
     const isFocused = state?.zIndex === 11;
     if (isFocused && isPlaying && gameContainerRef.current) {
       gameContainerRef.current.focus();
@@ -273,38 +275,23 @@ export function WordMuncherWindow() {
       >
         {!isPlaying ? (
           <div className="wordmuncher-menu">
-            <div className="wordmuncher-title">
-              <span className="wm-title-word">WORD</span>
-              <span className="wm-title-muncher">MUNCHER</span>
-            </div>
-            {isGameOver && (
-              <div className="wordmuncher-gameover">
-                <p>GAME OVER</p>
-                <p className="wm-final-score">Final Score: {score}</p>
-              </div>
-            )}
+            <h1 className="wordmuncher-title">WORD MUNCHER</h1>
             <button className="wordmuncher-btn" onClick={startGame}>
-              {isGameOver ? 'PLAY AGAIN' : 'START GAME'}
+              Start Game
             </button>
             <div className="wordmuncher-instructions">
-              <p>Arrow Keys to move &nbsp;|&nbsp; Spacebar to munch</p>
-              <p>Eat only the correct words for the category.</p>
+              <p>Use Arrow Keys to move.</p>
+              <p>Press Spacebar to munch words!</p>
+              <p>Munch only the correct words for the current category.</p>
               <p>Avoid the Troggles!</p>
             </div>
           </div>
         ) : (
           <div className="wordmuncher-game">
             <div className="wordmuncher-header">
-              <div className="wordmuncher-stat">Level: {level + 1}</div>
-              <div className="wordmuncher-rule">{currentCategory.name}</div>
               <div className="wordmuncher-stat">Score: {score}</div>
-              <div className="wordmuncher-lives">
-                {Array(lives)
-                  .fill(null)
-                  .map((_, i) => (
-                    <span key={i} className="wm-life-icon" />
-                  ))}
-              </div>
+              <div className="wordmuncher-rule">Find: {currentCategory.name}</div>
+              <div className="wordmuncher-stat">Lives: {lives}</div>
             </div>
 
             <div className="wordmuncher-board">
@@ -315,7 +302,7 @@ export function WordMuncherWindow() {
                     {Array(COLUMNS)
                       .fill(null)
                       .map((_, c) => {
-                        const isPlayerHere = playerPos.x === c && playerPos.y === r;
+                        const isPlayerHere = playerX === c && playerY === r;
                         const isTroggleHere = troggles.some((t) => t.x === c && t.y === r);
                         const cell = board[r]?.[c];
 
@@ -325,9 +312,9 @@ export function WordMuncherWindow() {
                             className={`wordmuncher-cell ${isPlayerHere ? 'player' : ''} ${isTroggleHere ? 'troggle' : ''}`}
                           >
                             {cell ? <div className="wordmuncher-word">{cell.word}</div> : null}
-                            {isPlayerHere && <div className="wordmuncher-player-sprite" />}
+                            {isPlayerHere && <div className="wordmuncher-player-sprite">M</div>}
                             {isTroggleHere && !isPlayerHere && (
-                              <div className="wordmuncher-troggle-sprite" />
+                              <div className="wordmuncher-troggle-sprite">T</div>
                             )}
                           </div>
                         );

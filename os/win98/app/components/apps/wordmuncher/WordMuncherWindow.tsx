@@ -1,4 +1,6 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWindowManager } from '@retro-web/core/context';
 import { AppWindow, TitleBar } from '../../win98';
 
@@ -262,7 +264,16 @@ export function WordMuncherWindow() {
       appId={appId}
       className={`app-window wordmuncher-window ${state.minimized ? 'minimized' : ''} windowed`}
       titleBar={
-        <TitleBar title="Word Muncher" icon={<img src="/apps/wordmuncher/icon.png" alt="" />} />
+        <TitleBar
+          title="Word Muncher"
+          icon={
+            <img
+              src="apps/wordmuncher/icon.png"
+              alt=""
+              style={{ width: 16, height: 16, marginRight: 4 }}
+            />
+          }
+        />
       }
       allowResize={false}
       getCanDrag={() => true}

@@ -15,8 +15,6 @@ export default [
       'react-hooks/preserve-manual-memoization': 'off',
       'react-hooks/immutability': 'off',
       'react/no-unescaped-entities': 'off',
-      // Retro OS UIs use many small <img> icons; next/image adds little value for static export + pixel art.
-      '@next/next/no-img-element': 'off',
     },
     ignores: ['coverage/**'],
   },

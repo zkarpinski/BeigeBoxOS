@@ -121,61 +121,50 @@ html {
 
 /* Title Bar */
 .title-bar {
-  background: linear-gradient(to right, #000080, #1084d0);
+  background-color: var(--title-active);
   color: var(--win-white);
-  padding: 2px 3px 2px 3px;
+  padding: 2px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 18px;
+  height: 22px;
   cursor: move;
-  flex-shrink: 0;
 }
 
 .title-bar-text {
   display: flex;
   align-items: center;
-  gap: 3px;
   font-weight: bold;
-  font-size: 11px;
-  overflow: hidden;
+  font-size: 13px;
 }
 
 .title-bar-text > img {
-  width: 14px !important;
-  height: 14px !important;
-  min-width: 14px !important;
-  min-height: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
   object-fit: fill !important;
   flex-shrink: 0;
   display: block;
 }
 
 .title-text {
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
 .title-bar-controls {
   display: flex;
   gap: 2px;
-  flex-shrink: 0;
-  margin-left: 2px;
 }
 
 .title-btn {
   width: 16px;
   height: 14px;
   padding: 0;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
   background-color: var(--win-bg);
-  line-height: 1;
 }
 
 .icon-min {

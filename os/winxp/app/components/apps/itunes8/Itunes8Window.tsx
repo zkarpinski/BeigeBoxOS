@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { AppWindow, TitleBar } from '../../winxp';
+import { useWindowManager } from '@retro-web/core/context';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import {
   MOCK_STREAMING_SONGS,
@@ -62,7 +63,6 @@ const ItunesIcon = (
 
 export function Itunes8Window() {
   const { hideApp, openDialog } = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
   const addFileInputRef = useRef<HTMLInputElement>(null);
 
   const libraryRows = useMemo(() => {

@@ -15,10 +15,8 @@ import './components/apps/limewire/limewire.css';
 import './components/apps/aim/aim.css';
 import './components/apps/winamp/winamp.css';
 // Notepad styles come from @retro-web/core via NotepadContent
-import '@retro-web/app-minesweeper/themes/win98.css';
-import '@retro-web/app-calculator/themes/win98.css';
-import '@retro-web/app-pdf-reader/themes/base.css';
-// Paint styles come from @retro-web/core via PaintContent
+import './components/apps/minesweeper/minesweeper.css';
+// Paint + Calculator styles come from @retro-web/core via PaintContent / CalculatorContent
 import './components/apps/mycomputer/mycomputer.css';
 import './components/apps/controlpanel/controlpanel.css';
 import './components/apps/msdos/msdos.css';

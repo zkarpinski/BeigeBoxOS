@@ -7,12 +7,7 @@ import { DesktopContextMenu } from './overlays/DesktopContextMenu';
 import { DialogModal } from './overlays/DialogModal';
 import { BsodOverlay } from './overlays/BsodOverlay';
 
-export type ShellOverlaysProps = {
-  /** When false, the desktop right-click menu is not mounted (e.g. KarpOS). */
-  showDesktopContextMenu?: boolean;
-};
-
-export function ShellOverlays({ showDesktopContextMenu = true }: ShellOverlaysProps = {}) {
+export function ShellOverlays() {
   const { runDialogOpen, setRunDialogOpen, shutdownOpen, setShutdownOpen, bsodState } =
     useWindowManager();
 
@@ -20,7 +15,7 @@ export function ShellOverlays({ showDesktopContextMenu = true }: ShellOverlaysPr
     <>
       <RunDialog open={runDialogOpen} onClose={() => setRunDialogOpen(false)} />
       <ShutdownOverlay open={shutdownOpen} onClose={() => setShutdownOpen(false)} />
-      {showDesktopContextMenu ? <DesktopContextMenu /> : null}
+      <DesktopContextMenu />
       <DialogModal />
       {bsodState && <BsodOverlay state={bsodState} />}
     </>

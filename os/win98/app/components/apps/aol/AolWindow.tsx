@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { AppWindow } from '../../win98/AppWindow';
+import { TitleBar } from '../../win98/TitleBar';
 import type { AppConfig } from '@/app/types/app-config';
-import { useOsShell } from '@retro-web/core/context';
 import { AolSignOn } from './AolSignOn';
 import { AolMainInterface } from './AolMainInterface';
 import { AolLogoLarge } from './AolIcon';
@@ -18,7 +19,6 @@ export const aolAppConfig: AppConfig = {
 };
 
 export function AolWindow() {
-  const { AppWindow, TitleBar } = useOsShell();
   const [isSignedOn, setIsSignedOn] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [activeWindow, setActiveWindow] = useState<string | null>(null);

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useWindowManager } from '@retro-web/core/context';
 
 const ICON = 'shell/icons/computer_taskmgr.png';
 
@@ -84,7 +85,6 @@ export function TaskManagerWindow({ registry }: { registry: AppConfig[] }) {
   const memCanvasRef = useRef<HTMLCanvasElement>(null);
   const cpuHistoryRef = useRef<number[]>(new Array(60).fill(3));
   const ctx = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
 
   // ── Derive app processes live from context ──────────────────────────────
   const appProcesses = useMemo<ProcessEntry[]>(() => {

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { AppWindow, TitleBar } from '../../win98';
+import { useWindowManager } from '@retro-web/core/context';
 import type { AppConfig } from '@/app/types/app-config';
 
 export const photoshopAppConfig: AppConfig = {
@@ -145,7 +146,6 @@ function clearAllPopups() {
 
 export function PhotoshopWindow() {
   const { apps, openBsod } = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
   const isVisible = apps['photoshop']?.visible ?? false;
 
   const [phase, setPhase] = useState<'idle' | 'splash' | 'virus'>('idle');

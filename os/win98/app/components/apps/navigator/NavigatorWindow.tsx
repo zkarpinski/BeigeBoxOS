@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useOsShell } from '@retro-web/core/context';
 
 export const navigatorAppConfig: AppConfig = {
   id: 'navigator',
@@ -100,7 +100,6 @@ function getErrorPage(url: string, reason?: string): string {
 }
 
 export function NavigatorWindow() {
-  const { AppWindow, TitleBar } = useOsShell();
   const [urlBarValue, setUrlBarValue] = useState('about:home');
   const [srcdoc, setSrcdoc] = useState('');
   const [isLoading, setIsLoading] = useState(false);

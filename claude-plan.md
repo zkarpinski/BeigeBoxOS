@@ -3,7 +3,7 @@
 ## Goal
 
 Expand the Win98 desktop simulator into a multi-OS platform supporting Win98 (current),
-WinXP, macOS X, and future OSes. _(Windows 95 app removed from the repo for now; can be re-added from git history.)_ Each OS builds and deploys as a standalone static site.
+WinXP, macOS X, and future OSes. *(Windows 95 app removed from the repo for now; can be re-added from git history.)* Each OS builds and deploys as a standalone static site.
 Shared code is organized in three tiers of packages — pure logic, cross-era complex apps,
 and simple portable app content — with OS-specific code staying in its OS directory.
 
@@ -181,11 +181,11 @@ Cross-era apps that appear in multiple OS registries but are too complex for `pa
 (their UI is non-trivial and tightly coupled to their own state) live here as individual
 packages. Each is a standalone React component with no `AppWindow` — the OS wraps it.
 
-| Package                  | Used by              |
-| ------------------------ | -------------------- |
-| `@retro-web/app-aim`     | win98, winxp, macosx |
-| `@retro-web/app-napster` | win98, winxp         |
-| `@retro-web/app-winamp`  | win98, winxp         |
+| Package | Used by |
+|---|---|
+| `@retro-web/app-aim` | win98, winxp, macosx |
+| `@retro-web/app-napster` | win98, winxp |
+| `@retro-web/app-winamp` | win98, winxp |
 
 Each OS still has a thin `AimWindow.tsx` wrapper (same pattern as core apps) that imports
 from `@retro-web/app-aim` and wraps it with the OS `AppWindow`. The package handles the
@@ -232,10 +232,9 @@ packages/config/
 ```
 
 Each OS's `next.config.js`:
-
 ```javascript
 const base = require('@retro-web/config/next.config.base');
-module.exports = { ...base /* OS-specific overrides */ };
+module.exports = { ...base, /* OS-specific overrides */ };
 ```
 
 Root `package.json` and CI enforce that all OS packages use the same Next.js and React
@@ -258,11 +257,9 @@ An app that fails criteria 3 or 4 but passes criteria 1 and 2 may belong in `pac
 (Tier 2) rather than being duplicated per-OS.
 
 **Promoted to `packages/core/apps/` (initial set):**
-
 - Calculator, Notepad, Paint — simple, self-contained, cross-era
 
 **Flagged — verify before promoting:**
-
 - **Minesweeper** — has a Supabase leaderboard (network call, env var). If the leaderboard
   logic can be injected as a prop/callback, it qualifies; otherwise it's OS-local with a
   shared logic-only submodule.
@@ -284,28 +281,24 @@ Each OS implements its own `AppWindow` using `useWindowBehavior` for logic,
 but rendering its own chrome. This is the most visually distinct part per OS.
 
 ### Win98 AppWindow (migrated, no functional change)
-
 - 3D bevel borders (outset/inset CSS)
 - Blue gradient active title bar, white text
 - 3 small square min/max/close buttons (right side of title bar)
 - Resize grip bottom-right
 
 ### Win95 AppWindow
-
 - Same 3D bevel structure as Win98
 - Slightly different button style (no `X` icon, just a small square)
 - No maximize button on some windows
 - Title bar text slightly smaller
 
 ### WinXP AppWindow (Luna theme)
-
 - Rounded top corners on title bar
 - Colorful gradient title bar (`#2f5496` → `#6ea0e0`)
 - Larger, rounded close/min/max buttons with icons
 - Softer gray body background (`#ece9d8`)
 
 ### macOS X AppWindow (Aqua theme)
-
 - White/light-gray body, drop shadow
 - Traffic light buttons (red/yellow/green circles) in **top-left** corner
 - Title centered, no icon in title bar
@@ -319,21 +312,18 @@ but rendering its own chrome. This is the most visually distinct part per OS.
 The shell is entirely replaced per OS — these share no components with each other.
 
 ### Win98 Shell (migrated from current `app/components/shell/`)
-
 - Bottom taskbar + Start button + system tray + clock
 - Start menu tree (Programs, Settings, Run, Shutdown)
 - Desktop icons grid
 - Win98 boot screen animation
 
 ### Win95 Shell
-
 - Same structure as Win98 shell, but:
   - Earlier Win95-style Start button (no color gradient)
   - Slightly different system tray styling
   - Win95 boot screen (different progress bar style)
 
 ### WinXP Shell
-
 - Luna-themed taskbar with rounded "Start" button (green, glowing)
 - Grouped taskbar buttons (collapse multiple windows of same app)
 - System tray with notification balloon tooltips
@@ -341,7 +331,6 @@ The shell is entirely replaced per OS — these share no components with each ot
 - Welcome screen (user login UI — visual only)
 
 ### macOS X Shell
-
 - **Menu bar** (top) — application name + menus, Apple logo left
 - **Dock** (bottom, centered) — icon launcher with CSS magnification effect on hover
 - **Finder** as file manager (replaces "My Computer")
@@ -355,14 +344,14 @@ The shell is entirely replaced per OS — these share no components with each ot
 Each OS defines its own CSS variable set. The variable names stay the same across all OSes
 so shared components pick up the correct OS theme automatically.
 
-| Variable         | Win95             | Win98             | WinXP       | macOS X           |
-| ---------------- | ----------------- | ----------------- | ----------- | ----------------- |
-| `--win-bg`       | `#c0c0c0`         | `#c0c0c0`         | `#ece9d8`   | `#f0f0f0`         |
-| `--win-dark`     | `#808080`         | `#808080`         | `#a0a0a0`   | `#cccccc`         |
-| `--title-active` | `#000080`         | `#0000a0`         | `#2f5496`   | `#aaaaaa`         |
-| `--desktop-bg`   | `#008080`         | `#008080`         | (wallpaper) | `#6d7785`         |
-| `--btn-radius`   | `0`               | `0`               | `3px`       | `8px`             |
-| `--title-font`   | `'MS Sans Serif'` | `'MS Sans Serif'` | `'Tahoma'`  | `'Lucida Grande'` |
+| Variable | Win95 | Win98 | WinXP | macOS X |
+|---|---|---|---|---|
+| `--win-bg` | `#c0c0c0` | `#c0c0c0` | `#ece9d8` | `#f0f0f0` |
+| `--win-dark` | `#808080` | `#808080` | `#a0a0a0` | `#cccccc` |
+| `--title-active` | `#000080` | `#0000a0` | `#2f5496` | `#aaaaaa` |
+| `--desktop-bg` | `#008080` | `#008080` | (wallpaper) | `#6d7785` |
+| `--btn-radius` | `0` | `0` | `3px` | `8px` |
+| `--title-font` | `'MS Sans Serif'` | `'MS Sans Serif'` | `'Tahoma'` | `'Lucida Grande'` |
 
 Each OS app also ships its own fonts, icon sets, and sound assets in its `public/` directory.
 
@@ -379,7 +368,7 @@ import type { AppConfig } from '@retro-web/core/types';
 
 export const appRegistry: AppConfig[] = [
   { id: 'calculator', label: 'Calculator', desktop: false },
-  { id: 'safari', label: 'Safari', desktop: true }, // macOS-only, defined in os/macosx/
+  { id: 'safari', label: 'Safari', desktop: true },  // macOS-only, defined in os/macosx/
   // No 'mycomputer' — macOS uses Finder instead
 ];
 ```
@@ -402,8 +391,8 @@ A change to `os/win98/` only triggers win98's build.
 {
   "tasks": {
     "build": { "dependsOn": ["^build"], "outputs": ["out/**", ".next/**"] },
-    "test": { "dependsOn": ["^build"] },
-    "dev": { "cache": false, "persistent": true }
+    "test":  { "dependsOn": ["^build"] },
+    "dev":   { "cache": false, "persistent": true }
   }
 }
 ```
@@ -413,15 +402,15 @@ A change to `os/win98/` only triggers win98's build.
 ```json
 {
   "scripts": {
-    "dev": "pnpm --filter @retro-web/win98 dev",
-    "dev:win98": "pnpm --filter @retro-web/win98 dev",
-    "dev:winxp": "pnpm --filter @retro-web/winxp dev",
+    "dev":        "pnpm --filter @retro-web/win98 dev",
+    "dev:win98":  "pnpm --filter @retro-web/win98 dev",
+    "dev:winxp":  "pnpm --filter @retro-web/winxp dev",
     "dev:macosx": "pnpm --filter @retro-web/macosx dev",
-    "build": "turbo build",
-    "build:win98": "turbo build --filter=@retro-web/win98",
-    "test": "turbo test",
-    "lint": "turbo lint",
-    "e2e": "playwright test"
+    "build":      "turbo build",
+    "build:win98":"turbo build --filter=@retro-web/win98",
+    "test":       "turbo test",
+    "lint":       "turbo lint",
+    "e2e":        "playwright test"
   }
 }
 ```
@@ -431,17 +420,16 @@ A change to `os/win98/` only triggers win98's build.
 Each OS deploys as a separate Cloudflare Pages project mapped to its own subdomain.
 The landing page is plain static HTML — no build step, deployed directly.
 
-| Project | Source                    | Cloudflare Pages project | URL                 |
-| ------- | ------------------------- | ------------------------ | ------------------- |
-| Landing | `landing/` (static files) | `retro-landing`          | `domain.com`        |
-| Win98   | `os/win98/out/`           | `retro-win98`            | `win98.domain.com`  |
-| WinXP   | `os/winxp/out/`           | `retro-winxp`            | `winxp.domain.com`  |
-| macOS X | `os/macosx/out/`          | `retro-macosx`           | `macosx.domain.com` |
+| Project | Source | Cloudflare Pages project | URL |
+|---|---|---|---|
+| Landing | `landing/` (static files) | `retro-landing` | `domain.com` |
+| Win98 | `os/win98/out/` | `retro-win98` | `win98.domain.com` |
+| WinXP | `os/winxp/out/` | `retro-winxp` | `winxp.domain.com` |
+| macOS X | `os/macosx/out/` | `retro-macosx` | `macosx.domain.com` |
 
 ### CI build graph
 
 Turborepo's dependency graph replaces hand-written path-based trigger rules:
-
 - Any package change → Turborepo determines which downstream packages need rebuilding
 - `packages/core` change → all OS builds run (they all depend on core)
 - `os/win98` change → only win98 builds
@@ -458,7 +446,6 @@ Displays an OS selection screen (retro boot-menu or custom design) with links
 to each OS subdomain. Fast to load, trivial to update.
 
 Not in `os/` — sits at repo root alongside it:
-
 ```
 website/
 ├── landing/
@@ -476,27 +463,27 @@ website/
 Each OS registry is curated to reflect apps that would have existed/shipped with that OS era.
 Apps that are too late (Netscape on XP) or platform-wrong (My Computer on macOS) are excluded.
 
-| App                | Win95 | Win98 |    WinXP    |        macOS X         |
-| ------------------ | :---: | :---: | :---------: | :--------------------: |
-| Calculator         |   ✓   |   ✓   |      ✓      |           ✓            |
-| Notepad            |   ✓   |   ✓   |      ✓      |      — (TextEdit)      |
-| Paint              |   ✓   |   ✓   |      ✓      |           —            |
-| Minesweeper        |   ✓   |   ✓   |      ✓      |           —            |
-| My Computer        |   ✓   |   ✓   |      ✓      |       — (Finder)       |
-| MS-DOS Prompt      |   ✓   |   ✓   | — (cmd.exe) |      — (Terminal)      |
-| Task Manager       |   ✓   |   ✓   |      ✓      |  — (Activity Monitor)  |
-| Internet Explorer  |  IE3  | IE4/5 |     IE6     |           —            |
-| Netscape Navigator |   ✓   |   ✓   |      —      |           —            |
-| Word 97            |   —   |   ✓   |      —      |           —            |
-| AOL / AIM          |   —   |   ✓   |      ✓      |           ✓            |
-| Napster            |   —   |   ✓   |      ✓      |           —            |
-| Winamp             |   —   |   ✓   |      ✓      |           —            |
-| Control Panel      |   ✓   |   ✓   |      ✓      | ✓ (System Preferences) |
-| VB6                |   —   |   ✓   |      —      |           —            |
-| Safari             |   —   |   —   |      —      |           ✓            |
-| iTunes             |   —   |   —   |      —      |           ✓            |
-| Terminal           |   —   |   —   |      —      |           ✓            |
-| cmd.exe            |   —   |   —   |      ✓      |           —            |
+| App | Win95 | Win98 | WinXP | macOS X |
+|---|:---:|:---:|:---:|:---:|
+| Calculator | ✓ | ✓ | ✓ | ✓ |
+| Notepad | ✓ | ✓ | ✓ | — (TextEdit) |
+| Paint | ✓ | ✓ | ✓ | — |
+| Minesweeper | ✓ | ✓ | ✓ | — |
+| My Computer | ✓ | ✓ | ✓ | — (Finder) |
+| MS-DOS Prompt | ✓ | ✓ | — (cmd.exe) | — (Terminal) |
+| Task Manager | ✓ | ✓ | ✓ | — (Activity Monitor) |
+| Internet Explorer | IE3 | IE4/5 | IE6 | — |
+| Netscape Navigator | ✓ | ✓ | — | — |
+| Word 97 | — | ✓ | — | — |
+| AOL / AIM | — | ✓ | ✓ | ✓ |
+| Napster | — | ✓ | ✓ | — |
+| Winamp | — | ✓ | ✓ | — |
+| Control Panel | ✓ | ✓ | ✓ | ✓ (System Preferences) |
+| VB6 | — | ✓ | — | — |
+| Safari | — | — | — | ✓ |
+| iTunes | — | — | — | ✓ |
+| Terminal | — | — | — | ✓ |
+| cmd.exe | — | — | ✓ | — |
 
 - **OS-exclusive apps** live in `os/{name}/components/apps/`
 - **Simple cross-era apps** (Calculator, Notepad, Paint) live in `packages/core/apps/`
@@ -511,7 +498,6 @@ Apps that are too late (Netscape on XP) or platform-wrong (My Computer on macOS)
 Tests are split across three levels:
 
 ### `packages/core/test/` — shared logic tests
-
 - `WindowManagerContext` state and actions
 - `useWindowBehavior` drag/resize/focus/resize-handler logic
 - `AppConfig` type utilities
@@ -519,7 +505,6 @@ Tests are split across three levels:
 - Run on **every CI build** — any change to core triggers these
 
 ### `os/{name}/test/` — OS-specific Jest tests
-
 - OS shell behavior (taskbar, start menu, dock, etc.)
 - OS-specific `AppWindow` chrome (button positions, title bar rendering)
 - Boot screen, BSOD, shutdown overlays
@@ -527,7 +512,6 @@ Tests are split across three levels:
 - Run when that OS's files change **or** core changes
 
 ### `e2e/` — root-level Playwright tests (parameterized by OS)
-
 A single E2E suite at the repo root, parameterized by `baseURL` so the same test
 scenarios run against each OS without duplicating spec files.
 
@@ -558,7 +542,6 @@ Coverage thresholds are per-package (core has its own threshold, each OS has its
 All work on the current `mutli-os` branch.
 
 ### Phase 0: Monorepo setup (no functional changes)
-
 - [ ] Install pnpm, convert from npm → pnpm (`pnpm import` from `package-lock.json`)
 - [ ] Install Turborepo (`pnpm add -Dw turbo`), add `turbo.json`
 - [ ] Add `pnpm-workspace.yaml` at repo root
@@ -569,7 +552,6 @@ All work on the current `mutli-os` branch.
 - [ ] Verify nothing broken: `pnpm dev` still works, `turbo build` runs
 
 ### Phase 1: Move Win98 into `os/win98/`
-
 - [ ] Create `os/win98/` directory structure
 - [ ] Move `app/`, `public/`, `next.config.js` → `os/win98/`
 - [ ] Update `os/win98/next.config.js` to extend `@retro-web/config/next.config.base.js`
@@ -579,7 +561,6 @@ All work on the current `mutli-os` branch.
 - [ ] Verify: `pnpm dev`, `turbo build`, `turbo test` all pass from root
 
 ### Phase 2: Extract shared logic into `packages/core`
-
 - [ ] Diff current `app/types/app-config.ts` against the proposed interface; carry over all
       fields still in use, drop `osOverrides`
 - [ ] Move `WindowManagerContext.tsx` → `packages/core/context/`
@@ -594,7 +575,6 @@ All work on the current `mutli-os` branch.
 - [ ] All existing tests pass
 
 ### Phase 3: Refactor Win98 to consume core + extract packages/apps
-
 - [ ] Win98 `AppWindow.tsx` uses `useWindowBehavior` from core (chrome stays identical)
 - [ ] Win98 shell imports `WindowManagerContext` from core
 - [ ] Create thin wrapper files in `os/win98/components/apps/` for all promoted core apps
@@ -605,18 +585,15 @@ All work on the current `mutli-os` branch.
 - [ ] Restructure `e2e/` to parameterized layout with `e2e/shared/` and `e2e/os/win98/`
 
 ### Phase 4: Landing page
-
 - [ ] Create `landing/index.html` + `landing/style.css` (no framework)
 - [ ] OS picker UI — retro boot-menu style or custom design
 - [ ] Links to each subdomain (win98 first, others stubbed)
 - [ ] Deploy `landing/` directly to Cloudflare Pages → `domain.com`
 
 ### Phase 5: Add Win95 — **Deferred / removed from repo**
-
 A Win95 app existed under `os/win95/`; it was removed to simplify the monorepo. Restore from git history if needed, then re-add scripts, CI matrix, Playwright project, and `landing` link.
 
 ### Phase 6: Add WinXP
-
 - [ ] Create `os/winxp/` with Next.js setup
 - [ ] Luna-themed `AppWindow` (rounded corners, colorful gradient, pill buttons)
 - [ ] WinXP shell (Luna taskbar, rounded Start button, grouped buttons, balloon tips, Welcome screen)
@@ -627,7 +604,6 @@ A Win95 app existed under `os/win95/`; it was removed to simplify the monorepo. 
 - [ ] Add `winxp.domain.com` link to `landing/index.html`
 
 ### Phase 7: Add macOS X
-
 - [ ] Create `os/macosx/` with Next.js setup
 - [ ] Aqua `AppWindow` (traffic lights top-left, centered title, drop shadow, pinstripe/metal variants)
       — attach all resize edge handlers from `getResizeHandlers`, not just corner

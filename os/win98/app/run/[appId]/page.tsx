@@ -33,6 +33,7 @@ const APP_IDS = [
   'zonealarm',
   'taskmanager',
   'avg',
+  'wordmuncher',
 ] as const;
 
 export const dynamicParams = false;

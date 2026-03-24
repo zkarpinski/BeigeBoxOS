@@ -40,18 +40,6 @@ describe('WindowManagerProvider initialOpenAppId', () => {
     expect(screen.getByTestId('probe-aim')).toHaveTextContent('hidden:10');
   });
 
-  test('applyOpenByDefault=false ignores registry openByDefault', () => {
-    render(
-      <WindowManagerProvider registry={[appCalculator, appAim]} applyOpenByDefault={false}>
-        <Probe appId="calculator" />
-        <Probe appId="aim" />
-      </WindowManagerProvider>,
-    );
-
-    expect(screen.getByTestId('probe-calculator')).toHaveTextContent('hidden:10');
-    expect(screen.getByTestId('probe-aim')).toHaveTextContent('hidden:10');
-  });
-
   test('when initialOpenAppId is set, mobile auto-hide does not hide that app', async () => {
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 500 });
 

@@ -167,7 +167,12 @@
   text-overflow: ellipsis;
   flex-shrink: 1;
   /* Raised XP task button */
-  background: linear-gradient(to bottom, #4a7fd4 0%, #3a6cc8 50%, #2c5ab8 100%);
+  background: linear-gradient(
+    to bottom,
+    #4a7fd4 0%,
+    #3a6cc8 50%,
+    #2c5ab8 100%
+  );
   border-top-color: rgba(255, 255, 255, 0.35);
   border-left-color: rgba(255, 255, 255, 0.2);
   border-right-color: rgba(0, 0, 60, 0.35);
@@ -176,11 +181,21 @@
 }
 
 .taskbar-task:hover {
-  background: linear-gradient(to bottom, #5a8fe4 0%, #4a7cd8 50%, #3c6ac8 100%);
+  background: linear-gradient(
+    to bottom,
+    #5a8fe4 0%,
+    #4a7cd8 50%,
+    #3c6ac8 100%
+  );
 }
 
 .taskbar-task.active {
-  background: linear-gradient(to bottom, #1a3f8c 0%, #2252aa 50%, #2a5cb8 100%);
+  background: linear-gradient(
+    to bottom,
+    #1a3f8c 0%,
+    #2252aa 50%,
+    #2a5cb8 100%
+  );
   border-top-color: rgba(0, 0, 60, 0.5);
   border-left-color: rgba(0, 0, 60, 0.35);
   border-right-color: rgba(255, 255, 255, 0.15);
@@ -213,7 +228,12 @@
   gap: 5px;
   height: 30px;
   padding: 0 6px;
-  background: linear-gradient(to bottom, #1640b0 0%, #0e38a8 50%, #0c34a0 100%);
+  background: linear-gradient(
+    to bottom,
+    #1640b0 0%,
+    #0e38a8 50%,
+    #0c34a0 100%
+  );
   border: 1px solid rgba(0, 30, 100, 0.7);
   border-radius: 3px;
   box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12);
@@ -311,9 +331,7 @@
   width: 390px;
   border-radius: 8px 8px 0 0;
   border: 1px solid #0a2490;
-  box-shadow:
-    4px 0 12px rgba(0, 0, 0, 0.6),
-    0 -2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6), 0 -2px 8px rgba(0, 0, 0, 0.4);
   z-index: 10100;
   /* Allow All Programs fly-out and cascading submenus to extend past the panel */
   overflow: visible;
@@ -667,6 +685,4 @@
 }
 
 /* Legacy class aliases kept for any existing references */
-#start-menu {
-  display: none;
-}
+#start-menu { display: none; }

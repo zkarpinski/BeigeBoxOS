@@ -5,12 +5,6 @@ import { useRef, useEffect } from 'react';
 const MIN_W = 320;
 const MIN_H = 200;
 
-/** Win98 taskbar ~28px; KarpOS dock ~52px — keeps resize below the bar */
-function taskbarReservePx(): number {
-  if (typeof document === 'undefined') return 28;
-  return document.body.classList.contains('karpos-desktop') ? 52 : 28;
-}
-
 interface Bounds {
   left: number;
   top: number;
@@ -42,9 +36,7 @@ export interface UseWindowBehaviorResult {
    * Currently 'se' is wired via the .win-resize-grip element in the useEffect.
    * Other edges are no-ops until implemented.
    */
-  getResizeHandler: (
-    edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw',
-  ) => (e: React.MouseEvent) => void;
+  getResizeHandler: (edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') => (e: React.MouseEvent) => void;
 }
 
 /**
@@ -70,6 +62,7 @@ export function useWindowBehavior({
   maximizedClass = 'maximized',
   allowResize = false,
 }: UseWindowBehaviorOptions): UseWindowBehaviorResult {
+
   const windowRef = useRef<HTMLDivElement>(null);
   const setBoundsRef = useRef(setBounds);
   setBoundsRef.current = setBounds;
@@ -156,9 +149,7 @@ export function useWindowBehavior({
     };
 
     titleBarEl.addEventListener('mousedown', onTitleMouseDown as EventListener);
-    titleBarEl.addEventListener('touchstart', onTitleTouchStart as EventListener, {
-      passive: false,
-    });
+    titleBarEl.addEventListener('touchstart', onTitleTouchStart as EventListener, { passive: false });
 
     return () => {
       titleBarEl.removeEventListener('mousedown', onTitleMouseDown as EventListener);
@@ -185,7 +176,7 @@ export function useWindowBehavior({
 
       const onMove = (x: number, y: number) => {
         const maxW = window.innerWidth - rect.left;
-        const maxH = window.innerHeight - taskbarReservePx() - rect.top;
+        const maxH = window.innerHeight - 28 - rect.top;
         let newW = startW + (x - startX);
         let newH = startH + (y - startY);
         newW = Math.max(MIN_W, Math.min(newW, maxW));
@@ -254,7 +245,8 @@ export function useWindowBehavior({
   // maps to the bottom-right corner resize (the grip element). Other edges are
   // provided for API completeness but are no-ops until implemented.
   const getResizeHandler =
-    (_edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') => (_e: React.MouseEvent) => {
+    (_edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') =>
+    (_e: React.MouseEvent) => {
       // TODO: implement per-edge resize if needed.
       // The 'se' resize is already handled via the .win-resize-grip element in the useEffect above.
     };

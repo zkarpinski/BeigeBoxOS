@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { WordWindow } from '../apps/word';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
 import { OsShellProvider } from '@retro-web/core/context';
-import { AppWindow, TitleBar, MenuBar } from '../win98';
+import { AppWindow, TitleBar } from '../win98';
 import { writeFile } from '../../fileSystem';
 import { AimWindow } from '../apps/aim';
 import { MinesweeperWindow } from '../apps/minesweeper';
@@ -27,6 +27,7 @@ import { ReporterWindow } from '../apps/reporter';
 import { ZonealarmWindow } from '../apps/zonealarm';
 import { TaskManagerWindow } from '../apps/taskmanager';
 import { AvgWindow } from '../apps/avg';
+import { WordMuncherWindow } from '../apps/wordmuncher';
 import { BootScreen } from '../shell/BootScreen';
 import { DesktopIcons } from '../shell/DesktopIcons';
 import { Taskbar } from '../shell/Taskbar';
@@ -185,7 +186,7 @@ export function Desktop({ openAppId }: DesktopProps) {
       boundsStorageKey="win98-window-bounds"
     >
       <Windows98GlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+      <OsShellProvider value={{ AppWindow, TitleBar, writeFile }}>
         {/* SEO content (visually hidden, crawlable) */}
         <div className="seo-intro" aria-hidden="true">
           <h1>Windows 98 in the Browser</h1>
@@ -223,6 +224,7 @@ export function Desktop({ openAppId }: DesktopProps) {
         <ZonealarmWindow />
         <TaskManagerWindow registry={appRegistry} />
         <AvgWindow />
+        <WordMuncherWindow />
 
         {/* Shell */}
         <DesktopIcons registry={appRegistry} />

@@ -14,6 +14,7 @@ import {
 export { NOTEPAD_PENDING_KEY };
 export { PDF_READER_PENDING_KEY };
 export const WORD_PENDING_KEY = 'word-pending-document';
+export const PAD_PENDING_KEY = 'pad-pending-document';
 
 const STORAGE_KEY = 'karpos-filesystem-linux';
 
@@ -29,18 +30,26 @@ const PROGRAM_FILES_BASE = '/opt';
 /** Extension → app id for opening files. */
 export const EXTENSION_TO_APP: Record<string, string> = {
   txt: 'notepad',
+  md: 'pad',
   doc: 'word',
   pdf: 'pdf-reader',
 };
 
 const DEFAULT_ICON_BY_EXT: Record<string, string> = {
   txt: 'shell/icons/notepad_file.png',
+  md: 'shell/icons/notepad_with_pencil.png',
   doc: 'apps/word/word-icon.png',
   pdf: 'shell/icons/adobe-pdf-modern-icon.png',
 };
 
 export type FolderNode = { type: 'folder'; children: string[] };
-export type FileNode = { type: 'file'; content?: string; contentKey?: string };
+export type FileNode = {
+  type: 'file';
+  content?: string;
+  contentKey?: string;
+  sourcePath?: string;
+  localOverride?: boolean;
+};
 export type AppNode = { type: 'app'; appId: string; label: string };
 export type FsNode = FolderNode | FileNode | AppNode;
 
@@ -70,12 +79,27 @@ export function getParentPath(path: string): string {
   return '/' + parts.slice(0, -1).join('/');
 }
 
-const DEFAULT_TODO_CONTENT = `Zach's Todo List:
-- Support creating folders and new files that save locally via cookies
-- Fully Functional Recreation of 3D Space Cadet Pinball Game`;
-
 let registryRef: AppConfig[] = [];
 let cachedTree: FsTree | null = null;
+let publicFsHydrated = false;
+let publicFsHydrating = false;
+
+type PublicFsManifestEntry = {
+  path: string;
+  type: 'file' | 'folder';
+};
+
+type PublicFsManifest = {
+  entries: PublicFsManifestEntry[];
+};
+
+/** Test helper: reset module state between Jest cases. */
+export function __resetFileSystemStateForTests(): void {
+  registryRef = [];
+  cachedTree = null;
+  publicFsHydrated = false;
+  publicFsHydrating = false;
+}
 
 /**
  * Call once at app load (e.g. from page) so `/opt` app shortcuts are built from the registry.
@@ -83,6 +107,7 @@ let cachedTree: FsTree | null = null;
 export function initFileSystem(registry: AppConfig[]): void {
   registryRef = registry;
   cachedTree = null;
+  void hydrateFromPublicFsManifest();
 }
 
 function buildDefaultTree(): FsTree {
@@ -101,15 +126,20 @@ function buildDefaultTree(): FsTree {
     },
     '/home/zkarpinski/Desktop': {
       type: 'folder',
-      children: ['TODO.txt', 'My Resume.pdf'],
+      children: ['Projects', 'TODO.md', 'My Resume.pdf'],
     },
-    '/home/zkarpinski/Desktop/TODO.txt': {
+    '/home/zkarpinski/Desktop/TODO.md': {
       type: 'file',
-      content: DEFAULT_TODO_CONTENT,
+      sourcePath: '/fs/home/zkarpinski/Desktop/TODO.md',
+    },
+    '/home/zkarpinski/Desktop/Projects': {
+      type: 'app',
+      appId: 'projects',
+      label: 'Projects',
     },
     '/home/zkarpinski/Desktop/My Resume.pdf': {
       type: 'file',
-      contentKey: 'resume-pdf',
+      sourcePath: '/fs/home/zkarpinski/Desktop/My%20Resume.pdf',
     },
     '/home/zkarpinski/Documents': {
       type: 'folder',
@@ -117,7 +147,7 @@ function buildDefaultTree(): FsTree {
     },
     '/home/zkarpinski/Documents/My Resume.pdf': {
       type: 'file',
-      contentKey: 'resume-pdf',
+      sourcePath: '/fs/home/zkarpinski/Desktop/My%20Resume.pdf',
     },
     '/tmp': { type: 'folder', children: [] },
   };
@@ -169,6 +199,92 @@ function loadTree(): FsTree {
     cachedTree = defaultTree;
   }
   return cachedTree;
+}
+
+function ensureFolder(tree: FsTree, folderPath: string): void {
+  if (!folderPath || folderPath === '/') return;
+  if (tree[folderPath]?.type === 'folder') return;
+  tree[folderPath] = { type: 'folder', children: [] };
+}
+
+function pushChild(tree: FsTree, parentPath: string, childName: string): void {
+  if (!parentPath || !childName) return;
+  if (!tree[parentPath]) {
+    tree[parentPath] = { type: 'folder', children: [] };
+  }
+  const parent = tree[parentPath];
+  if (parent.type !== 'folder') return;
+  if (!parent.children.includes(childName)) parent.children.push(childName);
+}
+
+function upsertPublicFsEntry(tree: FsTree, entry: PublicFsManifestEntry): void {
+  const normalized = normalizePath(entry.path);
+  if (!normalized || normalized === '/') return;
+  const parentPath = getParentPath(normalized);
+  const name = basename(normalized);
+  if (!name) return;
+
+  if (parentPath) ensureFolder(tree, parentPath);
+  if (parentPath) pushChild(tree, parentPath, name);
+
+  if (entry.type === 'folder') {
+    ensureFolder(tree, normalized);
+    return;
+  }
+
+  const existingNode = tree[normalized];
+  const existingFile = existingNode && existingNode.type === 'file' ? existingNode : null;
+  const localOverride = existingFile?.localOverride === true;
+
+  tree[normalized] = {
+    type: 'file',
+    sourcePath: `/fs${normalized}`,
+    localOverride,
+    content: localOverride ? existingFile?.content : undefined,
+  };
+}
+
+async function hydrateFromPublicFsManifest(): Promise<void> {
+  if (publicFsHydrated || publicFsHydrating) return;
+  if (typeof window === 'undefined') return;
+  publicFsHydrating = true;
+  try {
+    const res = await fetch('/fs/index.json', { cache: 'no-store' });
+    if (!res.ok) {
+      publicFsHydrated = true;
+      return;
+    }
+    const manifest = (await res.json()) as PublicFsManifest;
+    const entries = Array.isArray(manifest.entries) ? manifest.entries : [];
+    if (!entries.length) {
+      publicFsHydrated = true;
+      return;
+    }
+
+    const tree = { ...loadTree() };
+    for (const entry of entries) {
+      if (!entry || !entry.path || (entry.type !== 'file' && entry.type !== 'folder')) continue;
+      upsertPublicFsEntry(tree, entry);
+    }
+    saveTree(tree);
+    publicFsHydrated = true;
+  } catch {
+    publicFsHydrated = true;
+  } finally {
+    publicFsHydrating = false;
+  }
+}
+
+async function loadFileContent(node: FileNode): Promise<string> {
+  if (node.localOverride && typeof node.content === 'string') return node.content;
+  if (!node.sourcePath || typeof window === 'undefined') return node.content ?? '';
+  try {
+    const res = await fetch(node.sourcePath, { cache: 'no-store' });
+    if (!res.ok) return node.content ?? '';
+    return await res.text();
+  } catch {
+    return node.content ?? '';
+  }
 }
 
 function saveTree(tree: FsTree): void {
@@ -259,7 +375,11 @@ function basename(path: string): string {
 /**
  * Open a file or app by path: app nodes launch the app; files open by extension via sessionStorage.
  */
-export function openFileByPath(path: string, showApp: (appId: string) => void): void {
+export async function openFileByPath(
+  path: string,
+  showApp: (appId: string) => void,
+): Promise<void> {
+  await hydrateFromPublicFsManifest();
   const node = getNode(path);
   if (!node) return;
   if (node.type === 'app') {
@@ -274,11 +394,13 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
   if (!appId) return;
 
   try {
+    const content = await loadFileContent(node);
+
     switch (appId) {
       case 'notepad':
         sessionStorage.setItem(
           NOTEPAD_PENDING_KEY,
-          JSON.stringify({ filename: name, content: node.content ?? '', path: path }),
+          JSON.stringify({ filename: name, content: content || node.content || '', path: path }),
         );
         break;
       case 'word':
@@ -287,13 +409,19 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
           JSON.stringify({ documentKey: node.contentKey ?? 'resume' }),
         );
         break;
+      case 'pad':
+        sessionStorage.setItem(
+          PAD_PENDING_KEY,
+          JSON.stringify({ filename: name, content: content || node.content || '', path }),
+        );
+        break;
       case 'pdf-reader':
         sessionStorage.setItem(
           PDF_READER_PENDING_KEY,
           JSON.stringify({
             filename: name,
             path,
-            pdfUrl: node.contentKey ? PDF_CONTENT_KEY_TO_URL[node.contentKey] : undefined,
+            pdfUrl: node.contentKey ? PDF_CONTENT_KEY_TO_URL[node.contentKey] : node.sourcePath,
           }),
         );
         break;
@@ -327,7 +455,9 @@ export function writeFile(path: string, content: string): void {
     children.push(name);
     tree[parent] = { type: 'folder', children };
   }
-  tree[normalized] = { type: 'file', content };
+  const existing = tree[normalized];
+  const sourcePath = existing && existing.type === 'file' ? existing.sourcePath : undefined;
+  tree[normalized] = { type: 'file', content, sourcePath, localOverride: true };
   saveTree(tree);
 }
 

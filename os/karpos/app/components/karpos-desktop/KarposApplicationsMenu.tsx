@@ -60,7 +60,7 @@ export function KarposApplicationsMenu({
   menuOpen,
   setMenuOpen,
 }: KarposApplicationsMenuProps) {
-  const { showApp, setRunDialogOpen, setShutdownOpen } = useWindowManager();
+  const { showApp, setShutdownOpen } = useWindowManager();
   const [openFolder, setOpenFolder] = useState<string | null>(null);
 
   const { root, folders, folderKeys } = useMemo(
@@ -177,17 +177,6 @@ export function KarposApplicationsMenu({
         </div>
 
         <div className="karpos-apps-footer">
-          <button
-            type="button"
-            className="karpos-apps-footer-btn"
-            id="start-run"
-            onClick={() => {
-              setMenuOpen(false);
-              setRunDialogOpen(true);
-            }}
-          >
-            Run…
-          </button>
           <button
             type="button"
             className="karpos-apps-footer-btn"

@@ -1,1 +1,5 @@
-export { MinesweeperWindow, minesweeperAppConfig } from './MinesweeperWindow';
+export {
+  MinesweeperWindow,
+  minesweeperAppConfig,
+  MINESWEEPER_ICON_SRC,
+} from '@retro-web/app-minesweeper';

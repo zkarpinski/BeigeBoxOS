@@ -8,15 +8,17 @@
  */
 import { useEffect, useState } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
-import { TaskbarTasks } from '@win98/components/shell/taskbar/TaskbarTasks';
-import { SystemTray } from '@win98/components/shell/taskbar/SystemTray';
 import { KarposAppsButton } from './KarposAppsButton';
+import { KarposTaskbarTasks } from './KarposTaskbarTasks';
+import { KarposSystemTray } from './KarposSystemTray';
 import { KarposApplicationsMenu } from './KarposApplicationsMenu';
 import { shouldKeepMenuOpenOnDocumentClick } from './karposMenuDocumentClick';
 
+/** Tray icons hidden on KarpOS (apps still launch from APPS / registry). */
+const KARPOS_TRAY_EXCLUDED_IDS = new Set(['zonealarm', 'aim']);
+
 export function KarposTaskbar({ registry }: { registry: AppConfig[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [volumeOpen, setVolumeOpen] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -36,8 +38,11 @@ export function KarposTaskbar({ registry }: { registry: AppConfig[] }) {
       <div id="taskbar">
         <KarposAppsButton active={menuOpen} onClick={() => setMenuOpen((v) => !v)} />
         <div className="taskbar-divider" />
-        <TaskbarTasks registry={registry} />
-        <SystemTray registry={registry} volumeOpen={volumeOpen} setVolumeOpen={setVolumeOpen} />
+        <KarposTaskbarTasks registry={registry} />
+        <KarposSystemTray
+          registry={registry}
+          trayAppFilter={(a) => !KARPOS_TRAY_EXCLUDED_IDS.has(a.id)}
+        />
       </div>
       <KarposApplicationsMenu registry={registry} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
     </>

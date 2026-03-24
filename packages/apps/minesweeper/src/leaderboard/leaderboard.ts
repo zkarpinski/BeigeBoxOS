@@ -3,7 +3,7 @@
  * Uses Supabase via /api/minesweeper-leaderboard when configured; falls back to localStorage.
  */
 
-import type { DifficultyKey } from './MinesweeperLogic';
+import type { DifficultyKey } from '../logic/MinesweeperLogic';
 
 const STORAGE_KEY = 'minesweeper-leaderboard';
 const API_PATH = '/api/minesweeper-leaderboard';

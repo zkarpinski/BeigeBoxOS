@@ -1,30 +1,42 @@
 /**
- * Virtual Windows-style filesystem. Paths use backslash (e.g. C:\Windows\Desktop).
- * C:\Windows\Desktop is the desktop folder; its contents appear on the desktop.
- * Program Files structure is built from the app registry so new apps appear automatically.
- * Persisted to localStorage; call initFileSystem(registry) once at app load.
+ * KarpOS-only virtual filesystem (`karpos-filesystem-linux` in localStorage).
+ * Linux-style paths (forward slashes); desktop lives under `/home/zkarpinski/Desktop`.
+ * Independent from Win98 `os/win98/app/fileSystem.ts`.
  */
 
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { NOTEPAD_PENDING_KEY } from '@retro-web/core/apps/notepad';
+import {
+  PDF_READER_PENDING_KEY,
+  PDF_CONTENT_KEY_TO_URL,
+} from '@retro-web/core/apps/pdf-reader/constants';
 
 export { NOTEPAD_PENDING_KEY };
+export { PDF_READER_PENDING_KEY };
 export const WORD_PENDING_KEY = 'word-pending-document';
 
-const STORAGE_KEY = 'karpos-filesystem';
+const STORAGE_KEY = 'karpos-filesystem-linux';
 
-export const DESKTOP_PATH = 'C:\\Windows\\Desktop';
-const PROGRAM_FILES_BASE = 'C:\\Program Files';
+/** User home (zkarpinski). */
+export const HOME_PATH = '/home/zkarpinski';
+
+/** Virtual Desktop — mirrors `~/Desktop`. */
+export const DESKTOP_PATH = '/home/zkarpinski/Desktop';
+
+/** Packaged app shortcuts (Start menu) live under `/opt`, FHS-style. */
+const PROGRAM_FILES_BASE = '/opt';
 
 /** Extension → app id for opening files. */
 export const EXTENSION_TO_APP: Record<string, string> = {
   txt: 'notepad',
   doc: 'word',
+  pdf: 'pdf-reader',
 };
 
 const DEFAULT_ICON_BY_EXT: Record<string, string> = {
   txt: 'shell/icons/notepad_file.png',
   doc: 'apps/word/word-icon.png',
+  pdf: 'shell/icons/adobe-pdf-modern-icon.png',
 };
 
 export type FolderNode = { type: 'folder'; children: string[] };
@@ -34,32 +46,28 @@ export type FsNode = FolderNode | FileNode | AppNode;
 
 export type FsTree = Record<string, FsNode>;
 
+/** Normalize to absolute POSIX-style path with a single leading `/`. */
 function normalizePath(p: string): string {
-  const s = p.replace(/\//g, '\\').trim();
-  if (!s) return s;
-  const parts = s.split('\\').filter(Boolean);
-  if (parts.length === 0) return s;
-  const first = parts[0].toUpperCase();
-  if (first.endsWith(':')) {
-    parts[0] = first;
-    return parts.join('\\');
-  }
-  return parts.join('\\');
+  const s = p.replace(/\\/g, '/').trim();
+  if (!s) return '';
+  const parts = s.split('/').filter(Boolean);
+  if (parts.length === 0) return '/';
+  return '/' + parts.join('/');
 }
 
 function joinPath(parent: string, name: string): string {
   const p = normalizePath(parent);
-  if (!p) return name;
-  return p + '\\' + name;
+  if (!p || p === '/') return '/' + name;
+  return p + '/' + name;
 }
 
-/** Parent path, or "" if at root (e.g. C:\ -> "" for "up" from C:\). */
+/** Parent directory, or `""` when `path` is `/` (filesystem root). */
 export function getParentPath(path: string): string {
   const normalized = normalizePath(path);
-  if (!normalized) return '';
-  const parts = normalized.split('\\').filter(Boolean);
-  if (parts.length <= 1) return ''; // C: or A: etc. -> root
-  return parts.slice(0, -1).join('\\');
+  if (!normalized || normalized === '/') return '';
+  const parts = normalized.split('/').filter(Boolean);
+  if (parts.length <= 1) return '/';
+  return '/' + parts.slice(0, -1).join('/');
 }
 
 const DEFAULT_TODO_CONTENT = `Zach's Todo List:
@@ -70,7 +78,7 @@ let registryRef: AppConfig[] = [];
 let cachedTree: FsTree | null = null;
 
 /**
- * Call once at app load (e.g. from page) so Program Files and app shortcuts are built from the registry.
+ * Call once at app load (e.g. from page) so `/opt` app shortcuts are built from the registry.
  */
 export function initFileSystem(registry: AppConfig[]): void {
   registryRef = registry;
@@ -79,44 +87,46 @@ export function initFileSystem(registry: AppConfig[]): void {
 
 function buildDefaultTree(): FsTree {
   const tree: FsTree = {
-    'C:': {
+    '/': {
       type: 'folder',
-      children: ['Windows', 'Program Files', 'My Documents'],
+      children: ['home', 'opt', 'tmp'],
     },
-    'C:\\Windows': {
+    '/home': {
       type: 'folder',
-      children: ['Desktop', 'System', 'Temp', 'Fonts'],
+      children: ['zkarpinski'],
     },
-    'C:\\Windows\\Desktop': {
+    '/home/zkarpinski': {
       type: 'folder',
-      children: ['TODO.txt', 'My Resume.doc'],
+      children: ['Desktop', 'Documents'],
     },
-    'C:\\Windows\\Desktop\\TODO.txt': {
+    '/home/zkarpinski/Desktop': {
+      type: 'folder',
+      children: ['TODO.txt', 'My Resume.pdf'],
+    },
+    '/home/zkarpinski/Desktop/TODO.txt': {
       type: 'file',
       content: DEFAULT_TODO_CONTENT,
     },
-    'C:\\Windows\\Desktop\\My Resume.doc': {
+    '/home/zkarpinski/Desktop/My Resume.pdf': {
       type: 'file',
-      contentKey: 'resume',
+      contentKey: 'resume-pdf',
     },
-    'C:\\Windows\\System': { type: 'folder', children: [] },
-    'C:\\Windows\\Temp': { type: 'folder', children: [] },
-    'C:\\Windows\\Fonts': { type: 'folder', children: [] },
-    'C:\\My Documents': {
+    '/home/zkarpinski/Documents': {
       type: 'folder',
-      children: ['My Resume.doc'],
+      children: ['My Resume.pdf'],
     },
-    'C:\\My Documents\\My Resume.doc': {
+    '/home/zkarpinski/Documents/My Resume.pdf': {
       type: 'file',
-      contentKey: 'resume',
+      contentKey: 'resume-pdf',
     },
+    '/tmp': { type: 'folder', children: [] },
   };
 
   const appsWithStart = registryRef.filter(
     (a) => a.startMenu && typeof a.startMenu === 'object' && Array.isArray(a.startMenu.path),
   );
-  if (!tree['C:\\Program Files']) {
-    tree['C:\\Program Files'] = { type: 'folder', children: [] };
+  if (!tree['/opt']) {
+    tree['/opt'] = { type: 'folder', children: [] };
   }
   for (const app of appsWithStart) {
     const menu = app.startMenu && typeof app.startMenu === 'object' ? app.startMenu : null;
@@ -124,14 +134,14 @@ function buildDefaultTree(): FsTree {
     const subPath = menu.path.slice(1);
     let current = PROGRAM_FILES_BASE;
     for (const segment of subPath) {
-      const next = current + '\\' + segment;
+      const next = joinPath(current, segment);
       if (!tree[next]) tree[next] = { type: 'folder', children: [] };
       const folder = tree[current] as FolderNode;
       if (!folder.children.includes(segment)) folder.children.push(segment);
       current = next;
     }
     const appChildName = app.id;
-    const appPath = current + '\\' + appChildName;
+    const appPath = joinPath(current, appChildName);
     tree[appPath] = {
       type: 'app',
       appId: app.id,
@@ -212,26 +222,14 @@ export function listDir(path: string): DirEntry[] {
   return entries;
 }
 
-/** Drives shown at "My Computer" root. */
+/** Root entries for “My Computer” (single filesystem root on KarpOS). */
 export function getDrives(): DirEntry[] {
   return [
     {
-      name: '3½ Floppy (A:)',
-      path: 'A:\\',
+      name: 'File System',
+      path: '/',
       type: 'folder',
-      node: { type: 'folder', children: [] },
-    },
-    {
-      name: 'Local Disk (C:)',
-      path: 'C:\\',
-      type: 'folder',
-      node: getNode('C:\\') ?? { type: 'folder', children: [] },
-    },
-    {
-      name: 'CD-ROM Drive (D:)',
-      path: 'D:\\',
-      type: 'folder',
-      node: { type: 'folder', children: [] },
+      node: getNode('/') ?? { type: 'folder', children: [] },
     },
   ];
 }
@@ -252,6 +250,12 @@ export function getAppIcon(appId: string): string {
   return app?.icon ?? 'shell/icons/executable-0.png';
 }
 
+function basename(path: string): string {
+  const n = normalizePath(path);
+  const parts = n.split('/').filter(Boolean);
+  return parts.length ? parts[parts.length - 1]! : n;
+}
+
 /**
  * Open a file or app by path: app nodes launch the app; files open by extension via sessionStorage.
  */
@@ -263,7 +267,7 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
     return;
   }
   if (node.type !== 'file') return;
-  const name = path.split('\\').pop() ?? path;
+  const name = basename(path);
   const ext = getExtension(name);
   if (!ext) return;
   const appId = EXTENSION_TO_APP[ext];
@@ -283,6 +287,16 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
           JSON.stringify({ documentKey: node.contentKey ?? 'resume' }),
         );
         break;
+      case 'pdf-reader':
+        sessionStorage.setItem(
+          PDF_READER_PENDING_KEY,
+          JSON.stringify({
+            filename: name,
+            path,
+            pdfUrl: node.contentKey ? PDF_CONTENT_KEY_TO_URL[node.contentKey] : undefined,
+          }),
+        );
+        break;
       default:
         return;
     }
@@ -297,10 +311,14 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
  */
 export function writeFile(path: string, content: string): void {
   const normalized = normalizePath(path);
-  const tree = loadTree();
-  const name = normalized.split('\\').pop() ?? '';
-  const parent = normalized.slice(0, -(name.length + 1));
+  if (!normalized || normalized === '/') return;
 
+  const parts = normalized.split('/').filter(Boolean);
+  const name = parts.pop();
+  if (!name) return;
+  const parent = parts.length ? '/' + parts.join('/') : '/';
+
+  const tree = loadTree();
   const parentNode = tree[parent];
   if (!parentNode || parentNode.type !== 'folder') return;
 
@@ -318,9 +336,13 @@ export function writeFile(path: string, content: string): void {
  */
 export function createFolder(path: string): void {
   const normalized = normalizePath(path);
+  if (!normalized || normalized === '/') return;
   if (getNode(normalized)) return;
-  const name = normalized.split('\\').pop() ?? '';
-  const parent = normalized.slice(0, -(name.length + 1));
+
+  const parts = normalized.split('/').filter(Boolean);
+  const name = parts.pop();
+  if (!name) return;
+  const parent = parts.length ? '/' + parts.join('/') : '/';
 
   const tree = loadTree();
   const parentNode = tree[parent];
@@ -339,12 +361,16 @@ export function createFolder(path: string): void {
  */
 export function deletePath(path: string): void {
   const normalized = normalizePath(path);
+  if (!normalized || normalized === '/') return;
+
   const node = getNode(normalized);
   if (!node) return;
 
   const tree = loadTree();
-  const name = normalized.split('\\').pop() ?? '';
-  const parent = normalized.slice(0, -(name.length + 1));
+  const parts = normalized.split('/').filter(Boolean);
+  const name = parts.pop();
+  if (!name) return;
+  const parent = parts.length ? '/' + parts.join('/') : '/';
 
   if (parent && tree[parent]?.type === 'folder') {
     const parentNode = tree[parent];

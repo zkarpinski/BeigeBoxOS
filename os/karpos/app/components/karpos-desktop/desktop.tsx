@@ -8,8 +8,8 @@ import { AppWindow, TitleBar, KarpGlobalShim } from '../karpos-shell';
 import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { AimWindow } from '@win98/components/apps/aim';
-import { MinesweeperWindow } from '@win98/components/apps/minesweeper';
-import { CalculatorWindow } from '@win98/components/apps/calculator';
+import { MinesweeperWindow } from '@retro-web/app-minesweeper';
+import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PaintWindow } from '@win98/components/apps/paint';
 import { MsDosWindow } from '@win98/components/apps/msdos';
 import { WinampWindow } from '@win98/components/apps/winamp';
@@ -20,6 +20,7 @@ import { DefragWindow } from '@win98/components/apps/defrag';
 import { Vb6Window } from '@win98/components/apps/vb6';
 import { ControlPanelWindow } from '@win98/components/apps/controlpanel';
 import { MyComputerWindow } from '@win98/components/apps/mycomputer';
+import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { Thps2Window } from '@win98/components/apps/thps2/Thps2Window';
 import { TimWindow } from '@win98/components/apps/the_incredible_machine/TimWindow';
 import { PhotoshopWindow } from '@win98/components/apps/photoshop';
@@ -87,8 +88,8 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
         <WordWindow />
         <NotepadWindow />
         <AimWindow />
-        <MinesweeperWindow />
-        <CalculatorWindow />
+        <MinesweeperWindow skin="karpos" />
+        <CalculatorWindow skin="karpos" />
         <PaintWindow />
         <MsDosWindow />
         <WinampWindow />
@@ -99,6 +100,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
         <Vb6Window />
         <ControlPanelWindow />
         <MyComputerWindow />
+        <PdfReaderWindow />
         <Thps2Window />
         <TimWindow />
         <PhotoshopWindow />
@@ -110,7 +112,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
 
         <DesktopIcons registry={appRegistry} />
         <KarposTaskbar registry={appRegistry} />
-        <ShellOverlays />
+        <ShellOverlays showDesktopContextMenu={false} />
       </OsShellProvider>
     </WindowManagerProvider>
   );

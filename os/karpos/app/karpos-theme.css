@@ -45,22 +45,87 @@ body.karpos-desktop {
   background-size: 24px 24px;
 }
 
-/* Desktop icons */
-body.karpos-desktop #desktop-icons .desktop-icon {
+/* Desktop icons — rounded neo-brutalist tiles (palette + hash: karposNeoTileColors) */
+body.karpos-desktop #desktop-icons {
+  gap: 14px;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile {
+  width: 96px;
+  padding: 0;
+  margin: 0;
+  border: 3px solid var(--karp-black);
+  border-radius: 14px;
+  box-sizing: border-box;
+  box-shadow: 5px 5px 0 var(--karp-black);
+  overflow: hidden;
+  transition:
+    transform 0.07s ease,
+    box-shadow 0.07s ease;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--karp-black);
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile.selected {
+  box-shadow:
+    0 0 0 3px var(--karp-black),
+    7px 7px 0 var(--karp-yellow);
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 10px 8px 4px;
+  box-sizing: border-box;
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__img {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  object-fit: contain !important;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+  filter: none !important;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+body.karpos-desktop
+  #desktop-icons
+  .desktop-icon.karpos-desktop-tile.selected
+  .karpos-desktop-tile__img {
+  filter: none !important;
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__label {
+  display: block;
+  margin: 0;
+  padding: 4px 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
   color: var(--karp-black);
-  text-shadow: 1px 1px 0 #fff;
-  font-weight: 700;
-  font-size: 12px;
+  text-shadow: none;
+  word-break: break-word;
+  font-family: inherit;
 }
 
-body.karpos-desktop #desktop-icons .desktop-icon.selected span {
-  background: var(--karp-yellow);
-  border: var(--karp-border);
-  box-shadow: var(--karp-shadow-sm);
-}
-
-body.karpos-desktop #desktop-icons .desktop-icon img {
-  filter: drop-shadow(2px 2px 0 var(--karp-black));
+body.karpos-desktop
+  #desktop-icons
+  .desktop-icon.karpos-desktop-tile.selected
+  .karpos-desktop-tile__label {
+  background: transparent;
+  outline: none;
+  color: var(--karp-black);
 }
 
 /* Taskbar */
@@ -122,16 +187,76 @@ body.karpos-desktop .karpos-apps-launcher.active {
   box-shadow: 2px 2px 0 var(--karp-cyan);
 }
 
-body.karpos-desktop .taskbar-task {
-  border: var(--karp-border);
-  box-shadow: var(--karp-shadow-sm);
-  background: var(--karp-paper);
-  font-weight: 700;
-  border-radius: 0;
+/* Open-window chips — icon only; color from hash (see KarposTaskbarTasks) */
+body.karpos-desktop .karpos-taskbar-tasks {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
-body.karpos-desktop .taskbar-task.active {
-  background: var(--karp-pink);
+body.karpos-desktop .karpos-taskbar-chip {
+  display: inline-flex;
+  line-height: 0;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 3px solid var(--karp-black);
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--karp-black);
+  transition:
+    transform 0.07s ease,
+    box-shadow 0.07s ease;
+}
+
+body.karpos-desktop .karpos-taskbar-chip:hover {
+  filter: brightness(1.03);
+}
+
+body.karpos-desktop .karpos-taskbar-chip:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--karp-black);
+}
+
+body.karpos-desktop .karpos-taskbar-chip--focused {
+  box-shadow: 5px 5px 0 var(--karp-pink);
+  outline: 2px solid var(--karp-black);
+  outline-offset: 0;
+}
+
+body.karpos-desktop .karpos-taskbar-chip--focused:active {
+  box-shadow: 2px 2px 0 var(--karp-pink);
+}
+
+body.karpos-desktop .karpos-taskbar-chip__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 30px;
+  box-sizing: border-box;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(10, 10, 10, 0.08) 0px,
+    rgba(10, 10, 10, 0.08) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+}
+
+body.karpos-desktop .karpos-taskbar-chip__inner img {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+  filter: drop-shadow(1px 1px 0 var(--karp-black));
 }
 
 /* System tray — drop Win98 “inset well”; keep tray open on lime */
@@ -453,12 +578,22 @@ body.karpos-desktop .karp-app-window.app-window::before {
   z-index: 0;
 }
 
-body.karpos-desktop .karp-app-window.app-window > * {
+/* Exclude resize grip — it must stay position:absolute (bottom-right). */
+body.karpos-desktop .karp-app-window.app-window > *:not(.win-resize-grip) {
   position: relative;
   z-index: 1;
 }
 
-body.karpos-desktop .karp-app-window.maximized {
+/* Maximize: inline left/top/width/height are cleared in AppWindow — fill viewport above taskbar */
+body.karpos-desktop .karp-app-window.app-window.maximized {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100dvh - 52px) !important;
+  max-height: calc(100dvh - 52px) !important;
+  max-width: 100vw !important;
+  transform: none !important;
   box-shadow: none;
 }
 
@@ -607,6 +742,10 @@ body.karpos-desktop .karp-chrome-btn:active {
 
 /* Resize grip — chunky diagonal hatch, not Win98 pixel dots */
 body.karpos-desktop .win-resize-grip {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  z-index: 12 !important;
   width: 20px !important;
   height: 20px !important;
   background-color: var(--karp-yellow);

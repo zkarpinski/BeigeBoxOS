@@ -8,6 +8,7 @@ import { writeFile } from '../../fileSystem';
 import { AimWindow } from '../apps/aim';
 import { MinesweeperWindow } from '../apps/minesweeper';
 import { CalculatorWindow } from '../apps/calculator';
+import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { PaintWindow } from '../apps/paint';
 import { MsDosWindow } from '../apps/msdos';
 import { WinampWindow } from '../apps/winamp';
@@ -191,6 +192,7 @@ export function Desktop({ openAppId }: DesktopProps) {
         <AimWindow />
         <MinesweeperWindow />
         <CalculatorWindow />
+        <PdfReaderWindow />
         <PaintWindow />
         <MsDosWindow />
         <WinampWindow />

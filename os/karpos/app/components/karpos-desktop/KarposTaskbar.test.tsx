@@ -8,12 +8,12 @@ import { WindowManagerProvider } from '@retro-web/core/context';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { KarposTaskbar } from './KarposTaskbar';
 
-jest.mock('@win98/components/shell/taskbar/TaskbarTasks', () => ({
-  TaskbarTasks: () => <div data-testid="taskbar-tasks" />,
+jest.mock('./KarposTaskbarTasks', () => ({
+  KarposTaskbarTasks: () => <div data-testid="taskbar-tasks" />,
 }));
 
-jest.mock('@win98/components/shell/taskbar/SystemTray', () => ({
-  SystemTray: () => <div data-testid="system-tray" />,
+jest.mock('./KarposSystemTray', () => ({
+  KarposSystemTray: () => <div data-testid="system-tray" />,
 }));
 
 const testRegistry: AppConfig[] = [

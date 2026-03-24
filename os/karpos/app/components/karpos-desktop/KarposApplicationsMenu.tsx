@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { useWindowManager } from '@retro-web/core/context';
-const FOLDER_ICON = '/shell/icons/directory.png';
+const FOLDER_ICON = '/karpos/folder-icon.png';
 
 export type KarposApplicationsMenuProps = {
   registry: AppConfig[];

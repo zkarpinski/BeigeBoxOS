@@ -20,7 +20,11 @@ const BG = { r: 12, g: 12, b: 14, alpha: 1 };
 const logoPath = join(ROOT, 'os/karpos/public/android-chrome-512x512.png');
 
 function escapeXml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function frameAndTextSvg({ title, line2, line3 }) {

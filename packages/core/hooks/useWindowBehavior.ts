@@ -5,6 +5,12 @@ import { useRef, useEffect } from 'react';
 const MIN_W = 320;
 const MIN_H = 200;
 
+/** Win98 taskbar ~28px; KarpOS dock ~52px — keeps resize below the bar */
+function taskbarReservePx(): number {
+  if (typeof document === 'undefined') return 28;
+  return document.body.classList.contains('karpos-desktop') ? 52 : 28;
+}
+
 interface Bounds {
   left: number;
   top: number;
@@ -179,7 +185,7 @@ export function useWindowBehavior({
 
       const onMove = (x: number, y: number) => {
         const maxW = window.innerWidth - rect.left;
-        const maxH = window.innerHeight - 28 - rect.top;
+        const maxH = window.innerHeight - taskbarReservePx() - rect.top;
         let newW = startW + (x - startX);
         let newH = startH + (y - startY);
         newW = Math.max(MIN_W, Math.min(newW, maxW));

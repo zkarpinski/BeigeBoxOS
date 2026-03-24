@@ -8,7 +8,7 @@ import { AppWindow, TitleBar, KarpGlobalShim } from '../karpos-shell';
 import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { AimWindow } from '@win98/components/apps/aim';
-import { MinesweeperWindow } from '@win98/components/apps/minesweeper';
+import { MinesweeperWindow } from '@retro-web/app-minesweeper';
 import { CalculatorWindow } from '@win98/components/apps/calculator';
 import { PaintWindow } from '@win98/components/apps/paint';
 import { MsDosWindow } from '@win98/components/apps/msdos';
@@ -87,7 +87,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
         <WordWindow />
         <NotepadWindow />
         <AimWindow />
-        <MinesweeperWindow />
+        <MinesweeperWindow skin="karpos" />
         <CalculatorWindow />
         <PaintWindow />
         <MsDosWindow />

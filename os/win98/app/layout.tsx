@@ -19,7 +19,7 @@ import './components/apps/aim/aim.css';
 import './components/apps/navigator/navigator.css';
 import './components/apps/winamp/winamp.css';
 // Notepad styles come from @retro-web/core via NotepadContent
-import './components/apps/minesweeper/minesweeper.css';
+import '@retro-web/app-minesweeper/themes/win98.css';
 import './components/apps/paint/paint.css';
 import './components/apps/the_incredible_machine/tim.css';
 import './components/apps/calculator/calculator.css';

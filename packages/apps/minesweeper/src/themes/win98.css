@@ -24,6 +24,14 @@
   display: none !important;
 }
 
+/* Inner shell: menu + board (see MinesweeperWindow — dialogs are siblings for full-window overlays) */
+.minesweeper-app {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Menu bar */
 .minesweeper-menu-bar {
   display: flex;
@@ -66,6 +74,11 @@
 
 .minesweeper-menu-item:hover .minesweeper-menu-dropdown {
   display: block;
+}
+
+/* After a command is chosen, hide dropdowns until pointer leaves the menu bar (see MinesweeperMenuBar). */
+.minesweeper-menu-bar.minesweeper-menus-dismissed .minesweeper-menu-dropdown {
+  display: none !important;
 }
 
 .minesweeper-dropdown-item {
@@ -246,9 +259,27 @@
   color: gray;
 }
 
-/* Icons */
+/* Icons — flagged mine: bold red dot (visible on all skins; scales with --ms-cell-size) */
 .ms-cell.flag {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAUklEQVQoU2NgQIA/CjL/0QWZGBgYGKEsEhiIDzCia8QniE0zNjXIZtMkhksNskm41DAlTJMwDQx4nEZzGjGagYGBgWE+A0M0zHwwI/qGkIhhAAAEzSkx/oX1aQAAAABJRU5ErkJggg==');
+  position: relative;
+  background-image: none;
+}
+
+.ms-cell.flag::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--ms-cell-size, 16px) * 0.45);
+  height: calc(var(--ms-cell-size, 16px) * 0.45);
+  min-width: 5px;
+  min-height: 5px;
+  border-radius: 50%;
+  background: #c40000;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
 .ms-cell.mine {

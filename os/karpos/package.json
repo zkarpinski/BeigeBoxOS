@@ -11,6 +11,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@retro-web/app-minesweeper": "workspace:*",
     "@retro-web/app-winamp": "workspace:*",
     "@retro-web/core": "workspace:*",
     "@supabase/supabase-js": "^2.99.1",

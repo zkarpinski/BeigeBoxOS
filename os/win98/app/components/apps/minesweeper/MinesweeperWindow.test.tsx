@@ -4,9 +4,8 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MinesweeperWindow, minesweeperAppConfig } from './MinesweeperWindow';
+import { MinesweeperWindow, minesweeperAppConfig, addScore } from '@retro-web/app-minesweeper';
 import { Win98TestProviders } from '../../../../test/test-utils';
-import { addScore } from './leaderboard';
 
 const STORAGE_KEY = 'minesweeper-leaderboard';
 

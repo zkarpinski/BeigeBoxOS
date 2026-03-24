@@ -17,7 +17,8 @@ import '../../win98/app/components/apps/napster/napster.css';
 import '../../win98/app/components/apps/aim/aim.css';
 import '../../win98/app/components/apps/navigator/navigator.css';
 import '../../win98/app/components/apps/winamp/winamp.css';
-import '../../win98/app/components/apps/minesweeper/minesweeper.css';
+import '@retro-web/app-minesweeper/themes/win98.css';
+import '@retro-web/app-minesweeper/themes/karpos.css';
 import '../../win98/app/components/apps/paint/paint.css';
 import '../../win98/app/components/apps/the_incredible_machine/tim.css';
 import '../../win98/app/components/apps/calculator/calculator.css';
@@ -34,8 +35,6 @@ import '../../win98/app/components/apps/avg/avg.css';
 import '../../win98/app/components/apps/aol/aol.css';
 import './karpos-theme.css';
 import './karpos-app-brutal.css';
-import './minesweeper-karpos.css';
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://karpos.zkarpinski.com'),
   title: 'KarpOS | Zachary Karpinski',

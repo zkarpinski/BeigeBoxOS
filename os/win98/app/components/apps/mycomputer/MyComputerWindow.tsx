@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, useOsShell } from '@retro-web/core/context';
 import {
   getDrives,
   listDir,
@@ -58,6 +57,7 @@ export function MyComputerWindow() {
   const [histPos, setHistPos] = useState(0);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const ctx = useWindowManager();
+  const { AppWindow, TitleBar } = useOsShell();
 
   const currentPath = pathHistory[histPos];
   const isRoot = currentPath === '';

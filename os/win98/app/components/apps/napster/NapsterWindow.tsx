@@ -4,8 +4,8 @@
 // Not yet importing from @retro-web/app-napster.
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@retro-web/core/types/app-config';
+import { useOsShell } from '@retro-web/core/context';
 
 export const napsterAppConfig: AppConfig = {
   id: 'napster',
@@ -234,6 +234,7 @@ function spotifyUrl(item: { rawArtist: string; rawTitle: string }): string {
 }
 
 export function NapsterWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [activeTab, setActiveTab] = useState('search');
   const [artistQuery, setArtistQuery] = useState('*NSYNC');
   const [titleQuery, setTitleQuery] = useState('');

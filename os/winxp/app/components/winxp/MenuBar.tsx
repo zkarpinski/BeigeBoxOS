@@ -1,36 +1,13 @@
 'use client';
 
 import React from 'react';
+import type { MenuBarProps } from '@retro-web/core/types/os-shell';
 
-export interface MenuDropdownItem {
-  id?: string;
-  label?: string;
-  /** Character to underline in label (e.g. 'N' for "New") */
-  shortcutChar?: string;
-  shortcut?: string;
-  divider?: boolean;
-  onClick?: () => void;
-}
-
-export interface MenuItemConfig {
-  label: string;
-  /** Character to underline (e.g. 'F' for "File") */
-  shortcutChar?: string;
-  dropdown?: MenuDropdownItem[];
-}
-
-export interface MenuBarProps {
-  items: MenuItemConfig[];
-  /** Base class for the menu bar (e.g. 'notepad-menu-bar') */
-  className?: string;
-  /** Class for each menu item (e.g. 'notepad-menu-item') */
-  itemClassName?: string;
-  /** Class for dropdown container (e.g. 'notepad-menu-dropdown') */
-  dropdownClassName?: string;
-  /** Class for dropdown item (e.g. 'notepad-dropdown-item') */
-  dropdownItemClassName?: string;
-  dividerClassName?: string;
-}
+export type {
+  MenuDropdownItem,
+  MenuItemConfig,
+  MenuBarProps,
+} from '@retro-web/core/types/os-shell';
 
 function formatLabel(label: string, shortcutChar?: string): React.ReactNode {
   if (!shortcutChar) return label;

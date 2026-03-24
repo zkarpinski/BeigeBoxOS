@@ -1,0 +1,12 @@
+{
+  "name": "Zach Karpinski — zkarpinski.com",
+  "short_name": "ZK",
+  "description": "Personal website of Zach Karpinski (Zachary Karpinski). KarpOS and retro web desktops.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "lang": "en-US",
+  "icons": []
+}

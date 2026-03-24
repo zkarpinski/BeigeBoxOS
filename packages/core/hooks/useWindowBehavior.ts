@@ -36,7 +36,9 @@ export interface UseWindowBehaviorResult {
    * Currently 'se' is wired via the .win-resize-grip element in the useEffect.
    * Other edges are no-ops until implemented.
    */
-  getResizeHandler: (edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') => (e: React.MouseEvent) => void;
+  getResizeHandler: (
+    edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw',
+  ) => (e: React.MouseEvent) => void;
 }
 
 /**
@@ -62,7 +64,6 @@ export function useWindowBehavior({
   maximizedClass = 'maximized',
   allowResize = false,
 }: UseWindowBehaviorOptions): UseWindowBehaviorResult {
-
   const windowRef = useRef<HTMLDivElement>(null);
   const setBoundsRef = useRef(setBounds);
   setBoundsRef.current = setBounds;
@@ -149,7 +150,9 @@ export function useWindowBehavior({
     };
 
     titleBarEl.addEventListener('mousedown', onTitleMouseDown as EventListener);
-    titleBarEl.addEventListener('touchstart', onTitleTouchStart as EventListener, { passive: false });
+    titleBarEl.addEventListener('touchstart', onTitleTouchStart as EventListener, {
+      passive: false,
+    });
 
     return () => {
       titleBarEl.removeEventListener('mousedown', onTitleMouseDown as EventListener);
@@ -245,8 +248,7 @@ export function useWindowBehavior({
   // maps to the bottom-right corner resize (the grip element). Other edges are
   // provided for API completeness but are no-ops until implemented.
   const getResizeHandler =
-    (_edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') =>
-    (_e: React.MouseEvent) => {
+    (_edge: 'se' | 'e' | 's' | 'sw' | 'w' | 'n' | 'ne' | 'nw') => (_e: React.MouseEvent) => {
       // TODO: implement per-edge resize if needed.
       // The 'se' resize is already handled via the .win-resize-grip element in the useEffect above.
     };

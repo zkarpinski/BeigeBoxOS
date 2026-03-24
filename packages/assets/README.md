@@ -10,5 +10,6 @@ Each OS copies the relevant assets into its own `public/shell/` directory at bui
 Until a copy script is added, keep these in sync manually when updating shared assets.
 
 ## Contents
+
 - icons/ — Common shell icons (folder, drive, recycle bin, etc.)
 - sounds/ — System sounds (startup, shutdown, error, notify)

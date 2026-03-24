@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AppWindow, TitleBar } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
+import { useOsShell } from '@retro-web/core/context';
 
 export const zonealarmAppConfig: AppConfig = {
   id: 'zonealarm',
@@ -421,6 +421,7 @@ function EmailSection() {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function ZonealarmWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [section, setSection] = useState<NavSection>('firewall');
   const [fwTab, setFwTab] = useState<FirewallTab>('main');
   const [active, setActive] = useState(true);

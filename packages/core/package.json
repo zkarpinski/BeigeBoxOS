@@ -29,10 +29,20 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*.test.tsx"],
-    "setupFilesAfterEnv": ["<rootDir>/test/setup.ts"],
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/test/**/*.test.tsx"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setup.ts"
+    ],
     "transform": {
-      "\\.(ts|tsx)$": ["ts-jest", {"tsconfig": "<rootDir>/tsconfig.jest.json"}],
+      "\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": "<rootDir>/tsconfig.jest.json"
+        }
+      ],
       "\\.css$": "<rootDir>/test/cssTransform.js"
     },
     "moduleNameMapper": {

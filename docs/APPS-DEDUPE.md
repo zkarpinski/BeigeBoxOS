@@ -14,13 +14,13 @@
 
 ## Next high-impact steps
 
-| Priority | Action |
-|----------|--------|
-| 1 | **Minesweeper** — Move `MinesweeperLogic.ts` (+ tests) to `packages/core` or `@retro-web/app-minesweeper`; OS folders only keep `MinesweeperWindow` + assets. |
-| 2 | **AIM / Napster / Winamp** — Finish `packages/apps/*` exports and replace fat copies in each OS with `<AimApp />` etc. inside chrome. |
-| 3 | **One `WindowManagerContext`** — Delete per-OS copies; import from `@retro-web/core/context` everywhere. |
-| 4 | **Layouts** — Drop duplicate global CSS imports for any app whose styles are pulled in by core/app packages (Win98 can drop `paint.css` / `calculator.css` imports too if unused). |
-| 5 | **Tests** — Prefer **one** test suite in `packages/core` for pure logic; OS packages only test shell integration (optional). Align Jest `testMatch` so co-located `*.test.tsx` run where needed. |
+| Priority | Action                                                                                                                                                                                           |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1        | **Minesweeper** — Move `MinesweeperLogic.ts` (+ tests) to `packages/core` or `@retro-web/app-minesweeper`; OS folders only keep `MinesweeperWindow` + assets.                                    |
+| 2        | **AIM / Napster / Winamp** — Finish `packages/apps/*` exports and replace fat copies in each OS with `<AimApp />` etc. inside chrome.                                                            |
+| 3        | **One `WindowManagerContext`** — Delete per-OS copies; import from `@retro-web/core/context` everywhere.                                                                                         |
+| 4        | **Layouts** — Drop duplicate global CSS imports for any app whose styles are pulled in by core/app packages (Win98 can drop `paint.css` / `calculator.css` imports too if unused).               |
+| 5        | **Tests** — Prefer **one** test suite in `packages/core` for pure logic; OS packages only test shell integration (optional). Align Jest `testMatch` so co-located `*.test.tsx` run where needed. |
 
 ## Why duplication happened
 

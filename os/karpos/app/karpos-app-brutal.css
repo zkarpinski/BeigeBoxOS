@@ -1,0 +1,340 @@
+/**
+ * KarpOS — app chrome overrides (load LAST).
+ * Strips Win98 inset/outset/bevel from shared app CSS so internals read neo-brutalist.
+ */
+
+/* Title bar text must never inherit Win98 white-on-blue */
+body.karpos-desktop .title-bar.karp-title-bar,
+body.karpos-desktop .title-bar.karp-title-bar .title-text,
+body.karpos-desktop .title-bar.karp-title-bar .title-bar-text {
+  color: #0a0a0a !important;
+}
+
+/* ── Win98 border utilities — flat color blocks + offset shadow, no 3D bevel ── */
+body.karpos-desktop .win-border-outset {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+}
+
+body.karpos-desktop .win-border-inset {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+}
+
+/* ── Shared menu bar (Word, etc.) ── */
+body.karpos-desktop .menu-bar {
+  border-top: 3px solid #0a0a0a !important;
+  border-bottom: 3px solid #0a0a0a !important;
+  background: #fef9c3 !important;
+  height: auto !important;
+  min-height: 28px;
+}
+
+body.karpos-desktop .menu-title:hover,
+body.karpos-desktop .menu-title:focus {
+  background: #fb64b6 !important;
+  color: #0a0a0a !important;
+}
+
+body.karpos-desktop .menu-dropdown {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 6px 6px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+  border-radius: 0 !important;
+}
+
+body.karpos-desktop .menu-dropdown-item:hover {
+  background: #22d3ee !important;
+  color: #0a0a0a !important;
+}
+
+/* ── Shared toolbar (Word, VB6, …) ── */
+body.karpos-desktop .toolbar-row {
+  border-top: 2px solid #0a0a0a !important;
+  border-bottom: 3px solid #0a0a0a !important;
+  background: #e0f2fe !important;
+  height: auto !important;
+  min-height: 32px;
+}
+
+body.karpos-desktop .toolbar-gripper {
+  border: 2px solid #0a0a0a !important;
+  background: repeating-linear-gradient(90deg, #fde047 0 3px, #0a0a0a 3px 6px) !important;
+  box-shadow: 2px 2px 0 #0a0a0a !important;
+}
+
+body.karpos-desktop .tb-btn:hover {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+  background: #fff !important;
+}
+
+body.karpos-desktop .tb-btn:active,
+body.karpos-desktop .tb-btn.active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #0a0a0a !important;
+  background: #fbcfe8 !important;
+}
+
+body.karpos-desktop .tb-sep {
+  width: 3px !important;
+  background: #0a0a0a !important;
+  border: none !important;
+  box-shadow: none !important;
+  opacity: 0.35;
+}
+
+body.karpos-desktop .tb-select {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+  background: #fff !important;
+  height: 26px !important;
+}
+
+/* ── Navigator: root shares .nav-window with AppWindow — kill faux Win98 frame ── */
+body.karpos-desktop .karp-app-window.nav-window {
+  border: 4px solid #0a0a0a !important;
+  box-shadow: 12px 12px 0 #0a0a0a !important;
+  background-color: #fffef8 !important;
+  font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif !important;
+}
+
+body.karpos-desktop .nav-menu-bar {
+  background: #fef9c3 !important;
+  border-bottom: 3px solid #0a0a0a !important;
+  height: auto !important;
+  min-height: 32px;
+  padding: 4px 6px !important;
+}
+
+body.karpos-desktop .nav-menu-item {
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 10px !important;
+  border: 2px solid transparent;
+  border-radius: 0;
+}
+
+body.karpos-desktop .nav-menu-item:hover,
+body.karpos-desktop .nav-menu-item.active {
+  background: #22d3ee !important;
+  color: #0a0a0a !important;
+  border-color: #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+}
+
+body.karpos-desktop .nav-menu-dropdown {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 8px 8px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+  border-radius: 0 !important;
+}
+
+body.karpos-desktop .nav-menu-dropdown-item:hover {
+  background: #fbcfe8 !important;
+  color: #0a0a0a !important;
+}
+
+body.karpos-desktop .nav-menu-divider {
+  height: 3px !important;
+  background: #0a0a0a !important;
+  opacity: 0.35;
+  box-shadow: none !important;
+  margin: 6px 8px !important;
+}
+
+body.karpos-desktop .nav-toolbar-row {
+  background: #e0f2fe !important;
+  border-bottom: 3px solid #0a0a0a !important;
+}
+
+body.karpos-desktop .nav-grippy {
+  width: 12px !important;
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+  background: repeating-linear-gradient(to bottom, #fde047 0 4px, #0a0a0a 4px 8px) !important;
+  margin: 4px !important;
+}
+
+body.karpos-desktop .nav-btn {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+  border-radius: 0 !important;
+  min-width: 52px !important;
+}
+
+body.karpos-desktop .nav-btn:hover:not(:disabled) {
+  background: #fef9c3 !important;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #0a0a0a !important;
+  border: 3px solid #0a0a0a !important;
+}
+
+body.karpos-desktop .nav-btn:active:not(:disabled) {
+  transform: translate(3px, 3px) !important;
+  box-shadow: 1px 1px 0 #0a0a0a !important;
+  background: #fbcfe8 !important;
+}
+
+body.karpos-desktop .nav-menu-bar,
+body.karpos-desktop .nav-toolbar-row,
+body.karpos-desktop .nav-btn-label {
+  font-family: inherit !important;
+}
+
+body.karpos-desktop .nav-btn-label {
+  font-weight: 800 !important;
+  font-size: 9px !important;
+  letter-spacing: 0.04em;
+}
+
+body.karpos-desktop .nav-tb-sep {
+  width: 3px !important;
+  background: #0a0a0a !important;
+  box-shadow: none !important;
+  opacity: 0.35;
+}
+
+body.karpos-desktop .nav-url-input {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+  background: #fff !important;
+  height: 28px !important;
+  font-family: 'Space Mono', ui-monospace, monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em;
+}
+
+body.karpos-desktop .nav-bookmark-btn {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+  background: #fde047 !important;
+}
+
+body.karpos-desktop .nav-bookmark-btn:hover {
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+}
+
+body.karpos-desktop .nav-bookmark-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+body.karpos-desktop .nav-personal-btn {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 3px 3px 0 #0a0a0a !important;
+  background: #fff !important;
+  font-weight: 800 !important;
+  height: 26px !important;
+}
+
+body.karpos-desktop .nav-personal-btn:hover {
+  background: #22d3ee !important;
+}
+
+body.karpos-desktop .nav-personal-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+body.karpos-desktop .nav-content {
+  border-top: 3px solid #0a0a0a !important;
+  border-bottom: none !important;
+}
+
+body.karpos-desktop .nav-status-bar {
+  border-top: 3px solid #0a0a0a !important;
+  background: #bef264 !important;
+  height: auto !important;
+  min-height: 28px;
+  padding: 4px !important;
+}
+
+body.karpos-desktop .nav-status-text,
+body.karpos-desktop .nav-security-icon {
+  border: 2px solid #0a0a0a !important;
+  box-shadow: 2px 2px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+}
+
+body.karpos-desktop .nav-menu-bar u,
+body.karpos-desktop .nav-menu-dropdown u {
+  text-decoration: underline 2px solid #0a0a0a;
+  text-underline-offset: 2px;
+}
+
+/* ── Internet Explorer 5 window (same Win98 chrome patterns) ── */
+body.karpos-desktop .karp-app-window.ie5-window,
+body.karpos-desktop .ie5-window {
+  border: 4px solid #0a0a0a !important;
+  box-shadow: 12px 12px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+}
+
+body.karpos-desktop .ie5-menu-bar {
+  background: #fef9c3 !important;
+  border-bottom: 3px solid #0a0a0a !important;
+}
+
+body.karpos-desktop .ie5-menu-item:hover {
+  background: #22d3ee !important;
+  color: #0a0a0a !important;
+}
+
+body.karpos-desktop .ie5-menu-dropdown {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 8px 8px 0 #0a0a0a !important;
+}
+
+body.karpos-desktop .ie5-toolbar-row {
+  background: #e0f2fe !important;
+  border-top: 3px solid #0a0a0a !important;
+  border-bottom: 3px solid #0a0a0a !important;
+}
+
+body.karpos-desktop .ie5-grippy {
+  border: 2px solid #0a0a0a !important;
+  background: repeating-linear-gradient(90deg, #fde047 0 3px, #0a0a0a 3px 6px) !important;
+}
+
+body.karpos-desktop .ie5-menu-dropdown-item:not(.disabled):hover {
+  background: #fbcfe8 !important;
+  color: #0a0a0a !important;
+}
+
+body.karpos-desktop .ie5-btn:not(.disabled):hover {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+  background: #fffef8 !important;
+  padding: 2px 4px !important;
+}
+
+body.karpos-desktop .ie5-btn:not(.disabled):active,
+body.karpos-desktop .ie5-btn.active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #0a0a0a !important;
+  background: #fbcfe8 !important;
+}
+
+body.karpos-desktop .ie5-tb-sep {
+  width: 3px !important;
+  background: #0a0a0a !important;
+  border: none !important;
+  opacity: 0.35;
+}
+
+body.karpos-desktop .ie5-url-input-container {
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 4px 4px 0 #0a0a0a !important;
+  height: 26px !important;
+}
+
+body.karpos-desktop .ie5-status-bar {
+  border-top: 3px solid #0a0a0a !important;
+  background: #bef264 !important;
+}

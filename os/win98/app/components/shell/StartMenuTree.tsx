@@ -77,7 +77,8 @@ export function StartMenuTree({
     <div id="start-menu" className={menuOpen ? '' : 'hidden'} onClick={handleClick}>
       <div className="start-menu-sidebar">
         <span className="start-menu-title">
-          <b>Windows</b>98
+          <span className="sm-windows">Windows</span>
+          <span className="sm-version">98</span>
         </span>
       </div>
       <div className="start-menu-items">

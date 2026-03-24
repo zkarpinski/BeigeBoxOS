@@ -5,16 +5,16 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MinesweeperWindow, minesweeperAppConfig } from './MinesweeperWindow';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { Win98TestProviders } from '../../../../test/test-utils';
 import { addScore } from './leaderboard';
 
 const STORAGE_KEY = 'minesweeper-leaderboard';
 
 function renderMinesweeper() {
   return render(
-    <WindowManagerProvider registry={[minesweeperAppConfig]}>
+    <Win98TestProviders registry={[minesweeperAppConfig]}>
       <MinesweeperWindow />
-    </WindowManagerProvider>,
+    </Win98TestProviders>,
   );
 }
 

@@ -203,6 +203,11 @@ export function WindowManagerProvider({
   boundsStorageKey = 'retro-web-window-bounds',
   /** Default title when `openDialog` omits `title` (Win9x dialogs use "Windows"). */
   defaultDialogTitle = 'Windows',
+  /**
+   * When true (default), apps with `openByDefault` in the registry start visible.
+   * Set false for shells that should boot with a clear desktop (e.g. KarpOS); `initialOpenAppId` still opens that app.
+   */
+  applyOpenByDefault = true,
   children,
 }: {
   registry: AppConfig[];
@@ -210,13 +215,16 @@ export function WindowManagerProvider({
   initialOpenAppId?: string | null;
   boundsStorageKey?: string;
   defaultDialogTitle?: string;
+  applyOpenByDefault?: boolean;
   children: React.ReactNode;
 }) {
   // Initial state: no bounds (SSR-safe). Bounds are loaded client-side in useEffect below.
   const initialApps: AppsMap = {};
   const openingFromUrl = typeof initialOpenAppId === 'string' && initialOpenAppId.length > 0;
   for (const app of registry) {
-    const visible = openingFromUrl ? app.id === initialOpenAppId : !!app.openByDefault;
+    const visible = openingFromUrl
+      ? app.id === initialOpenAppId
+      : applyOpenByDefault && !!app.openByDefault;
     const isFocused = visible && (!openingFromUrl || app.id === initialOpenAppId);
     initialApps[app.id] = { visible, minimized: false, zIndex: isFocused ? Z_FOCUSED : Z_BASE };
   }
@@ -231,13 +239,14 @@ export function WindowManagerProvider({
     // If the window is small (e.g. mobile), hide apps that were open by default except for AIM
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
       if (openingFromUrl) return; // /run/[appId] should always open the requested app
+      if (!applyOpenByDefault) return;
       registry.forEach((app) => {
         if (app.openByDefault && app.id !== 'aim') {
           dispatch({ type: 'HIDE', id: app.id });
         }
       });
     }
-  }, [registry, openingFromUrl]);
+  }, [registry, openingFromUrl, applyOpenByDefault]);
 
   // Load persisted bounds from localStorage after mount (client-only, avoids SSR mismatch)
   useEffect(() => {

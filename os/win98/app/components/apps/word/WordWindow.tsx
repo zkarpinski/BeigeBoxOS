@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { AppWindow, TitleBar } from '../../win98';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, useOsShell } from '@retro-web/core/context';
 import type { AppConfig } from '@/app/types/app-config';
 import { sanitizeHTML } from './sanitizer';
 import { WORD_PENDING_KEY } from '@/app/fileSystem';
@@ -32,6 +31,7 @@ export const wordAppConfig: AppConfig = {
 
 export function WordWindow() {
   const { hideApp, apps } = useWindowManager();
+  const { AppWindow, TitleBar } = useOsShell();
   const wordVisible = apps.word?.visible;
 
   const editorRef = useRef<HTMLDivElement>(null);

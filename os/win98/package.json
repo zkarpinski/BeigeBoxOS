@@ -11,6 +11,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@retro-web/app-calculator": "workspace:*",
+    "@retro-web/app-minesweeper": "workspace:*",
     "@retro-web/app-winamp": "workspace:*",
     "@retro-web/core": "workspace:*",
     "@supabase/supabase-js": "^2.99.1",
@@ -55,15 +57,27 @@
     "setupFilesAfterEnv": [
       "<rootDir>/test/setup.js"
     ],
-    "moduleFileExtensions": ["js", "ts", "tsx"],
-    "testPathIgnorePatterns": ["/node_modules/"],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
     "transform": {
       "\\.(ts|tsx)$": [
         "ts-jest",
-        { "tsconfig": { "jsx": "react-jsx" } }
+        {
+          "tsconfig": {
+            "jsx": "react-jsx"
+          }
+        }
       ]
     },
-    "collectCoverageFrom": ["app/**/*.{ts,tsx,js}"],
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx,js}"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "\\.test\\.(ts|tsx|js)$",

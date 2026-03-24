@@ -1,0 +1,15 @@
+{
+  "extends": "@retro-web/config/tsconfig",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/app/virtual-fs": ["./app/virtual-fs.ts"],
+      "@/app/*": ["../win98/app/*"],
+      "@/*": ["./*"],
+      "@win98/*": ["../win98/app/*"]
+    },
+    "types": ["@testing-library/jest-dom"]
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

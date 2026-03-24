@@ -11,17 +11,21 @@
     "dev:win98": "pnpm --filter @retro-web/win98 dev",
     "dev:winxp": "pnpm --filter @retro-web/winxp dev",
     "dev:macosx": "pnpm --filter @retro-web/macosx dev",
+    "dev:karpos": "pnpm --filter @retro-web/karpos dev",
     "build": "turbo build",
     "build:win98": "turbo build --filter=@retro-web/win98",
     "build:winxp": "turbo build --filter=@retro-web/winxp",
     "build:macosx": "turbo build --filter=@retro-web/macosx",
+    "build:karpos": "turbo build --filter=@retro-web/karpos",
     "test": "turbo test",
     "test:win98": "pnpm --filter @retro-web/win98 test",
     "test:winxp": "pnpm --filter @retro-web/winxp test",
     "test:macosx": "pnpm --filter @retro-web/macosx test",
+    "test:karpos": "pnpm --filter @retro-web/karpos test",
     "lint": "turbo lint",
     "fmt": "prettier --write .",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "generate-og-images": "node scripts/generate-og-images.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -30,6 +34,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
+    "sharp": "^0.34.5",
     "turbo": "latest"
   }
 }

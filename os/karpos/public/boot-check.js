@@ -1,0 +1,1 @@
+../../win98/public/boot-check.js

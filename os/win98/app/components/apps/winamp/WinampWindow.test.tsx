@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { WinampWindow, winampAppConfig } from './WinampWindow';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { Win98TestProviders } from '../../../../test/test-utils';
 
 // jsdom doesn't implement HTMLMediaElement or canvas 2d context — stub them out
 beforeAll(() => {
@@ -35,9 +35,9 @@ afterEach(() => {
 function renderWinamp() {
   const config = { ...winampAppConfig, openByDefault: true };
   return render(
-    <WindowManagerProvider registry={[config]}>
+    <Win98TestProviders registry={[config]}>
       <WinampWindow />
-    </WindowManagerProvider>,
+    </Win98TestProviders>,
   );
 }
 

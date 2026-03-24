@@ -3,11 +3,12 @@
 import { useEffect, useMemo } from 'react';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
 import { OsShellProvider } from '@retro-web/core/context';
-import { AppWindow, TitleBar } from '../winxp';
+import { AppWindow, TitleBar, MenuBar } from '../winxp';
 import { writeFile } from '../../fileSystem';
 import { AimWindow } from '../apps/aim';
 import { MinesweeperWindow } from '../apps/minesweeper';
 import { CalculatorWindow } from '../apps/calculator';
+import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { PaintWindow } from '../apps/paint';
 import { MsDosWindow } from '../apps/msdos';
 import { WinampWindow } from '../apps/winamp';
@@ -173,7 +174,7 @@ export function Desktop({ openAppId }: DesktopProps) {
       boundsStorageKey="winxp-window-bounds"
     >
       <WindowsXPGlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, writeFile }}>
+      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
         {/* SEO content (visually hidden, crawlable) */}
         <div className="seo-intro" aria-hidden="true">
           <h1>Windows XP in the Browser</h1>
@@ -191,6 +192,7 @@ export function Desktop({ openAppId }: DesktopProps) {
         <AimWindow />
         <MinesweeperWindow />
         <CalculatorWindow />
+        <PdfReaderWindow />
         <PaintWindow />
         <MsDosWindow />
         <WinampWindow />

@@ -3,8 +3,8 @@
 // P2P client UI (mock search / transfers / library). Shared catalog: MOCK_STREAMING_SONGS.
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { AppWindow, TitleBar } from '../../winxp';
 import type { AppConfig } from '@retro-web/core/types/app-config';
+import { useOsShell } from '@retro-web/core/context';
 import {
   MOCK_STREAMING_SONGS,
   openSpotifyForTrack,
@@ -39,6 +39,9 @@ const SEARCH_CACHE = SONGS.map((s) => ({
   titleLower: s[1].toLowerCase(),
   song: s,
 }));
+
+const CATALOG_ARTISTS = [...new Set(SONGS.map((s) => s[0]))].sort().slice(0, 18);
+const CATALOG_ALBUMS = [...new Set(SONGS.map((s) => s[3]))].sort().slice(0, 14);
 
 const USERNAMES = [
   'mp3freak2003',
@@ -210,6 +213,7 @@ function doSearch(query: string): SearchResult[] {
 type MediaFilter = 'all' | 'audio' | 'programs' | 'video';
 
 export function LimeWireWindow() {
+  const { AppWindow, TitleBar } = useOsShell();
   const [activeTab, setActiveTab] = useState<'search' | 'monitor' | 'library'>('search');
   const [artistQuery, setArtistQuery] = useState('*NSYNC');
   const [titleQuery, setTitleQuery] = useState('');
@@ -225,12 +229,6 @@ export function LimeWireWindow() {
   const [selectedLibIdx, setSelectedLibIdx] = useState<number | null>(null);
   const [statusText, setStatusText] = useState('Connected to Gnutella: sharing 0 files.');
   const downloadIdRef = useRef(0);
-
-  const catalogArtists = useMemo(
-    () => [...new Set(SONGS.map((s) => s[0]))].sort().slice(0, 18),
-    [],
-  );
-  const catalogAlbums = useMemo(() => [...new Set(SONGS.map((s) => s[3]))].sort().slice(0, 14), []);
 
   const filteredResults = useMemo(() => {
     let r = results;
@@ -571,7 +569,7 @@ export function LimeWireWindow() {
             <section className="limewire-filter-section">
               <div className="lw-filter-header">Artist</div>
               <div className="lw-filter-scroll">
-                {catalogArtists.map((a) => (
+                {CATALOG_ARTISTS.map((a) => (
                   <button
                     key={a}
                     type="button"
@@ -586,7 +584,7 @@ export function LimeWireWindow() {
             <section className="limewire-filter-section">
               <div className="lw-filter-header">Album</div>
               <div className="lw-filter-scroll">
-                {catalogAlbums.map((g) => (
+                {CATALOG_ALBUMS.map((g) => (
                   <button
                     key={g}
                     type="button"

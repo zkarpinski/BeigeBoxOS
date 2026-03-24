@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { AppWindow, TitleBar, MenuBar } from '../../win98';
+import { AppWindow, TitleBar, MenuBar, type MenuItemConfig } from '../../win98';
 import type { AppConfig } from '@/app/types/app-config';
+import { useWindowManager } from '@retro-web/core/context';
 
 export const avgAppConfig: AppConfig = {
   id: 'avg',
@@ -14,18 +15,21 @@ export const avgAppConfig: AppConfig = {
   taskbarLabel: 'AVG Anti-Virus System',
 };
 
-const menuItems = [
+const getMenuItems = (hideApp: (appId: string) => void): MenuItemConfig[] => [
   {
     label: 'Program',
-    items: [{ label: 'Exit', action: () => console.log('Exit') }],
+    dropdown: [{ label: 'Exit', onClick: () => hideApp('avg') }],
   },
-  { label: 'Tests', items: [] },
-  { label: 'Results', items: [] },
-  { label: 'Service', items: [] },
-  { label: 'Help', items: [] },
+  { label: 'Tests', dropdown: [] },
+  { label: 'Results', dropdown: [] },
+  { label: 'Service', dropdown: [] },
+  { label: 'Help', dropdown: [] },
 ];
 
 export function AvgWindow() {
+  const { hideApp } = useWindowManager();
+  const menuItems = getMenuItems(hideApp);
+
   return (
     <AppWindow
       id="avg-window"
@@ -148,7 +152,7 @@ export function AvgWindow() {
               <div className="avg-btn-icon scheduler-icon"></div>
               <span>Scheduler</span>
             </button>
-            <button className="avg-bottom-btn">
+            <button className="avg-bottom-btn" onClick={() => hideApp('avg')}>
               <div className="avg-btn-icon exit-icon"></div>
               <span>Exit</span>
             </button>

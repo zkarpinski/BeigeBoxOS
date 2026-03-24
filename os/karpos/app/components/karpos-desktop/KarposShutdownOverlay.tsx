@@ -1,6 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+type PixelTile = {
+  id: number;
+  left: number;
+  top: number;
+  delayMs: number;
+};
 
 export function KarposShutdownOverlay({ open }: { open: boolean }) {
   const PIXEL_SIZE = 100;
@@ -8,6 +15,7 @@ export function KarposShutdownOverlay({ open }: { open: boolean }) {
   const PIXEL_FADE_MS = 200;
   const [gridSize, setGridSize] = useState({ cols: 10, rows: 10 });
   const [started, setStarted] = useState(false);
+  const [pixelTiles, setPixelTiles] = useState<PixelTile[]>([]);
 
   useEffect(() => {
     if (!open) return;
@@ -31,10 +39,15 @@ export function KarposShutdownOverlay({ open }: { open: boolean }) {
   }, [open]);
 
   const pixelCount = gridSize.cols * gridSize.rows;
-  const pixelTiles = useMemo(() => {
+
+  useEffect(() => {
+    if (!open) {
+      setPixelTiles([]);
+      return;
+    }
     const maxDelay = Math.max(0, MAX_ANIM_MS - PIXEL_FADE_MS);
     const ids = Array.from({ length: pixelCount }, (_, i) => i);
-    // Fisher-Yates shuffle so dim order is random.
+    // Fisher-Yates shuffle — must run outside render (Math.random is impure).
     for (let i = ids.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
       const tmp = ids[i];
@@ -48,17 +61,19 @@ export function KarposShutdownOverlay({ open }: { open: boolean }) {
       delayById[id] = Math.round(orderIdx * step);
     });
 
-    return Array.from({ length: pixelCount }, (_, idx) => {
-      const row = Math.floor(idx / gridSize.cols);
-      const col = idx % gridSize.cols;
-      return {
-        id: idx,
-        left: col * PIXEL_SIZE,
-        top: row * PIXEL_SIZE,
-        delayMs: delayById[idx],
-      };
-    });
-  }, [MAX_ANIM_MS, PIXEL_FADE_MS, PIXEL_SIZE, gridSize.cols, pixelCount]);
+    setPixelTiles(
+      Array.from({ length: pixelCount }, (_, idx) => {
+        const row = Math.floor(idx / gridSize.cols);
+        const col = idx % gridSize.cols;
+        return {
+          id: idx,
+          left: col * PIXEL_SIZE,
+          top: row * PIXEL_SIZE,
+          delayMs: delayById[idx] ?? 0,
+        };
+      }),
+    );
+  }, [open, pixelCount, gridSize.cols, gridSize.rows, MAX_ANIM_MS, PIXEL_FADE_MS, PIXEL_SIZE]);
 
   useEffect(() => {
     if (!open) return;

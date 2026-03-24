@@ -1,14 +1,17 @@
 /**
- * Virtual Windows-style filesystem. Paths use backslash (e.g. C:\Windows\Desktop).
- * C:\Windows\Desktop is the desktop folder; its contents appear on the desktop.
- * Program Files structure is built from the app registry so new apps appear automatically.
- * Persisted to localStorage; call initFileSystem(registry) once at app load.
+ * KarpOS-only virtual filesystem (`karpos-filesystem` in localStorage).
+ * Independent from Win98 `os/win98/app/fileSystem.ts`. KarpOS-specific desktop files (e.g. resume PDF) live here only.
  */
 
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { NOTEPAD_PENDING_KEY } from '@retro-web/core/apps/notepad';
+import {
+  PDF_READER_PENDING_KEY,
+  PDF_CONTENT_KEY_TO_URL,
+} from '@retro-web/core/apps/pdf-reader/constants';
 
 export { NOTEPAD_PENDING_KEY };
+export { PDF_READER_PENDING_KEY };
 export const WORD_PENDING_KEY = 'word-pending-document';
 
 const STORAGE_KEY = 'karpos-filesystem';
@@ -20,11 +23,13 @@ const PROGRAM_FILES_BASE = 'C:\\Program Files';
 export const EXTENSION_TO_APP: Record<string, string> = {
   txt: 'notepad',
   doc: 'word',
+  pdf: 'pdf-reader',
 };
 
 const DEFAULT_ICON_BY_EXT: Record<string, string> = {
   txt: 'shell/icons/notepad_file.png',
   doc: 'apps/word/word-icon.png',
+  pdf: 'shell/icons/adobe-pdf-modern-icon.png',
 };
 
 export type FolderNode = { type: 'folder'; children: string[] };
@@ -89,7 +94,7 @@ function buildDefaultTree(): FsTree {
     },
     'C:\\Windows\\Desktop': {
       type: 'folder',
-      children: ['TODO.txt', 'My Resume.doc'],
+      children: ['TODO.txt', 'My Resume.doc', 'My Resume.pdf'],
     },
     'C:\\Windows\\Desktop\\TODO.txt': {
       type: 'file',
@@ -99,16 +104,24 @@ function buildDefaultTree(): FsTree {
       type: 'file',
       contentKey: 'resume',
     },
+    'C:\\Windows\\Desktop\\My Resume.pdf': {
+      type: 'file',
+      contentKey: 'resume-pdf',
+    },
     'C:\\Windows\\System': { type: 'folder', children: [] },
     'C:\\Windows\\Temp': { type: 'folder', children: [] },
     'C:\\Windows\\Fonts': { type: 'folder', children: [] },
     'C:\\My Documents': {
       type: 'folder',
-      children: ['My Resume.doc'],
+      children: ['My Resume.doc', 'My Resume.pdf'],
     },
     'C:\\My Documents\\My Resume.doc': {
       type: 'file',
       contentKey: 'resume',
+    },
+    'C:\\My Documents\\My Resume.pdf': {
+      type: 'file',
+      contentKey: 'resume-pdf',
     },
   };
 
@@ -281,6 +294,16 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
         sessionStorage.setItem(
           WORD_PENDING_KEY,
           JSON.stringify({ documentKey: node.contentKey ?? 'resume' }),
+        );
+        break;
+      case 'pdf-reader':
+        sessionStorage.setItem(
+          PDF_READER_PENDING_KEY,
+          JSON.stringify({
+            filename: name,
+            path,
+            pdfUrl: node.contentKey ? PDF_CONTENT_KEY_TO_URL[node.contentKey] : undefined,
+          }),
         );
         break;
       default:

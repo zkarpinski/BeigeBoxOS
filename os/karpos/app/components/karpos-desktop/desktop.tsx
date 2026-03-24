@@ -20,6 +20,7 @@ import { DefragWindow } from '@win98/components/apps/defrag';
 import { Vb6Window } from '@win98/components/apps/vb6';
 import { ControlPanelWindow } from '@win98/components/apps/controlpanel';
 import { MyComputerWindow } from '@win98/components/apps/mycomputer';
+import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { Thps2Window } from '@win98/components/apps/thps2/Thps2Window';
 import { TimWindow } from '@win98/components/apps/the_incredible_machine/TimWindow';
 import { PhotoshopWindow } from '@win98/components/apps/photoshop';
@@ -99,6 +100,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
         <Vb6Window />
         <ControlPanelWindow />
         <MyComputerWindow />
+        <PdfReaderWindow />
         <Thps2Window />
         <TimWindow />
         <PhotoshopWindow />

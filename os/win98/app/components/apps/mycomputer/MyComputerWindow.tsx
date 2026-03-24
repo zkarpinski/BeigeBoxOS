@@ -11,7 +11,7 @@ import {
   getFileIconPath,
   getAppIcon,
   type DirEntry,
-} from '../../../fileSystem';
+} from '@/app/virtual-fs';
 
 const ICON = 'apps/mycomputer/mycomputer-icon.png';
 const FOLDER_ICON = 'shell/icons/directory.png';

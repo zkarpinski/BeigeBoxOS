@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 
 const APP_IDS = [
   'mycomputer',
+  'pdf-reader',
   'word',
   'thps2',
   'notepad',

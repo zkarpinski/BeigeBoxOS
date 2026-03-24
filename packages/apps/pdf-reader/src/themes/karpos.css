@@ -1,0 +1,17 @@
+/* KarpOS neo-brutalist skin — load after themes/base.css */
+
+body.karpos-desktop .pdf-reader-toolbar {
+  border-bottom: 3px solid #0a0a0a !important;
+  background: #e9d5ff !important;
+  box-shadow: none !important;
+}
+
+body.karpos-desktop .pdf-reader-tb-btn {
+  border: 2px solid #0a0a0a !important;
+  background: #fffef8 !important;
+  box-shadow: 2px 2px 0 #0a0a0a !important;
+}
+
+body.karpos-desktop .pdf-reader-body {
+  border-top: none !important;
+}

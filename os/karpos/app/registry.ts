@@ -13,6 +13,7 @@ import { defragAppConfig } from '@win98/components/apps/defrag';
 import { vb6AppConfig } from '@win98/components/apps/vb6';
 import { controlpanelAppConfig } from '@win98/components/apps/controlpanel';
 import { mycomputerAppConfig } from '@win98/components/apps/mycomputer';
+import { pdfReaderAppConfig } from '@retro-web/app-pdf-reader';
 import { thps2AppConfig } from '@win98/components/apps/thps2/Thps2Window';
 import { timAppConfig } from '@win98/components/apps/the_incredible_machine/TimWindow';
 import { photoshopAppConfig } from '@win98/components/apps/photoshop';
@@ -25,6 +26,7 @@ import type { AppConfig } from '@retro-web/core/types/app-config';
 
 export const appRegistry: AppConfig[] = [
   mycomputerAppConfig,
+  pdfReaderAppConfig,
   wordAppConfig,
   thps2AppConfig,
   notepadAppConfig,

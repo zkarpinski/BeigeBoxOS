@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@retro-web/app-calculator": "workspace:*",
+    "@retro-web/app-pdf-reader": "workspace:*",
     "@retro-web/app-minesweeper": "workspace:*",
     "@retro-web/app-winamp": "workspace:*",
     "@retro-web/core": "workspace:*",

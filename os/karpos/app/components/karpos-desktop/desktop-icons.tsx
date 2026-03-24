@@ -156,19 +156,11 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
     return () => window.removeEventListener('karpos-fs-change', onFsChange);
   }, []);
 
-  /** KarpOS desktop: only My Computer + virtual Desktop files (TODO, My Resume) — no other app shortcuts. */
-  const DESKTOP_FILE_ALLOWLIST = new Set(['TODO.txt', 'My Resume.doc']);
-
-  const appsWithDesktopIcon = registry.filter(
-    (a) => a.desktop !== false && a.desktop !== undefined && a.desktop,
-  );
-  const myComputer = appsWithDesktopIcon.find((a) => a.id === 'mycomputer');
+  /** KarpOS desktop: only virtual Desktop files (TODO, My Resume) — no other app shortcuts. */
+  const DESKTOP_FILE_ALLOWLIST = new Set(['TODO.txt', 'My Resume.doc', 'My Resume.pdf']);
   const desktopEntries = listDir(DESKTOP_PATH).filter((e) => DESKTOP_FILE_ALLOWLIST.has(e.name));
 
-  const items: DesktopItem[] = [
-    ...(myComputer ? [{ type: 'app' as const, app: myComputer }] : []),
-    ...desktopEntries.map((entry) => ({ type: 'fs' as const, entry })),
-  ];
+  const items: DesktopItem[] = [...desktopEntries.map((entry) => ({ type: 'fs' as const, entry }))];
 
   return (
     <div id="desktop-icons">

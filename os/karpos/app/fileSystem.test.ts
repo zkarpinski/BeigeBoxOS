@@ -28,6 +28,7 @@ describe('fileSystem path helpers', () => {
     it('maps known extensions', () => {
       expect(getFileIconPath('readme.txt')).toBe('shell/icons/notepad_file.png');
       expect(getFileIconPath('doc.doc')).toBe('apps/word/word-icon.png');
+      expect(getFileIconPath('resume.pdf')).toBe('shell/icons/adobe-pdf-modern-icon.png');
     });
 
     it('falls back to default for unknown extensions', () => {
@@ -49,7 +50,7 @@ describe('fileSystem init + listDir', () => {
   it('lists default desktop entries including TODO and resume', () => {
     const entries = listDir(DESKTOP_PATH);
     const names = entries.map((e) => e.name).sort();
-    expect(names).toEqual(['My Resume.doc', 'TODO.txt']);
+    expect(names).toEqual(['My Resume.doc', 'My Resume.pdf', 'TODO.txt']);
   });
 
   it('getDrives returns floppy, C, and CD-ROM', () => {

@@ -26,6 +26,8 @@ import '@retro-web/app-calculator/themes/karpos.css';
 import '../../win98/app/components/apps/ie5/ie5.css';
 import '../../win98/app/components/apps/defrag/defrag.css';
 import '../../win98/app/components/apps/mycomputer/mycomputer.css';
+import '@retro-web/app-pdf-reader/themes/base.css';
+import '@retro-web/app-pdf-reader/themes/karpos.css';
 import '../../win98/app/components/apps/controlpanel/controlpanel.css';
 import '../../win98/app/components/apps/msdos/msdos.css';
 import '../../win98/app/components/apps/photoshop/photoshop.css';

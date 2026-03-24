@@ -585,6 +585,12 @@ body.karpos-desktop .karpos-apps-footer-btn:hover {
 /* App windows — flat “card” frame: no Win98 3D bevel */
 body.karpos-desktop .karp-app-window.app-window,
 body.karpos-desktop .app-window.karp-app-window {
+  /*
+   * Win98 shell uses position: relative on .app-window. Without fixed, multiple visible
+   * windows stack in document flow; later siblings (e.g. Pad after Projects) sit below the
+   * fold and are clipped by body overflow — looks like one window.
+   */
+  position: fixed;
   border: var(--karp-border);
   box-shadow: var(--karp-shadow);
   background-color: var(--karp-paper);

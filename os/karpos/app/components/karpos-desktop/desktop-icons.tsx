@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { useWindowManager } from '@retro-web/core/context';
 import {
@@ -10,6 +10,7 @@ import {
   getFileIconPath,
   type DirEntry,
 } from '../../fileSystem';
+import { karposNeoTileColor } from './karposNeoTileColors';
 
 const FOLDER_ICON = 'shell/icons/directory.png';
 const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
@@ -18,16 +19,12 @@ function DesktopAppIcon({
   app,
   selected,
   onSelect,
-  onDeselect,
 }: {
   app: AppConfig;
   selected: boolean;
   onSelect: () => void;
-  onDeselect: () => void;
 }) {
   const { showApp } = useWindowManager();
-  const clickCount = useRef(0);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const desktopLabel =
     typeof app.desktop === 'object' ? (app.desktop?.label ?? app.label) : app.label;
@@ -35,46 +32,37 @@ function DesktopAppIcon({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect();
-    clickCount.current++;
-    if (clickCount.current === 1) {
-      timer.current = setTimeout(() => {
-        clickCount.current = 0;
-      }, 350);
-    } else {
-      if (timer.current) clearTimeout(timer.current);
-      clickCount.current = 0;
-      showApp(app.id);
-      onDeselect();
-    }
+    showApp(app.id);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onSelect();
-    clickCount.current++;
-    if (clickCount.current === 1) {
-      timer.current = setTimeout(() => {
-        clickCount.current = 0;
-      }, 350);
-    } else {
-      if (timer.current) clearTimeout(timer.current);
-      clickCount.current = 0;
-      showApp(app.id);
-      onDeselect();
-    }
+    showApp(app.id);
   };
+
+  const tileKey = `desktop:app:${app.id}`;
 
   return (
     <div
-      className={`desktop-icon${selected ? ' selected' : ''}`}
+      className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
       id={`${app.id}-desktop-icon`}
+      style={{ backgroundColor: karposNeoTileColor(tileKey) }}
       title={desktopLabel}
       onClick={handleClick}
       onTouchEnd={handleTouchEnd}
     >
-      <img src={app.icon} alt={desktopLabel} />
-      <span>{desktopLabel}</span>
+      <div className="karpos-desktop-tile__img-wrap">
+        <img
+          className="karpos-desktop-tile__img"
+          src={app.icon}
+          alt=""
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        />
+      </div>
+      <span className="karpos-desktop-tile__label">{desktopLabel}</span>
     </div>
   );
 }
@@ -83,16 +71,12 @@ function DesktopFsEntryIcon({
   entry,
   selected,
   onSelect,
-  onDeselect,
 }: {
   entry: DirEntry;
   selected: boolean;
   onSelect: () => void;
-  onDeselect: () => void;
 }) {
   const { showApp } = useWindowManager();
-  const clickCount = useRef(0);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const open = () => {
     if (entry.type === 'file') {
@@ -108,48 +92,38 @@ function DesktopFsEntryIcon({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect();
-    clickCount.current++;
-    if (clickCount.current === 1) {
-      timer.current = setTimeout(() => {
-        clickCount.current = 0;
-      }, 350);
-    } else {
-      if (timer.current) clearTimeout(timer.current);
-      clickCount.current = 0;
-      open();
-      onDeselect();
-    }
+    open();
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onSelect();
-    clickCount.current++;
-    if (clickCount.current === 1) {
-      timer.current = setTimeout(() => {
-        clickCount.current = 0;
-      }, 350);
-    } else {
-      if (timer.current) clearTimeout(timer.current);
-      clickCount.current = 0;
-      open();
-      onDeselect();
-    }
+    open();
   };
 
   const icon = entry.type === 'folder' ? FOLDER_ICON : getFileIconPath(entry.name, entry.path);
+  const tileKey = `desktop:fs:${entry.path}`;
 
   return (
     <div
-      className={`desktop-icon${selected ? ' selected' : ''}`}
+      className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
       id={`desktop-fs-${entry.path.replace(/\\/g, '-')}`}
+      style={{ backgroundColor: karposNeoTileColor(tileKey) }}
       title={entry.name}
       onClick={handleClick}
       onTouchEnd={handleTouchEnd}
     >
-      <img src={icon} alt={entry.name} />
-      <span>{entry.name}</span>
+      <div className="karpos-desktop-tile__img-wrap">
+        <img
+          className="karpos-desktop-tile__img"
+          src={icon}
+          alt=""
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        />
+      </div>
+      <span className="karpos-desktop-tile__label">{entry.name}</span>
     </div>
   );
 }
@@ -205,7 +179,6 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             app={item.app}
             selected={selectedId === item.app.id}
             onSelect={() => setSelectedId(item.app.id)}
-            onDeselect={() => setSelectedId(null)}
           />
         ) : (
           <DesktopFsEntryIcon
@@ -213,7 +186,6 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             entry={item.entry}
             selected={selectedId === item.entry.path}
             onSelect={() => setSelectedId(item.entry.path)}
-            onDeselect={() => setSelectedId(null)}
           />
         ),
       )}

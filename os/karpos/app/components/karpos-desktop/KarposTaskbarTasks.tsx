@@ -6,7 +6,7 @@
  */
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { useWindowManager } from '@retro-web/core/context';
-import { karposTaskbarTileBackground } from './karposTaskbarChipColors';
+import { karposNeoTileColor } from './karposNeoTileColors';
 
 export function KarposTaskbarTasks({ registry }: { registry: AppConfig[] }) {
   const { apps, showApp, focusApp, minimizeApp } = useWindowManager();
@@ -36,7 +36,7 @@ export function KarposTaskbarTasks({ registry }: { registry: AppConfig[] }) {
             type="button"
             className={`karpos-taskbar-chip${focused ? ' karpos-taskbar-chip--focused' : ''}`}
             id={`taskbar-${app.id}`}
-            style={{ backgroundColor: karposTaskbarTileBackground(app.id) }}
+            style={{ backgroundColor: karposNeoTileColor(app.id) }}
             onClick={() => handleTaskClick(app.id)}
             title={label}
             aria-label={label}

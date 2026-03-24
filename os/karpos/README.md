@@ -11,7 +11,7 @@ Personal playground “OS” shell — **neo-brutalist** styling inspired by [ne
 ## Layout (kebab-case folders)
 
 - `app/components/karpos-shell/` — `AppWindow`, `TitleBar`, `KarpGlobalShim` (`window.KarpOS`)
-- `app/components/karpos-desktop/` — `KarpDesktop`, `DesktopIcons`, `KarposTaskbarTasks` (icon-only neo-brutalist chips for **open** windows; tile color is stable-per-app from a hash), `KarposSystemTray`
+- `app/components/karpos-desktop/` — `KarpDesktop`, `DesktopIcons` (rounded neo-brutalist tiles; `karposNeoTileColors`), `KarposTaskbarTasks` (open windows only; same palette + hash), `KarposSystemTray`
 - `app/karpos-theme.css` — shell + token overrides for shared apps
 - `app/karpos-app-brutal.css` — **loaded last**; flattens Win98 bevels inside apps (Navigator, IE5, Word toolbars, `win-border-*`, etc.)
 

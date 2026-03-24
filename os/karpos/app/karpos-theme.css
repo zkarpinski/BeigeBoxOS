@@ -45,22 +45,81 @@ body.karpos-desktop {
   background-size: 24px 24px;
 }
 
-/* Desktop icons */
-body.karpos-desktop #desktop-icons .desktop-icon {
+/* Desktop icons — rounded neo-brutalist tiles (palette + hash: karposNeoTileColors) */
+body.karpos-desktop #desktop-icons {
+  gap: 14px;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile {
+  width: 96px;
+  padding: 0;
+  margin: 0;
+  border: 3px solid var(--karp-black);
+  border-radius: 14px;
+  box-sizing: border-box;
+  box-shadow: 5px 5px 0 var(--karp-black);
+  overflow: hidden;
+  transition:
+    transform 0.07s ease,
+    box-shadow 0.07s ease;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--karp-black);
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile.selected {
+  box-shadow:
+    0 0 0 3px var(--karp-black),
+    7px 7px 0 var(--karp-yellow);
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 10px 8px 4px;
+  box-sizing: border-box;
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__img {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  object-fit: contain !important;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+  filter: none !important;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile.selected .karpos-desktop-tile__img {
+  filter: none !important;
+}
+
+body.karpos-desktop #desktop-icons .karpos-desktop-tile__label {
+  display: block;
+  margin: 0;
+  padding: 4px 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
   color: var(--karp-black);
-  text-shadow: 1px 1px 0 #fff;
-  font-weight: 700;
-  font-size: 12px;
+  text-shadow: none;
+  word-break: break-word;
+  font-family: inherit;
 }
 
-body.karpos-desktop #desktop-icons .desktop-icon.selected span {
-  background: var(--karp-yellow);
-  border: var(--karp-border);
-  box-shadow: var(--karp-shadow-sm);
-}
-
-body.karpos-desktop #desktop-icons .desktop-icon img {
-  filter: drop-shadow(2px 2px 0 var(--karp-black));
+body.karpos-desktop #desktop-icons .desktop-icon.karpos-desktop-tile.selected .karpos-desktop-tile__label {
+  background: transparent;
+  outline: none;
+  color: var(--karp-black);
 }
 
 /* Taskbar */

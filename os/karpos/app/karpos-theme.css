@@ -122,16 +122,76 @@ body.karpos-desktop .karpos-apps-launcher.active {
   box-shadow: 2px 2px 0 var(--karp-cyan);
 }
 
-body.karpos-desktop .taskbar-task {
-  border: var(--karp-border);
-  box-shadow: var(--karp-shadow-sm);
-  background: var(--karp-paper);
-  font-weight: 700;
-  border-radius: 0;
+/* Open-window chips — icon only; color from hash (see KarposTaskbarTasks) */
+body.karpos-desktop .karpos-taskbar-tasks {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
-body.karpos-desktop .taskbar-task.active {
-  background: var(--karp-pink);
+body.karpos-desktop .karpos-taskbar-chip {
+  display: inline-flex;
+  line-height: 0;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 3px solid var(--karp-black);
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--karp-black);
+  transition:
+    transform 0.07s ease,
+    box-shadow 0.07s ease;
+}
+
+body.karpos-desktop .karpos-taskbar-chip:hover {
+  filter: brightness(1.03);
+}
+
+body.karpos-desktop .karpos-taskbar-chip:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--karp-black);
+}
+
+body.karpos-desktop .karpos-taskbar-chip--focused {
+  box-shadow: 5px 5px 0 var(--karp-pink);
+  outline: 2px solid var(--karp-black);
+  outline-offset: 0;
+}
+
+body.karpos-desktop .karpos-taskbar-chip--focused:active {
+  box-shadow: 2px 2px 0 var(--karp-pink);
+}
+
+body.karpos-desktop .karpos-taskbar-chip__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 30px;
+  box-sizing: border-box;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(10, 10, 10, 0.08) 0px,
+    rgba(10, 10, 10, 0.08) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+}
+
+body.karpos-desktop .karpos-taskbar-chip__inner img {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+  filter: drop-shadow(1px 1px 0 var(--karp-black));
 }
 
 /* System tray — drop Win98 “inset well”; keep tray open on lime */

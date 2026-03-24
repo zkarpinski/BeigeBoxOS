@@ -24,7 +24,8 @@
     "test:karpos": "pnpm --filter @retro-web/karpos test",
     "lint": "turbo lint",
     "fmt": "prettier --write .",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "generate-og-images": "node scripts/generate-og-images.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -33,6 +34,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
+    "sharp": "^0.34.5",
     "turbo": "latest"
   }
 }

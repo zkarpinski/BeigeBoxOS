@@ -6,6 +6,7 @@ Personal playground “OS” shell — **neo-brutalist** styling inspired by [ne
 
 - `pnpm dev:karpos` — Next.js dev server
 - `pnpm build:karpos` — static export to `out/`
+- From monorepo root: `pnpm generate-og-images` — rebuilds `public/og-image.png` (1200×630 Open Graph) from the fish icon; run after changing app icons.
 
 ## Layout (kebab-case folders)
 
@@ -14,4 +15,4 @@ Personal playground “OS” shell — **neo-brutalist** styling inspired by [ne
 - `app/karpos-theme.css` — shell + token overrides for shared apps
 - `app/karpos-app-brutal.css` — **loaded last**; flattens Win98 bevels inside apps (Navigator, IE5, Word toolbars, `win-border-*`, etc.)
 
-Static assets are symlinked from `os/win98/public`.
+Static assets live in **`os/karpos/public`**. App/game art and shell media are **symlinks** into `os/win98/public` (`apps/`, `shell/`, `boot-check.js`, etc.) so KarpOS reuses the Win98 implementations without duplicating files. **PWA icons, `site.webmanifest`, `robots.txt`, and `sitemap.xml`** are real files here (KarpOS / karpos.zkarpinski.com branding and SEO).

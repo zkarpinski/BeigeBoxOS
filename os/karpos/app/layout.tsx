@@ -36,6 +36,7 @@ import './karpos-theme.css';
 import './karpos-app-brutal.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://karpos.zkarpinski.com'),
   title: 'KarpOS | Zachary Karpinski',
   description:
     'KarpOS — a neo-brutalist playground desktop in the browser. Apps, experiments, and portfolio by Zachary Karpinski.',
@@ -47,15 +48,33 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'KarpOS | Zachary Karpinski',
     description: 'A neo-brutalist playground desktop in your browser.',
-    url: 'https://zkarpinski.com/',
+    url: 'https://karpos.zkarpinski.com/',
     siteName: 'KarpOS',
     locale: 'en_US',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'KarpOS — neo-brutalist desktop in the browser',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'KarpOS | Zachary Karpinski',
     description: 'A neo-brutalist playground desktop in your browser.',
+    images: ['/og-image.png'],
   },
+  /** Raster sizes generated from `public/shell/karpos-logo-trimmed.png` (see `scripts/generate-karpos-icons.sh`) */
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -73,11 +92,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..1000;1,9..40,400..1000&family=Space+Grotesk:wght@400..700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
         <Script src="/boot-check.js" strategy="beforeInteractive" />
         <script
           type="application/ld+json"
@@ -88,7 +102,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'KarpOS',
               description:
                 'A neo-brutalist playground desktop in the browser — apps and portfolio by Zachary Karpinski.',
-              url: 'https://zkarpinski.com/',
+              url: 'https://karpos.zkarpinski.com/',
+              image: 'https://karpos.zkarpinski.com/og-image.png',
               author: { '@type': 'Person', name: 'Zachary Karpinski' },
               applicationCategory: 'MultimediaApplication',
               offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

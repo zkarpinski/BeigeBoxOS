@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CalculatorWindow, calculatorAppConfig } from './CalculatorWindow';
+import { CalculatorWindow, calculatorAppConfig } from '@retro-web/app-calculator';
 import { Win98TestProviders } from '../../../../test/test-utils';
 
 function renderCalculator() {

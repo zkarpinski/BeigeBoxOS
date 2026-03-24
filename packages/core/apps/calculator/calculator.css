@@ -1,23 +1,4 @@
-/* Calculator App Styles – window border matches other apps (Notepad, etc.) */
-.calculator-window {
-  position: fixed;
-  top: 60px;
-  left: 80px;
-  width: 260px;
-  height: 250px;
-  z-index: 10;
-  background-color: var(--win-bg);
-  border-top: 1px solid var(--win-white);
-  border-left: 1px solid var(--win-white);
-  border-right: 1px solid var(--win-black);
-  border-bottom: 1px solid var(--win-black);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-  font-family: 'MS Sans Serif', Tahoma, sans-serif;
-  font-size: 11px;
-  display: flex;
-  flex-direction: column;
-}
-
+/* Calculator inner UI — window chrome lives in @retro-web/app-calculator/themes/win98.css */
 .calculator-menu-bar {
   display: flex;
   padding: 2px 0 2px 2px;

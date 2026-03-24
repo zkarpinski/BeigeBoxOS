@@ -9,7 +9,7 @@ import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { AimWindow } from '@win98/components/apps/aim';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
-import { CalculatorWindow } from '@win98/components/apps/calculator';
+import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PaintWindow } from '@win98/components/apps/paint';
 import { MsDosWindow } from '@win98/components/apps/msdos';
 import { WinampWindow } from '@win98/components/apps/winamp';
@@ -88,7 +88,7 @@ export function KarpDesktop({ openAppId }: KarpDesktopProps) {
         <NotepadWindow />
         <AimWindow />
         <MinesweeperWindow skin="karpos" />
-        <CalculatorWindow />
+        <CalculatorWindow skin="karpos" />
         <PaintWindow />
         <MsDosWindow />
         <WinampWindow />

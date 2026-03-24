@@ -22,7 +22,7 @@ import './components/apps/winamp/winamp.css';
 import '@retro-web/app-minesweeper/themes/win98.css';
 import './components/apps/paint/paint.css';
 import './components/apps/the_incredible_machine/tim.css';
-import './components/apps/calculator/calculator.css';
+import '@retro-web/app-calculator/themes/win98.css';
 import './components/apps/ie5/ie5.css';
 import './components/apps/defrag/defrag.css';
 import './components/apps/mycomputer/mycomputer.css';

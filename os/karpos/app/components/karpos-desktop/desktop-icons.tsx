@@ -12,7 +12,7 @@ import {
 } from '../../fileSystem';
 import { karposNeoTileColor } from './karposNeoTileColors';
 
-const FOLDER_ICON = 'shell/icons/directory.png';
+const FOLDER_ICON = '/karpos/folder-icon.png';
 const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
 
 function DesktopAppIcon({

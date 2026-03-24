@@ -2,7 +2,7 @@ import { wordAppConfig } from '@win98/components/apps/word';
 import { notepadAppConfig } from '@retro-web/core/apps/notepad';
 import { aimAppConfig } from '@win98/components/apps/aim';
 import { minesweeperAppConfig } from '@retro-web/app-minesweeper';
-import { calculatorAppConfig } from '@win98/components/apps/calculator';
+import { calculatorAppConfig } from '@retro-web/app-calculator';
 import { paintAppConfig } from '@win98/components/apps/paint';
 import { msdosAppConfig } from '@win98/components/apps/msdos';
 import { winampAppConfig } from '@win98/components/apps/winamp';

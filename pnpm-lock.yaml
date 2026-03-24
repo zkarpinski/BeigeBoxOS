@@ -39,6 +39,9 @@ importers:
 
   os/karpos:
     dependencies:
+      '@retro-web/app-calculator':
+        specifier: workspace:*
+        version: link:../../packages/apps/calculator
       '@retro-web/app-minesweeper':
         specifier: workspace:*
         version: link:../../packages/apps/minesweeper
@@ -124,6 +127,9 @@ importers:
 
   os/win98:
     dependencies:
+      '@retro-web/app-calculator':
+        specifier: workspace:*
+        version: link:../../packages/apps/calculator
       '@retro-web/app-minesweeper':
         specifier: workspace:*
         version: link:../../packages/apps/minesweeper
@@ -209,6 +215,9 @@ importers:
 
   os/winxp:
     dependencies:
+      '@retro-web/app-calculator':
+        specifier: workspace:*
+        version: link:../../packages/apps/calculator
       '@retro-web/app-minesweeper':
         specifier: workspace:*
         version: link:../../packages/apps/minesweeper
@@ -278,6 +287,28 @@ importers:
       react:
         specifier: ^18.3.0
         version: 18.3.1
+
+  packages/apps/calculator:
+    dependencies:
+      '@retro-web/core':
+        specifier: workspace:*
+        version: link:../../core
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.28)
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
 
   packages/apps/minesweeper:
     dependencies:

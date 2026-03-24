@@ -7,6 +7,6 @@
  *   `skin` prop so scoped selectors like `[data-myapp-skin="karpos"]` apply.
  * - **Window chrome** stays in the host via `useOsShell` / `AppWindow` — not in the app package.
  *
- * Example: `@retro-web/app-minesweeper` + `MinesweeperWindow` + `data-minesweeper-skin`.
+ * Examples: `@retro-web/app-minesweeper` + `data-minesweeper-skin`; `@retro-web/app-calculator` + `data-calculator-skin` (content may stay in core).
  */
 export type SkinId = string;

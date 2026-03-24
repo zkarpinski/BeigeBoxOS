@@ -16,56 +16,105 @@ import { KARPOS_DESKTOP_LINKS, type KarposDesktopLink } from './karposDesktopLin
 
 const FOLDER_ICON = '/karpos/folder-icon.png';
 const MYCOMPUTER_PENDING_PATH_KEY = 'mycomputer-pending-path';
+type OpenHandler = () => void;
+type ShowContextMenu = (e: React.MouseEvent, itemId: string, onOpen: OpenHandler) => void;
+type SelectHandler = () => void;
 
-function DesktopAppIcon({
-  app,
-  selected,
-  onSelect,
-}: {
-  app: AppConfig;
+type DesktopTileProps = {
+  id: string;
+  label: string;
+  icon: string;
   selected: boolean;
-  onSelect: () => void;
-}) {
-  const { showApp } = useWindowManager();
+  tileKey: string;
+  onSelect: SelectHandler;
+  onOpen: OpenHandler;
+  onShowContextMenu: ShowContextMenu;
+  contextItemId: string;
+};
 
-  const desktopLabel =
-    typeof app.desktop === 'object' ? (app.desktop?.label ?? app.label) : app.label;
-
+function DesktopTile({
+  id,
+  label,
+  icon,
+  selected,
+  tileKey,
+  onSelect,
+  onOpen,
+  onShowContextMenu,
+  contextItemId,
+}: DesktopTileProps) {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect();
-    showApp(app.id);
+    onOpen();
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onSelect();
-    showApp(app.id);
+    onOpen();
   };
 
-  const tileKey = `desktop:app:${app.id}`;
+  const handleContextMenu = (e: React.MouseEvent) => {
+    onShowContextMenu(e, contextItemId, onOpen);
+  };
 
   return (
     <div
       className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
-      id={`${app.id}-desktop-icon`}
+      id={id}
       style={{ backgroundColor: karposNeoTileColor(tileKey) }}
-      title={desktopLabel}
+      title={label}
       onClick={handleClick}
       onTouchEnd={handleTouchEnd}
+      onContextMenu={handleContextMenu}
     >
       <div className="karpos-desktop-tile__img-wrap">
         <img
           className="karpos-desktop-tile__img"
-          src={app.icon}
+          src={icon}
           alt=""
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
         />
       </div>
-      <span className="karpos-desktop-tile__label">{desktopLabel}</span>
+      <span className="karpos-desktop-tile__label">{label}</span>
     </div>
+  );
+}
+
+function DesktopAppIcon({
+  app,
+  selected,
+  onSelect,
+  onShowContextMenu,
+}: {
+  app: AppConfig;
+  selected: boolean;
+  onSelect: () => void;
+  onShowContextMenu: ShowContextMenu;
+}) {
+  const { showApp } = useWindowManager();
+
+  const desktopLabel =
+    typeof app.desktop === 'object' ? (app.desktop?.label ?? app.label) : app.label;
+  const onOpen = () => showApp(app.id);
+
+  const tileKey = `desktop:app:${app.id}`;
+
+  return (
+    <DesktopTile
+      id={`${app.id}-desktop-icon`}
+      label={desktopLabel}
+      icon={app.icon}
+      selected={selected}
+      tileKey={tileKey}
+      onSelect={onSelect}
+      onOpen={onOpen}
+      onShowContextMenu={onShowContextMenu}
+      contextItemId={app.id}
+    />
   );
 }
 
@@ -73,50 +122,31 @@ function DesktopUrlIcon({
   link,
   selected,
   onSelect,
+  onShowContextMenu,
 }: {
   link: KarposDesktopLink;
   selected: boolean;
   onSelect: () => void;
+  onShowContextMenu: ShowContextMenu;
 }) {
-  const openUrl = () => {
+  const onOpen = () => {
     window.open(link.url, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect();
-    openUrl();
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onSelect();
-    openUrl();
   };
 
   const tileKey = `desktop:link:${link.id}`;
 
   return (
-    <div
-      className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
+    <DesktopTile
       id={`desktop-link-${link.id}`}
-      style={{ backgroundColor: karposNeoTileColor(tileKey) }}
-      title={link.label}
-      onClick={handleClick}
-      onTouchEnd={handleTouchEnd}
-    >
-      <div className="karpos-desktop-tile__img-wrap">
-        <img
-          className="karpos-desktop-tile__img"
-          src={link.icon}
-          alt=""
-          draggable={false}
-          onDragStart={(e) => e.preventDefault()}
-        />
-      </div>
-      <span className="karpos-desktop-tile__label">{link.label}</span>
-    </div>
+      label={link.label}
+      icon={link.icon}
+      selected={selected}
+      tileKey={tileKey}
+      onSelect={onSelect}
+      onOpen={onOpen}
+      onShowContextMenu={onShowContextMenu}
+      contextItemId={`link:${link.id}`}
+    />
   );
 }
 
@@ -124,16 +154,18 @@ function DesktopFsEntryIcon({
   entry,
   selected,
   onSelect,
+  onShowContextMenu,
 }: {
   entry: DirEntry;
   selected: boolean;
   onSelect: () => void;
+  onShowContextMenu: ShowContextMenu;
 }) {
   const { showApp } = useWindowManager();
 
-  const open = () => {
+  const onOpen = () => {
     if (entry.type === 'file') {
-      openFileByPath(entry.path, showApp);
+      void openFileByPath(entry.path, showApp);
     } else if (entry.type === 'app' && entry.appId) {
       showApp(entry.appId);
     } else {
@@ -142,19 +174,6 @@ function DesktopFsEntryIcon({
       } catch (_) {}
       showApp('mycomputer');
     }
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect();
-    open();
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onSelect();
-    open();
   };
 
   const icon =
@@ -166,25 +185,17 @@ function DesktopFsEntryIcon({
   const tileKey = `desktop:fs:${entry.path}`;
 
   return (
-    <div
-      className={`desktop-icon karpos-desktop-tile${selected ? ' selected' : ''}`}
+    <DesktopTile
       id={`desktop-fs-${entry.path.replace(/[/\\]/g, '-')}`}
-      style={{ backgroundColor: karposNeoTileColor(tileKey) }}
-      title={entry.name}
-      onClick={handleClick}
-      onTouchEnd={handleTouchEnd}
-    >
-      <div className="karpos-desktop-tile__img-wrap">
-        <img
-          className="karpos-desktop-tile__img"
-          src={icon}
-          alt=""
-          draggable={false}
-          onDragStart={(e) => e.preventDefault()}
-        />
-      </div>
-      <span className="karpos-desktop-tile__label">{entry.name}</span>
-    </div>
+      label={entry.name}
+      icon={icon}
+      selected={selected}
+      tileKey={tileKey}
+      onSelect={onSelect}
+      onOpen={onOpen}
+      onShowContextMenu={onShowContextMenu}
+      contextItemId={entry.path}
+    />
   );
 }
 
@@ -195,12 +206,21 @@ type DesktopItem =
 
 export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    itemId: string;
+    onOpen: OpenHandler;
+  } | null>(null);
   const [, setFsVersion] = useState(0);
 
   useEffect(() => {
     const clearIfOutside = (target: EventTarget | null) => {
       if (!(target as HTMLElement)?.closest?.('.desktop-icon')) {
         setSelectedId(null);
+      }
+      if (!(target as HTMLElement)?.closest?.('.karpos-desktop-context-menu')) {
+        setContextMenu(null);
       }
     };
     const onClick = (e: MouseEvent) => clearIfOutside(e.target);
@@ -211,6 +231,14 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
       document.removeEventListener('click', onClick);
       document.removeEventListener('touchend', onTouchEnd);
     };
+  }, []);
+
+  useEffect(() => {
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    document.addEventListener('keydown', onEscape);
+    return () => document.removeEventListener('keydown', onEscape);
   }, []);
 
   useEffect(() => {
@@ -226,6 +254,22 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
     ...desktopEntries.map((entry) => ({ type: 'fs' as const, entry })),
     ...KARPOS_DESKTOP_LINKS.map((link) => ({ type: 'link' as const, link })),
   ];
+  const showContextMenu: ShowContextMenu = (e, itemId, onOpen) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedId(itemId);
+    setContextMenu({
+      x: Math.min(e.clientX, window.innerWidth - 170),
+      y: Math.min(e.clientY, window.innerHeight - 70),
+      itemId,
+      onOpen,
+    });
+  };
+  const handleContextOpen = () => {
+    if (!contextMenu) return;
+    contextMenu.onOpen();
+    setContextMenu(null);
+  };
 
   return (
     <div id="desktop-icons">
@@ -236,6 +280,7 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             app={item.app}
             selected={selectedId === item.app.id}
             onSelect={() => setSelectedId(item.app.id)}
+            onShowContextMenu={showContextMenu}
           />
         ) : item.type === 'link' ? (
           <DesktopUrlIcon
@@ -243,6 +288,7 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             link={item.link}
             selected={selectedId === `link:${item.link.id}`}
             onSelect={() => setSelectedId(`link:${item.link.id}`)}
+            onShowContextMenu={showContextMenu}
           />
         ) : (
           <DesktopFsEntryIcon
@@ -250,9 +296,26 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             entry={item.entry}
             selected={selectedId === item.entry.path}
             onSelect={() => setSelectedId(item.entry.path)}
+            onShowContextMenu={showContextMenu}
           />
         ),
       )}
+      {contextMenu ? (
+        <div
+          className="karpos-desktop-context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <button
+            type="button"
+            className="karpos-desktop-context-menu__item"
+            onClick={handleContextOpen}
+          >
+            Open
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

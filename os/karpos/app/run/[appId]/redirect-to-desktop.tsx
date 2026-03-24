@@ -7,6 +7,5 @@ export function RedirectToDesktop({ appId, valid }: { appId: string; valid: bool
     const target = valid ? `/?app=${encodeURIComponent(appId)}` : '/';
     window.location.replace(target);
   }, [appId, valid]);
-
   return null;
 }

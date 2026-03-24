@@ -5,32 +5,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const APP_IDS = [
-  'mycomputer',
-  'pdf-reader',
-  'word',
-  'thps2',
-  'notepad',
-  'minesweeper',
-  'paint',
-  'the_incredible_machine',
-  'calculator',
-  'ie5',
-  'msdos',
-  'winamp',
-  'aim',
-  'napster',
-  'navigator',
-  'defrag',
-  'vb6',
-  'controlpanel',
-  'photoshop',
-  'aol',
-  'reporter',
-  'zonealarm',
-  'taskmanager',
-  'avg',
-] as const;
+const APP_IDS = ['pdf-reader', 'notepad', 'minesweeper', 'calculator', 'projects', 'pad'] as const;
 
 export const dynamicParams = false;
 

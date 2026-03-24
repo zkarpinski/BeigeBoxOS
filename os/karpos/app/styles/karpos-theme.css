@@ -128,6 +128,39 @@ body.karpos-desktop
   color: var(--karp-black);
 }
 
+/* Desktop icon context menu (KarpOS-only, neo-brutalist) */
+body.karpos-desktop .karpos-desktop-context-menu {
+  position: fixed;
+  z-index: 10120;
+  min-width: 150px;
+  padding: 6px;
+  border: var(--karp-border-thin);
+  background: var(--karp-paper);
+  box-shadow: var(--karp-shadow-sm);
+}
+
+body.karpos-desktop .karpos-desktop-context-menu__item {
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: var(--karp-border-thin);
+  background: var(--karp-yellow);
+  color: var(--karp-black);
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body.karpos-desktop .karpos-desktop-context-menu__item:hover {
+  background: var(--karp-cyan);
+}
+
+body.karpos-desktop .karpos-desktop-context-menu__item:active {
+  transform: translate(2px, 2px);
+}
+
 /* Taskbar */
 body.karpos-desktop #taskbar {
   height: 40px;
@@ -814,6 +847,58 @@ body.karpos-desktop .w97dlg-btn {
 
 body.karpos-desktop .w97dlg-btn-default {
   background: var(--karp-yellow);
+}
+
+/* KarpOS shutdown: random pixel-grid dim then redirect */
+body.karpos-desktop .karpos-shutdown-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  animation: none !important;
+  cursor: wait;
+  overflow: hidden;
+}
+
+body.karpos-desktop .karpos-shutdown-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+body.karpos-desktop .karpos-shutdown-pixel {
+  position: absolute;
+  background: var(--karp-black);
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: steps(2, end);
+}
+
+body.karpos-desktop .karpos-shutdown-overlay--started .karpos-shutdown-pixel {
+  opacity: 1;
+}
+
+body.karpos-desktop .karpos-shutdown-message-wrap {
+  position: relative;
+  z-index: 1;
+  background: var(--karp-yellow);
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow);
+  padding: 14px 22px;
+  animation: none;
+  color: var(--karp-black);
+}
+
+body.karpos-desktop .karpos-shutdown-message {
+  color: var(--karp-black);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 var(--karp-paper);
 }
 
 /* BSOD — keep readable but on-brand */

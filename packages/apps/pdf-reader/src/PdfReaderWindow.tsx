@@ -69,6 +69,46 @@ export function PdfReaderWindow() {
     };
   }, [showWindow]);
 
+  /**
+   * When the title-bar "window" toggle restores from maximized state, size to a
+   * document-like reading width and center on screen.
+   */
+  useEffect(() => {
+    const win = document.getElementById('pdf-reader-window');
+    const btn = win?.querySelector('[data-win-max]') as HTMLButtonElement | null;
+    if (!win || !btn) return;
+
+    const onWindowToggle = () => {
+      const wasMaximized = win.classList.contains('maximized');
+      if (!wasMaximized) return; // Going to maximized; keep default behavior.
+
+      // Let AppWindow remove `.maximized` first, then apply custom windowed bounds.
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          if (win.classList.contains('maximized')) return;
+
+          const taskbarReserve = document.body.classList.contains('karpos-desktop') ? 52 : 28;
+          const sidePadding = 40;
+          const targetDocumentWidth = 920;
+          const width = Math.min(targetDocumentWidth, window.innerWidth - sidePadding);
+          const availableHeight = Math.max(320, window.innerHeight - taskbarReserve - 16);
+          const targetHeight = Math.min(
+            availableHeight,
+            Math.max(420, Math.round(window.innerHeight * 0.82)),
+          );
+
+          win.style.width = `${width}px`;
+          win.style.left = `${Math.max(8, Math.round((window.innerWidth - width) / 2))}px`;
+          win.style.top = `${Math.max(8, Math.round((availableHeight - targetHeight) / 2))}px`;
+          win.style.height = `${targetHeight}px`;
+        });
+      });
+    };
+
+    btn.addEventListener('click', onWindowToggle);
+    return () => btn.removeEventListener('click', onWindowToggle);
+  }, []);
+
   return (
     <AppWindow
       id="pdf-reader-window"

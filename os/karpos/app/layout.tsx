@@ -1,43 +1,9 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import './globals.css';
-import '../../win98/app/style.css';
-import '../../win98/app/components/shell/shell.css';
-import '../../win98/app/components/shell/taskbar.css';
-import '../../win98/app/components/shell/desktop.css';
-import '../../win98/app/components/shell/dialog.css';
-import '../../win98/app/components/shell/run.css';
-import '../../win98/app/components/shell/shutdown.css';
-import '../../win98/app/components/shell/bsod.css';
-import '../../win98/app/components/win98/toolbar/toolbar.css';
-import '../../win98/app/components/apps/word/word.css';
-import '../../win98/app/components/apps/thps2/thps2.css';
-import '../../win98/app/components/apps/vb6/vb6.css';
-import '../../win98/app/components/apps/napster/napster.css';
-import '../../win98/app/components/apps/aim/aim.css';
-import '../../win98/app/components/apps/navigator/navigator.css';
-import '../../win98/app/components/apps/winamp/winamp.css';
-import '@retro-web/app-minesweeper/themes/win98.css';
-import '@retro-web/app-minesweeper/themes/karpos.css';
-import '../../win98/app/components/apps/paint/paint.css';
-import '../../win98/app/components/apps/the_incredible_machine/tim.css';
-import '@retro-web/app-calculator/themes/win98.css';
-import '@retro-web/app-calculator/themes/karpos.css';
-import '../../win98/app/components/apps/ie5/ie5.css';
-import '../../win98/app/components/apps/defrag/defrag.css';
-import '../../win98/app/components/apps/mycomputer/mycomputer.css';
-import '@retro-web/app-pdf-reader/themes/base.css';
-import '@retro-web/app-pdf-reader/themes/karpos.css';
-import '../../win98/app/components/apps/controlpanel/controlpanel.css';
-import '../../win98/app/components/apps/msdos/msdos.css';
-import '../../win98/app/components/apps/photoshop/photoshop.css';
-import '../../win98/app/components/apps/reporter/reporter.css';
-import '../../win98/app/components/apps/zonealarm/zonealarm.css';
-import '../../win98/app/components/apps/taskmanager/taskmanager.css';
-import '../../win98/app/components/apps/avg/avg.css';
-import '../../win98/app/components/apps/aol/aol.css';
-import './karpos-theme.css';
-import './karpos-app-brutal.css';
+import './styles/shell.css';
+import './styles/apps.css';
+import './styles/karpos-theme.css';
+import './styles/karpos-app-brutal.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://karpos.zkarpinski.com'),
   title: 'KarpOS | Zachary Karpinski',

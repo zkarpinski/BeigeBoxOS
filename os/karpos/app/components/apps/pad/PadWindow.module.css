@@ -1,0 +1,172 @@
+.padWindow {
+  width: 520px;
+  height: 560px;
+}
+
+.padWindow :global(.app-window-content) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+}
+
+.padRoot {
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  background: linear-gradient(180deg, #fbcfe8 0%, #f9a8d4 100%);
+}
+
+.padCard {
+  border: var(--karp-border);
+  box-shadow: var(--karp-shadow-sm);
+  background: #fbcfe8;
+  color: var(--karp-black);
+  height: 100%;
+  padding: 12px 14px;
+  overflow: auto;
+}
+
+.padHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.padHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.padIcon {
+  font-size: 20px;
+}
+
+.padActionBtn {
+  border: var(--karp-border-thin);
+  box-shadow: var(--karp-shadow-tight);
+  background: var(--karp-yellow);
+  color: var(--karp-black);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 26px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.padActionBtn:active {
+  transform: translate(1px, 1px);
+}
+
+.padDate {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mdH1 {
+  margin: 6px 0 10px;
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mdH2 {
+  margin: 14px 0 10px;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mdP {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.mdList {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.mdList + .mdH2 {
+  margin-top: 28px;
+}
+
+.mdItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mdCheckbox {
+  width: 22px;
+  height: 22px;
+  border: var(--karp-border-thin);
+  background: #fdf2f8;
+  box-shadow: var(--karp-shadow-tight);
+  flex-shrink: 0;
+}
+
+.mdCheckboxBtn {
+  width: 22px;
+  height: 22px;
+  border: var(--karp-border-thin);
+  background: #fdf2f8;
+  box-shadow: var(--karp-shadow-tight);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.mdCheckboxDone {
+  background: var(--karp-pink);
+}
+
+.mdDoneText {
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+.mdStrong {
+  font-weight: 900;
+}
+
+.mdStrike {
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+.editorWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: calc(100% - 40px);
+}
+
+.editor {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  resize: none;
+  border: var(--karp-border-thin);
+  box-shadow: var(--karp-shadow-tight);
+  background: #fdf2f8;
+  color: var(--karp-black);
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px;
+}

@@ -22,16 +22,10 @@ function MenuHarness({ registry }: { registry: AppConfig[] }) {
   );
 }
 
-/** Reads shell dialog flags for assertions (Run / Shut Down). */
+/** Reads shell dialog flags for assertions (Shut Down). */
 function DialogFlags() {
-  const { runDialogOpen, shutdownOpen } = useWindowManager();
-  return (
-    <span
-      data-testid="dialog-flags"
-      data-run={runDialogOpen ? '1' : '0'}
-      data-shutdown={shutdownOpen ? '1' : '0'}
-    />
-  );
+  const { shutdownOpen } = useWindowManager();
+  return <span data-testid="dialog-flags" data-shutdown={shutdownOpen ? '1' : '0'} />;
 }
 
 describe('KarposApplicationsMenu', () => {
@@ -90,20 +84,6 @@ describe('KarposApplicationsMenu', () => {
     await user.click(screen.getByRole('button', { name: /^Accessories$/ }));
     await user.click(screen.getByRole('button', { name: /‹ Applications/ }));
     expect(screen.getByRole('heading', { name: 'Applications' })).toBeInTheDocument();
-  });
-
-  it('opens Run dialog and closes the menu when Run… is clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <WindowManagerProvider registry={testRegistry} applyOpenByDefault={false}>
-        <DialogFlags />
-        <MenuHarness registry={testRegistry} />
-      </WindowManagerProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Run…' }));
-    expect(document.getElementById('start-menu')).toHaveClass('hidden');
-    expect(screen.getByTestId('dialog-flags')).toHaveAttribute('data-run', '1');
   });
 
   it('opens Shut Down and closes the menu when Shut Down… is clicked', async () => {

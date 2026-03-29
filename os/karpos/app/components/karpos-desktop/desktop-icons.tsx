@@ -302,12 +302,12 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
       }
     };
     const onClick = (e: MouseEvent) => clearIfOutside(e.target);
-    const onTouchEnd = (e: TouchEvent) => clearIfOutside(e.target);
+    const onTouchStart = (e: TouchEvent) => clearIfOutside(e.target);
     document.addEventListener('click', onClick);
-    document.addEventListener('touchend', onTouchEnd);
+    document.addEventListener('touchstart', onTouchStart);
     return () => {
       document.removeEventListener('click', onClick);
-      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchstart', onTouchStart);
     };
   }, []);
 

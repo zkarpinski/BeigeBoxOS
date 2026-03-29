@@ -486,6 +486,76 @@ export function createFolder(path: string): void {
   saveTree(tree);
 }
 
+export function renamePath(oldPath: string, newPath: string): void {
+  const normalizedOld = normalizePath(oldPath);
+  const normalizedNew = normalizePath(newPath);
+  if (!normalizedOld || normalizedOld === '/' || !normalizedNew || normalizedNew === '/') return;
+  if (normalizedOld === normalizedNew) return;
+
+  const node = getNode(normalizedOld);
+  if (!node) return;
+  if (getNode(normalizedNew)) return; // New path already exists
+
+  const tree = loadTree();
+
+  // Remove from old parent
+  const oldParts = normalizedOld.split('/').filter(Boolean);
+  const oldName = oldParts.pop();
+  const oldParent = oldParts.length ? '/' + oldParts.join('/') : '/';
+
+  if (oldParent && tree[oldParent]?.type === 'folder') {
+    const parentNode = tree[oldParent];
+    tree[oldParent] = {
+      type: 'folder',
+      children: parentNode.children.filter((c) => c !== oldName),
+    };
+  }
+
+  // Add to new parent
+  const newParts = normalizedNew.split('/').filter(Boolean);
+  const newName = newParts.pop();
+  if (!newName) return;
+  const newParent = newParts.length ? '/' + newParts.join('/') : '/';
+
+  if (!tree[newParent]) {
+    ensureFolder(tree, newParent);
+  }
+  const newParentNode = tree[newParent];
+  if (newParentNode?.type === 'folder') {
+    if (!newParentNode.children.includes(newName)) {
+      tree[newParent] = {
+        type: 'folder',
+        children: [...newParentNode.children, newName],
+      };
+    }
+  }
+
+  // Update path in tree
+  tree[normalizedNew] = node;
+  delete tree[normalizedOld];
+
+  // If it's a folder, recursively update children
+  if (node.type === 'folder') {
+    const updateChildrenPaths = (currentOldPath: string, currentNewPath: string) => {
+      const currentNode = tree[currentNewPath];
+      if (currentNode?.type === 'folder') {
+        for (const childName of currentNode.children) {
+          const childOldPath = joinPath(currentOldPath, childName);
+          const childNewPath = joinPath(currentNewPath, childName);
+          if (tree[childOldPath]) {
+            tree[childNewPath] = tree[childOldPath];
+            delete tree[childOldPath];
+            updateChildrenPaths(childOldPath, childNewPath);
+          }
+        }
+      }
+    };
+    updateChildrenPaths(normalizedOld, normalizedNew);
+  }
+
+  saveTree(tree);
+}
+
 /**
  * Delete a file or folder. Persists to localStorage.
  */

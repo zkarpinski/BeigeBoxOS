@@ -9,6 +9,10 @@ import {
   openFileByPath,
   getFileIconPath,
   getAppIcon,
+  createFolder,
+  writeFile,
+  renamePath,
+  getNode,
   type DirEntry,
 } from '../../fileSystem';
 import { karposNeoTileColor } from './karposNeoTileColors';
@@ -30,6 +34,9 @@ type DesktopTileProps = {
   onOpen: OpenHandler;
   onShowContextMenu: ShowContextMenu;
   contextItemId: string;
+  isRenaming?: boolean;
+  onRenameCommit?: (newName: string) => void;
+  onRenameCancel?: () => void;
 };
 
 function DesktopTile({
@@ -42,6 +49,9 @@ function DesktopTile({
   onOpen,
   onShowContextMenu,
   contextItemId,
+  isRenaming,
+  onRenameCommit,
+  onRenameCancel,
 }: DesktopTileProps) {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,8 +66,24 @@ function DesktopTile({
     onOpen();
   };
 
+  const [editValue, setEditValue] = useState(label);
+
+  useEffect(() => {
+    if (isRenaming) {
+      setEditValue(label);
+    }
+  }, [isRenaming, label]);
+
   const handleContextMenu = (e: React.MouseEvent) => {
     onShowContextMenu(e, contextItemId, onOpen);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onRenameCommit?.(editValue);
+    } else if (e.key === 'Escape') {
+      onRenameCancel?.();
+    }
   };
 
   return (
@@ -79,7 +105,20 @@ function DesktopTile({
           onDragStart={(e) => e.preventDefault()}
         />
       </div>
-      <span className="karpos-desktop-tile__label">{label}</span>
+      {isRenaming ? (
+        <input
+          className="karpos-desktop-tile__label karpos-desktop-tile__rename-input"
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={() => onRenameCommit?.(editValue)}
+          onClick={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+          autoFocus
+        />
+      ) : (
+        <span className="karpos-desktop-tile__label">{label}</span>
+      )}
     </div>
   );
 }
@@ -155,11 +194,17 @@ function DesktopFsEntryIcon({
   selected,
   onSelect,
   onShowContextMenu,
+  isRenaming,
+  onRenameCommit,
+  onRenameCancel,
 }: {
   entry: DirEntry;
   selected: boolean;
   onSelect: () => void;
   onShowContextMenu: ShowContextMenu;
+  isRenaming?: boolean;
+  onRenameCommit?: (newName: string) => void;
+  onRenameCancel?: () => void;
 }) {
   const { showApp } = useWindowManager();
 
@@ -195,6 +240,9 @@ function DesktopFsEntryIcon({
       onOpen={onOpen}
       onShowContextMenu={onShowContextMenu}
       contextItemId={entry.path}
+      isRenaming={isRenaming}
+      onRenameCommit={onRenameCommit}
+      onRenameCancel={onRenameCancel}
     />
   );
 }
@@ -206,21 +254,51 @@ type DesktopItem =
 
 export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     itemId: string;
     onOpen: OpenHandler;
   } | null>(null);
+  const [desktopContextMenu, setDesktopContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [, setFsVersion] = useState(0);
 
   useEffect(() => {
-    const clearIfOutside = (target: EventTarget | null) => {
-      if (!(target as HTMLElement)?.closest?.('.desktop-icon')) {
-        setSelectedId(null);
+    const onContextMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.id === 'desktop-icons' ||
+        target.closest('.seo-intro') ||
+        target === document.body
+      ) {
+        e.preventDefault();
+        setDesktopContextMenu({
+          x: Math.min(e.clientX, window.innerWidth - 170),
+          y: Math.min(e.clientY, window.innerHeight - 70),
+        });
       }
-      if (!(target as HTMLElement)?.closest?.('.karpos-desktop-context-menu')) {
+    };
+    document.addEventListener('contextmenu', onContextMenu);
+    return () => document.removeEventListener('contextmenu', onContextMenu);
+  }, []);
+
+  useEffect(() => {
+    const clearIfOutside = (target: EventTarget | null) => {
+      const el = target as HTMLElement;
+      if (!el?.closest?.('.desktop-icon') && !el?.closest?.('.karpos-desktop-context-menu')) {
+        // Only clear selection if we are not renaming, or if we clicked outside
+        // renaming handles its own blur to commit
+        if (!renamingId) {
+          setSelectedId(null);
+        }
+      }
+      if (!el?.closest?.('.karpos-desktop-context-menu')) {
         setContextMenu(null);
+        setDesktopContextMenu(null);
       }
     };
     const onClick = (e: MouseEvent) => clearIfOutside(e.target);
@@ -235,7 +313,10 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
 
   useEffect(() => {
     const onEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setContextMenu(null);
+      if (e.key === 'Escape') {
+        setContextMenu(null);
+        setDesktopContextMenu(null);
+      }
     };
     document.addEventListener('keydown', onEscape);
     return () => document.removeEventListener('keydown', onEscape);
@@ -271,6 +352,62 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
     setContextMenu(null);
   };
 
+  const getUniqueName = (baseName: string, isFolder: boolean) => {
+    let newName = baseName;
+    let counter = 1;
+    while (getNode(`${DESKTOP_PATH}/${newName}`)) {
+      if (isFolder) {
+        newName = `${baseName} (${counter})`;
+      } else {
+        const extIdx = baseName.lastIndexOf('.');
+        if (extIdx !== -1) {
+          newName = `${baseName.slice(0, extIdx)} (${counter})${baseName.slice(extIdx)}`;
+        } else {
+          newName = `${baseName} (${counter})`;
+        }
+      }
+      counter++;
+    }
+    return newName;
+  };
+
+  const handleNewFolder = () => {
+    setDesktopContextMenu(null);
+    const folderName = getUniqueName('New Folder', true);
+    const newPath = `${DESKTOP_PATH}/${folderName}`;
+    createFolder(newPath);
+    setFsVersion((v) => v + 1);
+    setSelectedId(newPath);
+    setRenamingId(newPath);
+  };
+
+  const handleNewFile = () => {
+    setDesktopContextMenu(null);
+    const fileName = getUniqueName('New File.txt', false);
+    const newPath = `${DESKTOP_PATH}/${fileName}`;
+    writeFile(newPath, '');
+    setFsVersion((v) => v + 1);
+    setSelectedId(newPath);
+    setRenamingId(newPath);
+  };
+
+  const handleRenameCommit = (oldPath: string, newName: string) => {
+    if (newName && newName.trim() !== '') {
+      const parentPath = oldPath.substring(0, oldPath.lastIndexOf('/'));
+      const newPath = `${parentPath}/${newName}`;
+      if (oldPath !== newPath) {
+        renamePath(oldPath, newPath);
+        setSelectedId(newPath);
+      }
+    }
+    setRenamingId(null);
+    setFsVersion((v) => v + 1);
+  };
+
+  const handleRenameCancel = () => {
+    setRenamingId(null);
+  };
+
   return (
     <div id="desktop-icons">
       {items.map((item) =>
@@ -297,6 +434,9 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             selected={selectedId === item.entry.path}
             onSelect={() => setSelectedId(item.entry.path)}
             onShowContextMenu={showContextMenu}
+            isRenaming={renamingId === item.entry.path}
+            onRenameCommit={(newName) => handleRenameCommit(item.entry.path, newName)}
+            onRenameCancel={handleRenameCancel}
           />
         ),
       )}
@@ -313,6 +453,29 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
             onClick={handleContextOpen}
           >
             Open
+          </button>
+        </div>
+      ) : null}
+      {desktopContextMenu ? (
+        <div
+          className="karpos-desktop-context-menu"
+          style={{ left: desktopContextMenu.x, top: desktopContextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <button
+            type="button"
+            className="karpos-desktop-context-menu__item"
+            onClick={handleNewFolder}
+          >
+            New Folder
+          </button>
+          <button
+            type="button"
+            className="karpos-desktop-context-menu__item"
+            onClick={handleNewFile}
+          >
+            New File
           </button>
         </div>
       ) : null}

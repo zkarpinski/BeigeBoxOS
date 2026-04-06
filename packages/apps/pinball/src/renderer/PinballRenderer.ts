@@ -62,12 +62,97 @@ const STARS: Array<{ x: number; y: number; r: number; a: number }> = (() => {
   return out;
 })();
 
+/** Non-physics art matching 3D Pinball: Space Cadet (ramps, wormholes, targets, mission ring). */
+function drawSpaceCadetTableArt(ctx: CanvasRenderingContext2D, time: number): void {
+  ctx.save();
+
+  const g = ctx.createRadialGradient(100, 180, 30, 170, 240, 160);
+  g.addColorStop(0, 'rgba(90, 50, 140, 0.14)');
+  g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(14, 60, 272, 400);
+
+  // Outer orbit art — stop well left of x=284 so the shooter lane reads “open” at the top.
+  ctx.strokeStyle = 'rgba(110, 150, 255, 0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(16, 66);
+  ctx.bezierCurveTo(95, 58, 185, 58, 248, 72);
+  ctx.stroke();
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(130, 55, 200, 0.5)';
+  ctx.lineWidth = 12;
+  ctx.beginPath();
+  ctx.moveTo(18, 292);
+  ctx.lineTo(38, 242);
+  ctx.lineTo(54, 192);
+  ctx.lineTo(86, 142);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255, 210, 80, 0.45)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  for (const [wx, wy, wr] of [
+    [32, 92, 10],
+    [52, 118, 8],
+  ] as const) {
+    ctx.fillStyle = 'rgba(4, 4, 40, 0.9)';
+    ctx.beginPath();
+    ctx.arc(wx, wy, wr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(130, 200, 255, 0.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'rgba(200, 55, 75, 0.8)';
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(24, 246 + i * 18, 10, 14);
+  }
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(278, 246 + i * 18, 10, 14);
+  }
+
+  const mcx = 155;
+  const mcy = 312;
+  const mr = 36;
+  for (let i = 0; i < 12; i++) {
+    const ang = (i / 12) * Math.PI * 2 - Math.PI / 2;
+    const lx = mcx + Math.cos(ang) * mr;
+    const ly = mcy + Math.sin(ang) * mr;
+    const hue = (i * 28 + time * 35) % 360;
+    ctx.fillStyle = `hsla(${hue}, 72%, 52%, 0.7)`;
+    ctx.beginPath();
+    ctx.arc(lx, ly, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(220, 35, 35, 0.9)';
+  ctx.beginPath();
+  ctx.arc(mcx, mcy, 7, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(150, 70, 200, 0.22)';
+  ctx.lineWidth = 1;
+  const drainY = 438;
+  for (let i = 0; i < 8; i++) {
+    const ang = (i / 8) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(mcx, drainY);
+    ctx.lineTo(mcx + Math.cos(ang) * 42, drainY + Math.sin(ang) * 28);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
 export function renderFrame(
   ctx: CanvasRenderingContext2D,
   world: PinballWorld,
   time: number,
   lives: number,
-  ballsTotal: number
+  ballsTotal: number,
 ): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
@@ -83,9 +168,9 @@ export function renderFrame(
   ctx.fillStyle = COLORS.bg;
   ctx.fillRect(0, 0, 320, 480);
 
-  // Table surface
+  // Table surface (includes shooter lane to x=314; was 286w and left lane visually “outside”)
   ctx.fillStyle = COLORS.tableBg;
-  ctx.fillRect(14, 60, 286, 420);
+  ctx.fillRect(14, 60, 300, 420);
 
   // Starfield
   for (const s of STARS) {
@@ -97,6 +182,8 @@ export function renderFrame(
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+
+  drawSpaceCadetTableArt(ctx, time);
 
   // ── Lanes ───────────────────────────────────────────────────────────────
   for (const lane of world.lanes) {
@@ -113,6 +200,7 @@ export function renderFrame(
 
   // ── Walls ────────────────────────────────────────────────────────────────
   for (const w of world.walls) {
+    if (w.hidden) continue;
     ctx.strokeStyle = COLORS.wallGlow;
     ctx.lineWidth = 3;
     ctx.shadowColor = COLORS.wallGlow;
@@ -123,6 +211,18 @@ export function renderFrame(
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
+
+  // Cosmetic “shooter exit” (Space Cadet) — not in physics; top wall ends at x=284.
+  ctx.strokeStyle = COLORS.wallGlow;
+  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(284, 62);
+  ctx.lineTo(310, 90);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
 
   // ── Slingshots ───────────────────────────────────────────────────────────
   for (const ss of world.slingshots) {
@@ -140,7 +240,8 @@ export function renderFrame(
 
   // ── Bumpers ──────────────────────────────────────────────────────────────
   for (const b of world.bumpers) {
-    // Outer ring
+    const isMainPop = b.radius >= 13;
+
     ctx.beginPath();
     ctx.arc(b.pos.x, b.pos.y, b.radius + 3, 0, Math.PI * 2);
     ctx.strokeStyle = b.lit ? COLORS.bumperOn : COLORS.bumperRing;
@@ -150,20 +251,43 @@ export function renderFrame(
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // Fill
     const grad = ctx.createRadialGradient(
-      b.pos.x - b.radius * 0.3, b.pos.y - b.radius * 0.3, 1,
-      b.pos.x, b.pos.y, b.radius
+      b.pos.x - b.radius * 0.3,
+      b.pos.y - b.radius * 0.3,
+      1,
+      b.pos.x,
+      b.pos.y,
+      b.radius,
     );
-    grad.addColorStop(0, b.lit ? '#ff88ff' : '#220033');
-    grad.addColorStop(1, b.lit ? '#cc00cc' : '#110022');
+    if (isMainPop) {
+      grad.addColorStop(0, b.lit ? '#ffffff' : '#e8e8f0');
+      grad.addColorStop(0.45, b.lit ? '#dde0ff' : '#b8b8d0');
+      grad.addColorStop(1, b.lit ? '#a8a8c8' : '#707088');
+    } else {
+      grad.addColorStop(0, b.lit ? '#ff88ff' : '#220033');
+      grad.addColorStop(1, b.lit ? '#cc00cc' : '#110022');
+    }
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(b.pos.x, b.pos.y, b.radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Point label
-    ctx.fillStyle = b.lit ? '#ffffff' : '#886699';
+    if (isMainPop) {
+      ctx.save();
+      ctx.translate(b.pos.x, b.pos.y);
+      ctx.strokeStyle = b.lit ? '#ff4444' : '#cc2222';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        ctx.rotate(Math.PI / 2);
+        ctx.beginPath();
+        ctx.moveTo(0, -b.radius * 0.75);
+        ctx.lineTo(0, b.radius * 0.75);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    ctx.fillStyle = b.lit ? '#222244' : isMainPop ? '#333355' : '#886699';
     ctx.font = 'bold 7px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -222,8 +346,12 @@ export function renderFrame(
   if (!world.ballLost) {
     const { pos, radius } = world.ball;
     const grad = ctx.createRadialGradient(
-      pos.x - radius * 0.35, pos.y - radius * 0.35, 1,
-      pos.x, pos.y, radius
+      pos.x - radius * 0.35,
+      pos.y - radius * 0.35,
+      1,
+      pos.x,
+      pos.y,
+      radius,
     );
     grad.addColorStop(0, COLORS.ballShine);
     grad.addColorStop(0.4, COLORS.ball);
@@ -240,7 +368,7 @@ export function renderFrame(
   // ── HUD ──────────────────────────────────────────────────────────────────
   // Score panel (top)
   ctx.fillStyle = 'rgba(0,0,20,0.75)';
-  ctx.fillRect(14, 0, 286, 58);
+  ctx.fillRect(14, 0, 300, 58);
 
   ctx.fillStyle = COLORS.scoreText;
   ctx.font = 'bold 18px monospace';

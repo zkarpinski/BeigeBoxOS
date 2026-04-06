@@ -1,33 +1,36 @@
 /**
- * tableLayout.ts — Space Cadet-inspired table geometry.
+ * tableLayout.ts — 3D Pinball: Space Cadet–style table (320×480 reference).
  *
- * Reference resolution: 320×480 canvas pixels.
- * Coordinate origin: top-left.  Y increases downward.
+ * For RE source and browser ports to compare against, see ../../REFERENCE.md.
  *
- * Layout overview (top → bottom):
- *   y=0–60    : score HUD (not physics)
- *   y=60–80   : top rollover lanes + top wall
- *   y=80–280  : bumper cluster + ramps
- *   y=280–380 : slingshot area
- *   y=380–430 : flipper zone + drain guards
- *   y=430–480 : drain / plunger lane
- *
- * Plunger lane: x=286–316 (right of main field right wall x=286).
- * Ball launches from (302, 460) upward through the right lane,
- * hits the top-right redirect diagonal, and enters the main field.
+ * Coordinate origin: top-left; Y increases downward.
+ * Layout is tuned to mirror the Windows table: shooter far right, top rollovers,
+ * three pop bumpers in a triangle, three rebound bumpers stacked mid-left
+ * beside the hyperspace ramp, mirrored slingshots, flipper zone + drain.
  */
 
-import type { PinballWorld, Vec2 } from '../physics/PinballPhysics';
+import type { PinballWorld, Vec2, Wall } from '../physics/PinballPhysics';
 
 export const TABLE_W = 320;
 export const TABLE_H = 480;
 
-function wall(ax: number, ay: number, bx: number, by: number, r = 0.45) {
-  return { a: { x: ax, y: ay }, b: { x: bx, y: by }, restitution: r };
+/** Main-field mirror axis (16…284); used for right-side symmetry */
+const MIRROR_X = 300;
+
+function wall(ax: number, ay: number, bx: number, by: number, r = 0.45, hidden?: boolean): Wall {
+  const w: Wall = { a: { x: ax, y: ay }, b: { x: bx, y: by }, restitution: r };
+  if (hidden) w.hidden = true;
+  return w;
+}
+
+function mirrorSeg(ax: number, ay: number, bx: number, by: number) {
+  return {
+    a: { x: MIRROR_X - ax, y: ay },
+    b: { x: MIRROR_X - bx, y: by },
+  };
 }
 
 export function createTable(): PinballWorld {
-  // Plunger sits at bottom-right, ball rest position
   const plungerX = 302;
   const plungerY = 460;
 
@@ -40,60 +43,44 @@ export function createTable(): PinballWorld {
     onTable: true,
   };
 
-  // ── Walls ─────────────────────────────────────────────────────────────────
-  //
-  //  LEFT outer wall
-  //  RIGHT outer wall of main field  (x=284 — just inside plunger separator)
-  //  PLUNGER right wall               (x=314)
-  //  TOP wall of main field           (y=62)
-  //  TOP-RIGHT redirect diagonal      curves ball from plunger lane → main field
-  //  BOTTOM plunger lane floor
-  //  DRAIN guard diagonals            funnel ball toward flippers
-  //  INLANE dividers                  short posts beside flippers
-  //
+  // ── Left slingshot triangle (outer diag, inner vertical, base) ────────────
+  const slLeftA = { x: 38, y: 326 };
+  const slLeftB = { x: 72, y: 292 };
+  const slLeftC = { x: 38, y: 292 };
+  const srA = mirrorSeg(slLeftA.x, slLeftA.y, slLeftB.x, slLeftB.y);
+  const srB = mirrorSeg(slLeftA.x, slLeftA.y, slLeftC.x, slLeftC.y);
+  const srC = mirrorSeg(slLeftB.x, slLeftB.y, slLeftC.x, slLeftC.y);
+
   const walls: ReturnType<typeof wall>[] = [
-    // ── Outer boundary ───────────────────────────────────────────────────
-    wall(16, 62, 16, 400),           // Left outer wall
-    wall(314, 62, 314, 470),         // Plunger lane right wall (full height)
+    // Hidden ceiling MAIN FIELD ONLY (16…284). Must not extend into the shooter lane —
+    // a segment to x=314 seals the launch groove. Left/right walls start at y=56 so
+    // there is no gap at the corners for the main field.
+    wall(16, 56, 284, 56, 0.48, true),
 
-    // ── Top wall spans BOTH main field and plunger lane ───────────────────
-    // Ball launched up the right lane hits this wall and bounces left into play.
-    wall(16, 62, 314, 62, 0.5),
+    wall(16, 56, 16, 400),
+    wall(314, 56, 314, 470),
 
-    // ── Main field right wall — stops at y=95, leaving opening at top ─────
-    // The gap (y=62..95) is where the ball exits the plunger lane into the
-    // main field. A short diagonal guides it left-ward.
-    // Single wall at x=284 from the gap down to the drain — serves as both
-    // the main field right wall AND the plunger lane separator.
-    wall(284, 95, 284, 470),
-    // Short diagonal at gap entry: guides ball leftward when exiting lane
-    wall(284, 95, 310, 62, 0.55),
+    wall(16, 62, 284, 62, 0.5),
 
-    // ── Plunger lane bottom ───────────────────────────────────────────────
-    wall(284, 470, 314, 470, 0.1),   // Bottom of plunger lane (hard stop)
+    wall(284, 62, 284, 390),
+    wall(284, 440, 284, 470),
+    wall(284, 470, 314, 470, 0.1),
 
-    // ── Drain funnel guards ───────────────────────────────────────────────
-    // These diagonal walls angle inward from the outer walls toward the
-    // flipper pivots, deflecting near-drain balls back toward the flippers.
-    wall(16, 390, 62, 430, 0.35),    // Left drain guard (outer wall → left flipper area)
-    wall(284, 390, 238, 430, 0.35),  // Right drain guard (right wall → right flipper area)
+    wall(16, 390, 62, 430, 0.35),
+    wall(284, 390, 238, 430, 0.35),
 
-    // ── Inlane divider posts (short walls beside each flipper) ───────────
-    wall(68, 425, 68, 445, 0.3),     // Left inlane post
-    wall(236, 425, 236, 445, 0.3),   // Right inlane post
+    // Hyperspace ramp (left) — polyline approximation of purple ramp
+    wall(20, 288, 40, 238, 0.42),
+    wall(40, 238, 56, 188, 0.42),
+    wall(56, 188, 88, 138, 0.42),
+
+    // Inner guide below top rollovers (orbit path — must sit below laneY, not under y=62 ceiling)
+    wall(22, 94, 252, 94, 0.38),
+
+    wall(68, 425, 68, 448, 0.3),
+    wall(236, 425, 236, 448, 0.3),
   ];
 
-  // ── Flippers ──────────────────────────────────────────────────────────────
-  //
-  // Space Cadet geometry:
-  //   Left flipper:  pivot (76, 430), rest 28° (drooping right-down), active -26° (up-right)
-  //   Right flipper: pivot (228, 430), rest 152° (drooping left-down), active 206° (up-left)
-  //   Length: 52px
-  //
-  // In canvas coords (Y-down, angles clockwise from +X):
-  //   Left active angle < rest angle (rotates counter-clockwise = up)
-  //   Right active angle > rest angle (rotates clockwise = up)
-  //
   const leftPivot: Vec2 = { x: 76, y: 430 };
   const rightPivot: Vec2 = { x: 228, y: 430 };
   const flipperLen = 52;
@@ -119,63 +106,82 @@ export function createTable(): PinballWorld {
     },
   ];
 
-  // ── Pop bumpers ───────────────────────────────────────────────────────────
-  // Triangle cluster in upper-middle, matching Space Cadet's cluster.
+  // Three main pop bumpers (triangle, upper-center like Space Cadet)
   const bumpers = [
-    { pos: { x: 118, y: 148 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
-    { pos: { x: 182, y: 136 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
-    { pos: { x: 152, y: 192 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
-    // Two smaller bumpers flanking the cluster
-    { pos: { x: 90,  y: 220 }, radius: 10, restitution: 1.3, lit: false, litTimer: 0, points: 50 },
-    { pos: { x: 214, y: 210 }, radius: 10, restitution: 1.3, lit: false, litTimer: 0, points: 50 },
+    {
+      pos: { x: 148, y: 122 },
+      radius: 14,
+      restitution: 1.5,
+      lit: false,
+      litTimer: 0,
+      points: 100,
+    },
+    {
+      pos: { x: 104, y: 172 },
+      radius: 14,
+      restitution: 1.5,
+      lit: false,
+      litTimer: 0,
+      points: 100,
+    },
+    {
+      pos: { x: 192, y: 172 },
+      radius: 14,
+      restitution: 1.5,
+      lit: false,
+      litTimer: 0,
+      points: 100,
+    },
+    // Three rebound bumpers — vertical stack right of ramp (Cadet “Rebound” set)
+    {
+      pos: { x: 86, y: 186 },
+      radius: 9,
+      restitution: 1.28,
+      lit: false,
+      litTimer: 0,
+      points: 50,
+    },
+    {
+      pos: { x: 86, y: 216 },
+      radius: 9,
+      restitution: 1.28,
+      lit: false,
+      litTimer: 0,
+      points: 50,
+    },
+    {
+      pos: { x: 86, y: 246 },
+      radius: 9,
+      restitution: 1.28,
+      lit: false,
+      litTimer: 0,
+      points: 50,
+    },
   ];
 
-  // ── Slingshots ────────────────────────────────────────────────────────────
-  // Space Cadet has kicker triangles on both sides of the lower field.
+  const sling = {
+    restitution: 1.4,
+    lit: false,
+    litTimer: 0,
+    points: 50,
+  };
+
   const slingshots = [
-    {
-      a: { x: 38,  y: 330 },
-      b: { x: 72,  y: 295 },
-      restitution: 1.4,
-      lit: false,
-      litTimer: 0,
-      points: 50,
-    },
-    {
-      a: { x: 246, y: 295 },
-      b: { x: 246, y: 330 },
-      restitution: 1.4,
-      lit: false,
-      litTimer: 0,
-      points: 50,
-    },
-    // Extra bottom-side walls that complete the slingshot triangle shape
-    {
-      a: { x: 38,  y: 330 },
-      b: { x: 38,  y: 295 },
-      restitution: 1.2,
-      lit: false,
-      litTimer: 0,
-      points: 25,
-    },
-    {
-      a: { x: 246, y: 330 },
-      b: { x: 210, y: 295 },
-      restitution: 1.2,
-      lit: false,
-      litTimer: 0,
-      points: 25,
-    },
+    { a: slLeftA, b: slLeftB, ...sling },
+    { a: slLeftA, b: slLeftC, ...sling },
+    { a: slLeftB, b: slLeftC, ...sling, points: 25, restitution: 1.2 },
+    { a: srA.a, b: srA.b, ...sling },
+    { a: srB.a, b: srB.b, ...sling },
+    { a: srC.a, b: srC.b, ...sling, points: 25, restitution: 1.2 },
   ];
 
-  // ── Top rollover lanes ────────────────────────────────────────────────────
-  // Four short horizontal sensors just below the top wall.
-  const laneY = 82;
+  // Four top rollover lanes (skill shot strip), centered like the original
+  const laneY = 81;
   const lanes = [
-    { a: { x: 40,  y: laneY }, b: { x: 60,  y: laneY }, lit: false },
-    { a: { x: 90,  y: laneY }, b: { x: 110, y: laneY }, lit: false },
-    { a: { x: 140, y: laneY }, b: { x: 160, y: laneY }, lit: false },
-    { a: { x: 190, y: laneY }, b: { x: 210, y: laneY }, lit: false },
+    { a: { x: 56, y: laneY }, b: { x: 78, y: laneY }, lit: false },
+    { a: { x: 108, y: laneY }, b: { x: 130, y: laneY }, lit: false },
+    { a: { x: 160, y: laneY }, b: { x: 182, y: laneY }, lit: false },
+    { a: { x: 212, y: laneY }, b: { x: 234, y: laneY }, lit: false },
   ];
 
   return {

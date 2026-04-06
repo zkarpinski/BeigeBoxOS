@@ -50,6 +50,8 @@ export interface Wall {
   a: Vec2;
   b: Vec2;
   restitution: number;
+  /** If true, physics only — not drawn (e.g. full-width ceiling so the shooter cannot leave the table). */
+  hidden?: boolean;
 }
 
 export interface Slingshot {
@@ -302,6 +304,13 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
     }
   }
 
+  // Hard top clamp (HUD / off-table): hidden ceiling does not cover the shooter; this
+  // only fires if the ball would tunnel above the playfield strip.
+  if (!world.ballLost && ball.pos.y < 48) {
+    ball.pos.y = 48;
+    if (ball.vel.y < 0) ball.vel.y *= -0.35;
+  }
+
   // ── Speed cap ────────────────────────────────────────────────────────────
   const spd = len(ball.vel);
   if (spd > MAX_SPEED) {
@@ -317,7 +326,8 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
 /**
  * Launch ball from plunger.
  * force = 19 px/f (no compression) … 26 px/f (full compression).
- * Velocity is purely upward (-Y in canvas coords).
+ * Small -X drift sends the ball into the main field once the plunger lane is
+ * open above the bottom separator (purely vertical motion would ping-pong).
  */
 export function launchBall(world: PinballWorld): void {
   if (!world.ballInPlunger) return;
@@ -326,7 +336,7 @@ export function launchBall(world: PinballWorld): void {
   // Reset to rest position before applying velocity
   world.ball.pos.x = world.plungerX;
   world.ball.pos.y = world.plungerY;
-  world.ball.vel.x = 0;
+  world.ball.vel.x = -2.6;
   world.ball.vel.y = -force;
   world.ballInPlunger = false;
   world.plungerCompression = 0;

@@ -30,6 +30,10 @@ describe('createTable', () => {
     expect(world.walls.length).toBeGreaterThan(0);
     expect(world.slingshots.length).toBeGreaterThan(0);
     expect(world.lanes).toHaveLength(4);
+    expect(world.bumpers).toHaveLength(6);
+    expect(world.bumpers.filter((b) => b.radius >= 13)).toHaveLength(3);
+    expect(world.slingshots).toHaveLength(6);
+    expect(world.walls.some((w) => w.hidden)).toBe(true);
   });
 
   test('ball starts in plunger state at rest', () => {
@@ -103,7 +107,7 @@ describe('launchBall', () => {
     world.plungerCompression = 60;
     launchBall(world);
     expect(world.ball.vel.y).toBeLessThan(-20); // faster than minimum
-    expect(world.ball.vel.x).toBe(0);           // purely vertical
+    expect(world.ball.vel.x).toBe(-2.6); // slight drift into main field
   });
 
   test('velocity scales with compression between min and max', () => {
@@ -126,7 +130,7 @@ describe('launchBall', () => {
     const velAfterFirst = world.ball.vel.y;
 
     world.ball.vel.y = -5; // manually change vel
-    launchBall(world);     // should do nothing
+    launchBall(world); // should do nothing
     expect(world.ball.vel.y).toBe(-5); // unchanged
   });
 
@@ -136,6 +140,35 @@ describe('launchBall', () => {
     launchBall(world);
     expect(world.ball.pos.x).toBe(world.plungerX);
     expect(world.ball.pos.y).toBe(world.plungerY);
+  });
+
+  test('launched ball rises past plunger stub (lane not sealed upward)', () => {
+    const world = createTable();
+    world.plungerCompression = 60;
+    launchBall(world);
+    let minY = world.ball.pos.y;
+    for (let i = 0; i < 120; i++) {
+      simulate(world, 1);
+      minY = Math.min(minY, world.ball.pos.y);
+    }
+    // Stub separator ends at y=440; sealed layout blocked the ball below ~y=95.
+    expect(minY).toBeLessThan(420);
+  });
+
+  test('launched ball cannot escape past outer frame (hidden ceiling + walls)', () => {
+    const world = createTable();
+    world.plungerCompression = 60;
+    launchBall(world);
+    let minY = world.ball.pos.y;
+    let minX = world.ball.pos.x;
+    for (let i = 0; i < 300; i++) {
+      simulate(world, 1);
+      minY = Math.min(minY, world.ball.pos.y);
+      minX = Math.min(minX, world.ball.pos.x);
+    }
+    // Left wall x=16; hidden ceiling only to x=284; y<48 clamp catches tunneling into HUD.
+    expect(minX).toBeGreaterThan(9);
+    expect(minY).toBeGreaterThan(45);
   });
 });
 

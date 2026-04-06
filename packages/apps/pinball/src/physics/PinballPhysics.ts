@@ -1,10 +1,14 @@
 /**
  * PinballPhysics — 2D pinball physics engine.
  *
+ * Velocity units: pixels per frame at 60fps ("px/f").
+ * Integration: pos += vel * scale / SUB_STEPS per sub-step,
+ *   where scale = dt * 60 (= 1.0 at 60fps, 2.0 at 30fps, etc.).
+ * Gravity is applied once per full frame call, not per sub-step.
+ * This matches original Space Cadet "floaty" feel at low gravity.
+ *
  * Coordinate system: X right, Y down (canvas convention).
- * Gravity acts downward at g·sin(7°) ≈ 0.122 scaled units.
- * Physics sub-steps 4× per frame at 60fps → ~240Hz effective rate.
- * CCD implemented via swept circle vs. segment tests.
+ * Table gravity = g·sin(7°) ≈ 0.12; we use 0.38 for more responsive feel.
  */
 
 export interface Vec2 {
@@ -16,7 +20,6 @@ export interface Ball {
   pos: Vec2;
   vel: Vec2;
   radius: number;
-  /** 0–1 restitution */
   restitution: number;
   friction: number;
   onTable: boolean;
@@ -28,12 +31,9 @@ export interface Flipper {
   side: FlipperSide;
   pivot: Vec2;
   length: number;
-  /** Current angle in radians */
   angle: number;
   restAngle: number;
   activeAngle: number;
-  /** degrees/s angular speed */
-  angularSpeed: number;
   active: boolean;
 }
 
@@ -78,7 +78,6 @@ export interface PinballWorld {
   plungerActive: boolean;
   score: number;
   multiplier: number;
-  /** ball in plunger lane, not yet launched */
   ballInPlunger: boolean;
   plungerX: number;
   plungerY: number;
@@ -86,10 +85,18 @@ export interface PinballWorld {
   missionHits: number;
 }
 
-const GRAVITY = 0.18;
+// ── Tuning constants (all in px/frame units at 60fps) ──────────────────────
+/** Gravity added to vel.y per frame (once per stepWorld call, not per sub-step). */
+const GRAVITY = 0.38;
 const SUB_STEPS = 4;
-const FLIPPER_SPEED = Math.PI * 6; // rad/s
-const LIT_DURATION = 0.3; // seconds
+/** Flipper angular speed in radians per frame at 60fps. */
+const FLIPPER_SPEED = 0.32;
+/** Hard speed cap to prevent tunnelling. */
+const MAX_SPEED = 30;
+/** Duration a bumper/slingshot stays lit, seconds. */
+const LIT_DURATION = 0.25;
+
+// ── Math helpers ──────────────────────────────────────────────────────────
 
 function dot(a: Vec2, b: Vec2): number {
   return a.x * b.x + a.y * b.y;
@@ -101,8 +108,7 @@ function len(v: Vec2): number {
 
 function norm(v: Vec2): Vec2 {
   const l = len(v);
-  if (l === 0) return { x: 0, y: 0 };
-  return { x: v.x / l, y: v.y / l };
+  return l < 0.0001 ? { x: 0, y: 0 } : { x: v.x / l, y: v.y / l };
 }
 
 function sub(a: Vec2, b: Vec2): Vec2 {
@@ -113,19 +119,17 @@ function add(a: Vec2, b: Vec2): Vec2 {
   return { x: a.x + b.x, y: a.y + b.y };
 }
 
-function scale(v: Vec2, s: number): Vec2 {
+function scaleVec(v: Vec2, s: number): Vec2 {
   return { x: v.x * s, y: v.y * s };
 }
 
-/** Closest point on segment [a,b] to point p */
 function closestPointOnSegment(p: Vec2, a: Vec2, b: Vec2): Vec2 {
   const ab = sub(b, a);
   const ap = sub(p, a);
-  const t = Math.max(0, Math.min(1, dot(ap, ab) / dot(ab, ab)));
-  return add(a, scale(ab, t));
+  const t = Math.max(0, Math.min(1, dot(ap, ab) / (dot(ab, ab) || 1)));
+  return add(a, scaleVec(ab, t));
 }
 
-/** Flipper tip position from pivot, angle, length */
 function flipperTip(f: Flipper): Vec2 {
   return {
     x: f.pivot.x + Math.cos(f.angle) * f.length,
@@ -133,149 +137,151 @@ function flipperTip(f: Flipper): Vec2 {
   };
 }
 
-/** Velocity of flipper surface at a world point (from rotation) */
-function flipperSurfaceVelocity(f: Flipper, point: Vec2): Vec2 {
+/**
+ * Surface velocity of a rotating flipper at `point`.
+ * omega is in radians-per-frame (at 60fps); scale normalises for actual dt.
+ * v = omega × r  →  2D: { -r.y * omega, r.x * omega }
+ */
+function flipperSurfaceVelocity(f: Flipper, point: Vec2, scale: number): Vec2 {
   const r = sub(point, f.pivot);
-  const omega = f.active
-    ? (f.activeAngle - f.restAngle > 0 ? 1 : -1) * FLIPPER_SPEED
-    : (f.restAngle - f.activeAngle > 0 ? 1 : -1) * FLIPPER_SPEED;
-  // v = omega × r  (2D: v = (-ry, rx) * omega)
+  // Direction of rotation: toward active angle when active, toward rest when not.
+  const sign = f.active
+    ? Math.sign(f.activeAngle - f.restAngle)
+    : Math.sign(f.restAngle - f.activeAngle);
+  const omega = sign * FLIPPER_SPEED * scale;
   return { x: -r.y * omega, y: r.x * omega };
 }
+
+// ── Collision resolution ──────────────────────────────────────────────────
 
 function resolveSegmentCollision(
   ball: Ball,
   a: Vec2,
   b: Vec2,
   restitution: number,
-  surfaceVel?: Vec2
+  surfaceVel?: Vec2,
 ): boolean {
   const closest = closestPointOnSegment(ball.pos, a, b);
   const diff = sub(ball.pos, closest);
   const dist = len(diff);
-  if (dist < ball.radius && dist > 0.0001) {
-    const n = norm(diff);
-    // Push ball out
-    const penetration = ball.radius - dist;
-    ball.pos.x += n.x * penetration;
-    ball.pos.y += n.y * penetration;
-    // Relative velocity
-    const relVel = surfaceVel ? sub(ball.vel, surfaceVel) : ball.vel;
-    const vn = dot(relVel, n);
-    if (vn < 0) {
-      const impulse = -(1 + restitution) * vn;
-      ball.vel.x += impulse * n.x;
-      ball.vel.y += impulse * n.y;
-      // Friction on tangential component
-      const t = { x: -n.y, y: n.x };
-      const vt = dot(ball.vel, t);
-      ball.vel.x -= vt * ball.friction;
-      ball.vel.y -= vt * ball.friction;
-    }
-    return true;
+  if (dist >= ball.radius || dist < 0.0001) return false;
+
+  const n = norm(diff);
+  // Depenetrate
+  const pen = ball.radius - dist;
+  ball.pos.x += n.x * pen;
+  ball.pos.y += n.y * pen;
+
+  // Velocity impulse in relative frame
+  const relVel = surfaceVel ? sub(ball.vel, surfaceVel) : ball.vel;
+  const vn = dot(relVel, n);
+  if (vn < 0) {
+    const impulse = -(1 + restitution) * vn;
+    ball.vel.x += impulse * n.x;
+    ball.vel.y += impulse * n.y;
+    // Tiny friction on tangential component (pinball is nearly frictionless)
+    const t = { x: -n.y, y: n.x };
+    const vt = dot(ball.vel, t);
+    ball.vel.x -= vt * ball.friction;
+    ball.vel.y -= vt * ball.friction;
   }
-  return false;
+  return true;
 }
 
-function resolveCircleCollision(ball: Ball, center: Vec2, radius: number, restitution: number): boolean {
+function resolveCircleCollision(
+  ball: Ball,
+  center: Vec2,
+  radius: number,
+  restitution: number,
+): boolean {
   const diff = sub(ball.pos, center);
   const dist = len(diff);
   const minDist = ball.radius + radius;
-  if (dist < minDist && dist > 0.0001) {
-    const n = norm(diff);
-    ball.pos.x = center.x + n.x * minDist;
-    ball.pos.y = center.y + n.y * minDist;
-    const vn = dot(ball.vel, n);
-    if (vn < 0) {
-      ball.vel.x += -(1 + restitution) * vn * n.x;
-      ball.vel.y += -(1 + restitution) * vn * n.y;
-    }
-    return true;
+  if (dist >= minDist || dist < 0.0001) return false;
+
+  const n = norm(diff);
+  ball.pos.x = center.x + n.x * minDist;
+  ball.pos.y = center.y + n.y * minDist;
+  const vn = dot(ball.vel, n);
+  if (vn < 0) {
+    const impulse = -(1 + restitution) * vn;
+    ball.vel.x += impulse * n.x;
+    ball.vel.y += impulse * n.y;
   }
-  return false;
+  return true;
 }
+
+// ── Main step ──────────────────────────────────────────────────────────────
 
 export function stepWorld(world: PinballWorld, dt: number): string[] {
   const events: string[] = [];
-  const subDt = dt / SUB_STEPS;
+  // Normalise to 60fps; cap at 2.5× to avoid tunnelling on tab-freeze resume.
+  const scale = Math.min(dt * 60, 2.5);
+  const ball = world.ball;
 
+  // ── Flipper animation (always runs, even in plunger state) ───────────────
+  for (const f of world.flippers) {
+    const target = f.active ? f.activeAngle : f.restAngle;
+    const diff = target - f.angle;
+    const maxMove = FLIPPER_SPEED * scale;
+    f.angle = Math.abs(diff) <= maxMove ? target : f.angle + Math.sign(diff) * maxMove;
+  }
+
+  // ── Lit timers ───────────────────────────────────────────────────────────
+  for (const b of world.bumpers) {
+    if (b.lit && (b.litTimer -= dt) <= 0) b.lit = false;
+  }
+  for (const ss of world.slingshots) {
+    if (ss.lit && (ss.litTimer -= dt) <= 0) ss.lit = false;
+  }
+
+  if (world.ballInPlunger || world.ballLost) return events;
+
+  // ── Gravity (once per frame, not per sub-step) ───────────────────────────
+  ball.vel.y += GRAVITY * scale;
+
+  // ── Sub-step integration + collision ────────────────────────────────────
   for (let step = 0; step < SUB_STEPS; step++) {
-    const ball = world.ball;
+    ball.pos.x += (ball.vel.x * scale) / SUB_STEPS;
+    ball.pos.y += (ball.vel.y * scale) / SUB_STEPS;
 
-    if (world.ballInPlunger) {
-      // Ball sits on plunger, no physics
-      ball.pos.x = world.plungerX;
-      ball.pos.y = world.plungerY - world.plungerCompression * 0.4;
-      continue;
+    // Walls
+    for (const w of world.walls) {
+      resolveSegmentCollision(ball, w.a, w.b, w.restitution);
     }
 
-    if (world.ballLost) continue;
-
-    // Gravity
-    ball.vel.y += GRAVITY * subDt * 60;
-
-    // Integrate
-    ball.pos.x += ball.vel.x * subDt;
-    ball.pos.y += ball.vel.y * subDt;
-
-    // Wall collisions
-    for (const wall of world.walls) {
-      resolveSegmentCollision(ball, wall.a, wall.b, wall.restitution);
+    // Flippers
+    for (const f of world.flippers) {
+      const tip = flipperTip(f);
+      const sv = flipperSurfaceVelocity(f, ball.pos, scale);
+      resolveSegmentCollision(ball, f.pivot, tip, 0.65, sv);
     }
 
-    // Flipper collisions
-    for (const flipper of world.flippers) {
-      const tip = flipperTip(flipper);
-      const sv = flipperSurfaceVelocity(flipper, ball.pos);
-      if (resolveSegmentCollision(ball, flipper.pivot, tip, 0.5, sv)) {
-        // Add extra kick when flipper is actively swinging up
-        const swinging = flipper.active
-          ? (flipper.angle - flipper.restAngle) * (flipper.side === 'left' ? -1 : 1) > 0.05
-          : false;
-        if (swinging) {
-          ball.vel.y -= 2.5;
-          ball.vel.x += flipper.side === 'left' ? 1.5 : -1.5;
-        }
+    // Pop bumpers
+    for (const b of world.bumpers) {
+      if (resolveCircleCollision(ball, b.pos, b.radius, b.restitution) && !b.lit) {
+        world.score += b.points * world.multiplier;
+        b.lit = true;
+        b.litTimer = LIT_DURATION;
+        events.push(`bumper:${b.points}`);
       }
     }
 
-    // Bumper collisions
-    for (const bumper of world.bumpers) {
-      if (resolveCircleCollision(ball, bumper.pos, bumper.radius, bumper.restitution)) {
-        if (!bumper.lit) {
-          world.score += bumper.points * world.multiplier;
-          bumper.lit = true;
-          bumper.litTimer = LIT_DURATION;
-          events.push(`bumper:${bumper.points}`);
-        }
-      }
-      if (bumper.lit) {
-        bumper.litTimer -= subDt;
-        if (bumper.litTimer <= 0) bumper.lit = false;
-      }
-    }
-
-    // Slingshot collisions
+    // Slingshots
     for (const ss of world.slingshots) {
-      if (resolveSegmentCollision(ball, ss.a, ss.b, ss.restitution)) {
-        if (!ss.lit) {
-          world.score += ss.points * world.multiplier;
-          ss.lit = true;
-          ss.litTimer = LIT_DURATION;
-          events.push(`slingshot:${ss.points}`);
-        }
-      }
-      if (ss.lit) {
-        ss.litTimer -= subDt;
-        if (ss.litTimer <= 0) ss.lit = false;
+      if (resolveSegmentCollision(ball, ss.a, ss.b, ss.restitution) && !ss.lit) {
+        world.score += ss.points * world.multiplier;
+        ss.lit = true;
+        ss.litTimer = LIT_DURATION;
+        events.push(`slingshot:${ss.points}`);
       }
     }
 
-    // Lane sensors (score + track)
+    // Rollover lanes (sensors — no physics response, just scoring)
     for (const lane of world.lanes) {
       const closest = closestPointOnSegment(ball.pos, lane.a, lane.b);
       const d = len(sub(ball.pos, closest));
-      if (d < ball.radius + 2) {
+      if (d < ball.radius + 3) {
         if (!lane.lit) {
           lane.lit = true;
           world.score += 500 * world.multiplier;
@@ -288,41 +294,38 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
       }
     }
 
-    // Ball lost (fell below bottom)
-    if (ball.pos.y > world.plungerY + 30) {
+    // Drain detection — below table bottom
+    if (ball.pos.y > 475) {
       world.ballLost = true;
       events.push('ball_lost');
-    }
-
-    // Speed cap to prevent tunneling
-    const speed = len(ball.vel);
-    const maxSpeed = 25;
-    if (speed > maxSpeed) {
-      ball.vel.x = (ball.vel.x / speed) * maxSpeed;
-      ball.vel.y = (ball.vel.y / speed) * maxSpeed;
+      break;
     }
   }
 
-  // Update flippers (outside sub-steps for smooth feel)
-  for (const flipper of world.flippers) {
-    const target = flipper.active ? flipper.activeAngle : flipper.restAngle;
-    const diff = target - flipper.angle;
-    const maxMove = FLIPPER_SPEED * dt;
-    if (Math.abs(diff) < maxMove) {
-      flipper.angle = target;
-    } else {
-      flipper.angle += Math.sign(diff) * maxMove;
-    }
+  // ── Speed cap ────────────────────────────────────────────────────────────
+  const spd = len(ball.vel);
+  if (spd > MAX_SPEED) {
+    ball.vel.x = (ball.vel.x / spd) * MAX_SPEED;
+    ball.vel.y = (ball.vel.y / spd) * MAX_SPEED;
   }
-
-  // Lit timer for bumpers already updated in sub-steps
 
   return events;
 }
 
+// ── Plunger actions ───────────────────────────────────────────────────────
+
+/**
+ * Launch ball from plunger.
+ * force = 19 px/f (no compression) … 26 px/f (full compression).
+ * Velocity is purely upward (-Y in canvas coords).
+ */
 export function launchBall(world: PinballWorld): void {
   if (!world.ballInPlunger) return;
-  const force = 8 + world.plungerCompression * 0.22;
+  const pct = Math.min(world.plungerCompression / 60, 1);
+  const force = 19 + pct * 7;
+  // Reset to rest position before applying velocity
+  world.ball.pos.x = world.plungerX;
+  world.ball.pos.y = world.plungerY;
   world.ball.vel.x = 0;
   world.ball.vel.y = -force;
   world.ballInPlunger = false;
@@ -331,11 +334,10 @@ export function launchBall(world: PinballWorld): void {
 
 export function resetBall(world: PinballWorld): void {
   world.ball.pos.x = world.plungerX;
-  world.ball.pos.y = world.plungerY - 10;
+  world.ball.pos.y = world.plungerY;
   world.ball.vel.x = 0;
   world.ball.vel.y = 0;
   world.ballInPlunger = true;
   world.ballLost = false;
-  // Reset lane state
   for (const lane of world.lanes) lane.lit = false;
 }

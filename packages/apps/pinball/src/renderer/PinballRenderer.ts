@@ -195,21 +195,27 @@ export function renderFrame(
   }
 
   // ── Plunger ───────────────────────────────────────────────────────────────
+  // The plunger rod pulls DOWN (increasing Y) as the player compresses it.
+  // The ball stays at its rest position; only the rod/spring moves down.
   if (world.ballInPlunger || world.plungerCompression > 0) {
     const px = world.plungerX;
     const py = world.plungerY;
     const comp = world.plungerCompression;
-    // Lane fill (charge indicator)
+    const pct = Math.min(comp / 60, 1);
+
+    // Power bar grows DOWNWARD from ball rest position (correct direction)
     if (comp > 0) {
-      const pct = Math.min(comp / 60, 1);
-      ctx.fillStyle = `hsl(${60 - pct * 60}, 100%, 50%)`;
-      ctx.fillRect(px - 6, py - comp * 0.4, 12, comp * 0.4);
+      const barH = pct * 22;
+      ctx.fillStyle = `hsl(${55 - pct * 55}, 100%, 50%)`;
+      ctx.fillRect(px - 4, py + 8, 8, barH);
     }
-    // Rod
+
+    // Plunger rod: shifts down with compression
+    const rodOffset = pct * 14;
     ctx.fillStyle = COLORS.plunger;
-    ctx.fillRect(px - 5, py, 10, 20);
+    ctx.fillRect(px - 4, py + 8 + rodOffset, 8, 18);
     ctx.fillStyle = COLORS.plungerFill;
-    ctx.fillRect(px - 3, py + 2, 6, 14);
+    ctx.fillRect(px - 2, py + 10 + rodOffset, 4, 12);
   }
 
   // ── Ball ─────────────────────────────────────────────────────────────────

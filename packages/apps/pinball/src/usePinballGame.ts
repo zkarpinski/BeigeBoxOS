@@ -139,9 +139,10 @@ export function usePinballGame(canvasRef: React.RefObject<HTMLCanvasElement | nu
       const phase = phaseRef.current;
 
       if (phase === 'playing') {
-        // Plunger compression
+        // Plunger compression — ball stays at rest; only power bar fills.
+        // Rate: full charge in ~0.75s at 60fps.
         if (plungerHeldRef.current && world.ballInPlunger) {
-          world.plungerCompression = Math.min(world.plungerCompression + dt * 80, 60);
+          world.plungerCompression = Math.min(world.plungerCompression + dt * 85, 60);
         }
 
         const events = stepWorld(world, dt);

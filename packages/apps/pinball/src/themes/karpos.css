@@ -1,0 +1,94 @@
+/* Nebula Pinball — KarpOS skin */
+
+body.karpos-desktop .pinball-window {
+  width: 380px;
+  height: 580px;
+}
+
+/* .pinball-app IS the [data-pinball-skin] element — use compound selector (no space) */
+[data-pinball-skin="karpos"].pinball-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: #08081a;
+  color: #ccccff;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  user-select: none;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  background: #111130;
+  border-bottom: 2px solid #333366;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu-btn {
+  background: none;
+  border: none;
+  color: #aaaaff;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 1px 6px;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu-btn:hover {
+  background: #333366;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu-item {
+  color: #aaaaff;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 1px 4px;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu-item:hover {
+  background: #222244;
+}
+
+[data-pinball-skin="karpos"] .pinball-menu-sep {
+  flex: 1;
+}
+
+[data-pinball-skin="karpos"] .pinball-rank {
+  color: #8888ff;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-pinball-skin="karpos"] .pinball-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #05050f;
+  min-height: 0;
+}
+
+[data-pinball-skin="karpos"] .pinball-canvas {
+  display: block;
+  image-rendering: pixelated;
+  cursor: crosshair;
+  /* Neo-brutalist border */
+  box-shadow: 4px 4px 0 #0000ff, -2px -2px 0 #3333aa;
+}
+
+[data-pinball-skin="karpos"] .pinball-controls {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  background: #0a0a1f;
+  border-top: 1px solid #222244;
+  font-size: 10px;
+  color: #555577;
+  text-align: center;
+  letter-spacing: 0.02em;
+}

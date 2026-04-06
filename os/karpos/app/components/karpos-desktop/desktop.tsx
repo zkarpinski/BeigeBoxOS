@@ -7,6 +7,7 @@ import { AppWindow, TitleBar, KarpGlobalShim } from '../karpos-shell';
 import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
+import { PinballWindow } from '@retro-web/app-pinball';
 import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { ProjectsWindow } from '../apps/projects/ProjectsWindow';
@@ -56,7 +57,7 @@ export function KarpDesktop() {
           <h1>KarpOS — Zachary Karpinski</h1>
           <p>
             A neo-brutalist playground desktop in the browser. Open Projects, Notepad, Minesweeper,
-            Calculator, PDF Reader, and Pad.
+            Calculator, PDF Reader, Pad, and Nebula Pinball.
           </p>
         </div>
 
@@ -66,6 +67,7 @@ export function KarpDesktop() {
         <PdfReaderWindow />
         <ProjectsWindow />
         <PadWindow />
+        <PinballWindow skin="karpos" />
 
         <DesktopIcons registry={appRegistry} />
         <KarposTaskbar registry={appRegistry} />

@@ -1,0 +1,24 @@
+{
+  "name": "@retro-web/app-derp",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DERP — Desktop Error Reporting Program, KarpOS edition",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./themes/karpos.css": "./src/themes/karpos.css"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "dependencies": {
+    "@retro-web/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.0.0"
+  }
+}

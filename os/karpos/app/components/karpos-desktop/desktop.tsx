@@ -8,6 +8,7 @@ import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
 import { PinballWindow } from '@retro-web/app-pinball';
+import { DerpWindow } from '@retro-web/app-derp';
 import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { ProjectsWindow } from '../apps/projects/ProjectsWindow';
@@ -68,6 +69,7 @@ export function KarpDesktop() {
         <ProjectsWindow />
         <PadWindow />
         <PinballWindow skin="karpos" />
+        <DerpWindow />
 
         <DesktopIcons registry={appRegistry} />
         <KarposTaskbar registry={appRegistry} />

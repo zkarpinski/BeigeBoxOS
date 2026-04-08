@@ -1,0 +1,382 @@
+/* DERP — KarpOS neo-brutalist theme */
+
+body.karpos-desktop .derp-window {
+  width: 520px;
+  height: 600px;
+}
+
+.derp-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f0e8;
+  color: #111;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+  user-select: none;
+}
+
+/* ── Menu bar ────────────────────────────────────────────────────────────── */
+
+.derp-menubar {
+  display: flex;
+  align-items: stretch;
+  background: #111;
+  color: #f5f0e8;
+  flex-shrink: 0;
+  font-size: 12px;
+  border-bottom: 3px solid #111;
+}
+
+.derp-menu-root {
+  position: relative;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.derp-menu-root:hover,
+.derp-menu-root.open {
+  background: #f5c800;
+  color: #111;
+}
+
+.derp-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  background: #f5f0e8;
+  border: 3px solid #111;
+  box-shadow: 4px 4px 0 #111;
+  min-width: 180px;
+  color: #111;
+}
+
+.derp-menu-item {
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.derp-menu-item:hover {
+  background: #f5c800;
+}
+
+/* ── Form body ───────────────────────────────────────────────────────────── */
+
+.derp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.derp-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.derp-row-vcenter {
+  align-items: center;
+}
+
+.derp-lists-row {
+  flex: 1;
+  min-height: 0;
+}
+
+.derp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.derp-field-grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.derp-label {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #444;
+}
+
+.derp-char-count {
+  font-weight: normal;
+  color: #888;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+
+.derp-input,
+.derp-select,
+.derp-textarea {
+  font-family: inherit;
+  font-size: 12px;
+  background: #fff;
+  border: 3px solid #111;
+  padding: 4px 6px;
+  outline: none;
+  box-shadow: 3px 3px 0 #111;
+  color: #111;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.derp-input:focus,
+.derp-select:focus,
+.derp-textarea:focus {
+  background: #fffff0;
+  border-color: #0000cc;
+  box-shadow: 3px 3px 0 #0000cc;
+}
+
+.derp-input-sm {
+  width: 90px;
+}
+
+.derp-textarea {
+  resize: none;
+}
+
+.derp-select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+/* ── Fieldset ────────────────────────────────────────────────────────────── */
+
+.derp-fieldset {
+  border: 3px solid #111;
+  padding: 6px 10px 8px;
+  margin: 0;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.derp-legend {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 4px;
+  background: #f5c800;
+  border: 2px solid #111;
+}
+
+/* ── Listboxes ───────────────────────────────────────────────────────────── */
+
+.derp-listbox {
+  border: 3px solid #111;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+  overflow-y: auto;
+  height: 100px;
+}
+
+.derp-listbox-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.derp-listbox-item:last-child {
+  border-bottom: none;
+}
+
+.derp-listbox-item:hover {
+  background: #f5c800;
+}
+
+.derp-listbox-item.active {
+  background: #111;
+  color: #f5c800;
+}
+
+.derp-listbox-hint {
+  padding: 8px;
+  color: #888;
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* ── Error details grid ──────────────────────────────────────────────────── */
+
+.derp-grid {
+  border: 3px solid #111;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+  overflow-y: auto;
+  height: 80px;
+}
+
+.derp-grid-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.derp-grid-row:last-child {
+  border-bottom: none;
+}
+
+.derp-grid-row:hover {
+  background: #fffbe0;
+}
+
+.derp-grid-row input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #111;
+  flex-shrink: 0;
+}
+
+.derp-grid-code {
+  font-weight: bold;
+  width: 72px;
+  flex-shrink: 0;
+  color: #0000cc;
+}
+
+.derp-grid-desc {
+  flex: 1;
+  color: #222;
+}
+
+/* ── Checkbox label ──────────────────────────────────────────────────────── */
+
+.derp-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 4px;
+  margin-top: 18px; /* align with input bottom */
+}
+
+.derp-checkbox-label input[type="checkbox"] {
+  accent-color: #111;
+}
+
+/* ── Button bar ──────────────────────────────────────────────────────────── */
+
+.derp-btnbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 3px solid #111;
+  background: #e8e0d0;
+  flex-shrink: 0;
+}
+
+.derp-btn {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 16px;
+  border: 3px solid #111;
+  background: #f5f0e8;
+  color: #111;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #111;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: box-shadow 0.05s, transform 0.05s;
+}
+
+.derp-btn:hover {
+  background: #f5c800;
+}
+
+.derp-btn:active {
+  box-shadow: 1px 1px 0 #111;
+  transform: translate(2px, 2px);
+}
+
+.derp-btn-primary {
+  background: #111;
+  color: #f5c800;
+}
+
+.derp-btn-primary:hover {
+  background: #333;
+  color: #f5c800;
+}
+
+/* ── Status bar ──────────────────────────────────────────────────────────── */
+
+.derp-statusbar {
+  padding: 4px 10px;
+  border-top: 2px solid #111;
+  background: #e8e0d0;
+  font-size: 11px;
+  color: #333;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.derp-statusbar-error {
+  background: #cc0000;
+  color: #fff;
+}
+
+/* ── About dialog ────────────────────────────────────────────────────────── */
+
+.derp-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.derp-dialog {
+  background: #f5f0e8;
+  border: 4px solid #111;
+  box-shadow: 6px 6px 0 #111;
+  min-width: 260px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.derp-dialog-title {
+  background: #111;
+  color: #f5c800;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 6px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.derp-dialog-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.6;
+}
+
+.derp-dialog-footer {
+  padding: 8px 16px 12px;
+  display: flex;
+  justify-content: center;
+}

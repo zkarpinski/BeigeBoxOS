@@ -5,7 +5,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const APP_IDS = ['pdf-reader', 'notepad', 'minesweeper', 'calculator', 'projects', 'pad'] as const;
+const APP_IDS = [
+  'pdf-reader',
+  'notepad',
+  'minesweeper',
+  'calculator',
+  'pinball',
+  'projects',
+  'pad',
+] as const;
 
 export const dynamicParams = false;
 

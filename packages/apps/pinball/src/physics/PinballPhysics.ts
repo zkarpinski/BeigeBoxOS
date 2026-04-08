@@ -89,12 +89,12 @@ export interface PinballWorld {
 
 // ── Tuning constants (all in px/frame units at 60fps) ──────────────────────
 /** Gravity added to vel.y per frame (once per stepWorld call, not per sub-step). */
-const GRAVITY = 0.38;
+const GRAVITY = 0.22;
 const SUB_STEPS = 4;
 /** Flipper angular speed in radians per frame at 60fps. */
 const FLIPPER_SPEED = 0.32;
 /** Hard speed cap to prevent tunnelling. */
-const MAX_SPEED = 30;
+const MAX_SPEED = 18;
 /** Duration a bumper/slingshot stays lit, seconds. */
 const LIT_DURATION = 0.25;
 
@@ -325,14 +325,14 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
 
 /**
  * Launch ball from plunger.
- * force = 19 px/f (no compression) … 26 px/f (full compression).
+ * force = 12 px/f (no compression) … 18 px/f (full compression).
  * Small -X drift sends the ball into the main field once the plunger lane is
  * open above the bottom separator (purely vertical motion would ping-pong).
  */
 export function launchBall(world: PinballWorld): void {
   if (!world.ballInPlunger) return;
   const pct = Math.min(world.plungerCompression / 60, 1);
-  const force = 19 + pct * 7;
+  const force = 12 + pct * 6;
   // Reset to rest position before applying velocity
   world.ball.pos.x = world.plungerX;
   world.ball.pos.y = world.plungerY;

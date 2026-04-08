@@ -7,6 +7,20 @@
  * Layout is tuned to mirror the Windows table: shooter far right, top rollovers,
  * three pop bumpers in a triangle, three rebound bumpers stacked mid-left
  * beside the hyperspace ramp, mirrored slingshots, flipper zone + drain.
+ *
+ * Zone reference (top → bottom):
+ *   y=0–56    : above table / HUD (not physics)
+ *   y=56–94   : top rollover lanes + ceiling
+ *   y=94–280  : bumper cluster + ramps
+ *   y=280–390 : slingshot area
+ *   y=390–430 : flipper zone + drain guards
+ *   y=430–480 : drain / plunger lane
+ *
+ * Shooter lane: x=284–314 (right of main field right wall x=284).
+ *   Ball starts at (302, 460), launches upward through the lane, hits the
+ *   redirect diagonal at (284,95)→(310,62), curves left into the main field.
+ *   The 4px gap between x=310 and x=314 at y=62 is the exit opening.
+ *   Gap in inner wall (x=284) between y=62–95 is the exit point — do not seal it.
  */
 
 import type { PinballWorld, Vec2, Wall } from '../physics/PinballPhysics';
@@ -60,9 +74,14 @@ export function createTable(): PinballWorld {
     wall(16, 56, 16, 400),
     wall(314, 56, 314, 470),
 
+    // Visible ceiling — main field only (does not extend into shooter lane)
     wall(16, 62, 284, 62, 0.5),
 
-    wall(284, 62, 284, 390),
+    // Main field right wall — gap at y=62–95 is where the ball enters from the lane.
+    wall(284, 95, 284, 390),
+    // Angled exit at top of shooter lane: slopes \ from inner-top (284,62) to outer-bottom (314,95).
+    // A ball going straight up hits this and deflects LEFT into the main field through the gap.
+    wall(284, 62, 314, 95, 0.6),
     wall(284, 440, 284, 470),
     wall(284, 470, 314, 470, 0.1),
 
@@ -73,9 +92,6 @@ export function createTable(): PinballWorld {
     wall(20, 288, 40, 238, 0.42),
     wall(40, 238, 56, 188, 0.42),
     wall(56, 188, 88, 138, 0.42),
-
-    // Inner guide below top rollovers (orbit path — must sit below laneY, not under y=62 ceiling)
-    wall(22, 94, 252, 94, 0.38),
 
     wall(68, 425, 68, 448, 0.3),
     wall(236, 425, 236, 448, 0.3),

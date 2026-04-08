@@ -90,7 +90,7 @@ export interface PinballWorld {
 // ── Tuning constants (all in px/frame units at 60fps) ──────────────────────
 /** Gravity added to vel.y per frame (once per stepWorld call, not per sub-step). */
 const GRAVITY = 0.22;
-const SUB_STEPS = 4;
+const SUB_STEPS = 6;
 /** Flipper angular speed in radians per frame at 60fps. */
 const FLIPPER_SPEED = 0.32;
 /** Hard speed cap to prevent tunnelling. */
@@ -221,14 +221,6 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
   const scale = Math.min(dt * 60, 2.5);
   const ball = world.ball;
 
-  // ── Flipper animation (always runs, even in plunger state) ───────────────
-  for (const f of world.flippers) {
-    const target = f.active ? f.activeAngle : f.restAngle;
-    const diff = target - f.angle;
-    const maxMove = FLIPPER_SPEED * scale;
-    f.angle = Math.abs(diff) <= maxMove ? target : f.angle + Math.sign(diff) * maxMove;
-  }
-
   // ── Lit timers ───────────────────────────────────────────────────────────
   for (const b of world.bumpers) {
     if (b.lit && (b.litTimer -= dt) <= 0) b.lit = false;
@@ -237,7 +229,22 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
     if (ss.lit && (ss.litTimer -= dt) <= 0) ss.lit = false;
   }
 
-  if (world.ballInPlunger || world.ballLost) return events;
+  // ── Flipper target angles for this frame ─────────────────────────────────
+  // Computed up front so we can interpolate across sub-steps rather than
+  // jumping the full angle before collision runs (which causes tunnelling).
+  const flipperStartAngle = world.flippers.map(f => f.angle);
+  const flipperEndAngle = world.flippers.map(f => {
+    const target = f.active ? f.activeAngle : f.restAngle;
+    const diff = target - f.angle;
+    const maxMove = FLIPPER_SPEED * scale;
+    return Math.abs(diff) <= maxMove ? target : f.angle + Math.sign(diff) * maxMove;
+  });
+
+  if (world.ballInPlunger || world.ballLost) {
+    // Still commit flipper animation so they visually respond to input
+    for (let i = 0; i < world.flippers.length; i++) world.flippers[i].angle = flipperEndAngle[i];
+    return events;
+  }
 
   // ── Gravity (once per frame, not per sub-step) ───────────────────────────
   ball.vel.y += GRAVITY * scale;
@@ -252,8 +259,12 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
       resolveSegmentCollision(ball, w.a, w.b, w.restitution);
     }
 
-    // Flippers
-    for (const f of world.flippers) {
+    // Flippers — angle is interpolated across sub-steps so the flipper sweeps
+    // incrementally rather than jumping its full arc before collision runs.
+    const t = (step + 1) / SUB_STEPS;
+    for (let i = 0; i < world.flippers.length; i++) {
+      const f = world.flippers[i];
+      f.angle = flipperStartAngle[i] + t * (flipperEndAngle[i] - flipperStartAngle[i]);
       const tip = flipperTip(f);
       const sv = flipperSurfaceVelocity(f, ball.pos, scale);
       resolveSegmentCollision(ball, f.pivot, tip, 0.65, sv);
@@ -303,6 +314,9 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
       break;
     }
   }
+
+  // Commit flippers to their end-of-frame angle
+  for (let i = 0; i < world.flippers.length; i++) world.flippers[i].angle = flipperEndAngle[i];
 
   // Hard top clamp (HUD / off-table): hidden ceiling does not cover the shooter; this
   // only fires if the ball would tunnel above the playfield strip.

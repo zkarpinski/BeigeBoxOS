@@ -4,23 +4,22 @@
  * For RE source and browser ports to compare against, see ../../REFERENCE.md.
  *
  * Coordinate origin: top-left; Y increases downward.
- * Layout is tuned to mirror the Windows table: shooter far right, top rollovers,
- * three pop bumpers in a triangle, three rebound bumpers stacked mid-left
- * beside the hyperspace ramp, mirrored slingshots, flipper zone + drain.
+ * Based on the Space Cadet Playfield Schematic (Diagram 001 Rev. C).
  *
  * Zone reference (top → bottom):
- *   y=0–56    : above table / HUD (not physics)
- *   y=56–94   : top rollover lanes + ceiling
- *   y=94–280  : bumper cluster + ramps
+ *   y=0–62    : HUD / ceiling
+ *   y=62–280  : bumper clusters + orbit arc
  *   y=280–390 : slingshot area
  *   y=390–430 : flipper zone + drain guards
  *   y=430–480 : drain / plunger lane
  *
- * Shooter lane: x=284–314 (right of main field right wall x=284).
- *   Ball starts at (302, 460), launches upward through the lane, hits the
- *   redirect diagonal at (284,95)→(310,62), curves left into the main field.
- *   The 4px gap between x=310 and x=314 at y=62 is the exit opening.
- *   Gap in inner wall (x=284) between y=62–95 is the exit point — do not seal it.
+ * Shooter lane: x=284–314 (right of main field wall x=284).
+ *   Ball starts at (302, 460), launches up the lane, hits the angled exit
+ *   wall(284,62)→(314,95), deflects LEFT into the main field.
+ *   The gap in the inner wall (x=284) between y=62–95 is the exit — do not seal it.
+ *
+ * Left orbit: the top-left corner is angled; a sweeping arc of walls runs down
+ *   the left side approximating the twisted ramp path from the schematic.
  */
 
 import type { PinballWorld, Vec2, Wall } from '../physics/PinballPhysics';
@@ -28,7 +27,7 @@ import type { PinballWorld, Vec2, Wall } from '../physics/PinballPhysics';
 export const TABLE_W = 320;
 export const TABLE_H = 480;
 
-/** Main-field mirror axis (16…284); used for right-side symmetry */
+/** Main-field mirror axis; used for right-side slingshot symmetry */
 const MIRROR_X = 300;
 
 function wall(ax: number, ay: number, bx: number, by: number, r = 0.45, hidden?: boolean): Wall {
@@ -57,48 +56,60 @@ export function createTable(): PinballWorld {
     onTable: true,
   };
 
-  // ── Left slingshot triangle (outer diag, inner vertical, base) ────────────
-  const slLeftA = { x: 38, y: 326 };
-  const slLeftB = { x: 72, y: 292 };
-  const slLeftC = { x: 38, y: 292 };
+  // ── Left slingshot triangle ────────────────────────────────────────────────
+  // Positioned at lower-left per schematic (diag, vertical, base)
+  const slLeftA = { x: 42, y: 332 };
+  const slLeftB = { x: 76, y: 298 };
+  const slLeftC = { x: 42, y: 298 };
   const srA = mirrorSeg(slLeftA.x, slLeftA.y, slLeftB.x, slLeftB.y);
   const srB = mirrorSeg(slLeftA.x, slLeftA.y, slLeftC.x, slLeftC.y);
   const srC = mirrorSeg(slLeftB.x, slLeftB.y, slLeftC.x, slLeftC.y);
 
   const walls: ReturnType<typeof wall>[] = [
-    // Hidden ceiling MAIN FIELD ONLY (16…284). Must not extend into the shooter lane —
-    // a segment to x=314 seals the launch groove. Left/right walls start at y=56 so
-    // there is no gap at the corners for the main field.
+    // ── Outer boundary ─────────────────────────────────────────────────────
+    // Hidden full-width ceiling (physics backstop only — not rendered)
     wall(16, 56, 284, 56, 0.48, true),
 
-    wall(16, 56, 16, 400),
+    // Top-left angled corner (matches schematic — not a right angle)
+    wall(16, 112, 56, 62),
+    // Left outer wall (below the angled corner)
+    wall(16, 112, 16, 390),
+    // Shooter lane outer right wall
     wall(314, 56, 314, 470),
 
-    // Visible ceiling — main field only (does not extend into shooter lane)
-    wall(16, 62, 284, 62, 0.5),
+    // Visible ceiling (from the angled corner to the main-field right wall)
+    wall(56, 62, 284, 62, 0.5),
 
-    // Main field right wall — gap at y=62–95 is where the ball enters from the lane.
-    wall(284, 95, 284, 390),
-    // Angled exit at top of shooter lane: slopes \ from inner-top (284,62) to outer-bottom (314,95).
-    // A ball going straight up hits this and deflects LEFT into the main field through the gap.
+    // ── Shooter lane exit ──────────────────────────────────────────────────
+    // Angled \ surface: ball going up deflects LEFT into the main field
     wall(284, 62, 314, 95, 0.6),
+    // Main field right wall — gap at y=62–95 is the shooter exit opening
+    wall(284, 95, 284, 390),
     wall(284, 440, 284, 470),
     wall(284, 470, 314, 470, 0.1),
 
-    wall(16, 390, 62, 430, 0.35),
-    wall(284, 390, 238, 430, 0.35),
+    // ── Left orbit arc (twisted ramp path from schematic) ──────────────────
+    // Sweeps from just under the top-left angle, down the left side,
+    // and curves back rightward into the slingshot area.
+    wall(56, 78, 38, 140, 0.42),
+    wall(38, 140, 24, 215, 0.42),
+    wall(24, 215, 36, 288, 0.42),
+    wall(36, 288, 68, 316, 0.42),
 
-    // Hyperspace ramp (left) — polyline approximation of purple ramp
-    wall(20, 288, 40, 238, 0.42),
-    wall(40, 238, 56, 188, 0.42),
-    wall(56, 188, 88, 138, 0.42),
+    // ── Right-side guide rail (target bank area per schematic) ────────────
+    wall(248, 140, 268, 250, 0.4),
 
-    wall(68, 425, 68, 448, 0.3),
-    wall(236, 425, 236, 448, 0.3),
+    // ── Drain funnel guards ────────────────────────────────────────────────
+    wall(16, 390, 66, 432, 0.35),
+    wall(284, 390, 238, 432, 0.35),
+
+    // ── Inlane divider posts ───────────────────────────────────────────────
+    wall(72, 426, 72, 448, 0.3),
+    wall(232, 426, 232, 448, 0.3),
   ];
 
-  const leftPivot: Vec2 = { x: 76, y: 430 };
-  const rightPivot: Vec2 = { x: 228, y: 430 };
+  const leftPivot: Vec2 = { x: 80, y: 432 };
+  const rightPivot: Vec2 = { x: 224, y: 432 };
   const flipperLen = 52;
 
   const flippers = [
@@ -122,65 +133,21 @@ export function createTable(): PinballWorld {
     },
   ];
 
-  // Three main pop bumpers (triangle, upper-center like Space Cadet)
+  // ── Bumpers ───────────────────────────────────────────────────────────────
+  // Two clusters per schematic:
+  //   Left cluster  — upper-center (triangle formation)
+  //   Right cluster — upper-right (two bumpers, labeled "Bumper Cluster" on schematic)
   const bumpers = [
-    {
-      pos: { x: 148, y: 122 },
-      radius: 14,
-      restitution: 1.5,
-      lit: false,
-      litTimer: 0,
-      points: 100,
-    },
-    {
-      pos: { x: 104, y: 172 },
-      radius: 14,
-      restitution: 1.5,
-      lit: false,
-      litTimer: 0,
-      points: 100,
-    },
-    {
-      pos: { x: 192, y: 172 },
-      radius: 14,
-      restitution: 1.5,
-      lit: false,
-      litTimer: 0,
-      points: 100,
-    },
-    // Three rebound bumpers — vertical stack right of ramp (Cadet “Rebound” set)
-    {
-      pos: { x: 86, y: 186 },
-      radius: 9,
-      restitution: 1.28,
-      lit: false,
-      litTimer: 0,
-      points: 50,
-    },
-    {
-      pos: { x: 86, y: 216 },
-      radius: 9,
-      restitution: 1.28,
-      lit: false,
-      litTimer: 0,
-      points: 50,
-    },
-    {
-      pos: { x: 86, y: 246 },
-      radius: 9,
-      restitution: 1.28,
-      lit: false,
-      litTimer: 0,
-      points: 50,
-    },
+    // Left cluster (triangle)
+    { pos: { x: 138, y: 112 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
+    { pos: { x: 112, y: 158 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
+    { pos: { x: 168, y: 155 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
+    // Right cluster
+    { pos: { x: 214, y: 118 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
+    { pos: { x: 238, y: 155 }, radius: 14, restitution: 1.5, lit: false, litTimer: 0, points: 100 },
   ];
 
-  const sling = {
-    restitution: 1.4,
-    lit: false,
-    litTimer: 0,
-    points: 50,
-  };
+  const sling = { restitution: 1.4, lit: false, litTimer: 0, points: 50 };
 
   const slingshots = [
     { a: slLeftA, b: slLeftB, ...sling },
@@ -191,13 +158,13 @@ export function createTable(): PinballWorld {
     { a: srC.a, b: srC.b, ...sling, points: 25, restitution: 1.2 },
   ];
 
-  // Four top rollover lanes (skill shot strip), centered like the original
+  // Four top rollover lanes — shifted right to clear the top-left angled wall
   const laneY = 81;
   const lanes = [
-    { a: { x: 56, y: laneY }, b: { x: 78, y: laneY }, lit: false },
-    { a: { x: 108, y: laneY }, b: { x: 130, y: laneY }, lit: false },
-    { a: { x: 160, y: laneY }, b: { x: 182, y: laneY }, lit: false },
-    { a: { x: 212, y: laneY }, b: { x: 234, y: laneY }, lit: false },
+    { a: { x: 72,  y: laneY }, b: { x: 94,  y: laneY }, lit: false },
+    { a: { x: 120, y: laneY }, b: { x: 142, y: laneY }, lit: false },
+    { a: { x: 168, y: laneY }, b: { x: 190, y: laneY }, lit: false },
+    { a: { x: 216, y: laneY }, b: { x: 238, y: laneY }, lit: false },
   ];
 
   return {

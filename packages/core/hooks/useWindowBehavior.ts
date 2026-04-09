@@ -31,25 +31,6 @@ function getSnapZone(x: number, y: number): SnapZone | null {
   return null;
 }
 
-// ── Window snap (KarpOS only) ────────────────────────────────────────────────
-
-/** Pixels from viewport edge that trigger a snap zone. */
-const SNAP_EDGE = 20;
-
-type SnapZone = 'left' | 'right' | 'maximize';
-
-function isKarpOS(): boolean {
-  return typeof document !== 'undefined' && document.body.classList.contains('karpos-desktop');
-}
-
-function getSnapZone(x: number, y: number): SnapZone | null {
-  if (!isKarpOS()) return null;
-  if (y < SNAP_EDGE) return 'maximize';
-  if (x < SNAP_EDGE) return 'left';
-  if (x > window.innerWidth - SNAP_EDGE) return 'right';
-  return null;
-}
-
 interface Bounds {
   left: number;
   top: number;

@@ -1,0 +1,574 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Mac OS X Cheetah shell — menu bar, window chrome, dock, desktop icons
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Shared app-window positioning (matches Win98 shell.css behavior) ───────── */
+body.macosx-desktop .app-window,
+body.macosx-desktop .mac-app-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  min-height: 200px;
+}
+
+body.macosx-desktop .app-window-hidden {
+  display: none !important;
+}
+
+/* ── Mac Aqua window ─────────────────────────────────────────────────────────── */
+body.macosx-desktop .mac-app-window {
+  border-radius: var(--mac-window-radius);
+  box-shadow: var(--mac-window-shadow);
+  border: 1px solid var(--mac-window-border);
+  overflow: hidden;
+  background: var(--mac-window-bg);
+}
+
+/* ── Title bar ───────────────────────────────────────────────────────────────── */
+body.macosx-desktop .title-bar {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--mac-title-h);
+  padding: 0 8px;
+  cursor: default;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: var(--mac-window-radius) var(--mac-window-radius) 0 0;
+}
+
+/* Active title bar — Aqua pinstripe gradient */
+body.macosx-desktop .mac-app-window.mac-active .title-bar {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.07) 1px,
+      rgba(255, 255, 255, 0.07) 2px
+    ),
+    linear-gradient(
+      180deg,
+      var(--mac-title-active-1) 0%,
+      var(--mac-title-active-2) 40%,
+      var(--mac-title-active-3) 70%,
+      var(--mac-title-active-4) 100%
+    );
+}
+
+/* Inactive title bar — desaturated */
+body.macosx-desktop .mac-app-window:not(.mac-active) .title-bar {
+  background: linear-gradient(
+    180deg,
+    var(--mac-title-inactive-1) 0%,
+    var(--mac-title-inactive-2) 40%,
+    var(--mac-title-inactive-3) 70%,
+    var(--mac-title-inactive-4) 100%
+  );
+}
+
+/* ── Traffic lights ──────────────────────────────────────────────────────────── */
+body.macosx-desktop .mac-traffic-lights {
+  display: flex;
+  align-items: center;
+  gap: var(--mac-btn-gap);
+  flex-shrink: 0;
+  margin-right: auto; /* Push title to center */
+  width: calc(3 * var(--mac-btn-size) + 2 * var(--mac-btn-gap));
+}
+
+body.macosx-desktop .mac-traffic-lights button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mac-btn-size);
+  height: var(--mac-btn-size);
+  border-radius: 50%;
+  border: 1px solid var(--mac-btn-border, rgba(0, 0, 0, 0.15));
+  padding: 0;
+  cursor: pointer;
+  font-size: 0; /* Hide glyph by default */
+  line-height: 1;
+  transition: filter 0.08s;
+}
+
+body.macosx-desktop .mac-traffic-lights button:hover {
+  filter: brightness(0.88);
+}
+
+body.macosx-desktop .mac-traffic-lights button:active {
+  filter: brightness(0.75);
+}
+
+/* Show symbolic glyphs on group hover (Cheetah style) */
+body.macosx-desktop .mac-traffic-lights:hover button {
+  font-size: 9px;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+body.macosx-desktop .mac-btn-close {
+  background: var(--mac-close-bg);
+}
+
+body.macosx-desktop .mac-btn-min {
+  background: var(--mac-min-bg);
+}
+
+body.macosx-desktop .mac-btn-zoom {
+  background: var(--mac-zoom-bg);
+}
+
+/* Inactive state — drain color from traffic lights */
+body.macosx-desktop .mac-app-window:not(.mac-active) .mac-btn-close,
+body.macosx-desktop .mac-app-window:not(.mac-active) .mac-btn-min,
+body.macosx-desktop .mac-app-window:not(.mac-active) .mac-btn-zoom {
+  background: #c8c4c0;
+}
+
+/* ── Title text ──────────────────────────────────────────────────────────────── */
+body.macosx-desktop .mac-title-text-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+body.macosx-desktop .mac-app-window.mac-active .mac-title-text-wrap {
+  color: var(--mac-title-text-active);
+  text-shadow: 0 1px 0 var(--mac-title-shadow-active);
+}
+
+body.macosx-desktop .mac-app-window:not(.mac-active) .mac-title-text-wrap {
+  color: var(--mac-title-text-inactive);
+  text-shadow: none;
+}
+
+body.macosx-desktop .mac-title-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.macosx-desktop .mac-title-icon img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+body.macosx-desktop .mac-title-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Window resize grip ──────────────────────────────────────────────────────── */
+body.macosx-desktop .win-resize-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0, 0, 0, 0.2) 0px,
+    rgba(0, 0, 0, 0.2) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ── In-window menu bar (Aqua style, used by shared apps like Notepad) ──────── */
+body.macosx-desktop .mac-in-window-menu {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  height: 22px;
+  background: linear-gradient(to bottom, #f0eeea 0%, #dddad5 100%);
+  border-bottom: 1px solid #b8b4ae;
+  font-size: 12px;
+}
+
+body.macosx-desktop .mac-in-window-menu .menu-item,
+body.macosx-desktop .mac-in-window-menu [class*='menu-item'] {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  cursor: default;
+  white-space: nowrap;
+  position: relative;
+  color: #1a1a1a;
+}
+
+body.macosx-desktop .mac-in-window-menu .menu-item:hover,
+body.macosx-desktop .mac-in-window-menu [class*='menu-item']:hover {
+  background: var(--mac-menu-hover-bg);
+  color: var(--mac-menu-hover-text);
+}
+
+body.macosx-desktop .mac-in-window-menu .menu-dropdown,
+body.macosx-desktop .mac-in-window-menu [class*='menu-dropdown'] {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--mac-dropdown-bg);
+  border: 1px solid var(--mac-dropdown-border);
+  box-shadow: var(--mac-dropdown-shadow);
+  z-index: 9999;
+  padding: 4px 0;
+}
+
+body.macosx-desktop .mac-in-window-menu .menu-item:hover .menu-dropdown,
+body.macosx-desktop .mac-in-window-menu [class*='menu-item']:hover [class*='menu-dropdown'] {
+  display: block;
+}
+
+body.macosx-desktop .mac-in-window-menu .dropdown-item,
+body.macosx-desktop .mac-in-window-menu [class*='dropdown-item'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 18px;
+  font-size: 12px;
+  color: #1a1a1a;
+  cursor: default;
+  white-space: nowrap;
+}
+
+body.macosx-desktop .mac-in-window-menu .dropdown-item:hover,
+body.macosx-desktop .mac-in-window-menu [class*='dropdown-item']:hover {
+  background: var(--mac-menu-hover-bg);
+  color: var(--mac-menu-hover-text);
+}
+
+body.macosx-desktop .mac-in-window-menu .dropdown-divider,
+body.macosx-desktop .mac-in-window-menu [class*='dropdown-divider'] {
+  height: 1px;
+  background: #d8d5d0;
+  margin: 4px 0;
+}
+
+/* ── System menu bar ─────────────────────────────────────────────────────────── */
+#mac-menubar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--mac-menubar-h);
+  background: var(--mac-menubar-bg);
+  border-bottom: 1px solid var(--mac-menubar-border);
+  display: flex;
+  align-items: stretch;
+  z-index: 8000;
+  font-size: var(--mac-menubar-font);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mac-menubar-item {
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  cursor: default;
+  white-space: nowrap;
+  color: #1a1a1a;
+  position: relative;
+  user-select: none;
+}
+
+.mac-menubar-item:hover,
+.mac-menubar-item.active {
+  background: var(--mac-menu-hover-bg);
+  color: #ffffff;
+  border-radius: 3px;
+}
+
+.mac-menubar-item--apple {
+  padding: 0 10px;
+  font-size: 15px;
+  letter-spacing: -1px;
+}
+
+.mac-menubar-item--appname {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.mac-menubar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.mac-menubar-clock {
+  padding: 0 10px;
+  font-size: 12px;
+  color: #1a1a1a;
+}
+
+/* Dropdown from system menu bar */
+.mac-menubar-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 200px;
+  background: var(--mac-dropdown-bg);
+  border: 1px solid var(--mac-dropdown-border);
+  box-shadow: var(--mac-dropdown-shadow);
+  border-radius: 4px;
+  padding: 4px 0;
+  z-index: 9999;
+  color: #1a1a1a;
+}
+
+.mac-menubar-item:hover .mac-menubar-dropdown,
+.mac-menubar-item.active .mac-menubar-dropdown {
+  display: block;
+}
+
+.mac-menubar-dropdown__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 20px 3px 18px;
+  font-size: 12px;
+  cursor: default;
+  white-space: nowrap;
+  color: #1a1a1a;
+}
+
+.mac-menubar-dropdown__item:hover {
+  background: var(--mac-menu-hover-bg);
+  color: #ffffff;
+}
+
+.mac-menubar-dropdown__divider {
+  height: 1px;
+  background: #d8d5d0;
+  margin: 4px 0;
+}
+
+.mac-menubar-dropdown__item--disabled {
+  color: #aaaaaa;
+  pointer-events: none;
+}
+
+.mac-menubar-dropdown__arrow {
+  font-size: 9px;
+  margin-left: 12px;
+  opacity: 0.6;
+}
+
+/* ── Dock ────────────────────────────────────────────────────────────────────── */
+#mac-dock {
+  position: fixed;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+.mac-dock-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px 14px 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 40%,
+    rgba(20, 20, 20, 0.45) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  box-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.3) inset,
+    0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.mac-dock-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s ease;
+  transform-origin: bottom center;
+}
+
+.mac-dock-icon img {
+  width: var(--mac-dock-icon-base);
+  height: var(--mac-dock-icon-base);
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  transition: transform 0.12s ease;
+  transform-origin: bottom center;
+}
+
+/* Running indicator dot */
+.mac-dock-icon::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: transparent;
+  margin-top: 3px;
+  transition: background 0.1s;
+}
+
+.mac-dock-icon--running::after {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Tooltip label on hover */
+.mac-dock-label {
+  position: absolute;
+  bottom: calc(var(--mac-dock-icon-base) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 30, 0.82);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  backdrop-filter: blur(4px);
+}
+
+.mac-dock-icon:hover .mac-dock-label {
+  opacity: 1;
+}
+
+/* ── Desktop icons ───────────────────────────────────────────────────────────── */
+#desktop-icons {
+  position: fixed;
+  top: calc(var(--mac-menubar-h) + 8px);
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+
+.mac-desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 72px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mac-desktop-icon:hover,
+.mac-desktop-icon.selected {
+  background: rgba(64, 120, 220, 0.35);
+  border-color: rgba(64, 120, 220, 0.6);
+}
+
+.mac-desktop-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+.mac-desktop-icon__label {
+  font-size: 11px;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  word-break: break-word;
+  line-height: 1.2;
+  max-width: 70px;
+}
+
+.mac-desktop-icon.selected .mac-desktop-icon__label {
+  background: #0058cb;
+  color: #ffffff;
+  text-shadow: none;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Minimizing animation ────────────────────────────────────────────────────── */
+body.macosx-desktop .win-minimizing {
+  transform: scale(0.15) translateY(80vh);
+  opacity: 0;
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.6, 1),
+    opacity 0.28s ease;
+}
+
+/* ── Resize grip (bottom-right) ──────────────────────────────────────────────── */
+body.macosx-desktop .win-resize-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0, 0, 0, 0.18) 0px,
+    rgba(0, 0, 0, 0.18) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  border-radius: 0 0 var(--mac-window-radius) 0;
+}
+
+/* ── Dialog overlay (shared component — override Win98 chrome) ───────────────── */
+body.macosx-desktop #dialog-overlay {
+  z-index: 9500;
+}
+
+body.macosx-desktop .dialog-box {
+  border-radius: var(--mac-window-radius);
+  box-shadow: var(--mac-window-shadow);
+  border: 1px solid var(--mac-window-border);
+  background: var(--mac-window-bg);
+  overflow: hidden;
+}
+
+body.macosx-desktop .dialog-box .title-bar {
+  background: linear-gradient(180deg, var(--mac-title-active-1) 0%, var(--mac-title-active-3) 100%);
+}

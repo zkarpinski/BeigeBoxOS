@@ -5,10 +5,11 @@ import { useRef, useEffect } from 'react';
 const MIN_W = 320;
 const MIN_H = 200;
 
-/** Win98 taskbar ~28px; KarpOS dock ~52px — keeps resize below the bar */
+/** Win98 taskbar ~28px; KarpOS/macOSX dock ~52px — keeps resize below the bar */
 function taskbarReservePx(): number {
   if (typeof document === 'undefined') return 28;
-  return document.body.classList.contains('karpos-desktop') ? 52 : 28;
+  const cl = document.body.classList;
+  return cl.contains('karpos-desktop') || cl.contains('macosx-desktop') ? 52 : 28;
 }
 
 // ── Window snap (KarpOS only) ────────────────────────────────────────────────

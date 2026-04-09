@@ -913,6 +913,38 @@ body.karpos-desktop #bsod-overlay {
   box-shadow: var(--karp-shadow);
 }
 
+/* KarpOS startup: reverse pixel grid */
+body.karpos-desktop .karpos-startup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  animation: none !important;
+  cursor: wait;
+  overflow: hidden;
+}
+
+body.karpos-desktop .karpos-startup-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto; /* Block clicks behind it until finished */
+}
+
+body.karpos-desktop .karpos-startup-pixel {
+  position: absolute;
+  background: var(--karp-black);
+  opacity: 1;
+  transition-property: opacity;
+  transition-timing-function: steps(2, start);
+}
+
+body.karpos-desktop .karpos-startup-overlay--started .karpos-startup-pixel {
+  opacity: 0;
+}
+
 /* ── Toasts ─────────────────────────────────────────────────────────────────── */
 body.karpos-desktop .karp-toasts {
   position: fixed;

@@ -13,7 +13,7 @@ export function KarposShutdownOverlay({ open }: { open: boolean }) {
   const PIXEL_SIZE = 100;
   const MAX_ANIM_MS = 4000;
   const PIXEL_FADE_MS = 200;
-  const [gridSize, setGridSize] = useState({ cols: 10, rows: 10 });
+  const [gridSize, setGridSize] = useState({ cols: 0, rows: 0 });
   const [started, setStarted] = useState(false);
   const [pixelTiles, setPixelTiles] = useState<PixelTile[]>([]);
 
@@ -29,19 +29,23 @@ export function KarposShutdownOverlay({ open }: { open: boolean }) {
     return () => window.removeEventListener('resize', updateGrid);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) {
-      setStarted(false);
-      return;
-    }
-    const raf = window.requestAnimationFrame(() => setStarted(true));
-    return () => window.cancelAnimationFrame(raf);
-  }, [open]);
-
   const pixelCount = gridSize.cols * gridSize.rows;
 
   useEffect(() => {
-    if (!open) {
+    if (!open || pixelCount === 0 || pixelTiles.length !== pixelCount) {
+      setStarted(false);
+      return;
+    }
+    // Double requestAnimationFrame ensures that the DOM is painted once with
+    // initial opacity 0 before the `--started` class triggers the transition limit.
+    const raf = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setStarted(true));
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [open, pixelTiles.length, pixelCount]);
+
+  useEffect(() => {
+    if (!open || pixelCount === 0) {
       setPixelTiles([]);
       return;
     }

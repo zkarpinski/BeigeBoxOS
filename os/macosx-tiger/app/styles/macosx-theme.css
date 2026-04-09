@@ -1,0 +1,96 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Mac OS X 10.4 Tiger — Aqua design system
+   Reference: Apple Human Interface Guidelines 2004, Aqua UI
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+body.macosx-desktop {
+  /* ── Aqua traffic lights ─────────────────────────────────────────────────── */
+  --mac-close-bg: #ff5f57;
+  --mac-close-border: rgba(0, 0, 0, 0.18);
+  --mac-min-bg: #febc2e;
+  --mac-min-border: rgba(0, 0, 0, 0.18);
+  --mac-zoom-bg: #28c840;
+  --mac-zoom-border: rgba(0, 0, 0, 0.18);
+  --mac-btn-size: 13px;
+  --mac-btn-gap: 7px;
+  --mac-btn-inset: 8px; /* Distance from left edge to first button */
+
+  /* ── Window chrome ───────────────────────────────────────────────────────── */
+  --mac-title-h: 22px;
+
+  /* Active: blue-tinted silver gradient (the classic Tiger "Aqua" chrome) */
+  --mac-title-active-1: #d5dee8;
+  --mac-title-active-2: #bfcbd8;
+  --mac-title-active-3: #aab8c8;
+  --mac-title-active-4: #b6c3d0;
+
+  /* Inactive: desaturated gray */
+  --mac-title-inactive-1: #e2e0de;
+  --mac-title-inactive-2: #d0cecc;
+  --mac-title-inactive-3: #c2c0be;
+  --mac-title-inactive-4: #cbcac8;
+
+  --mac-title-text-active: #1a1a1a;
+  --mac-title-text-inactive: #8e8e8e;
+  --mac-title-shadow-active: rgba(255, 255, 255, 0.7);
+
+  --mac-window-bg: #ffffff;
+  --mac-window-border: rgba(0, 0, 0, 0.35);
+  --mac-window-radius: 8px;
+  --mac-window-shadow: 0 6px 30px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.22);
+
+  /* ── Finder toolbar (brushed metal stripe under title bar) ──────────────── */
+  --mac-toolbar-bg: linear-gradient(to bottom, #e2e0dc 0%, #d0cec8 100%);
+  --mac-toolbar-border: #b4b2ae;
+  --mac-toolbar-h: 40px;
+
+  /* ── System menu bar ─────────────────────────────────────────────────────── */
+  --mac-menubar-bg: rgba(236, 232, 228, 0.96);
+  --mac-menubar-h: 22px;
+  --mac-menubar-font: 13px;
+  --mac-menubar-border: rgba(0, 0, 0, 0.2);
+  --mac-menu-hover-bg: #0058cb;
+  --mac-menu-hover-text: #ffffff;
+  --mac-dropdown-bg: #ffffff;
+  --mac-dropdown-border: rgba(0, 0, 0, 0.28);
+  --mac-dropdown-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+
+  /* ── Dock ────────────────────────────────────────────────────────────────── */
+  --mac-dock-icon-base: 54px;
+  --mac-dock-icon-hover: 78px;
+
+  /* ── Desktop background ──────────────────────────────────────────────────── */
+  --mac-desktop-top: #2a4f82;
+  --mac-desktop-mid: #1a3462;
+  --mac-desktop-bot: #0c1e40;
+
+  /* ── Win98 compatibility tokens (shared apps read these) ─────────────────── */
+  --win-bg: var(--mac-window-bg);
+  --win-dark: #888888;
+  --win-black: #000000;
+  --win-light: #eeeeee;
+  --win-white: #ffffff;
+  --title-active: var(--mac-title-active-1);
+  --taskbar-bg: transparent;
+  --toolbar-bg: #eeece8;
+  --ruler-bg: #f5f3ef;
+  --desktop-bg: var(--mac-desktop-top);
+
+  font-family:
+    'Lucida Grande',
+    'Lucida Sans Unicode',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Desktop canvas ─────────────────────────────────────────────────────────── */
+body.macosx-desktop {
+  background: url('/desktop/aqua-blue.jpg') center center / cover no-repeat fixed;
+  overflow: hidden;
+  user-select: none;
+}

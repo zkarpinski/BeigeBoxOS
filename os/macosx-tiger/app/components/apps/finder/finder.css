@@ -1,0 +1,227 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Mac OS X Finder — Aqua design
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+body.macosx-desktop .finder-window {
+  top: 50px;
+  left: 80px;
+  width: 580px;
+  height: 420px;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
+
+body.macosx-desktop .finder-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  height: 38px;
+  background: var(--mac-toolbar-bg);
+  border-bottom: 1px solid var(--mac-toolbar-border);
+}
+
+body.macosx-desktop .finder-nav-btns {
+  display: flex;
+  background: linear-gradient(to bottom, #d0cdc8 0%, #b8b4ae 100%);
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+body.macosx-desktop .finder-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2a2a2a;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.06s;
+}
+
+body.macosx-desktop .finder-nav-btn:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+body.macosx-desktop .finder-nav-btn:disabled {
+  color: #a0a0a0;
+  cursor: default;
+}
+
+body.macosx-desktop .finder-nav-btn--up {
+  margin-left: 2px;
+  background: linear-gradient(to bottom, #d0cdc8 0%, #b8b4ae 100%);
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  border-radius: 5px;
+  min-width: 26px;
+  font-size: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+body.macosx-desktop .finder-nav-btn--up:disabled {
+  background: linear-gradient(to bottom, #e0ddd8 0%, #ccc9c4 100%);
+  color: #b0b0b0;
+}
+
+body.macosx-desktop .finder-path-bar {
+  flex: 1;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Body (sidebar + content) ────────────────────────────────────────────────── */
+
+body.macosx-desktop .finder-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────────── */
+
+body.macosx-desktop .finder-sidebar {
+  width: 140px;
+  flex-shrink: 0;
+  background: linear-gradient(to bottom, #dddad5 0%, #cac7c2 100%);
+  border-right: 1px solid #b0ada8;
+  overflow-y: auto;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+body.macosx-desktop .finder-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 8px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #1a1a1a;
+  cursor: default;
+  text-align: left;
+  border-radius: 4px;
+  user-select: none;
+}
+
+body.macosx-desktop .finder-sidebar-item:hover {
+  background: rgba(0, 88, 203, 0.15);
+}
+
+body.macosx-desktop .finder-sidebar-item.active {
+  background: #0058cb;
+  color: #ffffff;
+}
+
+body.macosx-desktop .finder-sidebar-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  image-rendering: auto;
+}
+
+/* ── Content area ────────────────────────────────────────────────────────────── */
+
+body.macosx-desktop .finder-content {
+  flex: 1;
+  overflow: auto;
+  background: #ffffff;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+}
+
+body.macosx-desktop .finder-empty {
+  padding: 16px;
+  font-size: 11px;
+  color: #888;
+  width: 100%;
+}
+
+body.macosx-desktop .finder-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: default;
+  user-select: none;
+  text-align: center;
+}
+
+body.macosx-desktop .finder-icon:hover {
+  background: rgba(0, 88, 203, 0.08);
+  border-color: rgba(0, 88, 203, 0.25);
+}
+
+body.macosx-desktop .finder-icon.selected {
+  background: rgba(0, 88, 203, 0.18);
+  border-color: rgba(0, 88, 203, 0.5);
+}
+
+body.macosx-desktop .finder-icon__img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 3px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+body.macosx-desktop .finder-icon__label {
+  font-size: 10px;
+  color: #1a1a1a;
+  line-height: 1.3;
+  word-break: break-word;
+  max-width: 68px;
+}
+
+body.macosx-desktop .finder-icon.selected .finder-icon__label {
+  background: #0058cb;
+  color: #ffffff;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Status bar ──────────────────────────────────────────────────────────────── */
+
+body.macosx-desktop .finder-statusbar {
+  flex-shrink: 0;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 10px;
+  color: #555;
+  background: linear-gradient(to bottom, #e8e5e0 0%, #d8d5d0 100%);
+  border-top: 1px solid #b8b4ae;
+  justify-content: center;
+}

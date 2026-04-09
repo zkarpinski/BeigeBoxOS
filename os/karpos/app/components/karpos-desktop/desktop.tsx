@@ -52,29 +52,29 @@ export function KarpDesktop() {
       applyOpenByDefault={false}
     >
       <ToastProvider>
-      <KarpGlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
-        <div className="seo-intro" aria-hidden="true">
-          <h1>KarpOS — Zachary Karpinski</h1>
-          <p>
-            A neo-brutalist playground desktop in the browser. Open Projects, Notepad, Minesweeper,
-            Calculator, PDF Reader, Pad, and Nebula Pinball.
-          </p>
-        </div>
+        <KarpGlobalShim registry={appRegistry} />
+        <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+          <div className="seo-intro" aria-hidden="true">
+            <h1>KarpOS — Zachary Karpinski</h1>
+            <p>
+              A neo-brutalist playground desktop in the browser. Open Projects, Notepad,
+              Minesweeper, Calculator, PDF Reader, Pad, and Nebula Pinball.
+            </p>
+          </div>
 
-        <NotepadWindow />
-        <MinesweeperWindow skin="karpos" />
-        <CalculatorWindow skin="karpos" />
-        <PdfReaderWindow />
-        <ProjectsWindow />
-        <PadWindow />
-        <PinballWindow skin="karpos" />
+          <NotepadWindow />
+          <MinesweeperWindow skin="karpos" />
+          <CalculatorWindow skin="karpos" />
+          <PdfReaderWindow />
+          <ProjectsWindow />
+          <PadWindow />
+          <PinballWindow skin="karpos" />
 
-        <DesktopIcons registry={appRegistry} />
-        <KarposTaskbar registry={appRegistry} />
-        <KarposShellOverlays />
-        <KarposToasts />
-      </OsShellProvider>
+          <DesktopIcons registry={appRegistry} />
+          <KarposTaskbar registry={appRegistry} />
+          <KarposShellOverlays />
+          <KarposToasts />
+        </OsShellProvider>
       </ToastProvider>
     </WindowManagerProvider>
   );

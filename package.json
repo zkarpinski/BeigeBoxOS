@@ -25,7 +25,11 @@
     "lint": "turbo lint",
     "fmt": "prettier --write .",
     "e2e": "playwright test",
-    "generate-og-images": "node scripts/generate-og-images.mjs"
+    "generate-og-images": "node scripts/generate-og-images.mjs",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,css,json,md}": "prettier --write"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -33,6 +37,8 @@
     "eslint-config-next": "^16.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
     "sharp": "^0.34.5",
     "turbo": "latest"

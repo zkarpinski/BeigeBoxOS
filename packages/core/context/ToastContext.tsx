@@ -39,21 +39,27 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const removeToast = useCallback((id: string) => {
     const t = timers.current.get(id);
-    if (t) { clearTimeout(t); timers.current.delete(id); }
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    if (t) {
+      clearTimeout(t);
+      timers.current.delete(id);
+    }
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const addToast = useCallback((message: string, opts?: ToastOptions): string => {
-    const id = `toast-${_nextId++}`;
-    const duration = opts?.duration ?? 3500;
-    const type = opts?.type ?? 'info';
-    setToasts(prev => [...prev, { id, message, type, duration }]);
-    if (duration > 0) {
-      const t = setTimeout(() => removeToast(id), duration);
-      timers.current.set(id, t);
-    }
-    return id;
-  }, [removeToast]);
+  const addToast = useCallback(
+    (message: string, opts?: ToastOptions): string => {
+      const id = `toast-${_nextId++}`;
+      const duration = opts?.duration ?? 3500;
+      const type = opts?.type ?? 'info';
+      setToasts((prev) => [...prev, { id, message, type, duration }]);
+      if (duration > 0) {
+        const t = setTimeout(() => removeToast(id), duration);
+        timers.current.set(id, t);
+      }
+      return id;
+    },
+    [removeToast],
+  );
 
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>

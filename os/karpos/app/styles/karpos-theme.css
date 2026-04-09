@@ -942,14 +942,28 @@ body.karpos-desktop .karp-toast {
 }
 
 @keyframes karp-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);   }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body.karpos-desktop .karp-toast-info    { background: var(--karp-cyan);   }
-body.karpos-desktop .karp-toast-success { background: var(--karp-lime);   }
-body.karpos-desktop .karp-toast-warning { background: var(--karp-yellow); }
-body.karpos-desktop .karp-toast-error   { background: var(--karp-pink);   }
+body.karpos-desktop .karp-toast-info {
+  background: var(--karp-cyan);
+}
+body.karpos-desktop .karp-toast-success {
+  background: var(--karp-lime);
+}
+body.karpos-desktop .karp-toast-warning {
+  background: var(--karp-yellow);
+}
+body.karpos-desktop .karp-toast-error {
+  background: var(--karp-pink);
+}
 
 body.karpos-desktop .karp-toast-icon {
   flex-shrink: 0;
@@ -989,5 +1003,9 @@ body.karpos-desktop .karp-snap-preview {
   background: rgba(10, 10, 10, 0.12);
   border: 3px dashed var(--karp-black);
   pointer-events: none;
-  transition: left 0.08s, top 0.08s, width 0.08s, height 0.08s;
+  transition:
+    left 0.08s,
+    top 0.08s,
+    width 0.08s,
+    height 0.08s;
 }

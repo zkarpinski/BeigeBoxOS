@@ -4,10 +4,10 @@ import React from 'react';
 import { useToast } from '@retro-web/core/context';
 
 const ICONS: Record<string, string> = {
-  info:    'ℹ',
+  info: 'ℹ',
   success: '✓',
   warning: '⚠',
-  error:   '✕',
+  error: '✕',
 };
 
 export function KarposToasts() {
@@ -16,9 +16,11 @@ export function KarposToasts() {
 
   return (
     <div className="karp-toasts" role="region" aria-label="Notifications" aria-live="polite">
-      {toasts.map(toast => (
+      {toasts.map((toast) => (
         <div key={toast.id} className={`karp-toast karp-toast-${toast.type}`} role="alert">
-          <span className="karp-toast-icon" aria-hidden="true">{ICONS[toast.type]}</span>
+          <span className="karp-toast-icon" aria-hidden="true">
+            {ICONS[toast.type]}
+          </span>
           <span className="karp-toast-msg">{toast.message}</span>
           <button
             className="karp-toast-close"

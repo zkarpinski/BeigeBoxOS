@@ -30,16 +30,24 @@ function getSnapZone(x: number, y: number): SnapZone | null {
   return null;
 }
 
-interface Bounds { left: number; top: number; width: number; height: number; }
+interface Bounds {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 
 function getSnapBounds(zone: SnapZone): Bounds {
   const taskbar = taskbarReservePx();
   const vw = window.innerWidth;
   const vh = window.innerHeight - taskbar;
   switch (zone) {
-    case 'left':     return { left: 0,               top: 0, width: Math.floor(vw / 2), height: vh };
-    case 'right':    return { left: Math.floor(vw / 2), top: 0, width: Math.ceil(vw / 2), height: vh };
-    case 'maximize': return { left: 0,               top: 0, width: vw,                height: vh };
+    case 'left':
+      return { left: 0, top: 0, width: Math.floor(vw / 2), height: vh };
+    case 'right':
+      return { left: Math.floor(vw / 2), top: 0, width: Math.ceil(vw / 2), height: vh };
+    case 'maximize':
+      return { left: 0, top: 0, width: vw, height: vh };
   }
 }
 
@@ -59,9 +67,9 @@ function getSnapPreviewEl(): HTMLDivElement {
 function showSnapPreview(zone: SnapZone) {
   const el = getSnapPreviewEl();
   const b = getSnapBounds(zone);
-  el.style.left   = b.left   + 'px';
-  el.style.top    = b.top    + 'px';
-  el.style.width  = b.width  + 'px';
+  el.style.left = b.left + 'px';
+  el.style.top = b.top + 'px';
+  el.style.width = b.width + 'px';
   el.style.height = b.height + 'px';
   el.style.display = 'block';
 }
@@ -176,9 +184,9 @@ export function useWindowBehavior({
         hideSnapPreview();
         if (currentSnapZone) {
           const b = getSnapBounds(currentSnapZone);
-          el.style.left   = b.left   + 'px';
-          el.style.top    = b.top    + 'px';
-          el.style.width  = b.width  + 'px';
+          el.style.left = b.left + 'px';
+          el.style.top = b.top + 'px';
+          el.style.width = b.width + 'px';
           el.style.height = b.height + 'px';
           setBoundsRef.current(appId, b);
           return;

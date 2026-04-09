@@ -161,7 +161,7 @@ export function createTable(): PinballWorld {
   // Four top rollover lanes — shifted right to clear the top-left angled wall
   const laneY = 81;
   const lanes = [
-    { a: { x: 72,  y: laneY }, b: { x: 94,  y: laneY }, lit: false },
+    { a: { x: 72, y: laneY }, b: { x: 94, y: laneY }, lit: false },
     { a: { x: 120, y: laneY }, b: { x: 142, y: laneY }, lit: false },
     { a: { x: 168, y: laneY }, b: { x: 190, y: laneY }, lit: false },
     { a: { x: 216, y: laneY }, b: { x: 238, y: laneY }, lit: false },

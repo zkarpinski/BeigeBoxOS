@@ -47,11 +47,7 @@ function setup(props: { message?: string; type?: string; duration?: number } = {
   const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   render(
     <ToastProvider>
-      <Trigger
-        message={props.message ?? 'hello'}
-        type={props.type}
-        duration={props.duration}
-      />
+      <Trigger message={props.message ?? 'hello'} type={props.type} duration={props.duration} />
       <ToastList />
     </ToastProvider>,
   );

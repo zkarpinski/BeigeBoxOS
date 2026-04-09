@@ -5,7 +5,13 @@
  */
 import { useEffect } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
-import { useWindowManager, Z_FOCUSED, type DialogType, useToast, type ToastOptions } from '@retro-web/core/context';
+import {
+  useWindowManager,
+  Z_FOCUSED,
+  type DialogType,
+  useToast,
+  type ToastOptions,
+} from '@retro-web/core/context';
 
 export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
   const {

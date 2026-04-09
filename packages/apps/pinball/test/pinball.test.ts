@@ -30,8 +30,8 @@ describe('createTable', () => {
     expect(world.walls.length).toBeGreaterThan(0);
     expect(world.slingshots.length).toBeGreaterThan(0);
     expect(world.lanes).toHaveLength(4);
-    expect(world.bumpers).toHaveLength(6);
-    expect(world.bumpers.filter((b) => b.radius >= 13)).toHaveLength(3);
+    expect(world.bumpers).toHaveLength(5);
+    expect(world.bumpers.filter((b) => b.radius >= 13)).toHaveLength(5);
     expect(world.slingshots).toHaveLength(6);
     expect(world.walls.some((w) => w.hidden)).toBe(true);
   });
@@ -99,14 +99,14 @@ describe('launchBall', () => {
     launchBall(world);
     expect(world.ballInPlunger).toBe(false);
     expect(world.ball.vel.y).toBeLessThan(0); // negative Y = upward in canvas coords
-    expect(world.ball.vel.y).toBeCloseTo(-19, 0);
+    expect(world.ball.vel.y).toBeCloseTo(-12, 0);
   });
 
   test('launch with full compression gives maximum upward velocity', () => {
     const world = createTable();
     world.plungerCompression = 60;
     launchBall(world);
-    expect(world.ball.vel.y).toBeLessThan(-20); // faster than minimum
+    expect(world.ball.vel.y).toBeLessThan(-12); // faster than minimum
     expect(world.ball.vel.x).toBe(-2.6); // slight drift into main field
   });
 

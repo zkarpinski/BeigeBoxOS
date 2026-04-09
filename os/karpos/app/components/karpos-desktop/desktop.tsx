@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo } from 'react';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
-import { OsShellProvider } from '@retro-web/core/context';
-import { AppWindow, TitleBar, KarpGlobalShim } from '../karpos-shell';
+import { OsShellProvider, ToastProvider } from '@retro-web/core/context';
+import { AppWindow, TitleBar, KarpGlobalShim, KarposToasts } from '../karpos-shell';
 import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
@@ -51,6 +51,7 @@ export function KarpDesktop() {
       boundsStorageKey="karpos-window-bounds"
       applyOpenByDefault={false}
     >
+      <ToastProvider>
       <KarpGlobalShim registry={appRegistry} />
       <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
         <div className="seo-intro" aria-hidden="true">
@@ -72,7 +73,9 @@ export function KarpDesktop() {
         <DesktopIcons registry={appRegistry} />
         <KarposTaskbar registry={appRegistry} />
         <KarposShellOverlays />
+        <KarposToasts />
       </OsShellProvider>
+      </ToastProvider>
     </WindowManagerProvider>
   );
 }

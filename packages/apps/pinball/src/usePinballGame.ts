@@ -25,8 +25,15 @@ export interface PinballGameState {
 }
 
 const RANKS = [
-  'Cadet', 'Ensign', 'Lieutenant', 'Captain', 'Major',
-  'Commander', 'Commodore', 'Admiral', 'Fleet Admiral',
+  'Cadet',
+  'Ensign',
+  'Lieutenant',
+  'Captain',
+  'Major',
+  'Commander',
+  'Commodore',
+  'Admiral',
+  'Fleet Admiral',
 ];
 
 function rankForScore(score: number): string {
@@ -69,37 +76,40 @@ export function usePinballGame(canvasRef: React.RefObject<HTMLCanvasElement | nu
   }, [syncState]);
 
   // ── Input handling ────────────────────────────────────────────────────────
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    keysRef.current.add(e.code);
-    const world = worldRef.current;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      keysRef.current.add(e.code);
+      const world = worldRef.current;
 
-    switch (e.code) {
-      case 'KeyZ':
-      case 'ShiftLeft':
-        world.flippers[0].active = true;
-        break;
-      case 'Slash':
-      case 'ShiftRight':
-        world.flippers[1].active = true;
-        break;
-      case 'Space':
-        e.preventDefault();
-        if (world.ballInPlunger) plungerHeldRef.current = true;
-        break;
-      case 'KeyX':
-      case 'Period': {
-        // Nudge
-        world.ball.vel.x += (Math.random() - 0.5) * 3;
-        world.ball.vel.y -= 1;
-        world.score -= 500;
-        if (world.score < 0) world.score = 0;
-        break;
+      switch (e.code) {
+        case 'KeyZ':
+        case 'ShiftLeft':
+          world.flippers[0].active = true;
+          break;
+        case 'Slash':
+        case 'ShiftRight':
+          world.flippers[1].active = true;
+          break;
+        case 'Space':
+          e.preventDefault();
+          if (world.ballInPlunger) plungerHeldRef.current = true;
+          break;
+        case 'KeyX':
+        case 'Period': {
+          // Nudge
+          world.ball.vel.x += (Math.random() - 0.5) * 3;
+          world.ball.vel.y -= 1;
+          world.score -= 500;
+          if (world.score < 0) world.score = 0;
+          break;
+        }
+        case 'F2':
+          newGame();
+          break;
       }
-      case 'F2':
-        newGame();
-        break;
-    }
-  }, [newGame]);
+    },
+    [newGame],
+  );
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     keysRef.current.delete(e.code);

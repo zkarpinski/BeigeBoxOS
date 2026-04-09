@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo } from 'react';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
-import { OsShellProvider } from '@retro-web/core/context';
-import { AppWindow, TitleBar, KarpGlobalShim } from '../karpos-shell';
+import { OsShellProvider, ToastProvider } from '@retro-web/core/context';
+import { AppWindow, TitleBar, KarpGlobalShim, KarposToasts } from '../karpos-shell';
 import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
@@ -51,28 +51,31 @@ export function KarpDesktop() {
       boundsStorageKey="karpos-window-bounds"
       applyOpenByDefault={false}
     >
-      <KarpGlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
-        <div className="seo-intro" aria-hidden="true">
-          <h1>KarpOS — Zachary Karpinski</h1>
-          <p>
-            A neo-brutalist playground desktop in the browser. Open Projects, Notepad, Minesweeper,
-            Calculator, PDF Reader, Pad, and Nebula Pinball.
-          </p>
-        </div>
+      <ToastProvider>
+        <KarpGlobalShim registry={appRegistry} />
+        <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+          <div className="seo-intro" aria-hidden="true">
+            <h1>KarpOS — Zachary Karpinski</h1>
+            <p>
+              A neo-brutalist playground desktop in the browser. Open Projects, Notepad,
+              Minesweeper, Calculator, PDF Reader, Pad, and Nebula Pinball.
+            </p>
+          </div>
 
-        <NotepadWindow />
-        <MinesweeperWindow skin="karpos" />
-        <CalculatorWindow skin="karpos" />
-        <PdfReaderWindow />
-        <ProjectsWindow />
-        <PadWindow />
-        <PinballWindow skin="karpos" />
+          <NotepadWindow />
+          <MinesweeperWindow skin="karpos" />
+          <CalculatorWindow skin="karpos" />
+          <PdfReaderWindow />
+          <ProjectsWindow />
+          <PadWindow />
+          <PinballWindow skin="karpos" />
 
-        <DesktopIcons registry={appRegistry} />
-        <KarposTaskbar registry={appRegistry} />
-        <KarposShellOverlays />
-      </OsShellProvider>
+          <DesktopIcons registry={appRegistry} />
+          <KarposTaskbar registry={appRegistry} />
+          <KarposShellOverlays />
+          <KarposToasts />
+        </OsShellProvider>
+      </ToastProvider>
     </WindowManagerProvider>
   );
 }

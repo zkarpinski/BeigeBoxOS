@@ -5,7 +5,13 @@
  */
 import { useEffect } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
-import { useWindowManager, Z_FOCUSED, type DialogType } from '@retro-web/core/context';
+import {
+  useWindowManager,
+  Z_FOCUSED,
+  type DialogType,
+  useToast,
+  type ToastOptions,
+} from '@retro-web/core/context';
 
 export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
   const {
@@ -21,6 +27,7 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
     openFatalError,
     clearBsod,
   } = useWindowManager();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
@@ -63,6 +70,7 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
       bsod: openBsod,
       fatalError: openFatalError,
       _clearBsod: clearBsod,
+      notify: (message: string, opts?: ToastOptions) => addToast(message, opts),
     };
   }, [
     apps,
@@ -76,6 +84,7 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
     openBsod,
     openFatalError,
     clearBsod,
+    addToast,
     registry,
   ]);
 

@@ -145,7 +145,10 @@ export function PinballWindow({ skin = 'karpos' }: PinballWindowProps) {
 
         {/* Controls hint */}
         <div className="pinball-controls">
-          <span>Z / ⇧L Flipper&nbsp;&nbsp;/ / ⇧R Flipper&nbsp;&nbsp;Space Plunge&nbsp;&nbsp;X Nudge&nbsp;&nbsp;F2 New</span>
+          <span>
+            Z / ⇧L Flipper&nbsp;&nbsp;/ / ⇧R Flipper&nbsp;&nbsp;Space Plunge&nbsp;&nbsp;X
+            Nudge&nbsp;&nbsp;F2 New
+          </span>
         </div>
       </div>
     </AppWindow>

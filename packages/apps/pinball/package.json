@@ -30,9 +30,18 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/test/**/*.test.ts"],
+    "testMatch": [
+      "**/test/**/*.test.ts"
+    ],
     "transform": {
-      "\\.(ts|tsx)$": ["ts-jest", { "tsconfig": { "jsx": "react-jsx" } }]
+      "\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "jsx": "react-jsx"
+          }
+        }
+      ]
     }
   }
 }

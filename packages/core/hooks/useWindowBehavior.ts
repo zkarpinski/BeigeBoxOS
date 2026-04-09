@@ -11,11 +11,71 @@ function taskbarReservePx(): number {
   return document.body.classList.contains('karpos-desktop') ? 52 : 28;
 }
 
+// ── Window snap (KarpOS only) ────────────────────────────────────────────────
+
+/** Pixels from viewport edge that trigger a snap zone. */
+const SNAP_EDGE = 20;
+
+type SnapZone = 'left' | 'right' | 'maximize';
+
+function isKarpOS(): boolean {
+  return typeof document !== 'undefined' && document.body.classList.contains('karpos-desktop');
+}
+
+function getSnapZone(x: number, y: number): SnapZone | null {
+  if (!isKarpOS()) return null;
+  if (y < SNAP_EDGE) return 'maximize';
+  if (x < SNAP_EDGE) return 'left';
+  if (x > window.innerWidth - SNAP_EDGE) return 'right';
+  return null;
+}
+
 interface Bounds {
   left: number;
   top: number;
   width: number;
   height: number;
+}
+
+function getSnapBounds(zone: SnapZone): Bounds {
+  const taskbar = taskbarReservePx();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight - taskbar;
+  switch (zone) {
+    case 'left':
+      return { left: 0, top: 0, width: Math.floor(vw / 2), height: vh };
+    case 'right':
+      return { left: Math.floor(vw / 2), top: 0, width: Math.ceil(vw / 2), height: vh };
+    case 'maximize':
+      return { left: 0, top: 0, width: vw, height: vh };
+  }
+}
+
+/** Module-level singleton preview element — only one snap preview at a time. */
+let _snapPreviewEl: HTMLDivElement | null = null;
+
+function getSnapPreviewEl(): HTMLDivElement {
+  if (!_snapPreviewEl) {
+    _snapPreviewEl = document.createElement('div');
+    _snapPreviewEl.className = 'karp-snap-preview';
+    _snapPreviewEl.style.display = 'none';
+    document.body.appendChild(_snapPreviewEl);
+  }
+  return _snapPreviewEl;
+}
+
+function showSnapPreview(zone: SnapZone) {
+  const el = getSnapPreviewEl();
+  const b = getSnapBounds(zone);
+  el.style.left = b.left + 'px';
+  el.style.top = b.top + 'px';
+  el.style.width = b.width + 'px';
+  el.style.height = b.height + 'px';
+  el.style.display = 'block';
+}
+
+function hideSnapPreview() {
+  if (_snapPreviewEl) _snapPreviewEl.style.display = 'none';
 }
 
 export interface UseWindowBehaviorOptions {
@@ -95,8 +155,17 @@ export function useWindowBehavior({
       const startY = clientY;
       const startLeft = r.left;
       const startTop = r.top;
+      let currentSnapZone: SnapZone | null = null;
 
       const onMove = (x: number, y: number) => {
+        const zone = getSnapZone(x, y);
+        if (zone) {
+          showSnapPreview(zone);
+          currentSnapZone = zone;
+          return; // Freeze window position while previewing snap
+        }
+        hideSnapPreview();
+        currentSnapZone = null;
         let newLeft = startLeft + (x - startX);
         let newTop = startTop + (y - startY);
         const r2 = rect();
@@ -112,6 +181,16 @@ export function useWindowBehavior({
         document.removeEventListener('touchmove', onTouchMove, { capture: true });
         document.removeEventListener('touchend', onTouchEnd, { capture: true });
         document.removeEventListener('touchcancel', onTouchEnd, { capture: true });
+        hideSnapPreview();
+        if (currentSnapZone) {
+          const b = getSnapBounds(currentSnapZone);
+          el.style.left = b.left + 'px';
+          el.style.top = b.top + 'px';
+          el.style.width = b.width + 'px';
+          el.style.height = b.height + 'px';
+          setBoundsRef.current(appId, b);
+          return;
+        }
         const r2 = rect();
         setBoundsRef.current(appId, {
           left: r2.left,

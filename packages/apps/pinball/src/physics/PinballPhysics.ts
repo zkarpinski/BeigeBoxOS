@@ -232,8 +232,8 @@ export function stepWorld(world: PinballWorld, dt: number): string[] {
   // ── Flipper target angles for this frame ─────────────────────────────────
   // Computed up front so we can interpolate across sub-steps rather than
   // jumping the full angle before collision runs (which causes tunnelling).
-  const flipperStartAngle = world.flippers.map(f => f.angle);
-  const flipperEndAngle = world.flippers.map(f => {
+  const flipperStartAngle = world.flippers.map((f) => f.angle);
+  const flipperEndAngle = world.flippers.map((f) => {
     const target = f.active ? f.activeAngle : f.restAngle;
     const diff = target - f.angle;
     const maxMove = FLIPPER_SPEED * scale;

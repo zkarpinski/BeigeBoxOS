@@ -5,6 +5,7 @@ import { pdfReaderAppConfig } from '@retro-web/app-pdf-reader';
 import { pinballAppConfig } from '@retro-web/app-pinball';
 import { projectsAppConfig } from './components/apps/projects/ProjectsWindow';
 import { padAppConfig } from './components/apps/pad/PadWindow';
+import { desktopDestroyerAppConfig } from '@retro-web/app-desktop-destroyer';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 
 export const appRegistry: AppConfig[] = [
@@ -15,4 +16,5 @@ export const appRegistry: AppConfig[] = [
   pinballAppConfig,
   projectsAppConfig,
   padAppConfig,
+  desktopDestroyerAppConfig,
 ];

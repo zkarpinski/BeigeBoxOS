@@ -18,12 +18,13 @@ import { ControlPanelWindow } from '../apps/controlpanel';
 import { MyComputerWindow } from '../apps/mycomputer';
 import { TaskManagerWindow } from '../apps/taskmanager';
 import { Ie6Window } from '../apps/ie6';
+import { DesktopDestroyer } from '@retro-web/app-desktop-destroyer';
 import { BootScreen } from '../shell/BootScreen';
 import { DesktopIcons } from '../shell/DesktopIcons';
 import { Taskbar } from '../shell/Taskbar';
 import { ShellOverlays } from '../shell/ShellOverlays';
 import { appRegistry } from '../../registry';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { WindowManagerProvider, useWindowManager } from '@retro-web/core/context';
 import { initFileSystem } from '../../fileSystem';
 import { WindowsXPGlobalShim } from '../shell/WindowsXPGlobalShim';
 
@@ -33,6 +34,12 @@ export interface DesktopProps {
    * only this app.
    */
   openAppId?: string;
+}
+
+function DesktopDestroyerContainer() {
+  const { apps } = useWindowManager();
+  if (!apps['desktop-destroyer']?.visible) return null;
+  return <DesktopDestroyer skin="winxp" />;
 }
 
 export function Desktop({ openAppId }: DesktopProps) {
@@ -202,6 +209,7 @@ export function Desktop({ openAppId }: DesktopProps) {
         <MyComputerWindow />
         <TaskManagerWindow registry={appRegistry} />
         <Ie6Window />
+        <DesktopDestroyerContainer />
 
         {/* Shell */}
         <DesktopIcons registry={appRegistry} />

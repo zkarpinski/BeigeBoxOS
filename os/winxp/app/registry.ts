@@ -12,6 +12,7 @@ import { mycomputerAppConfig } from './components/apps/mycomputer';
 import { taskmanagerAppConfig } from './components/apps/taskmanager';
 import { cmdAppConfig } from './components/apps/msdos';
 import { ie6AppConfig } from './components/apps/ie6';
+import { desktopDestroyerAppConfig } from '@retro-web/app-desktop-destroyer';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 
 export const appRegistry: AppConfig[] = [
@@ -29,4 +30,5 @@ export const appRegistry: AppConfig[] = [
   itunes8AppConfig,
   winampAppConfig,
   ie6AppConfig,
+  desktopDestroyerAppConfig,
 ];

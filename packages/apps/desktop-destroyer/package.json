@@ -1,0 +1,21 @@
+{
+  "name": "@retro-web/app-desktop-destroyer",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "dependencies": {
+    "@retro-web/core": "workspace:*",
+    "lucide-react": "^0.454.0"
+  },
+  "devDependencies": {
+    "@retro-web/config": "workspace:*",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.0.0"
+  }
+}

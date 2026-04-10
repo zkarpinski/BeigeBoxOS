@@ -1,0 +1,412 @@
+:root {
+  --palm-bg: #8c927b;
+  --palm-text: #2a2d24;
+  --palm-border: #4a4d41;
+  --palm-dark: #2a2d24;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #222;
+  color: var(--palm-text);
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Layout Utilities (replacing Tailwind) */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.items-start {
+  align-items: flex-start;
+}
+.items-end {
+  align-items: flex-end;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+.h-full {
+  height: 100%;
+}
+.w-full {
+  width: 100%;
+}
+.min-h-screen {
+  min-height: 100vh;
+}
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+/* Spacing */
+.p-1 {
+  padding: 0.25rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.p-12 {
+  padding: 3rem;
+}
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.pb-1 {
+  padding-bottom: 0.25rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
+}
+.m-0 {
+  margin: 0;
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.mt-auto {
+  margin-top: auto;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-auto {
+  margin-bottom: auto;
+}
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+/* Gaps */
+.gap-1 {
+  gap: 0.25rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.gap-\[1px\] {
+  gap: 1px;
+}
+.gap-y-4 {
+  row-gap: 1rem;
+}
+
+/* Borders & Rounded */
+.border {
+  border: 1px solid var(--palm-dark);
+}
+.border-2 {
+  border: 2px solid var(--palm-dark);
+}
+.border-b {
+  border-bottom: 1px solid var(--palm-dark);
+}
+.border-b-2 {
+  border-bottom: 2px solid var(--palm-dark);
+}
+.border-b-4 {
+  border-bottom: 4px solid var(--palm-dark);
+}
+.border-r-\[4px\] {
+  border-right: 4px solid #707070;
+}
+.border-b-\[8px\] {
+  border-bottom: 8px solid #707070;
+}
+.border-x {
+  border-left: 1px solid var(--palm-dark);
+  border-right: 1px solid var(--palm-dark);
+}
+.border-t {
+  border-top: 1px solid var(--palm-dark);
+}
+.rounded {
+  border-radius: 0.25rem;
+}
+.rounded-sm {
+  border-radius: 0.125rem;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.rounded-full {
+  border-radius: 9999px;
+}
+.rounded-t-lg {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+.rounded-b-lg {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+.rounded-\[40px\] {
+  border-radius: 40px;
+}
+
+/* Text */
+.text-xs {
+  font-size: 0.75rem;
+}
+.text-sm {
+  font-size: 0.875rem;
+}
+.text-xl {
+  font-size: 1.25rem;
+}
+.text-4xl {
+  font-size: 2.25rem;
+}
+.font-bold {
+  font-weight: 700;
+}
+.italic {
+  font-style: italic;
+}
+.text-center {
+  text-align: center;
+}
+.leading-tight {
+  line-height: 1.25;
+}
+.line-through {
+  text-decoration: line-through;
+}
+
+/* Colors */
+.bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.bg-\[\#1a1a1a\] {
+  background-color: #1a1a1a;
+}
+.bg-\[\#a0a0a0\] {
+  background-color: #a0a0a0;
+}
+.bg-\[\#8c927b\] {
+  background-color: #8c927b;
+}
+.bg-\[\#4a4d41\] {
+  background-color: #4a4d41;
+}
+.bg-\[\#7a826b\] {
+  background-color: #7a826b;
+}
+.bg-\[\#7a826b\/20\] {
+  background-color: rgba(122, 130, 107, 0.2);
+}
+.bg-\[\#888\] {
+  background-color: #888;
+}
+.bg-\[\#2a2d24\] {
+  background-color: #2a2d24;
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.text-white {
+  color: #fff;
+}
+.text-\[\#2a2d24\] {
+  color: #2a2d24;
+}
+.text-\[\#333\] {
+  color: #333;
+}
+.text-\[\#8c927b\] {
+  color: #8c927b;
+}
+.opacity-20 {
+  opacity: 0.2;
+}
+.opacity-30 {
+  opacity: 0.3;
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+.opacity-0 {
+  opacity: 0;
+}
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Effects */
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+.blur-2xl {
+  filter: blur(40px);
+}
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.active\:translate-y-1:active {
+  transform: translateY(0.25rem);
+}
+.active\:translate-y-0\.5:active {
+  transform: translateY(0.125rem);
+}
+.active\:border-b-0:active {
+  border-bottom-width: 0;
+}
+.active\:invert:active {
+  filter: invert(1);
+}
+.active\:bg-\[\#2a2d24\]:active {
+  background-color: #2a2d24;
+}
+.active\:text-\[\#8c927b\]:active {
+  color: #8c927b;
+}
+.hover\:bg-\[\#6a725b\]:hover {
+  background-color: #6a725b;
+}
+
+/* Specific Components */
+.grid {
+  display: grid;
+}
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.outline-none {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.pointer-events-none {
+  pointer-events: none;
+}
+
+/* Palm OS Specifics */
+input::placeholder {
+  color: var(--palm-text);
+  opacity: 0.5;
+}
+
+/* m505 Hardware Styling */
+.m505-chassis {
+  border-bottom: 8px solid #959595;
+  border-right: 4px solid #959595;
+  background: linear-gradient(to bottom right, #f0f0f0, #c0c0c0, #999999);
+}
+.m505-bezel {
+  border: 2px solid #555;
+  background-color: #333;
+}
+.m505-graffiti {
+  border: 1px solid #222;
+  background-color: #3a3a3a;
+  color: #fff;
+}
+.m505-graffiti-input {
+  border-left: 1px solid #111;
+  border-right: 1px solid #111;
+  color: #aaa;
+}
+.m505-btn-hover:hover {
+  background-color: #555;
+}
+.m505-hardware-btn {
+  border-bottom: 4px solid #777;
+  background-color: #ccc;
+  color: #333;
+}
+.m505-hardware-btn:active {
+  border-bottom-width: 0;
+  transform: translateY(0.25rem);
+}
+.m505-statusbar {
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #000;
+  color: #000;
+}
+.m505-battery {
+  background: linear-gradient(to bottom, #74ff74, #008000); /* Green battery per m505 usually */
+}

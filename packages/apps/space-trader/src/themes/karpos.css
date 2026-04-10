@@ -1,0 +1,125 @@
+.space-trader-app.st-karp {
+  background-color: var(--desktop-bg, #dfdfdf);
+  color: #000;
+  font-family: inherit;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.st-karp .st-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.st-karp .st-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.st-karp .st-tabs button {
+  background: #fff;
+  border: 2px solid #000;
+  color: #000;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.1s;
+}
+
+.st-karp .st-tabs button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.st-karp .st-tabs button.active {
+  background: #000;
+  color: #fff;
+}
+
+.st-karp .st-content {
+  flex: 1;
+  overflow-y: auto;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 8px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.st-karp .st-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  font-weight: bold;
+  border-bottom: 2px solid #000;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+.st-karp .st-trade-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+.st-karp .st-actions button {
+  background: #efefef;
+  border: 1px solid #000;
+  color: #000;
+  padding: 2px 6px;
+  margin-right: 4px;
+  font-weight: bold;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.st-karp .st-actions button:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.st-karp .st-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.st-karp .st-map-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ff0000;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.st-karp .st-system-map {
+  position: relative;
+  height: 150px;
+  border: 2px dashed #000;
+  background: #fafafa;
+  margin-top: 10px;
+}
+
+.st-karp .st-status-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #000;
+  padding: 4px 0;
+}
+
+.st-karp .st-chart-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding: 4px 0;
+  align-items: center;
+}

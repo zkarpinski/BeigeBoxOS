@@ -136,7 +136,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
       if (ctx && animCanvas) {
         ctx.clearRect(0, 0, animCanvas.width, animCanvas.height);
 
-        antsRef.current = antsRef.current.map(ant => {
+        antsRef.current = antsRef.current.map((ant) => {
           const newAngle = ant.angle + (Math.random() - 0.5) * 0.5;
           const nextX = (ant.x + Math.cos(newAngle) * 2 + animCanvas.width) % animCanvas.width;
           const nextY = (ant.y + Math.sin(newAngle) * 2 + animCanvas.height) % animCanvas.height;
@@ -243,14 +243,11 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         height: '100vh',
         zIndex: 9999,
         pointerEvents: activeTool === 'pointer' ? 'none' : 'auto',
-        cursor: getCursor(activeTool)
+        cursor: getCursor(activeTool),
       }}
       onMouseDown={handleMouseDown}
     >
-      <canvas
-        ref={canvasRef}
-        style={{ position: 'absolute', top: 0, left: 0, display: 'block' }}
-      />
+      <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, display: 'block' }} />
       <canvas
         ref={animationCanvasRef}
         style={{ position: 'absolute', top: 0, left: 0, display: 'block', pointerEvents: 'none' }}
@@ -270,7 +267,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
           border: skin === 'winxp' ? '2px solid #0054E3' : '4px solid #000',
           boxShadow: skin === 'winxp' ? '2px 2px 5px rgba(0,0,0,0.3)' : '8px 8px 0px #000',
           pointerEvents: 'auto',
-          zIndex: 10000
+          zIndex: 10000,
         }}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -352,7 +349,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         }
         .desktop-destroyer-overlay.skin-winxp .desktop-destroyer-toolbar button.active {
           background: #ccc;
-          box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
+          box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
       `}</style>
     </div>
@@ -380,12 +377,19 @@ function ToolbarButton({ active, onClick, icon, title, skin }: any) {
 
 function getCursor(tool: Tool) {
   switch (tool) {
-    case 'pointer': return 'default';
-    case 'hammer': return 'crosshair';
-    case 'ants': return 'copy';
-    case 'flamethrower': return 'wait';
-    case 'paint': return 'cell';
-    case 'repair': return 'help';
-    default: return 'default';
+    case 'pointer':
+      return 'default';
+    case 'hammer':
+      return 'crosshair';
+    case 'ants':
+      return 'copy';
+    case 'flamethrower':
+      return 'wait';
+    case 'paint':
+      return 'cell';
+    case 'repair':
+      return 'help';
+    default:
+      return 'default';
   }
 }

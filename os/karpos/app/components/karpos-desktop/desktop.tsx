@@ -70,7 +70,6 @@ export function KarpDesktop() {
           </div>
 
           <NotepadWindow />
-          <SpaceTraderWindow skin="karpos" />
           <MinesweeperWindow skin="karpos" />
           <CalculatorWindow skin="karpos" />
           <PdfReaderWindow />

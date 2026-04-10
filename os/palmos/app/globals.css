@@ -369,3 +369,44 @@ input::placeholder {
   color: var(--palm-text);
   opacity: 0.5;
 }
+
+/* m505 Hardware Styling */
+.m505-chassis {
+  border-bottom: 8px solid #959595;
+  border-right: 4px solid #959595;
+  background: linear-gradient(to bottom right, #f0f0f0, #c0c0c0, #999999);
+}
+.m505-bezel {
+  border: 2px solid #555;
+  background-color: #333;
+}
+.m505-graffiti {
+  border: 1px solid #222;
+  background-color: #3a3a3a;
+  color: #fff;
+}
+.m505-graffiti-input {
+  border-left: 1px solid #111;
+  border-right: 1px solid #111;
+  color: #aaa;
+}
+.m505-btn-hover:hover {
+  background-color: #555;
+}
+.m505-hardware-btn {
+  border-bottom: 4px solid #777;
+  background-color: #ccc;
+  color: #333;
+}
+.m505-hardware-btn:active {
+  border-bottom-width: 0;
+  transform: translateY(0.25rem);
+}
+.m505-statusbar {
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #000;
+  color: #000;
+}
+.m505-battery {
+  background: linear-gradient(to bottom, #74ff74, #008000); /* Green battery per m505 usually */
+}

@@ -6,9 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@retro-web/app-space-trader": "workspace:*",
     "@retro-web/core": "workspace:*",
     "next": "^15.0.0",
     "react": "^18.3.0",

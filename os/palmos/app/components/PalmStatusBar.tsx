@@ -10,23 +10,92 @@ export function PalmStatusBar() {
     return () => clearInterval(timer);
   }, []);
 
+  const timeStr = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+
   return (
-    <div className="flex h-6 w-full items-center justify-between border-b border-[#2a2d24] px-2 text-sm font-bold">
-      <div className="flex items-center gap-1">
-        <div className="relative h-2 w-4 border border-[#2a2d24]">
-          <div className="h-full bg-[#2a2d24]" style={{ width: '80%' }}></div>
-          <div className="absolute -right-1 top-0.5 h-1 w-0.5 bg-[#2a2d24]"></div>
+    <div
+      style={{
+        display: 'flex',
+        height: '22px',
+        width: '100%',
+        alignItems: 'stretch',
+        borderBottom: '1px solid #000',
+        fontSize: '11px',
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        flexShrink: 0,
+      }}
+    >
+      {/* Time - blue box on left */}
+      <div
+        style={{
+          backgroundColor: '#1A1A8C',
+          color: 'white',
+          padding: '0 6px',
+          display: 'flex',
+          alignItems: 'center',
+          minWidth: '62px',
+          borderBottomRightRadius: '6px',
+        }}
+      >
+        {timeStr}
+      </div>
+
+      {/* Battery indicator - centered */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            width: '28px',
+            height: '10px',
+            border: '1px solid #333',
+            background: 'white',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              left: '1px',
+              top: '1px',
+              bottom: '1px',
+              width: '75%',
+              background: 'linear-gradient(to bottom, #74ff74, #008000)',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              right: '-3px',
+              top: '2px',
+              width: '2px',
+              height: '5px',
+              background: '#333',
+            }}
+          />
         </div>
       </div>
-      <div>{time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</div>
-      <div className="flex items-center gap-1">
-        <div className="flex h-3 items-end gap-[1px]">
-          <div className="h-1 w-1 bg-[#2a2d24]"></div>
-          <div className="h-1.5 w-1 bg-[#2a2d24]"></div>
-          <div className="h-2 w-1 bg-[#2a2d24]"></div>
-          <div className="h-2.5 w-1 bg-[#2a2d24]"></div>
-          <div className="h-3 w-1 bg-[#2a2d24] opacity-30"></div>
-        </div>
+
+      {/* Category dropdown - right */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2px',
+          padding: '0 6px',
+          color: '#000',
+        }}
+      >
+        <span style={{ fontSize: '8px' }}>▼</span>
+        <span>All</span>
       </div>
     </div>
   );

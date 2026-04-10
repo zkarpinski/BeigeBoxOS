@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '@retro-web/app-space-trader/themes/palmos.css';
 
 export const metadata: Metadata = {
   title: 'Palm OS 3',

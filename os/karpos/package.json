@@ -11,10 +11,12 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@next/mdx": "^15.0.3",
     "@retro-web/app-calculator": "workspace:*",
-    "@retro-web/app-pdf-reader": "workspace:*",
     "@retro-web/app-minesweeper": "workspace:*",
+    "@retro-web/app-pdf-reader": "workspace:*",
     "@retro-web/app-pinball": "workspace:*",
+    "@retro-web/app-space-trader": "workspace:*",
     "@retro-web/app-winamp": "workspace:*",
     "@retro-web/core": "workspace:*",
     "@supabase/supabase-js": "^2.99.1",

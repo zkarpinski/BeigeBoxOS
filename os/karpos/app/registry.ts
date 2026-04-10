@@ -6,6 +6,7 @@ import { pinballAppConfig } from '@retro-web/app-pinball';
 import { spaceTraderAppConfig } from '@retro-web/app-space-trader';
 import { projectsAppConfig } from './components/apps/projects/ProjectsWindow';
 import { padAppConfig } from './components/apps/pad/PadWindow';
+import { desktopDestroyerAppConfig } from '@retro-web/app-desktop-destroyer';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 
 export const appRegistry: AppConfig[] = [
@@ -17,4 +18,5 @@ export const appRegistry: AppConfig[] = [
   pinballAppConfig,
   projectsAppConfig,
   padAppConfig,
+  desktopDestroyerAppConfig,
 ];

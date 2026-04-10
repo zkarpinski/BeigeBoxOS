@@ -8,7 +8,7 @@ import { MenuBar } from '@win98/components/win98/MenuBar';
 import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
 import { PinballWindow } from '@retro-web/app-pinball';
-import { SpaceTraderWindow } from '@retro-web/app-space-trader';
+import { DesktopDestroyer } from '@retro-web/app-desktop-destroyer';
 import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { ProjectsWindow } from '../apps/projects/ProjectsWindow';
@@ -17,8 +17,14 @@ import { DesktopIcons } from './desktop-icons';
 import { KarposTaskbar } from './KarposTaskbar';
 import { KarposShellOverlays } from './KarposShellOverlays';
 import { appRegistry } from '../../registry';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { WindowManagerProvider, useWindowManager } from '@retro-web/core/context';
 import { initFileSystem } from '../../fileSystem';
+
+function DesktopDestroyerContainer() {
+  const { apps } = useWindowManager();
+  if (!apps['desktop-destroyer']?.visible) return null;
+  return <DesktopDestroyer skin="karpos" />;
+}
 
 export function KarpDesktop() {
   const urlAppId = useMemo(() => {
@@ -71,6 +77,7 @@ export function KarpDesktop() {
           <ProjectsWindow />
           <PadWindow />
           <PinballWindow skin="karpos" />
+          <DesktopDestroyerContainer />
 
           <DesktopIcons registry={appRegistry} />
           <KarposTaskbar registry={appRegistry} />

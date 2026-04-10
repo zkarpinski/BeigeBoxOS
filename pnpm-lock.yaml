@@ -60,6 +60,9 @@ importers:
       '@retro-web/app-pinball':
         specifier: workspace:*
         version: link:../../packages/apps/pinball
+      '@retro-web/app-space-trader':
+        specifier: workspace:*
+        version: link:../../packages/apps/space-trader
       '@retro-web/app-winamp':
         specifier: workspace:*
         version: link:../../packages/apps/winamp

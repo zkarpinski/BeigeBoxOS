@@ -3,6 +3,7 @@ import { minesweeperAppConfig } from '@retro-web/app-minesweeper';
 import { calculatorAppConfig } from '@retro-web/app-calculator';
 import { pdfReaderAppConfig } from '@retro-web/app-pdf-reader';
 import { pinballAppConfig } from '@retro-web/app-pinball';
+import { SpaceTraderAppConfig } from '@retro-web/app-space-trader';
 import { projectsAppConfig } from './components/apps/projects/ProjectsWindow';
 import { padAppConfig } from './components/apps/pad/PadWindow';
 import { desktopDestroyerAppConfig } from '@retro-web/app-desktop-destroyer';
@@ -14,6 +15,7 @@ export const appRegistry: AppConfig[] = [
   minesweeperAppConfig,
   calculatorAppConfig,
   pinballAppConfig,
+  SpaceTraderAppConfig,
   projectsAppConfig,
   padAppConfig,
   desktopDestroyerAppConfig,

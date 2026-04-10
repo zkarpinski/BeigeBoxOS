@@ -4,6 +4,7 @@ import './styles/shell.css';
 import './styles/apps.css';
 import './styles/karpos-theme.css';
 import './styles/karpos-app-brutal.css';
+import '@retro-web/app-space-trader/themes/karpos.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://karpos.zkarpinski.com'),
   title: 'KarpOS | Zachary Karpinski',

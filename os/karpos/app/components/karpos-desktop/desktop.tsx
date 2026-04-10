@@ -9,6 +9,7 @@ import { writeFile } from '../../fileSystem';
 import { MinesweeperWindow } from '@retro-web/app-minesweeper';
 import { PinballWindow } from '@retro-web/app-pinball';
 import { DesktopDestroyer } from '@retro-web/app-desktop-destroyer';
+import { SpaceTraderWindow } from '@retro-web/app-space-trader';
 import { CalculatorWindow } from '@retro-web/app-calculator';
 import { PdfReaderWindow } from '@retro-web/app-pdf-reader';
 import { ProjectsWindow } from '../apps/projects/ProjectsWindow';
@@ -76,6 +77,7 @@ export function KarpDesktop() {
           <ProjectsWindow />
           <PadWindow />
           <PinballWindow skin="karpos" />
+          <SpaceTraderWindow skin="karpos" />
           <DesktopDestroyerContainer />
 
           <DesktopIcons registry={appRegistry} />

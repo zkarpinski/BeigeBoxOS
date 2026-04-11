@@ -18,7 +18,7 @@ describe('NewGameView Component', () => {
 
   it('renders correctly with default fields', () => {
     render(<NewGameView onStart={jest.fn()} />);
-    expect(screen.getByDisplayValue('Jameson')).toBeInTheDocument();
+    expect(screen.getByText('Jameson')).toBeInTheDocument();
     expect(screen.getByText('Skill Points: 0 remaining')).toBeInTheDocument();
   });
 
@@ -40,13 +40,23 @@ describe('NewGameView Component', () => {
 
   it('calls startNewGame when clicking Start Trading', () => {
     render(<NewGameView onStart={jest.fn()} />);
-    const nameInput = screen.getByDisplayValue('Jameson');
-    fireEvent.change(nameInput, { target: { value: 'Zaphod' } });
+    const nameSpan = screen.getByText('Jameson');
 
-    const startBtn = screen.getByText('Start Trading');
+    // Open keyboard
+    fireEvent.click(nameSpan);
+
+    // Press Z
+    const zKey = screen.getByText('z');
+    fireEvent.click(zKey);
+
+    // Press Done
+    const doneBtn = screen.getByText('Done');
+    fireEvent.click(doneBtn);
+
+    const startBtn = screen.getAllByText('Start Trading')[0];
     fireEvent.click(startBtn);
 
-    expect(mockStore.startNewGame).toHaveBeenCalledWith('Zaphod', 2, {
+    expect(mockStore.startNewGame).toHaveBeenCalledWith('Jamesonz', 2, {
       pilot: 4,
       fighter: 4,
       trader: 4,

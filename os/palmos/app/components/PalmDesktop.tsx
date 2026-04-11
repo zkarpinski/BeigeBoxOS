@@ -6,7 +6,7 @@ import { PalmStatusBar } from './PalmStatusBar';
 import { PalmLauncher } from './PalmLauncher';
 import { PalmTodoApp } from './PalmTodoApp';
 import { DateBookApp } from './DateBookApp';
-import { SpaceTraderGame } from '@retro-web/app-space-trader';
+import { SpaceTraderGame, PalmHeader } from '@retro-web/app-space-trader';
 
 export function PalmDesktop() {
   const [currentApp, setCurrentApp] = useState('launcher');
@@ -22,7 +22,7 @@ export function PalmDesktop() {
           {currentApp === 'launcher' && <PalmLauncher onAppOpen={setCurrentApp} />}
           {currentApp === 'todo' && <PalmTodoApp />}
           {currentApp === 'datebook' && <DateBookApp />}
-          {currentApp === 'space_trader' && <SpaceTraderGame host="palmos" />}
+          {currentApp === 'space_trader' && <SpaceTraderGame host="palmos" TitleBar={PalmHeader} />}
           {currentApp !== 'launcher' &&
             currentApp !== 'todo' &&
             currentApp !== 'datebook' &&

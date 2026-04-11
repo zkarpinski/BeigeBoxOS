@@ -8,13 +8,14 @@ import {
   SystemNames,
   ViewType,
 } from '../../logic/DataTypes';
-import { PalmHeader } from '../PalmHeader';
+import { useTitleBar } from '../TitleBarContext';
 
 interface SystemInfoViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
 export const SystemInfoView: React.FC<SystemInfoViewProps> = ({ onViewChange }) => {
+  const { TitleBar } = useTitleBar();
   const { systems, currentSystem } = useSpaceTraderGame();
   const system = systems[currentSystem];
 
@@ -24,7 +25,7 @@ export const SystemInfoView: React.FC<SystemInfoViewProps> = ({ onViewChange }) 
 
   return (
     <div className="palm-window">
-      <PalmHeader title="System Info" onViewChange={onViewChange} />
+      {TitleBar && <TitleBar title="System Info" onViewChange={onViewChange} />}
 
       <div className="palm-content" style={{ padding: '10px' }}>
         <p>

@@ -9,15 +9,21 @@ import { EquipmentView } from './views/EquipmentView';
 import { EncounterModal } from './views/EncounterModal';
 import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
+import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
+import { PalmHeader } from './PalmHeader';
+import { ViewType } from '../logic/DataTypes';
 
 interface SpaceTraderGameProps {
   skin?: string;
   host?: string;
+  TitleBar?: React.ComponentType<TitleBarProps> | null;
 }
 
-import { ViewType } from '../logic/DataTypes';
-
-export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({ skin, host }) => {
+export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
+  skin,
+  host,
+  TitleBar = PalmHeader,
+}) => {
   const { nameCommander, isGameOver } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
@@ -36,17 +42,19 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({ skin, host }) 
   if (!hydrated) return null;
 
   return (
-    <div className="space-trader-app" data-space-trader-skin={skin}>
-      {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
-      {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
-      {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
-      {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
-      {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
-      {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
-      {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
+    <TitleBarProvider TitleBar={TitleBar ?? null}>
+      <div className="space-trader-app" data-space-trader-skin={skin}>
+        {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
+        {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
+        {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
+        {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
+        {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
+        {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
+        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
 
-      {isGameOver && <GameOverView />}
-      <EncounterModal />
-    </div>
+        {isGameOver && <GameOverView />}
+        <EncounterModal />
+      </div>
+    </TitleBarProvider>
   );
 };

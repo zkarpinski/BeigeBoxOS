@@ -26,7 +26,7 @@ export function SpaceTraderWindow({ skin = 'karpos' }: SpaceTraderWindowProps) {
       getCanDrag={(el) => el.classList.contains('windowed')}
     >
       <div style={{ height: 'calc(100% - 24px)', width: '100%' }}>
-        <SpaceTraderGame skin={skin} />
+        <SpaceTraderGame skin={skin} TitleBar={null} />
       </div>
     </AppWindow>
   );

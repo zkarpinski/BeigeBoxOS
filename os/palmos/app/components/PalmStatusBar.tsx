@@ -20,7 +20,7 @@ export function PalmStatusBar() {
         width: '100%',
         alignItems: 'stretch',
         borderBottom: '1px solid #000',
-        fontSize: '11px',
+        fontSize: '15px',
         fontWeight: 'bold',
         fontFamily: 'sans-serif',
         flexShrink: 0,

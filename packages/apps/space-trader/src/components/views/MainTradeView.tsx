@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { TradeItems, SystemNames, ShipTypes, ViewType } from '../../logic/DataTypes';
 import { TradeQuantityModal } from './TradeQuantityModal';
-import { PalmHeader } from '../PalmHeader';
+import { useTitleBar } from '../TitleBarContext';
 
 interface MainTradeViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
 export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) => {
+  const { TitleBar } = useTitleBar();
   const {
     systems,
     currentSystem,
@@ -33,17 +34,18 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
 
   return (
     <div className="palm-window">
-      <PalmHeader
-        className="authentic"
-        title={
-          tradeMode === 'price-list'
-            ? 'Average Price List'
-            : tradeMode === 'buy'
-              ? 'Buy Cargo'
-              : 'Sell Cargo'
-        }
-        onViewChange={onViewChange}
-      />
+      {TitleBar && (
+        <TitleBar
+          title={
+            tradeMode === 'price-list'
+              ? 'Average Price List'
+              : tradeMode === 'buy'
+                ? 'Buy Cargo'
+                : 'Sell Cargo'
+          }
+          onViewChange={onViewChange}
+        />
+      )}
 
       <div className="trade-table-authentic">
         {tradeMode === 'price-list' ? (

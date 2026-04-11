@@ -111,10 +111,38 @@ export const PalmHeader: React.FC<PalmHeaderProps> = ({ title, onViewChange, cla
               <div
                 className="palm-dropdown-item"
                 onClick={() => {
-                  window.location.reload();
+                  useSpaceTraderGame.getState().restartGame();
+                  onViewChange('newgame');
+                  setMenuOpen(false);
                 }}
               >
-                <span>Quit</span>
+                <span>New Game</span>
+              </div>
+
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Switch Game</span>
+              </div>
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Retire</span>
+              </div>
+              <div className="palm-dropdown-separator" />
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Options</span>
+                <span className="shortcut">/O</span>
+              </div>
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Shortcuts</span>
+              </div>
+              <div className="palm-dropdown-separator" />
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>High Scores</span>
+              </div>
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Clear High Scores</span>
+              </div>
+              <div className="palm-dropdown-separator" />
+              <div className="palm-dropdown-item" onClick={() => setMenuOpen(false)}>
+                <span>Snapshot</span>
               </div>
             </div>
           )}

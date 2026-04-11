@@ -371,7 +371,27 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
 
       restartGame: () => {
         localStorage.removeItem('space-trader-save');
-        window.location.reload();
+        set({
+          nameCommander: '',
+          credits: 1000,
+          reputationScore: 0,
+          policeRecordScore: 0,
+          pilotSkill: 0,
+          fighterSkill: 0,
+          traderSkill: 0,
+          engineerSkill: 0,
+          ship: {
+            type: 0,
+            cargo: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            weapon: [],
+            shield: [],
+            gadget: [],
+            fuel: 14,
+            hull: 25,
+          },
+          encounter: null,
+          isGameOver: false,
+        });
       },
 
       setTradeMode: (mode) => set({ tradeMode: mode }),

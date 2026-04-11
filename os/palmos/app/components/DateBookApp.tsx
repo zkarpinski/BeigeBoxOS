@@ -19,9 +19,9 @@ export function DateBookApp() {
 
   return (
     <div className="flex h-full w-full flex-col bg-white font-sans text-black">
-      {/* Header */}
-      <div className="flex items-center border-b-[2px] border-black h-7">
-        <div className="bg-[#1A1A8C] text-white px-2 h-full flex items-center font-bold text-[11px] rounded-br-lg">
+      {/* Date navigation row */}
+      <div className="flex items-center border-b border-black h-7">
+        <div className="px-2 h-full flex items-center font-bold text-[11px] border-r border-black">
           Sep 23, 04
         </div>
         <div className="flex-1 flex items-center justify-center gap-3 px-2">

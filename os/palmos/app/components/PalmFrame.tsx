@@ -418,6 +418,7 @@ export function PalmFrame({
                 playClick();
                 onScroll?.('up');
               }}
+              title="Scroll Up"
               style={{
                 width: '36px',
                 height: '22px',
@@ -441,6 +442,7 @@ export function PalmFrame({
                 playClick();
                 onScroll?.('down');
               }}
+              title="Scroll Down"
               style={{
                 width: '36px',
                 height: '22px',

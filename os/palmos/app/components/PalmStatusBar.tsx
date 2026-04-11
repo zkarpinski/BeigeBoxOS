@@ -2,7 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 
-export function PalmStatusBar() {
+interface Shortcut {
+  label: string;
+  onClick: () => void;
+}
+
+interface PalmStatusBarProps {
+  appTitle?: string;
+  showCategory?: boolean;
+  shortcuts?: Shortcut[];
+  onTitleClick?: () => void;
+}
+
+export function PalmStatusBar({
+  appTitle,
+  showCategory,
+  shortcuts,
+  onTitleClick,
+}: PalmStatusBarProps = {}) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -12,6 +29,100 @@ export function PalmStatusBar() {
 
   const timeStr = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
 
+  // App mode: title pill left + white space + bordered shortcut boxes right
+  if (appTitle) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          height: '22px',
+          width: '100%',
+          alignItems: 'stretch',
+          borderBottom: '2px solid #000',
+          background: 'white',
+          fontFamily: 'sans-serif',
+          fontWeight: 'bold',
+          flexShrink: 0,
+        }}
+      >
+        {/* Title pill */}
+        <div
+          onClick={onTitleClick}
+          style={{
+            backgroundColor: '#1A1A8C',
+            color: 'white',
+            padding: '0 8px',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '15px',
+            borderBottomRightRadius: '6px',
+            whiteSpace: 'nowrap',
+            cursor: onTitleClick ? 'pointer' : 'default',
+          }}
+        >
+          {appTitle}
+        </div>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Shortcut boxes */}
+        {shortcuts && shortcuts.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              border: '1px solid #000',
+              borderBottom: 'none',
+            }}
+          >
+            {shortcuts.map(({ label, onClick }) => (
+              <button
+                key={label}
+                onClick={onClick}
+                style={{
+                  width: '20px',
+                  background: 'white',
+                  border: 'none',
+                  borderLeft: '1px solid #000',
+                  color: '#000',
+                  fontFamily: 'sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Category picker for list apps */}
+        {showCategory && (
+          <div
+            style={{
+              color: '#000',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              paddingRight: '6px',
+              fontSize: '13px',
+            }}
+          >
+            <span style={{ fontSize: '8px' }}>▼</span>
+            <span>All</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Launcher mode: time + battery + category
   return (
     <div
       style={{
@@ -20,13 +131,12 @@ export function PalmStatusBar() {
         width: '100%',
         alignItems: 'stretch',
         borderBottom: '1px solid #000',
-        fontSize: '11px',
+        fontSize: '15px',
         fontWeight: 'bold',
         fontFamily: 'sans-serif',
         flexShrink: 0,
       }}
     >
-      {/* Time - blue box on left */}
       <div
         style={{
           backgroundColor: '#1A1A8C',
@@ -40,16 +150,7 @@ export function PalmStatusBar() {
       >
         {timeStr}
       </div>
-
-      {/* Battery indicator - centered */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div
           style={{
             position: 'relative',
@@ -83,8 +184,6 @@ export function PalmStatusBar() {
           />
         </div>
       </div>
-
-      {/* Category dropdown - right */}
       <div
         style={{
           display: 'flex',

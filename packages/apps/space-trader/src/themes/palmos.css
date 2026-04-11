@@ -1,16 +1,16 @@
 .space-trader-app {
   --palm-bg: #ececec;
-  --palm-header-bg: #2a3d66; /* Palm OS 4 blue header */
+  --palm-header-bg: #1a1a8c;
   --palm-text: #000000;
   --palm-btn-bg: #ffffff;
   --palm-btn-border: #888888;
-  --palm-btn-active: #2a3d66;
+  --palm-btn-active: #1a1a8c;
   --palm-border: #666666;
 
   background-color: var(--palm-bg);
   color: var(--palm-text);
-  font-family: 'MS Sans Serif', Tahoma, sans-serif;
-  font-size: 10px;
+  font-family: sans-serif;
+  font-size: 11px;
   height: 100%;
   width: 100%;
   display: flex;
@@ -45,10 +45,8 @@
 
 .palm-header-title-container {
   background-color: var(--palm-header-bg);
-  padding: 0 4px;
-  border-radius: 4px 4px 0 0;
-  border: 1px solid #ffffff33; /* Very subtle white border */
-  border-bottom: none;
+  padding: 0 6px;
+  border-radius: 0 0 6px 0;
 }
 
 .palm-header-title {
@@ -178,6 +176,12 @@
 
 .palm-dropdown-item .shortcut {
   opacity: 0.6;
+}
+
+.palm-dropdown-separator {
+  height: 0;
+  border-bottom: 2px dotted #000;
+  margin: 3px 2px;
 }
 
 .trade-mode-tabs {

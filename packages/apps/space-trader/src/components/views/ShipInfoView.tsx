@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, Weapons, Shields, Gadgets, ViewType } from '../../logic/DataTypes';
-import { PalmHeader } from '../PalmHeader';
+import { useTitleBar } from '../TitleBarContext';
 
 interface ShipInfoViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
 export const ShipInfoView: React.FC<ShipInfoViewProps> = ({ onViewChange }) => {
+  const { TitleBar } = useTitleBar();
   const { ship, credits, reputationScore, policeRecordScore } = useSpaceTraderGame();
   const shipType = ShipTypes[ship.type];
 
@@ -18,7 +19,7 @@ export const ShipInfoView: React.FC<ShipInfoViewProps> = ({ onViewChange }) => {
 
   return (
     <div className="palm-window">
-      <PalmHeader title="Commander Status" onViewChange={onViewChange} />
+      {TitleBar && <TitleBar title="Commander Status" onViewChange={onViewChange} />}
 
       <div className="palm-content" style={{ padding: '10px', overflowY: 'auto' }}>
         <p>

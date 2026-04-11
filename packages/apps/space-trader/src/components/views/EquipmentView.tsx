@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { Weapons, Shields, Gadgets, ViewType } from '../../logic/DataTypes';
-import { PalmHeader } from '../PalmHeader';
+import { useTitleBar } from '../TitleBarContext';
 
 interface EquipmentViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
 export const EquipmentView: React.FC<EquipmentViewProps> = ({ onViewChange }) => {
+  const { TitleBar } = useTitleBar();
   const { systems, currentSystem, credits, ship, buyWeapon, buyShield, buyGadget } =
     useSpaceTraderGame();
   const system = systems[currentSystem];
@@ -17,7 +18,7 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({ onViewChange }) =>
   if (system.techLevel < 3) {
     return (
       <div className="palm-window">
-        <PalmHeader title="Equipment" onViewChange={onViewChange} />
+        {TitleBar && <TitleBar title="Equipment" onViewChange={onViewChange} />}
         <div className="palm-content" style={{ padding: '20px', textAlign: 'center' }}>
           This system is too primitive for equipment sales.
         </div>
@@ -34,7 +35,7 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({ onViewChange }) =>
 
   return (
     <div className="palm-window">
-      <PalmHeader title="Equipment" onViewChange={onViewChange} />
+      {TitleBar && <TitleBar title="Equipment" onViewChange={onViewChange} />}
 
       <div
         className="trade-mode-tabs"

@@ -65,6 +65,14 @@ describe('Merchant Logic', () => {
   });
 
   describe('determineSystemPrices', () => {
+    let randomSpy: jest.SpyInstance;
+    beforeEach(() => {
+      randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    });
+    afterEach(() => {
+      randomSpy.mockRestore();
+    });
+
     it('adjusts buy prices based on trader skill', () => {
       const lowSkillPrices = determineSystemPrices(mockSystem, 0, 0);
       const highSkillPrices = determineSystemPrices(mockSystem, 10, 0);

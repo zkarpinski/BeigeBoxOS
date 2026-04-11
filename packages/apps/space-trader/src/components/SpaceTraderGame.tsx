@@ -9,16 +9,36 @@ import { EquipmentView } from './views/EquipmentView';
 import { EncounterModal } from './views/EncounterModal';
 import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
+import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
+import { PalmHeader } from './PalmHeader';
+import { SpaceTraderMenu } from './SpaceTraderMenu';
+import { ViewType } from '../logic/DataTypes';
+
+export interface AppShortcut {
+  label: string;
+  onClick: () => void;
+}
 
 interface SpaceTraderGameProps {
   skin?: string;
   host?: string;
+  TitleBar?: React.ComponentType<TitleBarProps> | null;
+  onTitleChange?: (title: string) => void;
+  onShortcutsChange?: (shortcuts: AppShortcut[]) => void;
+  menuOpen?: boolean;
+  onMenuClose?: () => void;
 }
 
-import { ViewType } from '../logic/DataTypes';
-
-export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({ skin, host }) => {
-  const { nameCommander, isGameOver } = useSpaceTraderGame();
+export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
+  skin,
+  host,
+  TitleBar = PalmHeader,
+  onTitleChange,
+  onShortcutsChange,
+  menuOpen = false,
+  onMenuClose,
+}) => {
+  const { nameCommander, isGameOver, tradeMode, setTradeMode } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
 
@@ -33,20 +53,79 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({ skin, host }) 
     setHydrated(true);
   }, [nameCommander]);
 
+  useEffect(() => {
+    if (!onShortcutsChange) return;
+    // Only show shortcuts when actively playing (not on new game screen)
+    if (activeView === 'newgame') {
+      onShortcutsChange([]);
+      return;
+    }
+    onShortcutsChange([
+      {
+        label: 'B',
+        onClick: () => {
+          setTradeMode('buy');
+          setActiveView('trade');
+        },
+      },
+      {
+        label: 'S',
+        onClick: () => {
+          setTradeMode('sell');
+          setActiveView('trade');
+        },
+      },
+      { label: 'Y', onClick: () => setActiveView('shipyard') },
+      { label: 'W', onClick: () => setActiveView('map') },
+    ]);
+    return () => onShortcutsChange([]);
+  }, [activeView, setTradeMode, onShortcutsChange]);
+
+  useEffect(() => {
+    if (!onTitleChange) return;
+    const titles: Record<ViewType, string> = {
+      trade:
+        tradeMode === 'buy' ? 'Buy Cargo' : tradeMode === 'sell' ? 'Sell Cargo' : 'Avg Price List',
+      system: 'System Info',
+      ship: 'Commander Status',
+      map: 'Short Range Chart',
+      shipyard: 'Shipyard',
+      equipment: 'Equipment',
+      newgame: 'Space Trader',
+    };
+    onTitleChange(titles[activeView] ?? 'Space Trader');
+  }, [activeView, tradeMode, onTitleChange]);
+
   if (!hydrated) return null;
 
   return (
-    <div className="space-trader-app" data-space-trader-skin={skin}>
-      {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
-      {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
-      {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
-      {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
-      {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
-      {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
-      {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
+    <TitleBarProvider TitleBar={TitleBar ?? null}>
+      <div
+        className="space-trader-app"
+        data-space-trader-skin={skin}
+        style={{ position: 'relative' }}
+      >
+        {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
+        {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
+        {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
+        {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
+        {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
+        {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
+        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
 
-      {isGameOver && <GameOverView />}
-      <EncounterModal />
-    </div>
+        {isGameOver && <GameOverView />}
+        <EncounterModal />
+
+        {menuOpen && (
+          <SpaceTraderMenu
+            onViewChange={(view) => {
+              setActiveView(view);
+              onMenuClose?.();
+            }}
+            onClose={() => onMenuClose?.()}
+          />
+        )}
+      </div>
+    </TitleBarProvider>
   );
 };

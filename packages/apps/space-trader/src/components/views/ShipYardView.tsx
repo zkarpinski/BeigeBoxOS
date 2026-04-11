@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, ViewType } from '../../logic/DataTypes';
-import { PalmHeader } from '../PalmHeader';
+import { useTitleBar } from '../TitleBarContext';
 
 interface ShipYardViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
 export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
+  const { TitleBar } = useTitleBar();
   const { systems, currentSystem, credits, buyShip, ship, repairHull } = useSpaceTraderGame();
   const system = systems[currentSystem];
 
@@ -17,7 +18,7 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
   if (system.techLevel < 4) {
     return (
       <div className="palm-window">
-        <PalmHeader title="Shipyard" onViewChange={onViewChange} />
+        {TitleBar && <TitleBar title="Shipyard" onViewChange={onViewChange} />}
         <div className="palm-content" style={{ padding: '20px', textAlign: 'center' }}>
           This system is too primitive for a shipyard.
         </div>
@@ -35,7 +36,7 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
 
   return (
     <div className="palm-window">
-      <PalmHeader title="Shipyard" onViewChange={onViewChange} />
+      {TitleBar && <TitleBar title="Shipyard" onViewChange={onViewChange} />}
 
       <div
         className="palm-content"

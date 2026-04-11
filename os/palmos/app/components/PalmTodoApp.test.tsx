@@ -19,9 +19,9 @@ describe('PalmTodoApp Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the Todo list title', () => {
+  it('renders the New button', () => {
     render(<PalmTodoApp />);
-    expect(screen.getByText('To Do List')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'New' })).toBeInTheDocument();
   });
 
   it('adds a new todo item', () => {

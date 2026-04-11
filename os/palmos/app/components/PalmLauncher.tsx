@@ -98,8 +98,8 @@ export function PalmLauncher({ onAppOpen }: PalmLauncherProps) {
               </div>
               <span
                 style={{
-                  fontSize: '10px',
-                  fontWeight: 'bold',
+                  fontSize: '16x',
+                  fontWeight: 'normal',
                   textAlign: 'center',
                   color: '#000',
                   lineHeight: '1.1',

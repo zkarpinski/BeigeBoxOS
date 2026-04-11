@@ -6,23 +6,29 @@ import { PalmStatusBar } from './PalmStatusBar';
 import { PalmLauncher } from './PalmLauncher';
 import { PalmTodoApp } from './PalmTodoApp';
 import { DateBookApp } from './DateBookApp';
-import { SpaceTraderGame, PalmHeader } from '@retro-web/app-space-trader';
+import { SpaceTraderGame } from '@retro-web/app-space-trader';
 
 export function PalmDesktop() {
   const [currentApp, setCurrentApp] = useState('launcher');
+  const [appTitle, setAppTitle] = useState<string | undefined>(undefined);
 
   return (
     <PalmFrame
-      onHomeClick={() => setCurrentApp('launcher')}
+      onHomeClick={() => {
+        setCurrentApp('launcher');
+        setAppTitle(undefined);
+      }}
       onAppButtonClick={(app) => setCurrentApp(app)}
     >
       <div className="flex h-full w-full flex-col bg-white">
-        {currentApp === 'launcher' && <PalmStatusBar />}
+        <PalmStatusBar appTitle={currentApp !== 'launcher' ? appTitle : undefined} />
         <div className="flex-1 overflow-hidden">
           {currentApp === 'launcher' && <PalmLauncher onAppOpen={setCurrentApp} />}
           {currentApp === 'todo' && <PalmTodoApp />}
           {currentApp === 'datebook' && <DateBookApp />}
-          {currentApp === 'space_trader' && <SpaceTraderGame host="palmos" TitleBar={PalmHeader} />}
+          {currentApp === 'space_trader' && (
+            <SpaceTraderGame host="palmos" TitleBar={null} onTitleChange={setAppTitle} />
+          )}
           {currentApp !== 'launcher' &&
             currentApp !== 'todo' &&
             currentApp !== 'datebook' &&

@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 
-export function PalmStatusBar() {
+interface PalmStatusBarProps {
+  appTitle?: string;
+}
+
+export function PalmStatusBar({ appTitle }: PalmStatusBarProps = {}) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export function PalmStatusBar() {
         flexShrink: 0,
       }}
     >
-      {/* Time - blue box on left */}
+      {/* Left box — time in launcher, app title in apps */}
       <div
         style={{
           backgroundColor: '#1A1A8C',
@@ -38,65 +42,67 @@ export function PalmStatusBar() {
           borderBottomRightRadius: '6px',
         }}
       >
-        {timeStr}
+        {appTitle ?? timeStr}
       </div>
 
-      {/* Battery indicator - centered */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            position: 'relative',
-            width: '28px',
-            height: '10px',
-            border: '1px solid #333',
-            background: 'white',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
+      {/* Launcher-only: battery + category */}
+      {!appTitle && (
+        <>
           <div
             style={{
-              position: 'absolute',
-              left: '1px',
-              top: '1px',
-              bottom: '1px',
-              width: '75%',
-              background: 'linear-gradient(to bottom, #74ff74, #008000)',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            <div
+              style={{
+                position: 'relative',
+                width: '28px',
+                height: '10px',
+                border: '1px solid #333',
+                background: 'white',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '1px',
+                  top: '1px',
+                  bottom: '1px',
+                  width: '75%',
+                  background: 'linear-gradient(to bottom, #74ff74, #008000)',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '-3px',
+                  top: '2px',
+                  width: '2px',
+                  height: '5px',
+                  background: '#333',
+                }}
+              />
+            </div>
+          </div>
           <div
             style={{
-              position: 'absolute',
-              right: '-3px',
-              top: '2px',
-              width: '2px',
-              height: '5px',
-              background: '#333',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              padding: '0 6px',
+              color: '#000',
             }}
-          />
-        </div>
-      </div>
-
-      {/* Category dropdown - right */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2px',
-          padding: '0 6px',
-          color: '#000',
-        }}
-      >
-        <span style={{ fontSize: '8px' }}>▼</span>
-        <span>All</span>
-      </div>
+          >
+            <span style={{ fontSize: '8px' }}>▼</span>
+            <span>All</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

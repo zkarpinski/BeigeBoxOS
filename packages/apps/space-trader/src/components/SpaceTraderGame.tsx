@@ -17,14 +17,16 @@ interface SpaceTraderGameProps {
   skin?: string;
   host?: string;
   TitleBar?: React.ComponentType<TitleBarProps> | null;
+  onTitleChange?: (title: string) => void;
 }
 
 export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   skin,
   host,
   TitleBar = PalmHeader,
+  onTitleChange,
 }) => {
-  const { nameCommander, isGameOver } = useSpaceTraderGame();
+  const { nameCommander, isGameOver, tradeMode } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
 
@@ -38,6 +40,21 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
     }
     setHydrated(true);
   }, [nameCommander]);
+
+  useEffect(() => {
+    if (!onTitleChange) return;
+    const titles: Record<ViewType, string> = {
+      trade:
+        tradeMode === 'buy' ? 'Buy Cargo' : tradeMode === 'sell' ? 'Sell Cargo' : 'Avg Price List',
+      system: 'System Info',
+      ship: 'Commander Status',
+      map: 'Short Range Chart',
+      shipyard: 'Shipyard',
+      equipment: 'Equipment',
+      newgame: 'Space Trader',
+    };
+    onTitleChange(titles[activeView] ?? 'Space Trader');
+  }, [activeView, tradeMode, onTitleChange]);
 
   if (!hydrated) return null;
 

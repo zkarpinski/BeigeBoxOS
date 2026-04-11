@@ -77,11 +77,20 @@ function parseToken(token) {
 }
 
 async function verifySignature(secret, payloadB64, sigB64) {
-  const expectedSig = await hmacSha256(secret, payloadB64);
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify'],
+  );
   const actualSig = b64UrlDecode(sigB64);
-  if (expectedSig.length !== actualSig.length) return false;
-  for (let i = 0; i < expectedSig.length; i++) if (expectedSig[i] !== actualSig[i]) return false;
-  return true;
+  return await crypto.subtle.verify(
+    'HMAC',
+    key,
+    actualSig,
+    new TextEncoder().encode(payloadB64),
+  );
 }
 
 export async function onRequestPost(context) {

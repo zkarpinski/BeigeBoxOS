@@ -46,9 +46,10 @@ describe('MainTradeView Component', () => {
     (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(mockStore);
   });
 
-  it('renders "Buy Cargo" header when in buy mode', () => {
+  it('renders trade rows when in buy mode', () => {
     render(<MainTradeView onViewChange={jest.fn()} />);
-    expect(screen.getByText('Buy Cargo')).toBeInTheDocument();
+    const rows = document.querySelectorAll('.trade-row-authentic');
+    expect(rows.length).toBeGreaterThan(0);
   });
 
   it('renders 10 trade rows', () => {

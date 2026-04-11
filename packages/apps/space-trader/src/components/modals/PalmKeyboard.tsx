@@ -41,6 +41,7 @@ export const PalmKeyboard: React.FC<PalmKeyboardProps> = ({
 
   return (
     <div
+      className="palm-keyboard-container"
       style={{
         position: 'absolute',
         top: 0,

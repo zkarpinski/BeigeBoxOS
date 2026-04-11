@@ -11,13 +11,22 @@ import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
+import { SpaceTraderMenu } from './SpaceTraderMenu';
 import { ViewType } from '../logic/DataTypes';
+
+export interface AppShortcut {
+  label: string;
+  onClick: () => void;
+}
 
 interface SpaceTraderGameProps {
   skin?: string;
   host?: string;
   TitleBar?: React.ComponentType<TitleBarProps> | null;
   onTitleChange?: (title: string) => void;
+  onShortcutsChange?: (shortcuts: AppShortcut[]) => void;
+  menuOpen?: boolean;
+  onMenuClose?: () => void;
 }
 
 export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
@@ -25,8 +34,11 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   host,
   TitleBar = PalmHeader,
   onTitleChange,
+  onShortcutsChange,
+  menuOpen = false,
+  onMenuClose,
 }) => {
-  const { nameCommander, isGameOver, tradeMode } = useSpaceTraderGame();
+  const { nameCommander, isGameOver, tradeMode, setTradeMode } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
 
@@ -40,6 +52,34 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
     }
     setHydrated(true);
   }, [nameCommander]);
+
+  useEffect(() => {
+    if (!onShortcutsChange) return;
+    // Only show shortcuts when actively playing (not on new game screen)
+    if (activeView === 'newgame') {
+      onShortcutsChange([]);
+      return;
+    }
+    onShortcutsChange([
+      {
+        label: 'B',
+        onClick: () => {
+          setTradeMode('buy');
+          setActiveView('trade');
+        },
+      },
+      {
+        label: 'S',
+        onClick: () => {
+          setTradeMode('sell');
+          setActiveView('trade');
+        },
+      },
+      { label: 'Y', onClick: () => setActiveView('shipyard') },
+      { label: 'W', onClick: () => setActiveView('map') },
+    ]);
+    return () => onShortcutsChange([]);
+  }, [activeView, setTradeMode, onShortcutsChange]);
 
   useEffect(() => {
     if (!onTitleChange) return;
@@ -60,7 +100,11 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
 
   return (
     <TitleBarProvider TitleBar={TitleBar ?? null}>
-      <div className="space-trader-app" data-space-trader-skin={skin}>
+      <div
+        className="space-trader-app"
+        data-space-trader-skin={skin}
+        style={{ position: 'relative' }}
+      >
         {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
         {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
         {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
@@ -71,6 +115,16 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
 
         {isGameOver && <GameOverView />}
         <EncounterModal />
+
+        {menuOpen && (
+          <SpaceTraderMenu
+            onViewChange={(view) => {
+              setActiveView(view);
+              onMenuClose?.();
+            }}
+            onClose={() => onMenuClose?.()}
+          />
+        )}
       </div>
     </TitleBarProvider>
   );

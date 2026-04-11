@@ -25,37 +25,37 @@ describe('GalacticChartView Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders all system dots', () => {
+  it('renders all other system dots (excluding current system)', () => {
     const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
     const dots = container.querySelectorAll('.map-dot');
-    expect(dots).toHaveLength(3);
+    expect(dots).toHaveLength(2); // 3 total - 1 current = 2
   });
 
-  it('shows "Warp to System" when target is in range', () => {
+  it('shows Warp button enabled when target is in range', () => {
     render(<GalacticChartView onViewChange={jest.fn()} />);
-    // Click second dot (dist ~14.14, fuel 20)
+    // Click first dot (which is systems[1], dist ~14.14, fuel 20)
+    const dots = document.querySelectorAll('.map-dot');
+    fireEvent.click(dots[0]);
+
+    expect(screen.getByText('Warp')).not.toBeDisabled();
+    expect(screen.getByText(/14 parsecs/i)).toBeInTheDocument();
+  });
+
+  it('shows Warp button disabled when target is too far', () => {
+    render(<GalacticChartView onViewChange={jest.fn()} />);
+    // Click second dot (which is systems[2], dist ~141.4, fuel 20)
     const dots = document.querySelectorAll('.map-dot');
     fireEvent.click(dots[1]);
 
-    expect(screen.getByText('Warp to System')).not.toBeDisabled();
-    expect(screen.getByText(/14 light years/)).toBeInTheDocument();
-  });
-
-  it('shows "Out of Range" when target is too far', () => {
-    render(<GalacticChartView onViewChange={jest.fn()} />);
-    // Click third dot (dist ~141.4, fuel 20)
-    const dots = document.querySelectorAll('.map-dot');
-    fireEvent.click(dots[2]);
-
-    expect(screen.getByText('Out of Range')).toBeDisabled();
+    expect(screen.getByText('Warp')).toBeDisabled();
   });
 
   it('calls travelTo when Warp button is clicked', () => {
     render(<GalacticChartView onViewChange={jest.fn()} />);
     const dots = document.querySelectorAll('.map-dot');
-    fireEvent.click(dots[1]);
+    fireEvent.click(dots[0]);
 
-    const warpBtn = screen.getByText('Warp to System');
+    const warpBtn = screen.getByText('Warp');
     fireEvent.click(warpBtn);
 
     expect(mockStore.travelTo).toHaveBeenCalledWith(1);

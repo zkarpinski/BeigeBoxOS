@@ -2,11 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 
-interface PalmStatusBarProps {
-  appTitle?: string;
+interface Shortcut {
+  label: string;
+  onClick: () => void;
 }
 
-export function PalmStatusBar({ appTitle }: PalmStatusBarProps = {}) {
+interface PalmStatusBarProps {
+  appTitle?: string;
+  showCategory?: boolean;
+  shortcuts?: Shortcut[];
+  onTitleClick?: () => void;
+}
+
+export function PalmStatusBar({
+  appTitle,
+  showCategory,
+  shortcuts,
+  onTitleClick,
+}: PalmStatusBarProps = {}) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -16,6 +29,100 @@ export function PalmStatusBar({ appTitle }: PalmStatusBarProps = {}) {
 
   const timeStr = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
 
+  // App mode: title pill left + white space + bordered shortcut boxes right
+  if (appTitle) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          height: '22px',
+          width: '100%',
+          alignItems: 'stretch',
+          borderBottom: '2px solid #000',
+          background: 'white',
+          fontFamily: 'sans-serif',
+          fontWeight: 'bold',
+          flexShrink: 0,
+        }}
+      >
+        {/* Title pill */}
+        <div
+          onClick={onTitleClick}
+          style={{
+            backgroundColor: '#1A1A8C',
+            color: 'white',
+            padding: '0 8px',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '15px',
+            borderBottomRightRadius: '6px',
+            whiteSpace: 'nowrap',
+            cursor: onTitleClick ? 'pointer' : 'default',
+          }}
+        >
+          {appTitle}
+        </div>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Shortcut boxes */}
+        {shortcuts && shortcuts.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              border: '1px solid #000',
+              borderBottom: 'none',
+            }}
+          >
+            {shortcuts.map(({ label, onClick }) => (
+              <button
+                key={label}
+                onClick={onClick}
+                style={{
+                  width: '20px',
+                  background: 'white',
+                  border: 'none',
+                  borderLeft: '1px solid #000',
+                  color: '#000',
+                  fontFamily: 'sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Category picker for list apps */}
+        {showCategory && (
+          <div
+            style={{
+              color: '#000',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              paddingRight: '6px',
+              fontSize: '13px',
+            }}
+          >
+            <span style={{ fontSize: '8px' }}>▼</span>
+            <span>All</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Launcher mode: time + battery + category
   return (
     <div
       style={{
@@ -30,7 +137,6 @@ export function PalmStatusBar({ appTitle }: PalmStatusBarProps = {}) {
         flexShrink: 0,
       }}
     >
-      {/* Left box — time in launcher, app title in apps */}
       <div
         style={{
           backgroundColor: '#1A1A8C',
@@ -42,67 +148,54 @@ export function PalmStatusBar({ appTitle }: PalmStatusBarProps = {}) {
           borderBottomRightRadius: '6px',
         }}
       >
-        {appTitle ?? timeStr}
+        {timeStr}
       </div>
-
-      {/* Launcher-only: battery + category */}
-      {!appTitle && (
-        <>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            position: 'relative',
+            width: '28px',
+            height: '10px',
+            border: '1px solid #333',
+            background: 'white',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <div
             style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              position: 'absolute',
+              left: '1px',
+              top: '1px',
+              bottom: '1px',
+              width: '75%',
+              background: 'linear-gradient(to bottom, #74ff74, #008000)',
             }}
-          >
-            <div
-              style={{
-                position: 'relative',
-                width: '28px',
-                height: '10px',
-                border: '1px solid #333',
-                background: 'white',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '1px',
-                  top: '1px',
-                  bottom: '1px',
-                  width: '75%',
-                  background: 'linear-gradient(to bottom, #74ff74, #008000)',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  right: '-3px',
-                  top: '2px',
-                  width: '2px',
-                  height: '5px',
-                  background: '#333',
-                }}
-              />
-            </div>
-          </div>
+          />
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '2px',
-              padding: '0 6px',
-              color: '#000',
+              position: 'absolute',
+              right: '-3px',
+              top: '2px',
+              width: '2px',
+              height: '5px',
+              background: '#333',
             }}
-          >
-            <span style={{ fontSize: '8px' }}>▼</span>
-            <span>All</span>
-          </div>
-        </>
-      )}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2px',
+          padding: '0 6px',
+          color: '#000',
+        }}
+      >
+        <span style={{ fontSize: '8px' }}>▼</span>
+        <span>All</span>
+      </div>
     </div>
   );
 }

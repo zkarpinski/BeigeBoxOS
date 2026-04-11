@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Trash2, ChevronDown } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { usePalmSounds } from '../hooks/usePalmSounds';
 
 interface TodoItem {
@@ -61,14 +61,6 @@ export function PalmTodoApp() {
 
   return (
     <div className="flex h-full w-full flex-col p-2 text-[#2a2d24]">
-      <div className="mb-2 flex items-center justify-between border-b border-[#2a2d24] pb-1">
-        <span className="font-bold">To Do List</span>
-        <div className="flex items-center gap-1 bg-[#2a2d24] px-1 text-xs text-[#8c927b]">
-          <span>All</span>
-          <ChevronDown size={12} />
-        </div>
-      </div>
-
       <div className="flex-1 overflow-y-auto">
         {todos.map((todo) => (
           <div

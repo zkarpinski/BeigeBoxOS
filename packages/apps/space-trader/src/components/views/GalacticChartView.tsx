@@ -112,7 +112,12 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
               const baseline = dy > 0 ? 'hanging' : dy < -2 ? 'auto' : 'middle';
 
               return (
-                <g key={idx} onClick={() => setSelectedSystem(idx)} style={{ cursor: 'pointer' }}>
+                <g
+                  key={idx}
+                  className="map-dot"
+                  onClick={() => setSelectedSystem(idx)}
+                  style={{ cursor: 'pointer' }}
+                >
                   {isSelected && (
                     <circle
                       cx={sx}

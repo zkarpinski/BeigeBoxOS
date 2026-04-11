@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { TradeItems, SystemNames, ShipTypes, ViewType } from '../../logic/DataTypes';
 import { TradeQuantityModal } from './TradeQuantityModal';
-import { PalmHeader } from '../PalmHeader';
 import { useTitleBar } from '../TitleBarContext';
 
 interface MainTradeViewProps {
@@ -35,20 +34,8 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
 
   return (
     <div className="palm-window">
-      {TitleBar ? (
+      {TitleBar && (
         <TitleBar
-          title={
-            tradeMode === 'price-list'
-              ? 'Average Price List'
-              : tradeMode === 'buy'
-                ? 'Buy Cargo'
-                : 'Sell Cargo'
-          }
-          onViewChange={onViewChange}
-        />
-      ) : (
-        <PalmHeader
-          className="authentic"
           title={
             tradeMode === 'price-list'
               ? 'Average Price List'

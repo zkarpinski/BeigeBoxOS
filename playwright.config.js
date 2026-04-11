@@ -32,6 +32,14 @@ module.exports = defineConfig({
         baseURL: process.env.WIN98_URL || 'http://localhost:3000',
       },
     },
+    {
+      name: 'palmos-chromium',
+      testMatch: ['**/os/palmos/**/*.spec.js'],
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.PALMOS_URL || 'http://localhost:3000',
+      },
+    },
   ],
   webServer: {
     command: 'pnpm dev:win98',

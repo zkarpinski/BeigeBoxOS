@@ -370,6 +370,239 @@ input::placeholder {
   opacity: 0.5;
 }
 
+/* Palm OS Device Frame Styles */
+.palm-page-wrapper {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  padding: 28px;
+}
+
+.palm-chassis {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 312px;
+  background: linear-gradient(155deg, #e6e6e6 0%, #c4c4c4 45%, #a6a6a6 100%);
+  border-radius: 34px 34px 18px 18px;
+  box-shadow: 4px 5px 0 #808080, 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  padding-bottom: 14px;
+  border: 1px solid #b0b0b0;
+}
+
+.palm-logos {
+  position: absolute;
+  top: 13px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-sizing: border-box;
+  color: #555;
+  opacity: 0.75;
+}
+
+.palm-speaker {
+  margin-top: 40px;
+  margin-bottom: 7px;
+  width: 56px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #888, #ccc, #888);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.palm-bezel {
+  background: #282828;
+  border-radius: 3px;
+  padding: 4px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
+  border: 1px solid #111;
+}
+
+.palm-screen {
+  width: 264px;
+  height: 264px;
+  overflow: hidden;
+  background: white;
+  position: relative;
+}
+
+.palm-silk-area {
+  width: 272px;
+  height: 94px;
+  margin-top: 7px;
+  background: linear-gradient(to bottom, #383838, #282828);
+  border-radius: 4px;
+  border: 1px solid #111;
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.palm-silk-btn-column {
+  width: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 4px 0;
+}
+
+.palm-silk-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.palm-graffiti-container {
+  flex: 1;
+  border-left: 1px solid #1a1a1a;
+  border-right: 1px solid #1a1a1a;
+  display: flex;
+}
+
+.palm-graffiti-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 18px;
+  font-family: serif;
+  font-style: italic;
+  opacity: 0.4;
+}
+
+.palm-graffiti-divider {
+  width: 1px;
+  background: #555;
+  margin: 10px 0;
+}
+
+.palm-hardware-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 272px;
+  margin-top: 12px;
+  padding: 0 6px;
+}
+
+.palm-hw-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #d8d8d8, #b0b0b0);
+  border: 1px solid #888;
+  box-shadow: 0 3px 0 #666, inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.palm-scroll-rocker {
+  display: flex;
+  flex-direction: column;
+}
+
+.palm-scroll-btn {
+  width: 36px;
+  height: 22px;
+  background: linear-gradient(to bottom, #d4d4d4, #b0b0b0);
+  border: 1px solid #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.palm-scroll-btn-up {
+  border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid #999;
+  box-shadow: 0 2px 0 #666, inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.palm-scroll-btn-down {
+  border-radius: 0 0 4px 4px;
+  border-top: none;
+  box-shadow: 0 2px 0 #666;
+  background: linear-gradient(to bottom, #b0b0b0, #d4d4d4);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .palm-page-wrapper {
+    background: #000;
+    padding: 0;
+    align-items: center; /* Center vertically on mobile too if there is space */
+  }
+
+  .palm-chassis {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
+  .palm-logos,
+  .palm-speaker {
+    display: none;
+  }
+
+  .palm-bezel {
+    width: 100%;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .palm-screen {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .palm-silk-area {
+    width: 100%;
+    margin-top: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .palm-hardware-buttons {
+    width: 100%;
+    margin-top: 0;
+    padding: 10px 10px;
+    background: #333; /* Dark gray for the HW buttons area on mobile */
+  }
+
+  .palm-hw-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  .palm-scroll-btn {
+    width: 44px;
+    height: 25px;
+  }
+}
+
 /* m505 Hardware Styling */
 .m505-chassis {
   border-bottom: 8px solid #959595;
@@ -385,6 +618,7 @@ input::placeholder {
   background-color: #3a3a3a;
   color: #fff;
 }
+/* Already moved some of these to palm-* prefix but keeping for compatibility if needed elsewhere */
 .m505-graffiti-input {
   border-left: 1px solid #111;
   border-right: 1px solid #111;

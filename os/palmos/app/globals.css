@@ -469,26 +469,6 @@ input::placeholder {
   overflow: hidden;
 }
 
-.palm-silk-btn-column {
-  width: 38px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  padding: 4px 0;
-}
-
-.palm-silk-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .palm-graffiti-container {
   flex: 1;
   border-left: 1px solid #1a1a1a;
@@ -521,53 +501,6 @@ input::placeholder {
   width: 272px;
   margin-top: 12px;
   padding: 0 6px;
-}
-
-.palm-hw-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(to bottom, #d8d8d8, #b0b0b0);
-  border: 1px solid #888;
-  box-shadow:
-    0 3px 0 #666,
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.palm-scroll-rocker {
-  display: flex;
-  flex-direction: column;
-}
-
-.palm-scroll-btn {
-  width: 36px;
-  height: 22px;
-  background: linear-gradient(to bottom, #d4d4d4, #b0b0b0);
-  border: 1px solid #888;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.palm-scroll-btn-up {
-  border-radius: 4px 4px 0 0;
-  border-bottom: 1px solid #999;
-  box-shadow:
-    0 2px 0 #666,
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.palm-scroll-btn-down {
-  border-radius: 0 0 4px 4px;
-  border-top: none;
-  box-shadow: 0 2px 0 #666;
-  background: linear-gradient(to bottom, #b0b0b0, #d4d4d4);
 }
 
 /* Mobile: strip the hardware chassis chrome, scale the fixed 264px screen via JS in PalmFrame */
@@ -614,16 +547,6 @@ input::placeholder {
     margin-top: 0;
     padding: 10px;
     background: #333;
-  }
-
-  .palm-hw-btn {
-    width: 50px;
-    height: 50px;
-  }
-
-  .palm-scroll-btn {
-    width: 44px;
-    height: 25px;
   }
 }
 

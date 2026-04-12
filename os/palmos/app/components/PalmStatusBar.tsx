@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 interface Shortcut {
   label: string;
@@ -21,11 +22,32 @@ export function PalmStatusBar({
   onTitleClick,
 }: PalmStatusBarProps = {}) {
   const [time, setTime] = useState(new Date());
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFsChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('fullscreenchange', handleFsChange);
+    };
   }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   const timeStr = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
 
@@ -101,6 +123,24 @@ export function PalmStatusBar({
             ))}
           </div>
         )}
+
+        {/* Full screen toggle */}
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '0 6px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#000',
+          }}
+        >
+          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        </button>
 
         {/* Category picker for list apps */}
         {showCategory && (
@@ -188,13 +228,32 @@ export function PalmStatusBar({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '2px',
+          gap: '8px',
           padding: '0 6px',
           color: '#000',
         }}
       >
-        <span style={{ fontSize: '8px' }}>▼</span>
-        <span>All</span>
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '2px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#000',
+          }}
+        >
+          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <span style={{ fontSize: '8px' }}>▼</span>
+          <span>All</span>
+        </div>
       </div>
     </div>
   );

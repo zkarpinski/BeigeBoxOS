@@ -18,4 +18,7 @@ Update the PalmOS experience to be "almost full screen" on mobile devices, match
         - Remove "chassis" decorations (padding, metallic gradients, logos).
         - Scale the screen container to `width: 100%; aspect-ratio: 1/1;`.
         - Scale the Silk and Hardware areas to match the full width.
-3.  **Refinement**: Ensure buttons remain touch-friendly and the layout doesn't overflow.
+3.  **Scaling and Full Screen**:
+    - Added a full-screen toggle button in the `PalmStatusBar` to allow users to use the entire browser viewport.
+    - Implemented CSS `transform: scale(1.1)` on the mobile screen content. This increases the visual size of icons and buttons (improving tap targets and readability) while maintaining the original internal coordinate system and logic.
+4.  **Refinement**: Ensure buttons remain touch-friendly and the layout doesn't overflow.

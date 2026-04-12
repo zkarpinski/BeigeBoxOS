@@ -15,7 +15,26 @@ import {
 } from './DataTypes';
 import { generateGalaxy } from './SystemGenerator';
 import { determineSystemPrices, generateSystemQuantities } from './Merchant';
-import { determineEncounter, ENCOUNTER_NONE, ENCOUNTER_PIRATE } from './Encounter';
+import {
+  determineEncounter,
+  ENCOUNTER_NONE,
+  ENCOUNTER_PIRATE,
+  ENCOUNTER_POLICE,
+  ENCOUNTER_TRADER,
+  generateNPCEncounter,
+  NPCEncounterData,
+  executeAttack,
+  getTotalShieldStrength,
+} from './Encounter';
+
+export interface ActiveEncounter {
+  type: string; // ENCOUNTER_PIRATE | ENCOUNTER_POLICE | ENCOUNTER_TRADER
+  npc: NPCEncounterData;
+  log: string[];
+  round: number;
+  resolved: boolean; // combat ended, show result
+  playerWon: boolean;
+}
 
 export interface SpaceTraderState {
   credits: number;
@@ -37,7 +56,7 @@ export interface SpaceTraderState {
   buyPrices: number[];
   sellPrices: number[];
   systemQuantities: number[];
-  encounter: any | null; // Placeholder for encounter data
+  encounter: ActiveEncounter | null;
   isGameOver: boolean;
   tradeMode: 'buy' | 'sell' | 'price-list';
 
@@ -61,6 +80,13 @@ export interface SpaceTraderState {
   repairHull: () => void;
   restartGame: () => void;
   setTradeMode: (mode: 'buy' | 'sell' | 'price-list') => void;
+  attackInEncounter: () => void;
+  fleeFromEncounter: () => void;
+  surrenderToEncounter: () => void;
+  bribePolice: () => void;
+  lootNPC: () => void;
+  sellEquipment: (slot: 'weapon' | 'shield' | 'gadget', index: number) => void;
+  dumpCargo: (goodId: number, amount: number) => void;
 }
 
 export const useSpaceTraderGame = create<SpaceTraderState>()(
@@ -196,7 +222,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
 
         // Original: 21 encounter checks per trip (one click at a time)
         const CLICKS = 21;
-        let encounter = null;
+        let encounter: ActiveEncounter | null = null;
         let alreadyRaided = false;
         for (let click = 0; click < CLICKS; click++) {
           const encounterType = determineEncounter(
@@ -207,9 +233,23 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
             alreadyRaided,
           );
           if (encounterType !== ENCOUNTER_NONE) {
-            encounter = { type: encounterType, id: Math.floor(Math.random() * 1000) };
+            const npc = generateNPCEncounter(
+              encounterType,
+              state.difficulty,
+              state.policeRecordScore,
+              state.days,
+              target.techLevel,
+            );
+            encounter = {
+              type: encounterType,
+              npc,
+              log: [],
+              round: 0,
+              resolved: false,
+              playerWon: false,
+            };
             if (encounterType === ENCOUNTER_PIRATE) alreadyRaided = true;
-            break; // Surface one encounter at a time to the player
+            break;
           }
         }
 
@@ -227,9 +267,13 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
           newPoliceScore++;
         }
 
+        // Debt interest: 10% per warp (ceil), matches original DoWarp in Travel.c
+        const newDebt = state.debt > 0 ? Math.ceil(state.debt * 1.1) : 0;
+
         set({
           currentSystem: systemId,
           days: newDays,
+          debt: newDebt,
           policeRecordScore: newPoliceScore,
           ship: {
             ...state.ship,
@@ -442,6 +486,328 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         });
       },
 
+      // Helper to get effective fighter/pilot/engineer skill accounting for gadgets
+      // (called inline below using state)
+
+      attackInEncounter: () => {
+        const state = get();
+        if (!state.encounter || state.encounter.resolved) return;
+
+        const enc = state.encounter;
+        const npcShipCopy: PlayerShip = {
+          ...enc.npc.ship,
+          shieldStrength: [...enc.npc.ship.shieldStrength],
+          hull: enc.npc.ship.hull,
+        };
+        const playerShipCopy: PlayerShip = {
+          ...state.ship,
+          shieldStrength: [...state.ship.shieldStrength],
+          hull: state.ship.hull,
+        };
+
+        // Gadget bonuses to player skills
+        const hasTargeting = state.ship.gadget.includes(3);
+        const hasAutoRepair = state.ship.gadget.includes(1);
+        const hasNav = state.ship.gadget.includes(2);
+        const hasCloaking = state.ship.gadget.includes(4);
+        const effectiveFighter = state.fighterSkill + (hasTargeting ? 3 : 0);
+        const effectivePilot = state.pilotSkill + (hasNav || hasCloaking ? 3 : 0);
+        const effectiveEngineer = state.engineerSkill + (hasAutoRepair ? 2 : 0);
+
+        const log: string[] = [...enc.log];
+
+        // Player attacks NPC
+        const playerHit = executeAttack(
+          playerShipCopy,
+          npcShipCopy,
+          effectiveEngineer,
+          enc.npc.engineerSkill,
+          effectiveFighter,
+          enc.npc.pilotSkill,
+          false,
+          state.difficulty,
+          false,
+        );
+        if (playerHit) {
+          const shieldLeft = npcShipCopy.shieldStrength.reduce((a, v) => a + Math.max(0, v), 0);
+          log.push(
+            `Round ${enc.round + 1}: You hit! NPC hull: ${npcShipCopy.hull} / shields: ${shieldLeft}`,
+          );
+        } else {
+          log.push(`Round ${enc.round + 1}: Your shot missed.`);
+        }
+
+        // Check if NPC destroyed
+        if (npcShipCopy.hull <= 0) {
+          const bounty = enc.npc.bounty;
+          const repGain = enc.type === ENCOUNTER_PIRATE ? 1 : 0;
+          const policeHit = enc.type === ENCOUNTER_POLICE ? -3 : 0;
+          log.push(`NPC destroyed! Bounty: ${bounty} cr.`);
+          set({
+            credits: state.credits + bounty,
+            reputationScore: state.reputationScore + repGain,
+            policeRecordScore: state.policeRecordScore + policeHit,
+            encounter: {
+              ...enc,
+              npc: { ...enc.npc, ship: npcShipCopy },
+              log,
+              round: enc.round + 1,
+              resolved: true,
+              playerWon: true,
+            },
+          });
+          return;
+        }
+
+        // NPC attacks player
+        const npcHit = executeAttack(
+          npcShipCopy,
+          playerShipCopy,
+          enc.npc.engineerSkill,
+          effectiveEngineer,
+          enc.npc.fighterSkill,
+          effectivePilot,
+          false,
+          state.difficulty,
+          true,
+        );
+        if (npcHit) {
+          const shieldLeft = playerShipCopy.shieldStrength.reduce((a, v) => a + Math.max(0, v), 0);
+          log.push(`NPC hits you! Your hull: ${playerShipCopy.hull} / shields: ${shieldLeft}`);
+        } else {
+          log.push(`NPC missed.`);
+        }
+
+        // Check if player destroyed
+        if (playerShipCopy.hull <= 0) {
+          if (state.ship.escapePod) {
+            log.push('Your ship is destroyed! Escape pod activated.');
+            set({
+              ship: {
+                type: 0,
+                cargo: new Array(10).fill(0),
+                weapon: [-1, -1, -1],
+                shield: [-1, -1, -1],
+                shieldStrength: [-1, -1, -1],
+                gadget: [-1, -1, -1],
+                escapePod: false,
+                fuel: ShipTypes[0].fuelTanks,
+                hull: ShipTypes[0].hullStrength,
+              },
+              encounter: {
+                ...enc,
+                npc: { ...enc.npc, ship: npcShipCopy },
+                log,
+                round: enc.round + 1,
+                resolved: true,
+                playerWon: false,
+              },
+            });
+          } else {
+            set({
+              isGameOver: true,
+              encounter: null,
+            });
+          }
+          return;
+        }
+
+        set({
+          ship: { ...playerShipCopy },
+          encounter: {
+            ...enc,
+            npc: { ...enc.npc, ship: npcShipCopy },
+            log,
+            round: enc.round + 1,
+          },
+        });
+      },
+
+      fleeFromEncounter: () => {
+        const state = get();
+        if (!state.encounter || state.encounter.resolved) return;
+
+        const enc = state.encounter;
+        const log: string[] = [...enc.log];
+
+        // Gadget bonuses
+        const hasNav = state.ship.gadget.includes(2);
+        const hasCloaking = state.ship.gadget.includes(4);
+        const hasAutoRepair = state.ship.gadget.includes(1);
+        const effectivePilot = state.pilotSkill + (hasNav || hasCloaking ? 3 : 0);
+        const effectiveEngineer = state.engineerSkill + (hasAutoRepair ? 2 : 0);
+
+        // Flee roll: based on pilot skill
+        const fleeRoll = Math.random();
+        const fleeChance = 0.3 + effectivePilot * 0.04; // 30–70% base
+        if (fleeRoll < fleeChance) {
+          log.push('You successfully fled!');
+          set({ encounter: { ...enc, log, resolved: true, playerWon: false } });
+          return;
+        }
+
+        // Failed flee: NPC gets a free shot
+        log.push('Flee failed! NPC fires...');
+        const playerShipCopy: PlayerShip = {
+          ...state.ship,
+          shieldStrength: [...state.ship.shieldStrength],
+          hull: state.ship.hull,
+        };
+        const npcShipCopy: PlayerShip = {
+          ...enc.npc.ship,
+          shieldStrength: [...enc.npc.ship.shieldStrength],
+        };
+
+        executeAttack(
+          npcShipCopy,
+          playerShipCopy,
+          enc.npc.engineerSkill,
+          effectiveEngineer,
+          enc.npc.fighterSkill,
+          effectivePilot,
+          true, // player is fleeing
+          state.difficulty,
+          true,
+        );
+
+        if (playerShipCopy.hull <= 0) {
+          if (state.ship.escapePod) {
+            log.push('Your ship is destroyed while fleeing! Escape pod activated.');
+            set({
+              ship: {
+                type: 0,
+                cargo: new Array(10).fill(0),
+                weapon: [-1, -1, -1],
+                shield: [-1, -1, -1],
+                shieldStrength: [-1, -1, -1],
+                gadget: [-1, -1, -1],
+                escapePod: false,
+                fuel: ShipTypes[0].fuelTanks,
+                hull: ShipTypes[0].hullStrength,
+              },
+              encounter: { ...enc, log, round: enc.round + 1, resolved: true, playerWon: false },
+            });
+          } else {
+            set({ isGameOver: true, encounter: null });
+          }
+          return;
+        }
+
+        const shieldLeft = playerShipCopy.shieldStrength.reduce((a, v) => a + Math.max(0, v), 0);
+        log.push(
+          `You took a hit while fleeing. Hull: ${playerShipCopy.hull}, shields: ${shieldLeft}. Fled successfully.`,
+        );
+        set({
+          ship: { ...playerShipCopy },
+          encounter: { ...enc, log, round: enc.round + 1, resolved: true, playerWon: false },
+        });
+      },
+
+      surrenderToEncounter: () => {
+        const state = get();
+        if (!state.encounter || state.encounter.resolved) return;
+
+        const enc = state.encounter;
+        const log: string[] = [...enc.log];
+
+        if (enc.type === ENCOUNTER_PIRATE) {
+          // Pirates take as much cargo as they can carry
+          const npcBays = ShipTypes[enc.npc.ship.type].cargoBays;
+          const newCargo = [...state.ship.cargo];
+          let taken = 0;
+          for (let i = 9; i >= 0 && taken < npcBays; i--) {
+            const take = Math.min(newCargo[i], npcBays - taken);
+            newCargo[i] -= take;
+            taken += take;
+          }
+          log.push(`Pirates loot ${taken} units of cargo.`);
+          // Police record penalty for surrendering to pirates
+          set({
+            ship: { ...state.ship, cargo: newCargo },
+            encounter: { ...enc, log, resolved: true, playerWon: false },
+          });
+        } else if (enc.type === ENCOUNTER_POLICE) {
+          // Police inspect cargo for contraband
+          const politics = state.systems[state.currentSystem];
+          const hasNarcotics = state.ship.cargo[8] > 0;
+          const hasFirearms = state.ship.cargo[5] > 0;
+          // TODO: check politics.drugsOk / firearmsOk when PoliticalSystems accessible here
+          if (hasNarcotics || hasFirearms) {
+            const newCargo = [...state.ship.cargo];
+            const narcoticsTaken = newCargo[8];
+            const firearmsTaken = newCargo[5];
+            newCargo[8] = 0;
+            newCargo[5] = 0;
+            const fine = (narcoticsTaken + firearmsTaken) * 50 * (state.difficulty + 1);
+            const newCredits = Math.max(0, state.credits - fine);
+            log.push(
+              `Police found contraband! Confiscated ${narcoticsTaken} narcotics, ${firearmsTaken} firearms. Fine: ${fine} cr.`,
+            );
+            set({
+              credits: newCredits,
+              ship: { ...state.ship, cargo: newCargo },
+              policeRecordScore: state.policeRecordScore - 1,
+              encounter: { ...enc, log, resolved: true, playerWon: false },
+            });
+          } else {
+            log.push('Police found nothing illegal. You are free to go.');
+            set({ encounter: { ...enc, log, resolved: true, playerWon: false } });
+          }
+        } else {
+          // Trader — pass by peacefully
+          log.push('You pass the trader without incident.');
+          set({ encounter: { ...enc, log, resolved: true, playerWon: false } });
+        }
+      },
+
+      bribePolice: () => {
+        const state = get();
+        if (!state.encounter || state.encounter.resolved) return;
+        if (state.encounter.type !== ENCOUNTER_POLICE) return;
+
+        const enc = state.encounter;
+        // Bribe cost = player net worth * bribeLevel / 7  (simplified: credits * 0.05 * diff)
+        const bribeCost = Math.max(100, Math.floor(state.credits * 0.05 * (state.difficulty + 1)));
+        const log = [...enc.log];
+        if (state.credits < bribeCost) {
+          log.push(`You cannot afford the bribe (${bribeCost} cr).`);
+          set({ encounter: { ...enc, log } });
+          return;
+        }
+        log.push(`You paid a bribe of ${bribeCost} cr. Police let you go.`);
+        set({
+          credits: state.credits - bribeCost,
+          encounter: { ...enc, log, resolved: true, playerWon: false },
+        });
+      },
+
+      lootNPC: () => {
+        const state = get();
+        if (!state.encounter || !state.encounter.resolved || !state.encounter.playerWon) return;
+
+        const enc = state.encounter;
+        const shipType = ShipTypes[state.ship.type];
+        const usedCargo = state.ship.cargo.reduce((a, b) => a + b, 0);
+        const freeCargo = shipType.cargoBays - usedCargo;
+
+        if (freeCargo <= 0) {
+          set({ encounter: null });
+          return;
+        }
+
+        const newCargo = [...state.ship.cargo];
+        let looted = 0;
+        for (let i = 0; i < 10 && looted < freeCargo; i++) {
+          const take = Math.min(enc.npc.lootCargo[i], freeCargo - looted);
+          newCargo[i] += take;
+          looted += take;
+        }
+        set({
+          ship: { ...state.ship, cargo: newCargo },
+          encounter: null,
+        });
+      },
+
       clearEncounter: () => set({ encounter: null }),
 
       takeDamage: (amount: number) => {
@@ -526,6 +892,59 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         });
       },
 
+      sellEquipment: (slot: 'weapon' | 'shield' | 'gadget', index: number) => {
+        const state = get();
+        const ship = state.ship;
+        let refund = 0;
+        let newSlot: number[];
+
+        if (slot === 'weapon') {
+          if (ship.weapon[index] < 0) return;
+          refund = Math.floor(Weapons[ship.weapon[index]].price / 2);
+          newSlot = [...ship.weapon];
+          newSlot[index] = -1;
+          set({
+            credits: state.credits + refund,
+            ship: { ...ship, weapon: newSlot },
+          });
+        } else if (slot === 'shield') {
+          if (ship.shield[index] < 0) return;
+          refund = Math.floor(Shields[ship.shield[index]].price / 2);
+          const newShields = [...ship.shield];
+          newShields[index] = -1;
+          const newShieldStrength = [...ship.shieldStrength];
+          newShieldStrength[index] = -1;
+          set({
+            credits: state.credits + refund,
+            ship: { ...ship, shield: newShields, shieldStrength: newShieldStrength },
+          });
+        } else if (slot === 'gadget') {
+          if (ship.gadget[index] < 0) return;
+          refund = Math.floor(Gadgets[ship.gadget[index]].price / 2);
+          newSlot = [...ship.gadget];
+          newSlot[index] = -1;
+          set({
+            credits: state.credits + refund,
+            ship: { ...ship, gadget: newSlot },
+          });
+        }
+      },
+
+      dumpCargo: (goodId: number, amount: number) => {
+        const state = get();
+        const available = state.ship.cargo[goodId];
+        if (available <= 0) return;
+        const dumpAmount = Math.min(amount, available);
+        const dumpCost = dumpAmount * 5 * (state.difficulty + 1);
+        if (state.credits < dumpCost) return;
+        const newCargo = [...state.ship.cargo];
+        newCargo[goodId] -= dumpAmount;
+        set({
+          credits: state.credits - dumpCost,
+          ship: { ...state.ship, cargo: newCargo },
+        });
+      },
+
       setTradeMode: (mode) => set({ tradeMode: mode }),
     }),
     {
@@ -547,6 +966,17 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
                 'buyEscapePod',
                 'buyFuel',
                 'clearEncounter',
+                'takeDamage',
+                'repairHull',
+                'restartGame',
+                'setTradeMode',
+                'attackInEncounter',
+                'fleeFromEncounter',
+                'surrenderToEncounter',
+                'bribePolice',
+                'lootNPC',
+                'sellEquipment',
+                'dumpCargo',
               ].includes(key),
           ),
         ) as any,

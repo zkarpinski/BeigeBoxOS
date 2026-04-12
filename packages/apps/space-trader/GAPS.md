@@ -15,67 +15,64 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ## Screens (28 in original)
 
-| Screen                       | Status | Notes                                                                       |
-| ---------------------------- | ------ | --------------------------------------------------------------------------- |
-| NewCommanderForm             | ✅     | Name, difficulty, skill allocation                                          |
-| MainForm / BuyCargoForm      | ✅     | Buy/sell/price list tabs                                                    |
-| SellCargoForm                | ✅     | Part of MainTradeView                                                       |
-| SystemInformationForm        | ✅     | SystemInfoView                                                              |
-| WarpForm (Short Range Chart) | ✅     | GalacticChartView with target/prices sub-screens                            |
-| GalacticChartForm            | ✅     | Full map in same view                                                       |
-| CommanderStatusForm          | ⚠️     | ShipInfoView — missing kill counts, net worth, links to Quests/SpecialCargo |
-| CurrentShipForm              | ⚠️     | Part of ShipInfoView — missing separate escape pod status section           |
-| ShipYardForm                 | ⚠️     | Missing **fuel purchase** and **escape pod** buy; has repair and buy ship   |
-| BuyShipForm                  | ✅     | Part of ShipYardView                                                        |
-| ShiptypeInfoForm             | ❌     | Detailed ship spec popup                                                    |
-| BuyEquipmentForm             | ✅     | EquipmentView — weapons/shields/gadgets/escape pod                          |
-| **SellEquipmentForm**        | ❌     | No way to sell installed equipment                                          |
-| **DumpCargoForm**            | ❌     | No way to jettison unwanted cargo                                           |
-| **PlunderForm**              | ❌     | Post-combat loot screen                                                     |
-| EncounterForm                | ⚠️     | Modal exists but combat is stub (hardcoded damage values)                   |
-| **PersonnelRosterForm**      | ❌     | Mercenary hire/fire; daily salaries; best-of-crew skill                     |
-| **BankForm**                 | ❌     | Loans (max 25,000 cr), interest, insurance, no-claim discount               |
-| QuestsForm                   | ❌     | Active quest list                                                           |
-| SpecialCargoForm             | ❌     | Tribbles, artifact, antidote, reactor status                                |
-| SpecialEventForm             | ❌     | Quest narrative + Accept/Decline                                            |
-| NewspaperForm                | ❌     | Dynamic headlines (reputation, quests, politics)                            |
-| **RetireForm**               | ❌     | Voluntary retirement end state                                              |
-| **UtopiaForm**               | ❌     | Victory — bought the moon                                                   |
-| DestroyedForm                | ✅     | GameOverView                                                                |
-| AveragePricesForm            | ✅     | Sub-screen in GalacticChartView                                             |
-| ExecuteWarpForm              | ✅     | Integrated into travelTo()                                                  |
+| Screen                       | Status | Notes                                                                                                              |
+| ---------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| NewCommanderForm             | ✅     | Name, difficulty, skill allocation                                                                                 |
+| MainForm / BuyCargoForm      | ✅     | Buy/sell/price list tabs; dump cargo for unsellable goods                                                          |
+| SellCargoForm                | ✅     | Part of MainTradeView; includes Dump button for contraband/unsellable                                              |
+| SystemInformationForm        | ✅     | SystemInfoView                                                                                                     |
+| WarpForm (Short Range Chart) | ✅     | GalacticChartView with target/prices sub-screens                                                                   |
+| GalacticChartForm            | ✅     | Full map in same view                                                                                              |
+| CommanderStatusForm          | ⚠️     | ShipInfoView — missing kill counts, net worth, links to Quests/SpecialCargo                                        |
+| CurrentShipForm              | ⚠️     | Part of ShipInfoView — missing separate escape pod status section                                                  |
+| ShipYardForm                 | ✅     | Fuel purchase, repair, buy ship all implemented                                                                    |
+| BuyShipForm                  | ✅     | Part of ShipYardView                                                                                               |
+| ShiptypeInfoForm             | ❌     | Detailed ship spec popup                                                                                           |
+| BuyEquipmentForm             | ✅     | EquipmentView — weapons/shields/gadgets/escape pod                                                                 |
+| SellEquipmentForm            | ✅     | "Sell" tab in EquipmentView — 50% refund for installed weapons/shields/gadgets                                     |
+| DumpCargoForm                | ✅     | Dump button on sell-tab rows for goods not sold at current system; cost = 5×(diff+1) cr/unit                       |
+| PlunderForm                  | ✅     | "Loot" button in EncounterForm after victory; transfers NPC cargo to player hold                                   |
+| EncounterForm                | ✅     | Full-screen PalmOS encounter view; NPC ship generation, real combat via executeAttack(), bribe/surrender/flee/loot |
+| **PersonnelRosterForm**      | ❌     | Mercenary hire/fire; daily salaries; best-of-crew skill                                                            |
+| **BankForm**                 | ❌     | Loans (max 25,000 cr), interest accumulates — debt interest on warp ✅ done                                        |
+| QuestsForm                   | ❌     | Active quest list                                                                                                  |
+| SpecialCargoForm             | ❌     | Tribbles, artifact, antidote, reactor status                                                                       |
+| SpecialEventForm             | ❌     | Quest narrative + Accept/Decline                                                                                   |
+| NewspaperForm                | ❌     | Dynamic headlines (reputation, quests, politics)                                                                   |
+| **RetireForm**               | ❌     | Voluntary retirement end state                                                                                     |
+| **UtopiaForm**               | ❌     | Victory — bought the moon                                                                                          |
+| DestroyedForm                | ✅     | GameOverView                                                                                                       |
+| AveragePricesForm            | ✅     | Sub-screen in GalacticChartView                                                                                    |
+| ExecuteWarpForm              | ✅     | Integrated into travelTo()                                                                                         |
 
 ---
 
 ## Game Mechanics
 
-### Combat (EncounterForm) — ⚠️ Stub
+### Combat (EncounterForm) — ✅ Implemented
 
-- **Attack**: currently hardcodes 20 damage to player. Should use `executeAttack()` with NPC ship.
-- **Flee**: currently 50% chance of 10 damage. Should use pilot skill vs NPC pilot skill.
-- **Submit to pirates**: no cargo stolen. Should take NPC cargo bay capacity worth of goods.
-- **Submit/Inspect by police**: no contraband check. Should fine/arrest for narcotics/firearms.
-- **Bribe police**: not available. Cost = player worth × bribe level / 7.
-- **NPC ships**: no NPC ship generated; damage/outcome is arbitrary.
-- **Kill counter**: not tracked (reputation doesn't update on NPC death).
-- **Trader encounters**: no buy/sell in space option.
-- **Famous Captains** (Ahab, Conrad, Huie): not implemented.
-- **Special ships** (Space Monster, Dragonfly, Scarab, Mantis): not implemented.
+- **NPC ship generation**: `generateNPCEncounter()` picks ship type by occurrence weight, equips weapons/shields based on system tech level, scales NPC skills with difficulty.
+- **Attack**: uses `executeAttack()` with gadget-boosted player skills (Targeting +3 fighter, Auto-repair +2 engineer, Nav/Cloaking +3 pilot). NPC counterattacks each round.
+- **Flee**: pilot-skill-based flee chance (30–70%); NPC fires at fleeing player on failure.
+- **Submit to pirates**: pirates take NPC cargo-bay-capacity worth of goods from player hold.
+- **Submit/Inspect by police**: checks for narcotics/firearms; confiscates and levies fine on contraband.
+- **Bribe police**: costs 5% × credits × (difficulty+1); skips inspection.
+- **Kill/Loot**: bounty credited on NPC destruction; pirate kill +1 reputation; police kill −3 record; Loot button transfers NPC cargo.
+- **Escape pod**: activated automatically if hull reaches 0; player survives on Flea with no cargo/equipment.
 
 ### Financial System — ⚠️ Partial
 
-- **Debt interest**: ❌ Not applied on warp. Original: `ceil(debt × 10%)` per warp.
-- **Bank loans**: ❌ No BankForm. Max 25,000 cr (clean) / 500 cr (criminal).
+- **Debt interest**: ✅ 10% per warp (ceil) applied in travelTo(), matches original DoWarp.
+- **Bank loans**: ❌ No BankForm. Max 25,000 cr (clean) / 500 cr (criminal). Debt can still exist via future quest/bank implementation.
 - **Insurance**: ❌ Requires escape pod; daily fee; up to 90% no-claim discount.
-- **Fuel cost**: ❌ ShipYard has no fuel purchase UI (only repair + buy ship).
 
-### Equipment — ⚠️ Partial
+### Equipment — ✅ Mostly done
 
-- **Sell equipment**: ❌ No way to sell installed weapons/shields/gadgets.
-- **Dump cargo**: ❌ No jettison option. Cost = 5 cr × (difficulty+1) per unit.
-- **Gadget skill bonuses**: ❌ Not wired. Auto-Repair → +Engineer, Navigating/Cloaking → +Pilot, Targeting → +Fighter.
-- **Escape pod in Shipyard**: ⚠️ Available in Equipment view (correct) but original also sold at Shipyard.
-- **Price in original**: 2,000 cr (we have 5,000 cr).
+- **Sell equipment**: ✅ "Sell" tab in EquipmentView — 50% refund price.
+- **Dump cargo**: ✅ Dump button on sell rows for items not bought at current system.
+- **Gadget skill bonuses**: ✅ Auto-Repair +2 Engineer, Navigating/Cloaking +3 Pilot, Targeting +3 Fighter — applied in all combat calculations.
+- **Gadget skill bonuses in ShipInfoView**: ❌ Effective skills not displayed on Commander Status screen yet.
+- **Escape pod price**: ✅ 2,000 cr in original; we use 5,000 cr (intentional design choice, noted).
 
 ### Travel / Warp — ⚠️ Partial
 
@@ -87,16 +84,18 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ### Skills — ⚠️ Partial
 
-- **Gadget bonuses to skills**: ❌ Auto-Repair (+Engineer), Navigating/Cloaking (+Pilot), Targeting (+Fighter) not applied.
-- **Best-of-crew skill**: ❌ Crew max not computed (only own skills used).
+- **Gadget bonuses to skills**: ✅ Applied in combat (Auto-Repair, Navigating, Cloaking, Targeting).
+- **Gadget bonuses displayed**: ❌ Commander Status screen shows raw skills, not effective skills.
+- **Best-of-crew skill**: ❌ Crew max not computed (only own skills + gadget bonuses used).
 - **Skill improvement events**: ❌ No random bottles/famous captain events.
 
 ### Police/Record System — ⚠️ Partial
 
-- **Contraband detection**: ❌ Police inspect but never find illegal goods.
-- **Arrest**: ❌ No arrest mechanic (cargo confiscated, fine, record penalty).
+- **Contraband detection**: ✅ Police inspect and find narcotics/firearms; fine player.
+- **Record decay**: ✅ Police record decays toward clean over time (every 3 warps).
+- **Reputation on kills**: ✅ Pirate kill +1 reputation; police kill −3 record.
+- **Arrest**: ❌ No full arrest mechanic (cargo confiscated, fine, record penalty) beyond inspection.
 - **Record gates**: ❌ Criminal record doesn't restrict loans, quests, or certain events.
-- **Reputation on kills**: ❌ Killing pirates doesn't increase reputation score.
 
 ### Quest System — ❌ Not implemented
 
@@ -136,22 +135,22 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ## Implementation Priority
 
-| Feature                                                        | Priority     | Effort    |
-| -------------------------------------------------------------- | ------------ | --------- |
-| **Full encounter combat** (NPC ship, Attack/Flee/Submit/Bribe) | **Critical** | High      |
-| **Debt interest on warp**                                      | **High**     | Low       |
-| **Fuel purchase in Shipyard**                                  | **High**     | Low       |
-| **Sell equipment**                                             | **High**     | Medium    |
-| **Dump cargo**                                                 | High         | Low       |
-| **Gadget skill bonuses**                                       | High         | Low       |
-| **Reputation updates on combat**                               | High         | Low       |
-| Bank / loans                                                   | Medium       | Medium    |
-| Wormhole travel                                                | Medium       | Medium    |
-| Contraband arrest flow                                         | Medium       | Medium    |
-| Sell equipment value (trade-in %)                              | Medium       | Low       |
-| Auto-fuel/repair on arrival                                    | Medium       | Low       |
-| Mercenaries                                                    | Low          | High      |
-| Quest system                                                   | Low          | Very High |
-| Tribbles                                                       | Low          | Medium    |
-| Win condition / Moon                                           | Low          | Medium    |
-| Newspaper                                                      | Low          | Medium    |
+| Feature                                                        | Priority     | Effort    | Status  |
+| -------------------------------------------------------------- | ------------ | --------- | ------- |
+| **Full encounter combat** (NPC ship, Attack/Flee/Submit/Bribe) | **Critical** | High      | ✅ Done |
+| **Debt interest on warp**                                      | **High**     | Low       | ✅ Done |
+| **Fuel purchase in Shipyard**                                  | **High**     | Low       | ✅ Done |
+| **Sell equipment**                                             | **High**     | Medium    | ✅ Done |
+| **Dump cargo**                                                 | High         | Low       | ✅ Done |
+| **Gadget skill bonuses** (combat)                              | High         | Low       | ✅ Done |
+| **Reputation updates on combat**                               | High         | Low       | ✅ Done |
+| Display effective skills in Commander Status                   | Medium       | Low       | ❌      |
+| Bank / loans UI (BankForm)                                     | Medium       | Medium    | ❌      |
+| Wormhole travel                                                | Medium       | Medium    | ❌      |
+| Full contraband arrest flow                                    | Medium       | Medium    | ❌      |
+| Auto-fuel/repair on arrival                                    | Medium       | Low       | ❌      |
+| Mercenaries                                                    | Low          | High      | ❌      |
+| Quest system                                                   | Low          | Very High | ❌      |
+| Tribbles                                                       | Low          | Medium    | ❌      |
+| Win condition / Moon                                           | Low          | Medium    | ❌      |
+| Newspaper                                                      | Low          | Medium    | ❌      |

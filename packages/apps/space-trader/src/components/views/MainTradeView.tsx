@@ -20,6 +20,8 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
     systemQuantities,
     buyGood,
     sellGood,
+    dumpCargo,
+    difficulty,
     tradeMode,
     setTradeMode,
   } = useSpaceTraderGame();
@@ -109,6 +111,22 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
                       {tradeMode === 'buy' ? 'Max' : 'All'}
                     </div>
                     <div className="price-text-authentic">{price} cr.</div>
+                  </>
+                ) : tradeMode === 'sell' && qtyInShip > 0 ? (
+                  <>
+                    <div
+                      className="all-btn-authentic"
+                      title={`Dump cost: ${5 * (difficulty + 1)} cr/unit`}
+                      onClick={() => dumpCargo(item.id, qtyInShip)}
+                    >
+                      Dump
+                    </div>
+                    <div
+                      className="price-text-authentic"
+                      style={{ fontStyle: 'italic', opacity: 0.7 }}
+                    >
+                      -{5 * (difficulty + 1)} cr
+                    </div>
                   </>
                 ) : (
                   <div

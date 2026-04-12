@@ -9,7 +9,8 @@ interface ShipYardViewProps {
 
 export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, credits, buyShip, ship, repairHull } = useSpaceTraderGame();
+  const { systems, currentSystem, credits, buyShip, ship, repairHull, buyFuel } =
+    useSpaceTraderGame();
   const system = systems[currentSystem];
 
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -98,6 +99,46 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
               {(ShipTypes[ship.type].hullStrength - ship.hull) * ShipTypes[ship.type].repairCosts}{' '}
               cr)
             </button>
+          </div>
+
+          <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '4px' }}>
+            <div style={{ fontSize: '9px', marginBottom: '2px' }}>
+              Fuel: {ship.fuel}/{ShipTypes[ship.type].fuelTanks} ({ShipTypes[ship.type].costOfFuel}{' '}
+              cr/unit)
+            </div>
+            <div style={{ display: 'flex', gap: '2px' }}>
+              <button
+                className="palm-btn-small"
+                disabled={
+                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
+                  credits < ShipTypes[ship.type].costOfFuel
+                }
+                onClick={() => buyFuel(1)}
+              >
+                +1
+              </button>
+              <button
+                className="palm-btn-small"
+                disabled={
+                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
+                  credits < ShipTypes[ship.type].costOfFuel * 5
+                }
+                onClick={() => buyFuel(5)}
+              >
+                +5
+              </button>
+              <button
+                className="palm-btn-small"
+                disabled={
+                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
+                  credits < ShipTypes[ship.type].costOfFuel
+                }
+                onClick={() => buyFuel(ShipTypes[ship.type].fuelTanks - ship.fuel)}
+              >
+                Fill (
+                {(ShipTypes[ship.type].fuelTanks - ship.fuel) * ShipTypes[ship.type].costOfFuel} cr)
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -55,6 +55,7 @@ export interface SpaceTraderState {
   buyShield: (shieldId: number) => void;
   buyGadget: (gadgetId: number) => void;
   buyEscapePod: () => void;
+  buyFuel: (units: number) => void;
   clearEncounter: () => void;
   takeDamage: (amount: number) => void;
   repairHull: () => void;
@@ -472,6 +473,20 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         }
       },
 
+      buyFuel: (units: number) => {
+        const state = get();
+        const shipType = ShipTypes[state.ship.type];
+        const maxFuel = shipType.fuelTanks;
+        const canBuy = Math.min(units, maxFuel - state.ship.fuel);
+        if (canBuy <= 0) return;
+        const cost = canBuy * shipType.costOfFuel;
+        if (state.credits < cost) return;
+        set({
+          credits: state.credits - cost,
+          ship: { ...state.ship, fuel: state.ship.fuel + canBuy },
+        });
+      },
+
       repairHull: () => {
         const state = get();
         const shipType = ShipTypes[state.ship.type];
@@ -530,6 +545,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
                 'buyShield',
                 'buyGadget',
                 'buyEscapePod',
+                'buyFuel',
                 'clearEncounter',
               ].includes(key),
           ),

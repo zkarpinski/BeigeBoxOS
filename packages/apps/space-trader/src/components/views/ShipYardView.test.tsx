@@ -12,9 +12,10 @@ const mockStore = {
   ],
   currentSystem: 0,
   credits: 50000,
-  ship: { type: 0, hull: 25 }, // Flea
+  ship: { type: 0, hull: 25, fuel: 10 }, // Flea, partial fuel
   buyShip: jest.fn(),
   repairHull: jest.fn(),
+  buyFuel: jest.fn(),
 };
 
 describe('ShipYardView Component', () => {
@@ -47,12 +48,30 @@ describe('ShipYardView Component', () => {
   });
 
   it('calls repairHull when Hull is damaged and affordable', () => {
-    const damagedStore = { ...mockStore, ship: { type: 0, hull: 10 } };
+    const damagedStore = { ...mockStore, ship: { type: 0, hull: 10, fuel: 10 } };
     (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(damagedStore);
 
     render(<ShipYardView onViewChange={jest.fn()} />);
     const repairBtn = screen.getByText(/Repair/);
     fireEvent.click(repairBtn);
     expect(mockStore.repairHull).toHaveBeenCalled();
+  });
+
+  it('shows fuel status and calls buyFuel when Fill is clicked', () => {
+    render(<ShipYardView onViewChange={jest.fn()} />);
+    // Flea has fuelTanks=20, fuel=10, so Fill = 10 units × 1 cr = 10 cr
+    expect(screen.getByText('Fuel: 10/20 (1 cr/unit)')).toBeInTheDocument();
+    const fillBtn = screen.getByText(/Fill/);
+    fireEvent.click(fillBtn);
+    expect(mockStore.buyFuel).toHaveBeenCalledWith(10); // 20 - 10 = 10 units
+  });
+
+  it('disables Fill button when tank is full', () => {
+    const fullFuelStore = { ...mockStore, ship: { type: 0, hull: 25, fuel: 20 } };
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(fullFuelStore);
+
+    render(<ShipYardView onViewChange={jest.fn()} />);
+    const fillBtn = screen.getByText(/Fill/);
+    expect(fillBtn).toBeDisabled();
   });
 });

@@ -32,7 +32,7 @@ const commandItems: Array<{
 
 export function SpaceTraderMenu({ onViewChange, onClose }: SpaceTraderMenuProps) {
   const [tab, setTab] = useState<'Command' | 'Game' | 'Help'>('Command');
-  const { setTradeMode } = useSpaceTraderGame();
+  const { setTradeMode, restartGame } = useSpaceTraderGame();
 
   const row = (content: React.ReactNode, key: string | number, onClick?: () => void) => (
     <div
@@ -110,7 +110,9 @@ export function SpaceTraderMenu({ onViewChange, onClose }: SpaceTraderMenuProps)
         {tab === 'Game' && (
           <>
             {row(<span>New Game</span>, 'new', () => {
-              window.location.reload();
+              restartGame();
+              onViewChange('newgame');
+              onClose();
             })}
             {row(<span>Switch Game</span>, 'switch', onClose)}
             {row(<span>Retire</span>, 'retire', onClose)}

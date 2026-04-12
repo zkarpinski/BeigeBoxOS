@@ -142,4 +142,24 @@ test.describe('Space Trader Gameplay', () => {
     // Check cash is still reduced
     await expect(page.locator('text=Cash: 1000 cr.')).not.toBeVisible();
   });
+
+  test('can restart game from menu', async ({ page }) => {
+    await page.click('text=Start Trading', { force: true });
+    await expect(page.locator('text=Buy Cargo')).toBeVisible();
+
+    // Open menu
+    await page.click('[title="Menu"]', { force: true });
+
+    // Switch to Game tab
+    await page.click('text=Game', { force: true });
+
+    // Click New Game
+    await page.click('text=New Game', { force: true });
+
+    // Should be back at the New Game view with skill selection
+    await expect(page.locator('text=Skill Points: 0 remaining')).toBeVisible({ timeout: 10000 });
+
+    // Check that name is default
+    await expect(page.locator('text=Jameson')).toBeVisible();
+  });
 });

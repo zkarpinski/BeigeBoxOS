@@ -952,13 +952,16 @@ export interface SolarSystem {
   specialResources: number;
   size: number;
   visited: boolean;
+  // Persistent market quantities — initialized at galaxy creation, depleted by trading
+  qty?: number[];
 }
 
 export interface PlayerShip {
   type: number;
   cargo: number[]; // 10 indexes
-  weapon: number[]; // 3 indexes (-1 if empty)
-  shield: number[]; // 3 indexes (-1 if empty)
+  weapon: number[]; // 3 indexes (-1 if empty), stores weapon type ID
+  shield: number[]; // 3 indexes (-1 if empty), stores shield type ID
+  shieldStrength: number[]; // current health per shield slot (max = Shields[shield[i]].power)
   gadget: number[]; // 3 indexes (-1 if empty)
   fuel: number;
   hull: number;

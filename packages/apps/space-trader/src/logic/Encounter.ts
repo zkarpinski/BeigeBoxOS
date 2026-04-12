@@ -41,10 +41,10 @@ export function getTotalWeapons(ship: PlayerShip, minWeapon = -1, maxWeapon = -1
 }
 
 /**
- * Calculates current shield strength in ship state
+ * Calculates current shield strength — sums shieldStrength[] (current health per slot, not type IDs)
  */
 export function getTotalShieldStrength(ship: PlayerShip): number {
-  return ship.shield.reduce((acc, curr) => (curr >= 0 ? acc + curr : acc), 0); // Simplified mapping
+  return ship.shieldStrength.reduce((acc, curr) => (curr > 0 ? acc + curr : acc), 0);
 }
 
 /**
@@ -122,18 +122,17 @@ export function executeAttack(
   let damage = getRandom(Math.floor((totalWep * (100 + 2 * attackerEngineerSkill)) / 100));
   if (damage <= 0) return false;
 
-  // Deplete Shields First (Simplified 1:1 mapping)
-  for (let i = 0; i < defender.shield.length; i++) {
-    if (defender.shield[i] < 0) break;
+  // Deplete shields using shieldStrength[] (current health), not the type ID in shield[]
+  for (let i = 0; i < defender.shieldStrength.length; i++) {
+    if (defender.shieldStrength[i] <= 0) continue;
 
-    // Assuming we track shield health dynamically in `defender.shield` array instead of full power
-    if (damage <= defender.shield[i]) {
-      defender.shield[i] -= damage;
+    if (damage <= defender.shieldStrength[i]) {
+      defender.shieldStrength[i] -= damage;
       damage = 0;
       break;
     }
-    damage -= defender.shield[i];
-    defender.shield[i] = 0;
+    damage -= defender.shieldStrength[i];
+    defender.shieldStrength[i] = 0;
   }
 
   if (damage > 0) {

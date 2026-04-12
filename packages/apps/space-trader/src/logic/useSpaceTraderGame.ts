@@ -13,6 +13,7 @@ import {
 } from './DataTypes';
 import { generateGalaxy } from './SystemGenerator';
 import { determineSystemPrices, generateSystemQuantities } from './Merchant';
+import { determineEncounter, ENCOUNTER_NONE, ENCOUNTER_PIRATE } from './Encounter';
 
 export interface SpaceTraderState {
   credits: number;
@@ -80,6 +81,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         cargo: new Array(10).fill(0),
         weapon: [0, -1, -1], // Pulse Laser
         shield: [-1, -1, -1],
+        shieldStrength: [-1, -1, -1],
         gadget: [-1, -1, -1],
         fuel: ShipTypes[1].fuelTanks,
         hull: ShipTypes[1].hullStrength,
@@ -98,7 +100,13 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         diff: number,
         skills: { pilot: number; fighter: number; trader: number; engineer: number },
       ) => {
-        const { systems } = generateGalaxy();
+        const { systems: rawSystems } = generateGalaxy();
+
+        // Initialize persistent market quantities for every system at galaxy creation
+        const systems = rawSystems.map((sys) => ({
+          ...sys,
+          qty: generateSystemQuantities(sys, diff),
+        }));
 
         // Start at some system, usually system 0? Wait, the C actually picks random wormhole.
         // In Traveler.c, StartNewGame: WarpSystem = GetRandom(MAXWORMHOLE)
@@ -110,14 +118,15 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
           cargo: new Array(10).fill(0),
           weapon: [0, -1, -1],
           shield: [-1, -1, -1],
+          shieldStrength: [-1, -1, -1],
           gadget: [-1, -1, -1],
           fuel: ShipTypes[1].fuelTanks,
           hull: ShipTypes[1].hullStrength,
         };
 
         const sys = systems[startSystem];
-        const { buyPrices, sellPrices } = determineSystemPrices(sys, 4, 0); // 4 trader skill
-        const systemQuantities = generateSystemQuantities(sys, diff);
+        const { buyPrices, sellPrices } = determineSystemPrices(sys, skills.trader, 0);
+        const systemQuantities = sys.qty ?? new Array(10).fill(0);
 
         set({
           nameCommander: name,
@@ -150,7 +159,6 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         const current = state.systems[state.currentSystem];
         const target = state.systems[systemId];
 
-        // Simple Euclidean distance
         const dist = Math.sqrt(
           Math.pow(target.x - current.x, 2) + Math.pow(target.y - current.y, 2),
         );
@@ -158,37 +166,61 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
 
         if (state.ship.fuel < fuelCost) return;
 
-        target.visited = true;
-
         const { buyPrices, sellPrices } = determineSystemPrices(
           target,
           state.traderSkill,
           state.policeRecordScore,
         );
-        const systemQuantities = generateSystemQuantities(target, state.difficulty);
 
-        // Random encounter trigger (15% chance)
-        const encounterTriggered = Math.random() < 0.15;
-        const encounter = encounterTriggered
-          ? {
-              type: Math.random() > 0.5 ? 'Police' : 'Pirate',
-              id: Math.floor(Math.random() * 1000),
-            }
-          : null;
+        // Use persistent system quantities — don't regenerate on every visit
+        const systemQuantities = target.qty ?? new Array(10).fill(0);
+
+        // Original: 21 encounter checks per trip (one click at a time)
+        const CLICKS = 21;
+        let encounter = null;
+        let alreadyRaided = false;
+        for (let click = 0; click < CLICKS; click++) {
+          const encounterType = determineEncounter(
+            target,
+            state.difficulty,
+            state.policeRecordScore,
+            state.ship.type,
+            alreadyRaided,
+          );
+          if (encounterType !== ENCOUNTER_NONE) {
+            encounter = { type: encounterType, id: Math.floor(Math.random() * 1000) };
+            if (encounterType === ENCOUNTER_PIRATE) alreadyRaided = true;
+            break; // Surface one encounter at a time to the player
+          }
+        }
+
+        // Reset shield strength to full power at start of each warp (matches original DoWarp)
+        const newShieldStrength = state.ship.shield.map((s) => (s >= 0 ? Shields[s].power : -1));
 
         set({
           currentSystem: systemId,
           days: state.days + 1,
-          ship: { ...state.ship, fuel: state.ship.fuel - fuelCost },
+          ship: {
+            ...state.ship,
+            fuel: state.ship.fuel - fuelCost,
+            shieldStrength: newShieldStrength,
+          },
           buyPrices,
           sellPrices,
           systemQuantities,
           systems: state.systems.map((s, idx) => {
+            // Flush current system's traded quantities back to persistent store
+            if (idx === state.currentSystem) {
+              return { ...s, qty: state.systemQuantities };
+            }
+            if (idx === systemId) {
+              return { ...s, visited: true };
+            }
             // 10% chance for any system to clear status
             if (s.status !== UNEVENTFUL && Math.random() < 0.1) {
               return { ...s, status: UNEVENTFUL };
             }
-            // 5% chance for a random system to get a random status
+            // 5% chance for a random system to get a new status
             if (s.status === UNEVENTFUL && Math.random() < 0.05) {
               return { ...s, status: Math.floor(Math.random() * 8) };
             }
@@ -220,14 +252,19 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         const newCargo = [...state.ship.cargo];
         newCargo[goodId] += finalAmount;
 
-        const newSystems = [...state.systems];
         const newQuantities = [...state.systemQuantities];
         newQuantities[goodId] -= finalAmount;
+
+        // Persist depletion back to system so markets don't reset on re-visit
+        const newSystems = state.systems.map((s, idx) =>
+          idx === state.currentSystem ? { ...s, qty: newQuantities } : s,
+        );
 
         set({
           credits: state.credits - finalAmount * price,
           ship: { ...state.ship, cargo: newCargo },
           systemQuantities: newQuantities,
+          systems: newSystems,
         });
       },
 
@@ -245,10 +282,15 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         const newQuantities = [...state.systemQuantities];
         newQuantities[goodId] += finalAmount;
 
+        const newSystems = state.systems.map((s, idx) =>
+          idx === state.currentSystem ? { ...s, qty: newQuantities } : s,
+        );
+
         set({
           credits: state.credits + finalAmount * price,
           ship: { ...state.ship, cargo: newCargo },
           systemQuantities: newQuantities,
+          systems: newSystems,
         });
       },
 
@@ -302,9 +344,12 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         const newShields = [...state.ship.shield];
         newShields[emptySlot] = shieldId;
 
+        const newShieldStrength = [...state.ship.shieldStrength];
+        newShieldStrength[emptySlot] = s.power; // Initialize to full power when installed
+
         set({
           credits: state.credits - s.price,
-          ship: { ...state.ship, shield: newShields },
+          ship: { ...state.ship, shield: newShields, shieldStrength: newShieldStrength },
         });
       },
 
@@ -343,6 +388,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
                 cargo: new Array(10).fill(0),
                 weapon: [-1, -1, -1],
                 shield: [-1, -1, -1],
+                shieldStrength: [-1, -1, -1],
                 gadget: [-1, -1, -1],
                 fuel: ShipTypes[0].fuelTanks,
                 hull: ShipTypes[0].hullStrength,
@@ -385,6 +431,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
             cargo: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             weapon: [],
             shield: [],
+            shieldStrength: [],
             gadget: [],
             fuel: 14,
             hull: 25,

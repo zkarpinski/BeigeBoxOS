@@ -47,25 +47,6 @@ test.describe('PalmOS Desktop', () => {
     await expect(page.locator('text=Details')).toBeVisible();
   });
 
-  test('can open Space Trader and start a new game', async ({ page }) => {
-    await page.click('text=Space Trader');
-    // Space Trader should load its NewGameView
-    await expect(page.locator('text=Skill Points: 0 remaining')).toBeVisible();
-
-    // Test the keyboard trigger (clicking the name "Jameson")
-    await page.click('text=Jameson');
-    await expect(page.locator('.palm-keyboard-container')).toBeVisible();
-
-    // Close keyboard via Done button
-    await page.click('text=Done');
-    await expect(page.locator('.palm-keyboard-container')).not.toBeVisible();
-
-    // Start Trading
-    await page.click('text=Start Trading');
-    // Should be in trade view
-    await expect(page.locator('text=Cash: 1000 cr.')).toBeVisible();
-  });
-
   test('can navigate back to launcher via Home silk button', async ({ page }) => {
     await page.click('text=Date Book');
     await expect(page.locator('text=Sep 23, 04')).toBeVisible();

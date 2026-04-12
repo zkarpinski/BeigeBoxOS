@@ -974,6 +974,24 @@ export interface PlayerShip {
   hull: number;
 }
 
+export interface NPCEncounterData {
+  ship: PlayerShip;
+  fighterSkill: number;
+  pilotSkill: number;
+  engineerSkill: number;
+  bounty: number;
+  lootCargo: number[];
+}
+
+export interface ActiveEncounter {
+  type: string;
+  npc: NPCEncounterData;
+  log: string[];
+  round: number;
+  resolved: boolean;
+  playerWon: boolean;
+}
+
 export interface SaveGameType {
   credits: number;
   debt: number;

@@ -2,6 +2,7 @@ import React from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, Shields } from '../../logic/DataTypes';
 import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../../logic/Encounter';
+import { SHIP_SPRITES } from '../../assets/ships/ShipSprites';
 
 /**
  * PalmOS-style gauge bar: solid black fill within a bordered rect.
@@ -36,32 +37,58 @@ function ShipStatus({
   hull,
   maxHull,
   shieldStrength,
+  shipTypeId,
+  flip,
 }: {
   label: string;
   hull: number;
   maxHull: number;
   shieldStrength: number[];
+  shipTypeId: number;
+  flip?: boolean;
 }) {
   const totalShield = shieldStrength.reduce((a, v) => a + Math.max(0, v), 0);
-  // Max possible shield = sum of full power for each installed slot.
-  // We track current only; for display purposes cap at 100% (current IS max after warp reset).
-  const maxShield = totalShield; // at warp start shields are full; only decrements in combat
+  const maxShield = totalShield;
+  const Sprite = SHIP_SPRITES[shipTypeId] ?? SHIP_SPRITES[0];
 
   return (
     <div style={{ marginBottom: '6px' }}>
-      <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '1px' }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px' }}>
-        <span style={{ width: '30px' }}>Hull</span>
-        <PalmGauge current={hull} max={maxHull} />
-        <span style={{ fontFamily: 'monospace' }}>{hull}</span>
-      </div>
-      {totalShield > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px' }}>
-          <span style={{ width: '30px' }}>Shld</span>
-          <PalmGauge current={totalShield} max={maxShield} />
-          <span style={{ fontFamily: 'monospace' }}>{totalShield}</span>
+      <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '2px' }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {/* Ship sprite — mirrored for NPC (facing left) */}
+        <div
+          style={{
+            transform: flip ? 'scaleX(-1)' : undefined,
+            lineHeight: 0,
+            flexShrink: 0,
+          }}
+        >
+          <Sprite scale={2} />
         </div>
-      )}
+        {/* Gauges */}
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '9px',
+              marginBottom: '2px',
+            }}
+          >
+            <span style={{ width: '30px' }}>Hull</span>
+            <PalmGauge current={hull} max={maxHull} />
+            <span style={{ fontFamily: 'monospace' }}>{hull}</span>
+          </div>
+          {totalShield > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px' }}>
+              <span style={{ width: '30px' }}>Shld</span>
+              <PalmGauge current={totalShield} max={maxShield} />
+              <span style={{ fontFamily: 'monospace' }}>{totalShield}</span>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -149,14 +176,17 @@ export const EncounterModal: React.FC = () => {
           hull={ship.hull}
           maxHull={playerShipType.hullStrength}
           shieldStrength={ship.shieldStrength}
+          shipTypeId={ship.type}
         />
 
-        {/* Ship status — NPC ship */}
+        {/* Ship status — NPC ship (sprite mirrored to face left / toward player) */}
         <ShipStatus
           label={`${typeLabel} ${npcShipType.name}`}
           hull={encounter.npc.ship.hull}
           maxHull={npcShipType.hullStrength}
           shieldStrength={encounter.npc.ship.shieldStrength}
+          shipTypeId={encounter.npc.ship.type}
+          flip
         />
 
         {/* Last combat message */}

@@ -4,70 +4,67 @@ Source compared against: https://github.com/videogamepreservation/spacetrader/tr
 
 ---
 
+## Status Key
+
+- ✅ Fixed
+- ❌ Not yet fixed
+- ⚠️ Partial / simplified
+
+---
+
 ## Critical Bugs
 
-### 1. Buy price formula is inverted — `Merchant.ts`
+### 1. ✅ Buy price formula — `Merchant.ts`
 
 **Original** (`DeterminePrices` in `Trade.c`):
 
 ```c
-Price = ((SellPrice * (100 - TraderSkill(&Ship))) / 100)
+BuyPrice[i] = (SellPrice[i] * (100 - TraderSkill(&Ship))) / 100
 ```
 
-Higher trader skill **reduces** what you pay (up to 10% off at skill 10).
+At max skill (10): player pays 90% of market price (10% discount).
+At skill 0: player pays 100% (no discount — buy at market).
 
-**Ours** (`Merchant.ts`):
-
-```ts
-buyPrices[item.id] = Math.floor((buyPrices[item.id] * (103 + (MAXSKILL - traderSkill))) / 100);
-```
-
-This applies a markup that shrinks with skill — but the player always pays _more_ than the sell price. The formula is inverted; skill should give a discount, not reduce a surcharge.
+**Was:** base of `103` — player always paid ≥3% over market even at max skill.
+**Now:** base of `100` — max skill pays market price, skill 0 pays 10% markup.
 
 ---
 
-### 2. `DUBIOUSSCORE` constant is wrong — `Merchant.ts`
+### 2. ✅ `DUBIOUSSCORE` constant was wrong — `Merchant.ts`
 
 **Original** (`spacetrader.h`): `DUBIOUSSCORE = -5`
-**Ours** (`Merchant.ts`): `const DUBIOUSSCORE = -20`
-
-The threshold at which criminals receive a 10% sell-price penalty is way too permissive. The criminal penalty doesn't kick in until a score of −20 instead of −5.
+**Was:** `const DUBIOUSSCORE = -20` → **Now:** `const DUBIOUSSCORE = -5`
 
 ---
 
 ## Significant Missing Mechanics
 
-### 3. Encounters never fire — `useSpaceTraderGame.ts` + `Encounter.ts`
+### 3. ✅ Encounters — `useSpaceTraderGame.ts` + `Encounter.ts`
 
-**Original** (`Travel.c`): Sets `Clicks = 21` per warp and loops 21 times, rolling for an encounter on each click using `GetRandom(44 - 2*Difficulty)` compared against strength thresholds.
+**Original** (`Travel.c`): 21 clicks per warp, each rolling `GetRandom(44 - 2*Difficulty)`.
 
-**Ours**: One flat 15% check per warp. `Encounter.ts`'s `determineEncounter()` function exists but is never called by the travel system. Real encounter rate is far higher than 15% per trip in the original, and multi-encounter trips are impossible in our version.
-
----
-
-### 4. Starting system is always index 0 — `useSpaceTraderGame.ts`
-
-**Original** (`StartNewGame` in `NewGame.c`): Tries up to 200 random systems, requiring tech level 1–5 and at least 3 other systems reachable within the starting ship's fuel range.
-
-**Ours**:
-
-```ts
-const startSystem = 0; // always Acamar
-```
-
-The player always starts at Acamar regardless of its tech level or neighbor count.
+**Was:** One flat 15% check. **Now:** 21-click loop using `determineEncounter()`. Flea ships encounter at half rate. Pirates can only raid once per trip (`alreadyRaided` flag).
 
 ---
 
-### 5. System quantities reset every visit — `Merchant.ts` + `useSpaceTraderGame.ts`
+### 4. ✅ Starting system is always index 0 — `useSpaceTraderGame.ts`
 
-**Original** (`NewGame.c`): `InitializeTradeitems(i)` is called once per system during galaxy generation. Quantities are stored persistently and only change when the player trades; markets can be depleted.
+**Original** (`StartNewGame` in `NewGame.c`): Tries up to 200 random systems, requiring
+tech level 1–5 and at least 3 other systems reachable within the starting Gnat's fuel range (14 units).
 
-**Ours**: `generateSystemQuantities()` is called fresh on every `travelTo()`, regenerating quantities each visit. Markets never deplete and the economy has no memory.
+**Was:** Always started at index 0 (Acamar).
+**Now:** Up to 200 random candidates checked; picks first with tech level 1–5 and ≥3 reachable neighbors.
 
 ---
 
-### 6. No police record decay — `useSpaceTraderGame.ts`
+### 5. ✅ System quantities — `Merchant.ts` + `useSpaceTraderGame.ts`
+
+**Was:** `generateSystemQuantities()` called fresh on every `travelTo()`.
+**Now:** Quantities initialized once at galaxy creation into `SolarSystem.qty`, persisted through buy/sell/travel.
+
+---
+
+### 6. ✅ Police record decay — `useSpaceTraderGame.ts`
 
 **Original** (`DoWarp` in `Travel.c`):
 
@@ -78,65 +75,69 @@ if (PoliceRecordScore < DUBIOUSSCORE)
   if (Difficulty <= NORMAL) ++PoliceRecordScore;
 ```
 
-Score decays toward clean over time; criminals slowly rehabilitate.
-
-**Ours**: Police record score never changes automatically during travel.
+**Was:** Police record never changed during travel.
+**Now:** `travelTo` applies both decay rules. Score drifts toward 0 every 3 days; criminals (score < −5) on Normal/easier slowly rehabilitate.
 
 ---
 
-### 7. Ship trade-in value missing — `useSpaceTraderGame.ts`
+### 7. ✅ Ship trade-in value — `useSpaceTraderGame.ts`
 
-**Original** (`Shipyard.c`): When buying a new ship the player receives:
+**Original** (`Shipyard.c`): When buying a new ship, the player receives:
 
-- 75% of old ship's base price
-- Minus repair cost for hull damage
-- Minus cost to fill fuel
-- Plus 2/3 of equipped weapons, shields, and gadgets
+- 75% of the old ship's base price
+- Minus hull repair cost: `(maxHull - hull) * repairCosts`
+- Minus fuel refill cost: `(fuelTanks - fuel) * costOfFuel`
+- Plus 2/3 of each equipped weapon, shield, and gadget's price
 
-**Ours**: Simply deducts `newType.price` from credits. The old ship is surrendered for free.
+**Was:** Simply deducted `newType.price`. Old ship surrendered for free.
+**Now:** Full trade-in value calculated; only the net cost (`newShipPrice - tradeIn`) is charged. Cargo transfers if it fits in the new ship; equipment stays with the traded vessel.
 
 ---
 
 ## Moderate Bugs
 
-### 8. Shield strength sums type IDs, not power values — `Encounter.ts`
+### 8. ✅ Shield strength used type IDs instead of power values — `Encounter.ts`
 
-**Original**: `ShieldStrength[]` is a separate array tracking current health per slot. Shield power comes from `Shieldtype[Shield[i]].Power`.
-
-**Ours** (`Encounter.ts`):
-
-```ts
-return ship.shield.reduce((acc, curr) => (curr >= 0 ? acc + curr : acc), 0);
-```
-
-`curr` is a shield type ID (0 = Energy, 1 = Reflective), not its power value (100, 200). A ship with one Energy Shield has effective shield strength of `0`.
+**Was:** `ship.shield.reduce(...)` summed type IDs (0, 1) instead of power.
+**Now:** `ship.shieldStrength` tracks current health per slot; `executeAttack` depletes it directly. `buyShield` initializes `shieldStrength[slot] = shield.power`. Shields reset to full on each warp.
 
 ---
 
-### 9. Lightning Shield missing — `DataTypes.ts`
+### 9. ✅ Lightning Shield added — `DataTypes.ts`
 
 **Original** (`Global.c`): Three shield types:
-| Shield | Power | Price | Min Tech |
-|---|---|---|---|
-| Energy Shield | 100 | 5,000 | 2 |
-| Reflective Shield | 200 | 20,000 | 6 |
-| Lightning Shield | 350 | 45,000 | 8 |
 
-**Ours**: Only Energy and Reflective are defined.
+| Shield            | Power | Price  | Min Tech |
+| ----------------- | ----- | ------ | -------- |
+| Energy Shield     | 100   | 5,000  | 5        |
+| Reflective Shield | 200   | 20,000 | 6        |
+| Lightning Shield  | 350   | 45,000 | 8        |
 
----
-
-### 10. Escape Pod should be a flag, not a gadget slot — `DataTypes.ts` + `useSpaceTraderGame.ts`
-
-**Original**: `EscapePod` is a separate boolean flag in `PlayerShip`, not stored in `Gadget[]`. `MAXGADGETTYPE = 4` (indices 0–4, five gadgets). The escape pod has its own purchase/activation path.
-
-**Ours**: Stored as gadget index 5 in a 6-item array, wasting a gadget slot.
+**Was:** Only Energy and Reflective defined. `MAXSHIELDTYPE = 2`.
+**Now:** Lightning Shield (id=2, power=350, price=45,000, techLevel=8) added. `MAXSHIELDTYPE = 3`.
 
 ---
 
-### 11. Wormholes not shuffled — `SystemGenerator.ts`
+### 10. ✅ Escape Pod is now a separate flag — `DataTypes.ts` + `useSpaceTraderGame.ts`
 
-**Original** (`NewGame.c`): After placing systems, wormhole endpoint assignments are randomly shuffled among themselves:
+**Original**: `EscapePod` is a separate boolean on `PlayerShip`, not in `Gadget[]`.
+Five gadget types (indices 0–4). The escape pod has its own purchase path.
+
+**Was**: Stored as gadget id 5, wasting a gadget slot and exceeding `MAXGADGETTYPE`.
+**Now**:
+
+- `PlayerShip.escapePod: boolean` — dedicated field, no gadget slot consumed
+- `Gadgets[]` trimmed to 5 entries (ids 0–4); `ESCAPE_POD_PRICE`/`ESCAPE_POD_TECH_LEVEL` exported as constants
+- `buyEscapePod()` action added to the store
+- `takeDamage`: checks `ship.escapePod`; sets it to `false` on activation (pod consumed)
+- `buyShip`: `escapePod` transfers to the new vessel
+- Equipment view: escape pod row appears at the bottom of the Gadget tab, disabled when already owned
+
+---
+
+### 11. ✅ Wormholes shuffled — `SystemGenerator.ts`
+
+**Original** (`NewGame.c`):
 
 ```c
 for (i=0; i<MAXWORMHOLE; ++i) {
@@ -145,21 +146,16 @@ for (i=0; i<MAXWORMHOLE; ++i) {
 }
 ```
 
-**Ours**: Wormholes always connect in original placement order.
-
----
-
-### 12. Police record score decay missing on travel — `useSpaceTraderGame.ts`
-
-See item #6 above.
+**Was**: Wormholes always connected in original placement order.
+**Now**: Fisher-Yates shuffle applied after galaxy placement. Each wormhole system stores its `wormholeDest` index (next in the shuffled ring) on the `SolarSystem` object for use by the galactic chart and future wormhole travel.
 
 ---
 
 ## Likely Original Bug We Accidentally Fixed
 
-### 13. `InitializeTradeitems` size multiplier — `Merchant.ts`
+### 12. `InitializeTradeitems` size multiplier — `Merchant.ts`
 
-**Original** (`Trade.c`) uses `SolarSystem[i].Size` where `i` is the _trade item_ loop variable — clearly a bug, it should be the system being initialized. Our code uses `system.size` (correct). We unintentionally fixed an original bug.
+**Original** (`Trade.c`) uses `SolarSystem[i].Size` where `i` is the _trade item_ loop variable — clearly a bug. Our code uses `system.size` (correct).
 
 ---
 
@@ -170,22 +166,22 @@ See item #6 above.
 - All 3 weapons (Pulse Laser 15, Beam Laser 25, Military Laser 35)
 - Political systems (all 17 with correct fields)
 - Galaxy dimensions: 150×110, MINDISTANCE=6, CLOSEDISTANCE=13, MAXWORMHOLE=6
-- `PSYCHOPATHSCORE=-70`, `VILLAINSCORE=-30`
+- `PSYCHOPATHSCORE=-70`, `VILLAINSCORE=-30`, `DUBIOUSSCORE=-5` (now fixed)
 
 ---
 
 ## Fix Priority
 
-| #   | Issue                              | Priority     |
-| --- | ---------------------------------- | ------------ |
-| 1   | Buy price formula inverted         | **Critical** |
-| 3   | Encounters never fire              | **Critical** |
-| 8   | Shield strength uses IDs not power | **High**     |
-| 5   | System quantities reset each visit | **High**     |
-| 2   | DUBIOUSSCORE wrong (-20 vs -5)     | Medium       |
-| 6   | No police record decay             | Medium       |
-| 7   | No ship trade-in value             | Medium       |
-| 9   | Lightning Shield missing           | Medium       |
-| 4   | Starting system always index 0     | Medium       |
-| 10  | Escape pod as gadget slot          | Low          |
-| 11  | Wormholes not shuffled             | Low          |
+| #   | Issue                              | Status   | Priority     |
+| --- | ---------------------------------- | -------- | ------------ |
+| 1   | Buy price formula inverted         | ✅ Fixed | **Critical** |
+| 3   | Encounters never fire              | ✅ Fixed | **Critical** |
+| 8   | Shield strength uses IDs not power | ✅ Fixed | **High**     |
+| 5   | System quantities reset each visit | ✅ Fixed | **High**     |
+| 2   | DUBIOUSSCORE wrong (-20 vs -5)     | ✅ Fixed | Medium       |
+| 6   | No police record decay             | ✅ Fixed | Medium       |
+| 7   | No ship trade-in value             | ✅ Fixed | Medium       |
+| 9   | Lightning Shield missing           | ✅ Fixed | Medium       |
+| 4   | Starting system always index 0     | ✅ Fixed | Medium       |
+| 10  | Escape pod as gadget slot          | ✅ Fixed | Low          |
+| 11  | Wormholes not shuffled             | ✅ Fixed | Low          |

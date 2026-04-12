@@ -17,10 +17,12 @@ const mockStore = {
     weapon: [-1, -1, -1],
     shield: [-1, -1],
     gadget: [],
+    escapePod: false,
   },
   buyWeapon: jest.fn(),
   buyShield: jest.fn(),
   buyGadget: jest.fn(),
+  buyEscapePod: jest.fn(),
 };
 
 describe('EquipmentView Component', () => {

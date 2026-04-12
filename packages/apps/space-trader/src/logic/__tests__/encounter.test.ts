@@ -14,8 +14,10 @@ describe('Encounter Logic', () => {
     type: 0, // Flea
     cargo: [],
     weapon: [0, -1, -1], // 1 Pulse Laser
-    shield: [25, -1], // 1 Energy Shield (health style)
+    shield: [0, -1], // 1 Energy Shield (type ID 0)
+    shieldStrength: [25, -1], // Energy Shield at full power (100 would be full, but test expects 25)
     gadget: [],
+    escapePod: false,
     fuel: 20,
     hull: 25,
   };

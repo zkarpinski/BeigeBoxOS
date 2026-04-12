@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
-import { Weapons, Shields, Gadgets, ViewType } from '../../logic/DataTypes';
+import {
+  Weapons,
+  Shields,
+  Gadgets,
+  ViewType,
+  ESCAPE_POD_PRICE,
+  ESCAPE_POD_TECH_LEVEL,
+} from '../../logic/DataTypes';
 import { useTitleBar } from '../TitleBarContext';
 
 interface EquipmentViewProps {
@@ -9,7 +16,7 @@ interface EquipmentViewProps {
 
 export const EquipmentView: React.FC<EquipmentViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, credits, ship, buyWeapon, buyShield, buyGadget } =
+  const { systems, currentSystem, credits, ship, buyWeapon, buyShield, buyGadget, buyEscapePod } =
     useSpaceTraderGame();
   const system = systems[currentSystem];
 
@@ -75,6 +82,23 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({ onViewChange }) =>
             </div>
           );
         })}
+        {tab === 'gadget' && (
+          <div className="equipment-row-authentic">
+            <span className="item-name-authentic">Escape pod{ship.escapePod ? ' ✓' : ''}</span>
+            <span style={{ textAlign: 'right', paddingRight: '4px' }}>{ESCAPE_POD_PRICE} cr</span>
+            <button
+              className="palm-btn-small"
+              disabled={
+                ship.escapePod ||
+                credits < ESCAPE_POD_PRICE ||
+                system.techLevel < ESCAPE_POD_TECH_LEVEL
+              }
+              onClick={buyEscapePod}
+            >
+              {ship.escapePod ? 'Have' : 'Buy'}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="palm-footer trade-footer-authentic">

@@ -15,6 +15,7 @@ const mockStore = {
     weapon: [0, -1, -1],
     shield: [-1, -1],
     gadget: [],
+    escapePod: false,
   },
   credits: 1000,
   reputationScore: 1234,

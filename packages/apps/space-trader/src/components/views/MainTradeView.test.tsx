@@ -29,6 +29,7 @@ const mockStore = {
     weapon: [],
     shield: [],
     gadget: [],
+    escapePod: false,
     fuel: 20,
     hull: 25,
   },

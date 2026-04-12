@@ -10,6 +10,8 @@ import {
   Weapons,
   Shields,
   Gadgets,
+  ESCAPE_POD_PRICE,
+  ESCAPE_POD_TECH_LEVEL,
 } from './DataTypes';
 import { generateGalaxy } from './SystemGenerator';
 import { determineSystemPrices, generateSystemQuantities } from './Merchant';
@@ -52,6 +54,7 @@ export interface SpaceTraderState {
   buyWeapon: (weaponId: number) => void;
   buyShield: (shieldId: number) => void;
   buyGadget: (gadgetId: number) => void;
+  buyEscapePod: () => void;
   clearEncounter: () => void;
   takeDamage: (amount: number) => void;
   repairHull: () => void;
@@ -83,6 +86,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         shield: [-1, -1, -1],
         shieldStrength: [-1, -1, -1],
         gadget: [-1, -1, -1],
+        escapePod: false,
         fuel: ShipTypes[1].fuelTanks,
         hull: ShipTypes[1].hullStrength,
       },
@@ -108,10 +112,23 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
           qty: generateSystemQuantities(sys, diff),
         }));
 
-        // Start at some system, usually system 0? Wait, the C actually picks random wormhole.
-        // In Traveler.c, StartNewGame: WarpSystem = GetRandom(MAXWORMHOLE)
-        // We will just pick system 0
-        const startSystem = 0;
+        // Pick a valid starting system: tech level 1–5, at least 3 neighbors in fuel range.
+        // Matches StartNewGame logic in NewGame.c (up to 200 attempts).
+        const START_FUEL = ShipTypes[1].fuelTanks; // Gnat starting fuel
+        let startSystem = 0;
+        for (let attempt = 0; attempt < 200; attempt++) {
+          const candidate = Math.floor(Math.random() * systems.length);
+          const sys = systems[candidate];
+          if (sys.techLevel < 1 || sys.techLevel > 5) continue;
+          const neighbors = systems.filter((s, idx) => {
+            if (idx === candidate) return false;
+            return Math.sqrt(Math.pow(s.x - sys.x, 2) + Math.pow(s.y - sys.y, 2)) <= START_FUEL;
+          });
+          if (neighbors.length >= 3) {
+            startSystem = candidate;
+            break;
+          }
+        }
 
         const initialShip: PlayerShip = {
           type: 1, // Gnat
@@ -120,6 +137,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
           shield: [-1, -1, -1],
           shieldStrength: [-1, -1, -1],
           gadget: [-1, -1, -1],
+          escapePod: false,
           fuel: ShipTypes[1].fuelTanks,
           hull: ShipTypes[1].hullStrength,
         };
@@ -197,9 +215,21 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         // Reset shield strength to full power at start of each warp (matches original DoWarp)
         const newShieldStrength = state.ship.shield.map((s) => (s >= 0 ? Shields[s].power : -1));
 
+        // Police record decay toward clean over time (from DoWarp in Travel.c)
+        // CLEANSCORE=0, DUBIOUSSCORE=-5, NORMAL difficulty=2
+        const newDays = state.days + 1;
+        let newPoliceScore = state.policeRecordScore;
+        if (newDays % 3 === 0) {
+          if (newPoliceScore > 0) newPoliceScore--;
+        }
+        if (newPoliceScore < -5 && state.difficulty <= 2) {
+          newPoliceScore++;
+        }
+
         set({
           currentSystem: systemId,
-          days: state.days + 1,
+          days: newDays,
+          policeRecordScore: newPoliceScore,
           ship: {
             ...state.ship,
             fuel: state.ship.fuel - fuelCost,
@@ -297,17 +327,44 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
       buyShip: (shipTypeId: number) => {
         const state = get();
         const newType = ShipTypes[shipTypeId];
-        if (state.credits < newType.price) return;
+        const oldType = ShipTypes[state.ship.type];
 
-        // Trade-in logic is missing, but simple buy for now
+        // Trade-in value (from Shipyard.c):
+        // 75% of old ship base price, minus hull damage and fuel deficit, plus 2/3 of equipment
+        let tradeIn = Math.floor((oldType.price * 3) / 4);
+        tradeIn -= (oldType.hullStrength - state.ship.hull) * oldType.repairCosts;
+        tradeIn -= (oldType.fuelTanks - state.ship.fuel) * oldType.costOfFuel;
+        for (const w of state.ship.weapon) {
+          if (w >= 0) tradeIn += Math.floor((Weapons[w].price * 2) / 3);
+        }
+        for (const s of state.ship.shield) {
+          if (s >= 0) tradeIn += Math.floor((Shields[s].price * 2) / 3);
+        }
+        for (const g of state.ship.gadget) {
+          if (g >= 0) tradeIn += Math.floor((Gadgets[g].price * 2) / 3);
+        }
+        tradeIn = Math.max(0, tradeIn);
+
+        const netCost = newType.price - tradeIn;
+        if (state.credits < netCost) return;
+
+        // Cargo transfers if it fits in the new ship; equipment stays with old ship
+        const usedCargo = state.ship.cargo.reduce((a, b) => a + b, 0);
+        const newCargo =
+          usedCargo <= newType.cargoBays ? [...state.ship.cargo] : new Array(10).fill(0);
+
         set({
-          credits: state.credits - newType.price,
+          credits: state.credits - netCost,
           ship: {
-            ...state.ship,
             type: shipTypeId,
+            cargo: newCargo,
+            weapon: [-1, -1, -1],
+            shield: [-1, -1, -1],
+            shieldStrength: [-1, -1, -1],
+            gadget: [-1, -1, -1],
+            escapePod: state.ship.escapePod, // escape pod transfers to new ship
             fuel: newType.fuelTanks,
             hull: newType.hullStrength,
-            // Cargo/items usually transfer if they fit
           },
         });
       },
@@ -372,6 +429,18 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         });
       },
 
+      buyEscapePod: () => {
+        const state = get();
+        if (state.ship.escapePod) return; // already have one
+        if (state.credits < ESCAPE_POD_PRICE) return;
+        const system = state.systems[state.currentSystem];
+        if (system.techLevel < ESCAPE_POD_TECH_LEVEL) return;
+        set({
+          credits: state.credits - ESCAPE_POD_PRICE,
+          ship: { ...state.ship, escapePod: true },
+        });
+      },
+
       clearEncounter: () => set({ encounter: null }),
 
       takeDamage: (amount: number) => {
@@ -379,9 +448,8 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
         const newHull = Math.max(0, state.ship.hull - amount);
 
         if (newHull <= 0) {
-          const hasEscapePod = state.ship.gadget.includes(5); // Escape pod ID is 5
-          if (hasEscapePod) {
-            // Lose ship, cargo, weapons, gadgets, but survive
+          if (state.ship.escapePod) {
+            // Lose ship, cargo, weapons, gadgets; escape pod consumed on use
             set({
               ship: {
                 type: 0, // Back to Flea
@@ -390,6 +458,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
                 shield: [-1, -1, -1],
                 shieldStrength: [-1, -1, -1],
                 gadget: [-1, -1, -1],
+                escapePod: false, // pod is consumed
                 fuel: ShipTypes[0].fuelTanks,
                 hull: ShipTypes[0].hullStrength,
               },
@@ -433,6 +502,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
             shield: [],
             shieldStrength: [],
             gadget: [],
+            escapePod: false,
             fuel: 14,
             hull: 25,
           },
@@ -459,6 +529,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
                 'buyWeapon',
                 'buyShield',
                 'buyGadget',
+                'buyEscapePod',
                 'clearEncounter',
               ].includes(key),
           ),

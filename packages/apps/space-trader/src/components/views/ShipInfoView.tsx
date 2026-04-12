@@ -53,6 +53,9 @@ export const ShipInfoView: React.FC<ShipInfoViewProps> = ({ onViewChange }) => {
             .map(getGadgetName)
             .join(', ') || 'None'}
         </p>
+        <p>
+          <strong>Escape Pod:</strong> {ship.escapePod ? 'Yes' : 'No'}
+        </p>
         <hr />
         <p>
           <strong>Reputation:</strong> {reputationScore}

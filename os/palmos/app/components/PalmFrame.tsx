@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { usePalmSounds } from '../hooks/usePalmSounds';
+
+const SCREEN_PX = 264;
 
 interface PalmFrameProps {
   children: React.ReactNode;
@@ -149,6 +152,34 @@ export function PalmFrame({
   onScroll,
 }: PalmFrameProps) {
   const { playClick } = usePalmSounds();
+  const [mobileScale, setMobileScale] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const compute = () => {
+      setMobileScale(window.innerWidth < 640 ? window.innerWidth / SCREEN_PX : 1);
+    };
+    compute();
+    window.addEventListener('resize', compute);
+
+    const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handleFsChange);
+
+    return () => {
+      window.removeEventListener('resize', compute);
+      document.removeEventListener('fullscreenchange', handleFsChange);
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const isMobile = mobileScale !== 1;
 
   const handleHomeClick = () => {
     playClick();
@@ -173,6 +204,15 @@ export function PalmFrame({
 
   return (
     <div className="palm-page-wrapper">
+      {/* Fullscreen toggle — floats in the dark background above the device */}
+      <button
+        onClick={toggleFullscreen}
+        title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+        className="palm-fullscreen-btn"
+      >
+        {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+      </button>
+
       {/* Device chassis — silver/gray metallic body */}
       <div className="palm-chassis">
         {/* palm / m505 logos */}
@@ -195,10 +235,28 @@ export function PalmFrame({
         {/* Speaker slot */}
         <div className="palm-speaker" />
 
-        {/* Screen bezel */}
-        <div className="palm-bezel">
-          <div className="palm-screen">{children}</div>
-        </div>
+        {/* Screen bezel — on mobile, strip the chrome and scale the fixed 264px content up */}
+        {isMobile ? (
+          <div
+            style={{
+              width: '100%',
+              height: `${SCREEN_PX * mobileScale}px`,
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              className="palm-screen"
+              style={{ transform: `scale(${mobileScale})`, transformOrigin: 'top left' }}
+            >
+              {children}
+            </div>
+          </div>
+        ) : (
+          <div className="palm-bezel">
+            <div className="palm-screen">{children}</div>
+          </div>
+        )}
 
         {/* Graffiti / silk area */}
         <div className="palm-silk-area">

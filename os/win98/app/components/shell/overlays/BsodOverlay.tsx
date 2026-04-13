@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '@retro-web/core/context';
 import type { BsodState, FatalErrorState } from '@retro-web/core/context';
 import { DIALOG_ICONS } from './dialogIcons';
+import { escapeHtml } from '@retro-web/core';
 
 const DEFAULT_BSOD_MSG =
   'A fatal exception 0E has occurred at F000:E2C3 in VXD VMM(01) +\n' +
@@ -41,11 +42,7 @@ export function BsodOverlay({ state }: { state: BsodState | FatalErrorState }) {
   if (state.type === 'bsod') {
     const opts = (state as BsodState).options;
     const msg = opts.message ?? DEFAULT_BSOD_MSG;
-    const safeMsg = msg
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
+    const safeMsg = escapeHtml(msg).replace(/\n/g, '<br>');
     return (
       <div className="w97-bsod" onClick={dismiss}>
         <div className="w97-bsod-inner">

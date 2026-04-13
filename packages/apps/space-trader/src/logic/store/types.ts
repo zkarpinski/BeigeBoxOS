@@ -56,7 +56,9 @@ export interface EncounterSlice {
 export interface GameSlice {
   difficulty: number;
   tradeMode: 'buy' | 'sell' | 'price-list';
+  viewingShipId: number | null;
   setTradeMode: (mode: 'buy' | 'sell' | 'price-list') => void;
+  setViewingShipId: (id: number | null) => void;
   restartGame: () => void;
 }
 

@@ -95,10 +95,11 @@
   border: 1px solid black !important;
   background: white !important;
   color: black !important;
+  padding: 2px 14px;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
-  border-radius: 0;
+  border-radius: 12px;
 }
 
 .palm-btn:active,

@@ -49,14 +49,18 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ## Game Mechanics
 
-### Combat (EncounterForm) — ✅ Implemented
+### Combat (EncounterForm) — ⚠️ Partial
 
 - **NPC ship generation**: `generateNPCEncounter()` picks ship type by occurrence weight, equips weapons/shields based on system tech level, scales NPC skills with difficulty.
 - **Attack**: uses `executeAttack()` with gadget-boosted player skills (Targeting +3 fighter, Auto-repair +2 engineer, Nav/Cloaking +3 pilot). NPC counterattacks each round.
 - **Flee**: pilot-skill-based flee chance (30–70%); NPC fires at fleeing player on failure.
+  - ⚠️ **Bug**: flee success does not factor in NPC pilot skill — original uses both sides' pilot skills.
 - **Submit to pirates**: pirates take NPC cargo-bay-capacity worth of goods from player hold.
 - **Submit/Inspect by police**: checks for narcotics/firearms; confiscates and levies fine on contraband.
+  - ⚠️ **Bug**: does not check `drugsOk`/`firearmsOk` from `PoliticalSystems` — police in anarchies should ignore contraband.
 - **Bribe police**: costs 5% × credits × (difficulty+1); skips inspection.
+  - ⚠️ **Bug**: ignores `bribeLevel` property in `PoliticalSystems`; bribe should be `Math.max(10, Math.floor(netWorth / (10 × bribeLevel)))`.
+- **NPC gadgets**: ❌ NPC ships always have `gadget: [-1,-1,-1]`; original game equipped NPCs with gadgets.
 - **Kill/Loot**: bounty credited on NPC destruction; pirate kill +1 reputation; police kill −3 record; Loot button transfers NPC cargo.
 - **Escape pod**: activated automatically if hull reaches 0; player survives on Flea with no cargo/equipment.
 
@@ -91,7 +95,7 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ### Police/Record System — ⚠️ Partial
 
-- **Contraband detection**: ✅ Police inspect and find narcotics/firearms; fine player.
+- **Contraband detection**: ⚠️ Police inspect and find narcotics/firearms, but do not check `PoliticalSystems[politics].drugsOk / firearmsOk` — police in anarchies/low-law systems should not care about contraband.
 - **Record decay**: ✅ Police record decays toward clean over time (every 3 warps).
 - **Reputation on kills**: ✅ Pirate kill +1 reputation; police kill −3 record.
 - **Arrest**: ❌ No full arrest mechanic (cargo confiscated, fine, record penalty) beyond inspection.
@@ -144,11 +148,17 @@ Original C source (github.com/videogamepreservation/spacetrader)
 | **Dump cargo**                                                 | High         | Low       | ✅ Done |
 | **Gadget skill bonuses** (combat)                              | High         | Low       | ✅ Done |
 | **Reputation updates on combat**                               | High         | Low       | ✅ Done |
+| **Fix: police ignore contraband per PoliticalSystems.drugsOk** | **High**     | Low       | ❌ Bug  |
+| **Fix: bribe cost uses bribeLevel + net worth**                | **High**     | Low       | ❌ Bug  |
+| **Fix: flee factors in NPC pilot skill**                       | Medium       | Low       | ❌ Bug  |
+| NPC ships receive gadgets                                      | Medium       | Low       | ❌      |
 | Display effective skills in Commander Status                   | Medium       | Low       | ❌      |
+| ShipInfoView: net worth, kill counts, rep/record titles, debt  | Medium       | Low       | ❌      |
 | Bank / loans UI (BankForm)                                     | Medium       | Medium    | ❌      |
 | Wormhole travel                                                | Medium       | Medium    | ❌      |
 | Full contraband arrest flow                                    | Medium       | Medium    | ❌      |
 | Auto-fuel/repair on arrival                                    | Medium       | Low       | ❌      |
+| Fix price list: show actual system special resource            | Medium       | Low       | ❌      |
 | Mercenaries                                                    | Low          | High      | ❌      |
 | Quest system                                                   | Low          | Very High | ❌      |
 | Tribbles                                                       | Low          | Medium    | ❌      |

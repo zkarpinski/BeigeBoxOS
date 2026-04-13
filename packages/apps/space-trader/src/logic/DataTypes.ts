@@ -1033,4 +1033,13 @@ export const PoliceRecordTitles = [
   'Hero',
 ];
 
-export type ViewType = 'trade' | 'system' | 'ship' | 'map' | 'shipyard' | 'equipment' | 'newgame';
+export type ViewType =
+  | 'trade'
+  | 'system'
+  | 'ship'
+  | 'map'
+  | 'shipyard'
+  | 'equipment'
+  | 'newgame'
+  | 'buyShip'
+  | 'shipInfo';

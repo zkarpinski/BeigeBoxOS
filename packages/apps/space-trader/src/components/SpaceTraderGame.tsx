@@ -9,6 +9,8 @@ import { EquipmentView } from './views/EquipmentView';
 import { EncounterModal } from './views/EncounterModal';
 import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
+import { BuyShipListView } from './views/BuyShipListView';
+import { ShipInformationView } from './views/ShipInformationView';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
@@ -89,9 +91,11 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       system: 'System Info',
       ship: 'Commander Status',
       map: 'Short Range Chart',
-      shipyard: 'Shipyard',
+      shipyard: 'Ship Yard',
       equipment: 'Equipment',
       newgame: 'Space Trader',
+      buyShip: 'Buy Ship',
+      shipInfo: 'Ship Information',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);
@@ -112,6 +116,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
         {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
         {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
+        {activeView === 'buyShip' && <BuyShipListView onViewChange={setActiveView} />}
+        {activeView === 'shipInfo' && <ShipInformationView onViewChange={setActiveView} />}
 
         {isGameOver && <GameOverView />}
         <EncounterModal />

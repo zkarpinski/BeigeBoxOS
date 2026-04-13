@@ -82,9 +82,9 @@ test.describe('Space Trader Gameplay', () => {
     await page.locator('button', { hasText: 'B' }).click({ force: true });
     await expect(page.locator('text=Buy Cargo')).toBeVisible();
 
-    // Y -> Shipyard
+    // Y -> Ship Yard
     await page.locator('button', { hasText: 'Y' }).click({ force: true });
-    await expect(page.locator('text=Shipyard')).toBeVisible();
+    await expect(page.locator('text=Ship Yard')).toBeVisible();
   });
 
   test('can travel to a nearby system', async ({ page }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, ViewType } from '../../logic/DataTypes';
 import { useTitleBar } from '../TitleBarContext';
@@ -9,21 +9,19 @@ interface ShipYardViewProps {
 
 export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, credits, buyShip, ship, repairHull, buyFuel } =
-    useSpaceTraderGame();
+  const { systems, currentSystem, credits, ship, repairHull, buyFuel } = useSpaceTraderGame();
   const system = systems[currentSystem];
+  const shipType = ShipTypes[ship.type];
 
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
-  // Shipyard only at tech level 4+
+  // Yard only at tech level 4+
   if (system.techLevel < 4) {
     return (
       <div className="palm-window">
-        {TitleBar && <TitleBar title="Shipyard" onViewChange={onViewChange} />}
+        {TitleBar && <TitleBar title="Ship Yard" onViewChange={onViewChange} />}
         <div className="palm-content" style={{ padding: '20px', textAlign: 'center' }}>
           This system is too primitive for a shipyard.
         </div>
-        <div className="palm-footer">
+        <div className="palm-footer" style={{ justifyContent: 'center' }}>
           <button className="palm-btn" onClick={() => onViewChange('trade')}>
             Back
           </button>
@@ -32,122 +30,107 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
     );
   }
 
+  // Calculate fuel and hull costs
+  const fuelCost = shipType.costOfFuel;
+  const fuelNeeded = shipType.fuelTanks - ship.fuel;
+  const fuelCostTotal = fuelNeeded * fuelCost;
+  const hullNeeded = shipType.hullStrength - ship.hull;
+  const repairCostTotal = hullNeeded * shipType.repairCosts;
+
   const availableShips = ShipTypes.filter((s) => s.minTechLevel <= system.techLevel);
-  const selectedShip = availableShips[selectedIndex] || availableShips[0];
 
   return (
-    <div className="palm-window">
-      {TitleBar && <TitleBar title="Shipyard" onViewChange={onViewChange} />}
+    <div className="palm-window" style={{ background: '#fff' }}>
+      {TitleBar && <TitleBar title="Ship Yard" onViewChange={onViewChange} />}
 
       <div
         className="palm-content"
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+        style={{ padding: '8px 12px', color: '#000', fontSize: '13px' }}
       >
-        <div className="ship-list-authentic" style={{ height: '100px', overflowY: 'auto' }}>
-          {availableShips.map((s, idx) => (
-            <div
-              key={s.id}
-              className={`ship-row-authentic ${idx === selectedIndex ? 'selected' : ''}`}
-              onClick={() => setSelectedIndex(idx)}
-            >
-              <span className="item-name-authentic">{s.name}</span>
-              <span style={{ textAlign: 'right' }}>{s.price} cr</span>
-            </div>
-          ))}
+        {/* Fuel Section */}
+        <div style={{ marginBottom: '16px' }}>
+          <div>You have fuel to fly {ship.fuel} parsecs.</div>
+          {ship.fuel >= shipType.fuelTanks ? (
+            <div style={{ marginBottom: '4px' }}>Your tank cannot hold more fuel.</div>
+          ) : (
+            <>
+              <div style={{ marginBottom: '4px' }}>A full tank costs {fuelCostTotal} cr.</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="palm-btn"
+                  disabled={credits < fuelCost}
+                  onClick={() => buyFuel(1)}
+                >
+                  Buy Fuel
+                </button>
+                <button
+                  className="palm-btn"
+                  disabled={credits < fuelCostTotal}
+                  onClick={() => buyFuel(fuelNeeded)}
+                >
+                  Buy Full Tank
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="ship-details details-panel-authentic" style={{ flex: 1 }}>
+        {/* Hull Section */}
+        <div style={{ marginBottom: '16px' }}>
+          <div>
+            Your hull strength is at {Math.floor((ship.hull / shipType.hullStrength) * 100)}%.
+          </div>
+          {ship.hull >= shipType.hullStrength ? (
+            <div style={{ marginBottom: '4px' }}>No repairs are needed.</div>
+          ) : (
+            <>
+              <div style={{ marginBottom: '4px' }}>Full repair will cost {repairCostTotal} cr.</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="palm-btn"
+                  disabled={credits < shipType.repairCosts}
+                  onClick={repairHull}
+                >
+                  Repair
+                </button>
+                <button
+                  className="palm-btn"
+                  disabled={credits < repairCostTotal}
+                  onClick={repairHull}
+                >
+                  Full Repairs
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Ships for Sale Section */}
+        <div style={{ marginBottom: '16px' }}>
           <div style={{ marginBottom: '4px' }}>
-            <strong>Bays:</strong> {selectedShip.cargoBays} | <strong>Hull:</strong>{' '}
-            {selectedShip.hullStrength}
-            <br />
-            <strong>Wpn/Shd/Gdt:</strong> {selectedShip.weaponSlots}/{selectedShip.shieldSlots}/
-            {selectedShip.gadgetSlots}
-            <br />
-            <strong>Crew:</strong> {selectedShip.crewQuarters} | <strong>Fuel:</strong>{' '}
-            {selectedShip.fuelTanks}
+            {availableShips.length > 0 ? 'Ships are for sale.' : 'No new ships are for sale.'}
           </div>
-
-          <button
-            className="palm-btn-large"
-            disabled={credits < selectedShip.price}
-            style={{ width: '100%', fontWeight: 'bold' }}
-            onClick={() => {
-              buyShip(selectedShip.id);
-              onViewChange('trade');
-            }}
-          >
-            Buy {selectedShip.name}
+          <button className="palm-btn" onClick={() => onViewChange('buyShip')}>
+            View Ship Info
           </button>
+        </div>
 
-          <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '4px' }}>
-            <div style={{ fontSize: '9px', marginBottom: '2px' }}>
-              Current: {ShipTypes[ship.type].name} ({ship.hull}/{ShipTypes[ship.type].hullStrength}{' '}
-              Hull)
-            </div>
-            <button
-              className="palm-btn-small"
-              style={{ width: '100%' }}
-              disabled={
-                ship.hull >= ShipTypes[ship.type].hullStrength ||
-                credits <
-                  (ShipTypes[ship.type].hullStrength - ship.hull) * ShipTypes[ship.type].repairCosts
-              }
-              onClick={repairHull}
-            >
-              Repair (
-              {(ShipTypes[ship.type].hullStrength - ship.hull) * ShipTypes[ship.type].repairCosts}{' '}
-              cr)
-            </button>
-          </div>
-
-          <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '4px' }}>
-            <div style={{ fontSize: '9px', marginBottom: '2px' }}>
-              Fuel: {ship.fuel}/{ShipTypes[ship.type].fuelTanks} ({ShipTypes[ship.type].costOfFuel}{' '}
-              cr/unit)
-            </div>
-            <div style={{ display: 'flex', gap: '2px' }}>
-              <button
-                className="palm-btn-small"
-                disabled={
-                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
-                  credits < ShipTypes[ship.type].costOfFuel
-                }
-                onClick={() => buyFuel(1)}
-              >
-                +1
-              </button>
-              <button
-                className="palm-btn-small"
-                disabled={
-                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
-                  credits < ShipTypes[ship.type].costOfFuel * 5
-                }
-                onClick={() => buyFuel(5)}
-              >
-                +5
-              </button>
-              <button
-                className="palm-btn-small"
-                disabled={
-                  ship.fuel >= ShipTypes[ship.type].fuelTanks ||
-                  credits < ShipTypes[ship.type].costOfFuel
-                }
-                onClick={() => buyFuel(ShipTypes[ship.type].fuelTanks - ship.fuel)}
-              >
-                Fill (
-                {(ShipTypes[ship.type].fuelTanks - ship.fuel) * ShipTypes[ship.type].costOfFuel} cr)
-              </button>
-            </div>
-          </div>
+        {/* Escape Pods Section */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ marginBottom: '4px' }}>No escape pods are for sale.</div>
         </div>
       </div>
 
-      <div className="palm-footer trade-footer-authentic">
-        <button className="palm-btn" onClick={() => onViewChange('trade')}>
-          Back
-        </button>
-        <span>Cash: {credits} cr.</span>
+      <div
+        className="palm-footer"
+        style={{
+          background: '#fff',
+          justifyContent: 'flex-end',
+          padding: '2px 8px',
+          borderTop: 'none',
+        }}
+      >
+        <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Cash: {credits} cr.</span>
       </div>
     </div>
   );

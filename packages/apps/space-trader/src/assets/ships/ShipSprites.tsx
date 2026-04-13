@@ -12,6 +12,8 @@ export const FleaSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={16 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Flea"
   >
     <g fill="#000000">
       <rect x={5} y={0} width={1} height={1} />
@@ -116,6 +118,8 @@ export const GnatSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={26 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Gnat"
   >
     <g fill="#000000">
       <rect x={2} y={0} width={1} height={1} />
@@ -357,6 +361,8 @@ export const FireflySprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={22 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Firefly"
   >
     <g fill="#000000">
       <rect x={8} y={0} width={1} height={1} />
@@ -545,6 +551,8 @@ export const MosquitoSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={26 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Mosquito"
   >
     <g fill="#000000">
       <rect x={2} y={0} width={1} height={1} />
@@ -757,6 +765,8 @@ export const BumblebeeSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={34 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Bumblebee"
   >
     <g fill="#000000">
       <rect x={12} y={0} width={1} height={1} />
@@ -1105,6 +1115,8 @@ export const BeetleSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={36 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Beetle"
   >
     <g fill="#000000">
       <rect x={14} y={0} width={1} height={1} />
@@ -1481,6 +1493,8 @@ export const HornetSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={40 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Hornet"
   >
     <g fill="#000000">
       <rect x={3} y={0} width={1} height={1} />
@@ -1917,6 +1931,8 @@ export const GrasshopperSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={40 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Grasshopper"
   >
     <g fill="#000000">
       <rect x={11} y={0} width={1} height={1} />
@@ -2371,6 +2387,8 @@ export const TermiteSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={47 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Termite"
   >
     <g fill="#000000">
       <rect x={17} y={0} width={1} height={1} />
@@ -3100,6 +3118,8 @@ export const WaspSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
     height={48 * scale}
     shapeRendering="crispEdges"
     style={{ imageRendering: 'pixelated' }}
+    role="img"
+    aria-label="Wasp"
   >
     <g fill="#000000">
       <rect x={7} y={0} width={1} height={1} />

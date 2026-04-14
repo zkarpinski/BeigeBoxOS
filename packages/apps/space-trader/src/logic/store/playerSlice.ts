@@ -19,6 +19,8 @@ export const createPlayerSlice: StateCreator<SpaceTraderState, [], [], PlayerSli
   debt: 0,
   policeRecordScore: 0,
   reputationScore: 0,
+  killsPirate: 0,
+  killsPolice: 0,
   nameCommander: '',
   pilotSkill: 4,
   fighterSkill: 4,

@@ -303,50 +303,6 @@
   flex-direction: column;
 }
 
-/* Authentic Trade UI Styles (Phase 6) */
-.trade-row-authentic {
-  display: grid;
-  grid-template-columns: 34px 1fr 44px 1fr;
-  align-items: center;
-  padding: 0 4px;
-  height: 18px;
-}
-
-.qty-box {
-  width: 30px;
-  height: 18px;
-  padding: 1px;
-  border: 1px solid #000;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.item-name-authentic {
-  padding-left: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 14px;
-}
-
-.all-btn-authentic {
-  width: 40px;
-  height: 18px;
-  padding: 1px;
-  border: 1px solid #000;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
 /* Dialog/Modal Styles (Phase 10) */
 .palm-modal-overlay {
   position: absolute;
@@ -403,36 +359,6 @@
   padding: 4px;
   font-size: 10px;
   background: #f9f9f9;
-}
-
-.all-btn-authentic:active {
-  background: #000;
-  color: #fff;
-}
-
-.price-text-authentic {
-  text-align: right;
-  padding-right: 2px;
-  font-family: monospace;
-  font-size: 14px;
-}
-
-.trade-footer-authentic {
-  display: flex;
-  justify-content: space-between;
-  padding: 2px 4px;
-  background: var(--palm-bg);
-  border-top: 1px solid #000;
-  font-weight: bold;
-  font-size: 11px;
-  height: 18px;
-  align-items: center;
-}
-
-.trade-table-authentic {
-  flex: 1;
-  overflow-y: auto;
-  background: #fff;
 }
 
 .palm-header.authentic {

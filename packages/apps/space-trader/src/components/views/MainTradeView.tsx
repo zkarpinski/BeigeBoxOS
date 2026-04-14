@@ -3,6 +3,9 @@ import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { TradeItems, SystemNames, ShipTypes, ViewType } from '../../logic/DataTypes';
 import { TradeQuantityModal } from './TradeQuantityModal';
 import { useTitleBar } from '../TitleBarContext';
+import { TradeRow } from './TradeRow';
+import { PriceListTable } from './PriceListTable';
+import './MainTradeView.css';
 
 interface MainTradeViewProps {
   onViewChange: (view: ViewType) => void;
@@ -23,7 +26,6 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
     dumpCargo,
     difficulty,
     tradeMode,
-    setTradeMode,
   } = useSpaceTraderGame();
 
   const [selectedGoodId, setSelectedGoodId] = useState<number | null>(null);
@@ -51,103 +53,29 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
 
       <div className="trade-table-authentic">
         {tradeMode === 'price-list' ? (
-          <div style={{ padding: '8px' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '8px',
-                fontWeight: 'bold',
-              }}
-            >
-              <span>{SystemNames[system.nameIndex]}</span>
-              <span>⬅ ⚖ ➡</span>
-            </div>
-            <p style={{ fontStyle: 'italic', marginBottom: '8px' }}>Nothing special</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-              {TradeItems.map((item) => (
-                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>{item.name}</span>
-                  <span style={{ fontFamily: 'monospace' }}>
-                    {buyPrices[item.id] > 0
-                      ? `+${buyPrices[item.id] - item.priceLowTech} cr.`
-                      : '---'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PriceListTable
+            systemName={SystemNames[system.nameIndex]}
+            buyPrices={buyPrices}
+            tradeItems={TradeItems}
+          />
         ) : (
-          TradeItems.map((item) => {
-            const price = tradeMode === 'buy' ? buyPrices[item.id] : sellPrices[item.id];
-            const qtyInShip = ship.cargo[item.id];
-            const qtyInSystem = systemQuantities[item.id];
-            const isNotSold = price === 0;
-
-            return (
-              <div key={item.id} className="trade-row-authentic">
-                {isNotSold ? (
-                  <div />
-                ) : (
-                  <div className="qty-box" onClick={() => setSelectedGoodId(item.id)}>
-                    {tradeMode === 'buy' ? qtyInSystem : qtyInShip}
-                  </div>
-                )}
-                <div className="item-name-authentic">{item.name}</div>
-                {!isNotSold ? (
-                  <>
-                    <div
-                      className="all-btn-authentic"
-                      onClick={() => {
-                        if (tradeMode === 'buy') {
-                          const canAfford = Math.floor(credits / price);
-                          const amount = Math.min(
-                            qtyInSystem,
-                            canAfford,
-                            shipType.cargoBays - usedCargo,
-                          );
-                          if (amount > 0) buyGood(item.id, amount);
-                        } else {
-                          if (qtyInShip > 0) sellGood(item.id, qtyInShip);
-                        }
-                      }}
-                    >
-                      {tradeMode === 'buy' ? 'Max' : 'All'}
-                    </div>
-                    <div className="price-text-authentic">{price} cr.</div>
-                  </>
-                ) : tradeMode === 'sell' ? (
-                  <>
-                    <div
-                      className="all-btn-authentic"
-                      title={`Dump cost: ${5 * (difficulty + 1)} cr/unit`}
-                      onClick={() => {
-                        if (qtyInShip > 0) dumpCargo(item.id, qtyInShip);
-                      }}
-                    >
-                      Dump
-                    </div>
-                    <div
-                      className="price-text-authentic"
-                      style={{ fontStyle: 'italic', opacity: 0.7 }}
-                    >
-                      no trade
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div />
-                    <div
-                      className="price-text-authentic"
-                      style={{ fontStyle: 'italic', opacity: 0.7 }}
-                    >
-                      not sold
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })
+          TradeItems.map((item) => (
+            <TradeRow
+              key={item.id}
+              item={item}
+              price={tradeMode === 'buy' ? buyPrices[item.id] : sellPrices[item.id]}
+              qtyInShip={ship.cargo[item.id]}
+              qtyInSystem={systemQuantities[item.id]}
+              tradeMode={tradeMode as 'buy' | 'sell'}
+              credits={credits}
+              shipType={shipType}
+              usedCargo={usedCargo}
+              difficulty={difficulty}
+              onSelect={setSelectedGoodId}
+              onAction={tradeMode === 'buy' ? buyGood : sellGood}
+              onDump={dumpCargo}
+            />
+          ))
         )}
       </div>
 

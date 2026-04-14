@@ -22,7 +22,7 @@ export function PalmDesktop() {
   const [appTitle, setAppTitle] = useState<string | undefined>(undefined);
   const [shortcuts, setShortcuts] = useState<AppShortcut[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [encounterActive, setEncounterActive] = useState(false);
+  const [hideStatusBar, setHideStatusBar] = useState(false);
 
   const openApp = (app: string) => {
     setCurrentApp(app);
@@ -50,7 +50,7 @@ export function PalmDesktop() {
   return (
     <PalmFrame onHomeClick={goHome} onMenuClick={handleMenuClick} onAppButtonClick={openApp}>
       <div className="flex h-full w-full flex-col bg-white">
-        {!encounterActive && (
+        {!hideStatusBar && (
           <PalmStatusBar
             appTitle={currentApp !== 'launcher' ? appTitle : undefined}
             showCategory={SHOWS_CATEGORY.has(currentApp)}
@@ -68,7 +68,7 @@ export function PalmDesktop() {
               TitleBar={null}
               onTitleChange={setAppTitle}
               onShortcutsChange={setShortcuts}
-              onEncounterActiveChange={setEncounterActive}
+              onHideStatusBarChange={setHideStatusBar}
               menuOpen={menuOpen}
               onMenuClose={() => setMenuOpen(false)}
             />

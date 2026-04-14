@@ -22,6 +22,7 @@ export const InformationButton: React.FC<InformationButtonProps> = ({ onClick, s
         justifyContent: 'center',
         fontSize: '14px',
         fontWeight: 'bold',
+        fontFamily: "'Times New Roman', Times, serif",
         cursor: 'pointer',
         ...style,
       }}

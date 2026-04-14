@@ -56,7 +56,7 @@ export const GameModal: React.FC<GameModalProps> = ({
           style={{
             background: '#330099',
             color: '#fff',
-            padding: '4px 8px',
+            padding: '1px 2px',
             fontWeight: 'bold',
             fontSize: '14px',
             flexShrink: 0,
@@ -88,7 +88,7 @@ export const GameModal: React.FC<GameModalProps> = ({
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            overflowY: 'auto',
+            overflowY: 'hidden',
           }}
         >
           <div style={{ flex: 1 }}>{children}</div>

@@ -29,7 +29,7 @@ interface SpaceTraderGameProps {
   TitleBar?: React.ComponentType<TitleBarProps> | null;
   onTitleChange?: (title: string) => void;
   onShortcutsChange?: (shortcuts: AppShortcut[]) => void;
-  onEncounterActiveChange?: (active: boolean) => void;
+  onHideStatusBarChange?: (hide: boolean) => void;
   menuOpen?: boolean;
   onMenuClose?: () => void;
 }
@@ -40,7 +40,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   TitleBar = PalmHeader,
   onTitleChange,
   onShortcutsChange,
-  onEncounterActiveChange,
+  onHideStatusBarChange,
   menuOpen = false,
   onMenuClose,
 }) => {
@@ -88,8 +88,9 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   }, [activeView, setTradeMode, onShortcutsChange]);
 
   useEffect(() => {
-    onEncounterActiveChange?.(!!encounter);
-  }, [encounter, onEncounterActiveChange]);
+    const modalActive = !!encounter || activeView === 'newgame' || activeView === 'shipInfo';
+    onHideStatusBarChange?.(modalActive);
+  }, [encounter, activeView, onHideStatusBarChange]);
 
   useEffect(() => {
     if (!onTitleChange) return;

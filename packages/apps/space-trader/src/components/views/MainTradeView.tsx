@@ -86,9 +86,13 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
 
             return (
               <div key={item.id} className="trade-row-authentic">
-                <div className="qty-box" onClick={() => setSelectedGoodId(item.id)}>
-                  {tradeMode === 'buy' ? qtyInSystem : qtyInShip}
-                </div>
+                {isNotSold ? (
+                  <div />
+                ) : (
+                  <div className="qty-box" onClick={() => setSelectedGoodId(item.id)}>
+                    {tradeMode === 'buy' ? qtyInSystem : qtyInShip}
+                  </div>
+                )}
                 <div className="item-name-authentic">{item.name}</div>
                 {!isNotSold ? (
                   <>
@@ -112,12 +116,14 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
                     </div>
                     <div className="price-text-authentic">{price} cr.</div>
                   </>
-                ) : tradeMode === 'sell' && qtyInShip > 0 ? (
+                ) : tradeMode === 'sell' ? (
                   <>
                     <div
                       className="all-btn-authentic"
                       title={`Dump cost: ${5 * (difficulty + 1)} cr/unit`}
-                      onClick={() => dumpCargo(item.id, qtyInShip)}
+                      onClick={() => {
+                        if (qtyInShip > 0) dumpCargo(item.id, qtyInShip);
+                      }}
                     >
                       Dump
                     </div>
@@ -125,21 +131,19 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
                       className="price-text-authentic"
                       style={{ fontStyle: 'italic', opacity: 0.7 }}
                     >
-                      -{5 * (difficulty + 1)} cr
+                      no trade
                     </div>
                   </>
                 ) : (
-                  <div
-                    style={{
-                      gridColumn: 'span 2',
-                      textAlign: 'right',
-                      paddingRight: '2px',
-                      fontStyle: 'italic',
-                      opacity: 0.7,
-                    }}
-                  >
-                    not sold
-                  </div>
+                  <>
+                    <div />
+                    <div
+                      className="price-text-authentic"
+                      style={{ fontStyle: 'italic', opacity: 0.7 }}
+                    >
+                      not sold
+                    </div>
+                  </>
                 )}
               </div>
             );

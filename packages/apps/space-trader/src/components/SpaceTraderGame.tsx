@@ -128,7 +128,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'pricelist' && <AveragePriceListView onViewChange={setActiveView} />}
         {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
         {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
-        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
+        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('system')} />}
         {activeView === 'buyShip' && <BuyShipListView onViewChange={setActiveView} />}
         {activeView === 'shipInfo' && <ShipInformationView onViewChange={setActiveView} />}
 

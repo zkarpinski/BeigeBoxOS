@@ -1,38 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
-import { SystemNames, ViewType, WAR } from '../../logic/DataTypes';
+import { SystemNames, ViewType, WAR, ShipTypes } from '../../logic/DataTypes';
 import { useTitleBar } from '../TitleBarContext';
 
 interface GalacticChartViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
+// Coordinate space for projection math — SVG scales to fill the container
 const CHART_W = 264;
-const CHART_H = 230;
+const CHART_H = 220;
 const CX = CHART_W / 2;
 const CY = CHART_H / 2;
+// Fraction of min(CX, CY) used as warp-circle radius on screen.
+// 0.65 matches the original PalmOS short-range chart proportions.
+const ZOOM = 0.65;
 
 function dist(ax: number, ay: number, bx: number, by: number) {
   return Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
 }
 
-// Compute a label anchor offset so names don't sit on top of the dot
-function labelOffset(sx: number, sy: number): { dx: number; dy: number } {
-  const angle = Math.atan2(sy - CY, sx - CX);
-  const r = 10;
-  return {
-    dx: Math.cos(angle) * r,
-    dy: Math.sin(angle) * r,
-  };
-}
+// Label sits above the dot. With font-size 14 and dominantBaseline="auto", the
+// text baseline is at sy+LABEL_DY. Descenders extend ~3px below baseline and
+// the filter adds ~2px padding, so the white box bottom ≈ sy+LABEL_DY+5.
+// Dot radius is 4.5, so we need LABEL_DY+5 < -4.5, i.e. LABEL_DY < -9.5.
+// -14 gives a comfortable 4-5px gap between the label box and the dot edge.
+const LABEL_DY = -14;
 
 export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, travelTo, ship } = useSpaceTraderGame();
-  const [selectedSystem, setSelectedSystem] = useState<number>(currentSystem);
+  const {
+    systems,
+    currentSystem,
+    setSelectedMapSystem,
+    selectedMapSystemId,
+    ship,
+    optChartToInfo,
+    optShowRangeToTracked,
+  } = useSpaceTraderGame();
 
   const current = systems[currentSystem];
-  const target = systems[selectedSystem] ?? systems[0];
 
   if (!current || !systems.length) {
     return (
@@ -58,15 +65,21 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
       </div>
     );
   }
-  const targetDist = dist(target.x, target.y, current.x, current.y);
-  const canTravel = targetDist > 0 && targetDist <= ship.fuel;
 
-  // Scale so that 2x the warp range fits within the chart (warp circle at ~45% radius)
-  const fuelRange = Math.max(ship.fuel, 1);
-  const scale = (Math.min(CX, CY) * 0.45) / fuelRange;
-  const warpRadius = fuelRange * scale;
+  const selectedSystem = selectedMapSystemId ?? currentSystem;
 
-  // Project a system to SVG coords relative to current system
+  const handleMapClick = (idx: number) => {
+    setSelectedMapSystem(idx);
+    onViewChange(optChartToInfo ? 'system' : 'target');
+  };
+
+  // ── SHORT RANGE CHART ──
+  // Scale is fixed to the full tank capacity so visible systems never change.
+  // The warp circle shrinks with current fuel.
+  const maxFuel = Math.max(ShipTypes[ship.type]?.fuelTanks ?? 1, 1);
+  const scale = (Math.min(CX, CY) * ZOOM) / maxFuel;
+  const warpRadius = Math.max(ship.fuel, 0) * scale;
+
   const project = (sx: number, sy: number) => ({
     x: CX + (sx - current.x) * scale,
     y: CY + (sy - current.y) * scale,
@@ -79,43 +92,62 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
     >
       {TitleBar && <TitleBar title="Short Range Chart" onViewChange={onViewChange} />}
 
-      <div style={{ flex: 1, overflow: 'hidden', background: 'white' }}>
+      <div style={{ flex: 1, overflow: 'hidden', background: 'white', position: 'relative' }}>
         <svg
-          width={CHART_W}
-          height={CHART_H}
+          width="100%"
+          height="100%"
           viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display: 'block', background: 'white' }}
         >
           <defs>
             <clipPath id="chart-clip">
               <rect x="0" y="0" width={CHART_W} height={CHART_H} />
             </clipPath>
+            {/* White background box behind each system name label */}
+            <filter id="label-bg" x="-5%" y="-15%" width="110%" height="140%">
+              <feFlood floodColor="white" result="bg" />
+              <feMerge>
+                <feMergeNode in="bg" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          {/* Warp range circle */}
           <circle cx={CX} cy={CY} r={warpRadius} fill="none" stroke="#000" strokeWidth="1" />
+          {optShowRangeToTracked &&
+            selectedMapSystemId !== null &&
+            selectedMapSystemId !== currentSystem &&
+            (() => {
+              const tracked = systems[selectedMapSystemId];
+              if (!tracked) return null;
+              const { x: tx, y: ty } = project(tracked.x, tracked.y);
+              const rangeR = maxFuel * scale;
+              return (
+                <circle
+                  cx={tx}
+                  cy={ty}
+                  r={rangeR}
+                  fill="none"
+                  stroke="#555"
+                  strokeWidth="0.75"
+                  strokeDasharray="3,2"
+                />
+              );
+            })()}
 
-          {/* Systems */}
           <g clipPath="url(#chart-clip)">
             {systems.map((s, idx) => {
               if (idx === currentSystem) return null;
               const { x: sx, y: sy } = project(s.x, s.y);
-
               const inRange = dist(s.x, s.y, current.x, current.y) <= ship.fuel;
               const isSelected = idx === selectedSystem;
               const dotColor = s.status === WAR ? '#cc4400' : '#33aa00';
-              const { dx, dy } = labelOffset(sx, sy);
-
-              // Anchor text away from center
-              const textX = sx + dx;
-              const textY = sy + dy;
-              const anchor = dx > 0 ? 'start' : dx < -2 ? 'end' : 'middle';
-              const baseline = dy > 0 ? 'hanging' : dy < -2 ? 'auto' : 'middle';
 
               return (
                 <g
                   key={idx}
                   className="map-dot"
-                  onClick={() => setSelectedSystem(idx)}
+                  onClick={() => handleMapClick(idx)}
                   style={{ cursor: 'pointer' }}
                 >
                   {isSelected && (
@@ -136,13 +168,14 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
                     fill={inRange ? dotColor : '#888'}
                   />
                   <text
-                    x={textX}
-                    y={textY}
-                    fontSize="9"
+                    x={sx}
+                    y={sy + LABEL_DY}
+                    fontSize="14"
                     fontFamily="'Courier New', monospace"
-                    fill="#000"
-                    textAnchor={anchor}
-                    dominantBaseline={baseline}
+                    fill="#000000"
+                    textAnchor="middle"
+                    dominantBaseline="auto"
+                    filter="url(#label-bg)"
                   >
                     {SystemNames[s.nameIndex]}
                   </text>
@@ -150,6 +183,7 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
               );
             })}
           </g>
+
           {/* Current system — blue diamond */}
           <polygon
             points={`${CX},${CY - 9} ${CX + 7},${CY} ${CX},${CY + 9} ${CX - 7},${CY}`}
@@ -160,43 +194,6 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
             fill="#6688ff"
           />
         </svg>
-      </div>
-
-      {/* Travel button strip */}
-      <div
-        style={{
-          borderTop: '1px solid #000',
-          padding: '3px 4px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#f0f0f0',
-          flexShrink: 0,
-        }}
-      >
-        <span style={{ fontSize: '10px', fontFamily: 'monospace' }}>
-          {selectedSystem === currentSystem
-            ? 'Select a system'
-            : `${SystemNames[target.nameIndex]} — ${Math.floor(targetDist)} parsecs`}
-        </span>
-        <button
-          disabled={!canTravel}
-          onClick={() => {
-            travelTo(selectedSystem);
-            onViewChange('trade');
-          }}
-          style={{
-            fontSize: '10px',
-            fontFamily: 'monospace',
-            padding: '2px 6px',
-            background: canTravel ? '#1A1A8C' : '#ccc',
-            color: canTravel ? 'white' : '#888',
-            border: '1px solid #000',
-            cursor: canTravel ? 'pointer' : 'default',
-          }}
-        >
-          Warp
-        </button>
       </div>
     </div>
   );

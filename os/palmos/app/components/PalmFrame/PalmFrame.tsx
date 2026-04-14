@@ -106,21 +106,33 @@ export function PalmFrame({
 
         {/* Screen — on mobile, strip bezel chrome and scale the fixed 264px content up */}
         {isMobile ? (
-          <div
-            style={{
-              width: '100%',
-              height: `${SCREEN_PX * mobileScale}px`,
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              className="palm-screen"
-              style={{ transform: `scale(${mobileScale})`, transformOrigin: 'top left' }}
-            >
-              {children}
+          <>
+            {/* Mobile toolbar: sits above the screen, holds the expand button */}
+            <div className="palm-mobile-toolbar">
+              <button
+                onClick={toggleFullscreen}
+                title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+                className="palm-mobile-toolbar-btn"
+              >
+                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </button>
             </div>
-          </div>
+            <div
+              style={{
+                width: '100%',
+                height: `${SCREEN_PX * mobileScale}px`,
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}
+            >
+              <div
+                className="palm-screen"
+                style={{ transform: `scale(${mobileScale})`, transformOrigin: 'top left' }}
+              >
+                {children}
+              </div>
+            </div>
+          </>
         ) : (
           <div className="palm-bezel">
             <div className="palm-screen">{children}</div>

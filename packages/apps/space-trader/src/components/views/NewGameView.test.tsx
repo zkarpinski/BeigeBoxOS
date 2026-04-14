@@ -16,51 +16,80 @@ describe('NewGameView Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders correctly with default fields', () => {
+  it('renders with default name and 16 skill points', () => {
     render(<NewGameView onStart={jest.fn()} />);
     expect(screen.getByText('Jameson')).toBeInTheDocument();
-    expect(screen.getByText('Skill Points: 0 remaining')).toBeInTheDocument();
+    expect(screen.getByText('16')).toBeInTheDocument(); // extraPoints remaining
   });
 
-  it('allows decreasing skill and updates points left', () => {
+  it('renders "New Commander" title', () => {
     render(<NewGameView onStart={jest.fn()} />);
-    const pilotMinus = screen.getAllByText('-')[0]; // Pilot
-    fireEvent.click(pilotMinus);
-    expect(screen.getByText('Skill Points: 1 remaining')).toBeInTheDocument();
+    expect(screen.getByText('New Commander')).toBeInTheDocument();
   });
 
-  it('increases points back when clicking plus after decrease', () => {
+  it('renders default difficulty as Normal', () => {
     render(<NewGameView onStart={jest.fn()} />);
-    const pilotMinus = screen.getAllByText('-')[0];
-    fireEvent.click(pilotMinus);
-    const pilotPlus = screen.getAllByText('+')[0];
-    fireEvent.click(pilotPlus);
-    expect(screen.getByText('Skill Points: 0 remaining')).toBeInTheDocument();
+    expect(screen.getByText('Normal')).toBeInTheDocument();
   });
 
-  it('calls startNewGame when clicking Start Trading', () => {
+  it('spending a skill point decreases remaining count', () => {
     render(<NewGameView onStart={jest.fn()} />);
-    const nameSpan = screen.getByText('Jameson');
+    fireEvent.click(screen.getAllByText('+')[0]); // Difficulty + (first +)
+    // Difficulty changed; skill points unchanged at 16
+    expect(screen.getByText('16')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByText('+')[1]); // Pilot +1 (second +)
+    expect(screen.getByText('15')).toBeInTheDocument();
+  });
 
-    // Open keyboard
-    fireEvent.click(nameSpan);
+  it('cannot decrease a skill below 1', () => {
+    render(<NewGameView onStart={jest.fn()} />);
+    fireEvent.click(screen.getAllByText('-')[1]); // Pilot - (index 1, after difficulty -)
+    expect(screen.getByText('16')).toBeInTheDocument(); // unchanged
+  });
 
-    // Press Z
-    const zKey = screen.getByText('z');
-    fireEvent.click(zKey);
+  it('cannot increase a skill above 10', () => {
+    render(<NewGameView onStart={jest.fn()} />);
+    for (let i = 0; i < 9; i++) {
+      fireEvent.click(screen.getAllByText('+')[1]); // Pilot + (9 clicks: 1→10)
+    }
+    expect(screen.getByText('7')).toBeInTheDocument(); // 16 - 9 = 7 extraPoints
+    fireEvent.click(screen.getAllByText('+')[1]); // 11th click should be blocked
+    expect(screen.getByText('7')).toBeInTheDocument(); // unchanged
+  });
 
-    // Press Done
-    const doneBtn = screen.getByText('Done');
-    fireEvent.click(doneBtn);
+  it('cannot spend more than 16 skill points', () => {
+    render(<NewGameView onStart={jest.fn()} />);
+    // Spend 9 on pilot (1→10), then 7 on fighter (1→8) = 16 total
+    for (let i = 0; i < 9; i++) {
+      fireEvent.click(screen.getAllByText('+')[1]); // Pilot +
+    }
+    for (let i = 0; i < 7; i++) {
+      fireEvent.click(screen.getAllByText('+')[2]); // Fighter +
+    }
+    expect(screen.getByText('0')).toBeInTheDocument();
+    // Further clicks should be blocked
+    fireEvent.click(screen.getAllByText('+')[3]); // Trader +
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
 
-    const startBtn = screen.getAllByText('Start Trading')[0];
-    fireEvent.click(startBtn);
-
-    expect(mockStore.startNewGame).toHaveBeenCalledWith('Jamesonz', 2, {
-      pilot: 4,
-      fighter: 4,
-      trader: 4,
-      engineer: 4,
+  it('calls startNewGame with correct args when OK is clicked', () => {
+    render(<NewGameView onStart={jest.fn()} />);
+    fireEvent.click(screen.getByText('OK'));
+    expect(mockStore.startNewGame).toHaveBeenCalledWith('Jameson', 2, {
+      pilot: 1,
+      fighter: 1,
+      trader: 1,
+      engineer: 1,
     });
+  });
+
+  it('difficulty changes with stepper buttons', () => {
+    render(<NewGameView onStart={jest.fn()} />);
+    // First '+' in the DOM is difficulty's plus button (after name)
+    const allPlus = screen.getAllByText('+');
+    // Difficulty stepper is the first Stepper rendered (index 0 among steppers)
+    // But difficulty minus/plus appear before skill minus/plus
+    fireEvent.click(allPlus[0]); // Difficulty: Normal → Hard
+    expect(screen.getByText('Hard')).toBeInTheDocument();
   });
 });

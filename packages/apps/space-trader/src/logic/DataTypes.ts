@@ -8,7 +8,7 @@ export const MAXSHIPTYPE = 10;
 export const EXTRASHIPS = 5;
 export const MAXWEAPONTYPE = 3;
 export const EXTRAWEAPONS = 1;
-export const MAXSHIELDTYPE = 2;
+export const MAXSHIELDTYPE = 3;
 export const EXTRASHIELDS = 1;
 export const MAXGADGETTYPE = 5;
 export const EXTRAGADGETS = 1;
@@ -535,6 +535,7 @@ export interface Shield {
 export const Shields: Shield[] = [
   { id: 0, name: 'Energy shield', power: 100, price: 5000, techLevel: 5, chance: 70 },
   { id: 1, name: 'Reflective shield', power: 200, price: 20000, techLevel: 6, chance: 30 },
+  { id: 2, name: 'Lightning shield', power: 350, price: 45000, techLevel: 8, chance: 15 },
 ];
 
 export interface Gadget {
@@ -550,8 +551,11 @@ export const Gadgets: Gadget[] = [
   { id: 2, name: 'Navigating system', price: 15000, techLevel: 6, chance: 20 },
   { id: 3, name: 'Targeting system', price: 25000, techLevel: 6, chance: 20 },
   { id: 4, name: 'Cloaking device', price: 100000, techLevel: 7, chance: 5 },
-  { id: 5, name: 'Escape pod', price: 5000, techLevel: 5, chance: 100 },
 ];
+
+// Escape pod is a separate personal item, not a gadget slot (matches original spacetrader.h)
+export const ESCAPE_POD_PRICE = 5000;
+export const ESCAPE_POD_TECH_LEVEL = 5;
 
 export interface Politics {
   id: number;
@@ -952,16 +956,42 @@ export interface SolarSystem {
   specialResources: number;
   size: number;
   visited: boolean;
+  // Persistent market quantities — initialized at galaxy creation, depleted by trading
+  qty?: number[];
+  // Wormhole destination system index (-1 if not a wormhole system)
+  wormholeDest?: number;
 }
 
 export interface PlayerShip {
   type: number;
   cargo: number[]; // 10 indexes
-  weapon: number[]; // 3 indexes (-1 if empty)
-  shield: number[]; // 3 indexes (-1 if empty)
+  weapon: number[]; // 3 indexes (-1 if empty), stores weapon type ID
+  shield: number[]; // 3 indexes (-1 if empty), stores shield type ID
+  shieldStrength: number[]; // current health per shield slot (max = Shields[shield[i]].power)
   gadget: number[]; // 3 indexes (-1 if empty)
+  escapePod: boolean; // separate flag, not a gadget slot (matches original spacetrader.h)
   fuel: number;
   hull: number;
+}
+
+export interface NPCEncounterData {
+  ship: PlayerShip;
+  fighterSkill: number;
+  pilotSkill: number;
+  engineerSkill: number;
+  bounty: number;
+  lootCargo: number[];
+}
+
+export interface ActiveEncounter {
+  type: string;
+  npc: NPCEncounterData;
+  log: string[];
+  round: number;
+  resolved: boolean;
+  playerWon: boolean;
+  clickNumber: number;
+  destinationSystemIdx: number;
 }
 
 export interface SaveGameType {
@@ -1005,4 +1035,17 @@ export const PoliceRecordTitles = [
   'Hero',
 ];
 
-export type ViewType = 'trade' | 'system' | 'ship' | 'map' | 'shipyard' | 'equipment' | 'newgame';
+export type ViewType =
+  | 'trade'
+  | 'system'
+  | 'ship'
+  | 'map'
+  | 'target'
+  | 'pricelist'
+  | 'shipyard'
+  | 'equipment'
+  | 'newgame'
+  | 'buyShip'
+  | 'shipInfo'
+  | 'options'
+  | 'options2';

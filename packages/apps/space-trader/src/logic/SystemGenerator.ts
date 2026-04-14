@@ -163,13 +163,26 @@ export function generateGalaxy() {
     { target: KRAVATSYSTEM, spec: WILDGETSOUT },
   ];
 
+  // Shuffle wormhole endpoint assignments (from NewGame.c)
+  for (let i = 0; i < wormholes.length; i++) {
+    const j = getRandom(MAXWORMHOLE);
+    const temp = wormholes[i];
+    wormholes[i] = wormholes[j];
+    wormholes[j] = temp;
+  }
+
   // Expose an extra property 'special' to track quests, just like original
-  const systemState = systems.map((s) => ({
-    ...s,
-    special: -1,
-    qty: new Array(10).fill(0),
-    countDown: 0,
-  }));
+  const systemState = systems.map((s, idx) => {
+    const wormholeIdx = wormholes.indexOf(idx);
+    return {
+      ...s,
+      special: -1,
+      qty: new Array(10).fill(0),
+      countDown: 0,
+      // Each wormhole system points to the next in the shuffled ring
+      wormholeDest: wormholeIdx >= 0 ? wormholes[(wormholeIdx + 1) % MAXWORMHOLE] : -1,
+    };
+  });
 
   for (const loc of specialLocations) {
     if (systemState[loc.target]) {

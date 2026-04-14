@@ -50,7 +50,11 @@
             "jsx": "react-jsx"
           }
         }
-      ]
+      ],
+      "\\.css$": "<rootDir>/src/test/cssTransform.js"
+    },
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/src/test/cssTransform.js"
     }
   }
 }

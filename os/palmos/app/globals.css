@@ -527,9 +527,9 @@ input::placeholder {
     display: none;
   }
 
-  /* On mobile there's no dark background above the device, so pin the button to the viewport */
+  /* Desktop fullscreen button is hidden on mobile — replaced by palm-mobile-toolbar-btn */
   .palm-fullscreen-btn {
-    position: fixed;
+    display: none;
   }
 
   /* Silk area spans full width */
@@ -547,6 +547,40 @@ input::placeholder {
     margin-top: 0;
     padding: 10px;
     background: #333;
+  }
+}
+
+/* Mobile toolbar — bar above the screen containing the expand button */
+.palm-mobile-toolbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .palm-mobile-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 4px 8px;
+    background: #000;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .palm-mobile-toolbar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .palm-mobile-toolbar-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
   }
 }
 

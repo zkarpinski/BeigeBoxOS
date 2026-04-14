@@ -9,6 +9,12 @@ import { EquipmentView } from './views/EquipmentView';
 import { EncounterModal } from './views/EncounterModal';
 import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
+import { BuyShipListView } from './views/BuyShipListView';
+import { ShipInformationView } from './views/ShipInformationView';
+import { TargetSystemView } from './views/TargetSystemView';
+import { AveragePriceListView } from './views/AveragePriceListView';
+import { OptionsView } from './views/OptionsView';
+import { OptionsPage2View } from './views/OptionsPage2View';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
@@ -25,6 +31,7 @@ interface SpaceTraderGameProps {
   TitleBar?: React.ComponentType<TitleBarProps> | null;
   onTitleChange?: (title: string) => void;
   onShortcutsChange?: (shortcuts: AppShortcut[]) => void;
+  onHideStatusBarChange?: (hide: boolean) => void;
   menuOpen?: boolean;
   onMenuClose?: () => void;
 }
@@ -35,10 +42,11 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   TitleBar = PalmHeader,
   onTitleChange,
   onShortcutsChange,
+  onHideStatusBarChange,
   menuOpen = false,
   onMenuClose,
 }) => {
-  const { nameCommander, isGameOver, tradeMode, setTradeMode } = useSpaceTraderGame();
+  const { nameCommander, isGameOver, tradeMode, setTradeMode, encounter } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
 
@@ -82,6 +90,16 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   }, [activeView, setTradeMode, onShortcutsChange]);
 
   useEffect(() => {
+    const modalActive =
+      !!encounter ||
+      activeView === 'newgame' ||
+      activeView === 'shipInfo' ||
+      activeView === 'options' ||
+      activeView === 'options2';
+    onHideStatusBarChange?.(modalActive);
+  }, [encounter, activeView, onHideStatusBarChange]);
+
+  useEffect(() => {
     if (!onTitleChange) return;
     const titles: Record<ViewType, string> = {
       trade:
@@ -89,9 +107,15 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       system: 'System Info',
       ship: 'Commander Status',
       map: 'Short Range Chart',
-      shipyard: 'Shipyard',
+      target: 'Target System',
+      pricelist: 'Average Price List',
+      shipyard: 'Ship Yard',
       equipment: 'Equipment',
       newgame: 'Space Trader',
+      buyShip: 'Buy Ship',
+      shipInfo: 'Ship Information',
+      options: 'Options',
+      options2: 'Options',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);
@@ -109,9 +133,15 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
         {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
         {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
+        {activeView === 'target' && <TargetSystemView onViewChange={setActiveView} />}
+        {activeView === 'pricelist' && <AveragePriceListView onViewChange={setActiveView} />}
         {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
         {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
-        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}
+        {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('system')} />}
+        {activeView === 'buyShip' && <BuyShipListView onViewChange={setActiveView} />}
+        {activeView === 'shipInfo' && <ShipInformationView onViewChange={setActiveView} />}
+        {activeView === 'options' && <OptionsView onViewChange={setActiveView} />}
+        {activeView === 'options2' && <OptionsPage2View onViewChange={setActiveView} />}
 
         {isGameOver && <GameOverView />}
         <EncounterModal />

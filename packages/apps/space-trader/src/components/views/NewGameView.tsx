@@ -1,113 +1,171 @@
 import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
+import { GameModal } from '../modals/GameModal';
+import { InformationButton } from '../common/InformationButton';
 import { PalmKeyboard } from '../modals/PalmKeyboard';
 
 interface NewGameViewProps {
   onStart: () => void;
 }
 
+const DIFFICULTIES = ['Beginner', 'Easy', 'Normal', 'Hard', 'Impossible'];
+
+const stepBtnStyle: React.CSSProperties = {
+  width: '22px',
+  height: '22px',
+  border: '1px solid #555',
+  borderRadius: '5px',
+  background: '#f0f0f0',
+  fontSize: '14px',
+  lineHeight: 1,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  fontFamily: 'monospace',
+};
+
+const nameRowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '10px',
+  marginBottom: '15px',
+  fontSize: '14px',
+};
+
+const rowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '1px',
+  fontSize: '14px',
+};
+
+const labelStyle: React.CSSProperties = {
+  width: '90px',
+  flexShrink: 0,
+};
+
 export const NewGameView: React.FC<NewGameViewProps> = ({ onStart }) => {
   const { startNewGame } = useSpaceTraderGame();
   const [name, setName] = useState('Jameson');
-  const [skills, setSkills] = useState({ pilot: 4, fighter: 4, trader: 4, engineer: 4 });
-  const [difficulty, setDifficulty] = useState(2);
-
-  const totalPoints = skills.pilot + skills.fighter + skills.trader + skills.engineer;
-  const maxPoints = 16;
-
+  const [difficulty, setDifficulty] = useState(2); // Normal
+  const [extraPoints, setExtraPoints] = useState(16);
+  const [skills, setSkills] = useState({ pilot: 1, fighter: 1, trader: 1, engineer: 1 });
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
-  const handleSkillChange = (skill: keyof typeof skills, delta: number) => {
-    if (delta > 0 && totalPoints >= maxPoints) return;
+  const adjustSkill = (skill: keyof typeof skills, delta: number) => {
+    if (delta > 0 && extraPoints <= 0) return;
+    if (delta > 0 && skills[skill] >= 10) return;
     if (delta < 0 && skills[skill] <= 1) return;
-    setSkills({ ...skills, [skill]: skills[skill] + delta });
+    setSkills((prev) => ({ ...prev, [skill]: prev[skill] + delta }));
+    setExtraPoints((p) => p - delta);
   };
+
+  const adjustDifficulty = (delta: number) => {
+    setDifficulty((d) => Math.max(0, Math.min(4, d + delta)));
+  };
+
+  const Stepper = ({
+    value,
+    onMinus,
+    onPlus,
+  }: {
+    value: React.ReactNode;
+    onMinus: () => void;
+    onPlus: () => void;
+  }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <button style={stepBtnStyle} onClick={onMinus}>
+        -
+      </button>
+      <span style={{ minWidth: '25px', textAlign: 'center', fontFamily: 'monospace' }}>
+        {value}
+      </span>
+      <button style={stepBtnStyle} onClick={onPlus}>
+        +
+      </button>
+    </div>
+  );
 
   return (
     <>
-      <div className="new-game-view palm-window">
-        <div className="palm-header">New Game</div>
-
-        <div
-          className="palm-content"
-          style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}
-        >
-          <div>
-            <span>Name: </span>
-            <span
-              onClick={() => setIsKeyboardOpen(true)}
+      <GameModal
+        isOpen={true}
+        onClose={() => {}}
+        title="New Commander"
+        titleRight={
+          <InformationButton onClick={() => {}} style={{ position: 'relative', right: 'auto' }} />
+        }
+        footer={
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <button
+              onClick={() => {
+                startNewGame(name, difficulty, skills);
+                onStart();
+              }}
               style={{
-                display: 'inline-block',
-                width: '100px',
-                borderBottom: '1px dotted #000',
-                fontFamily: 'monospace',
-                minHeight: '16px',
-                paddingLeft: '2px',
+                padding: '4px 32px',
+                border: '2px solid #000',
+                borderRadius: '10px',
+                background: '#fff',
+                fontSize: '14px',
                 cursor: 'pointer',
+                fontFamily: 'monospace',
               }}
             >
-              {name}
-            </span>
+              OK
+            </button>
           </div>
-
-          <div className="skill-section">
-            <p>Skill Points: {maxPoints - totalPoints} remaining</p>
-            {Object.entries(skills).map(([s, val]) => (
-              <div
-                key={s}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '4px',
-                }}
-              >
-                <span style={{ textTransform: 'capitalize' }}>{s}:</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <button
-                    className="palm-btn-small"
-                    onClick={() => handleSkillChange(s as any, -1)}
-                  >
-                    -
-                  </button>
-                  <span style={{ width: '20px', textAlign: 'center' }}>{val}</span>
-                  <button className="palm-btn-small" onClick={() => handleSkillChange(s as any, 1)}>
-                    +
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <span>Difficulty: </span>
-            <select value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value))}>
-              <option value={0}>Beginner</option>
-              <option value={1}>Easy</option>
-              <option value={2}>Normal</option>
-              <option value={3}>Hard</option>
-              <option value={4}>Impossible</option>
-            </select>
-          </div>
-
-          <button
-            className="palm-btn-large"
+        }
+      >
+        {/* Name */}
+        <div style={nameRowStyle}>
+          <span style={labelStyle}>Name:</span>
+          <span
+            onClick={() => setIsKeyboardOpen(true)}
             style={{
-              marginTop: 'auto',
-              padding: '10px',
-              background: '#1A1A8C',
-              color: 'white',
-              fontWeight: 'bold',
-            }}
-            onClick={() => {
-              startNewGame(name, difficulty, skills);
-              onStart();
+              flex: 1,
+              borderBottom: '1px dotted #000',
+              fontFamily: 'monospace',
+              minHeight: '16px',
+              paddingLeft: '2px',
+              cursor: 'pointer',
             }}
           >
-            Start Trading
-          </button>
+            {name}
+          </span>
         </div>
-      </div>
+
+        {/* Difficulty */}
+        <div style={rowStyle}>
+          <span style={labelStyle}>Difficulty:</span>
+          <Stepper
+            value={DIFFICULTIES[difficulty]}
+            onMinus={() => adjustDifficulty(-1)}
+            onPlus={() => adjustDifficulty(1)}
+          />
+        </div>
+
+        {/* Skill points remaining */}
+        <div style={rowStyle}>
+          <span style={labelStyle}>Skill points:</span>
+          <span style={{ fontFamily: 'monospace', paddingLeft: '40px' }}>{extraPoints}</span>
+        </div>
+
+        {/* Individual skills */}
+        {(['pilot', 'fighter', 'trader', 'engineer'] as const).map((skill) => (
+          <div key={skill} style={rowStyle}>
+            <span style={labelStyle}>{skill.charAt(0).toUpperCase() + skill.slice(1)}:</span>
+            <Stepper
+              value={skills[skill]}
+              onMinus={() => adjustSkill(skill, -1)}
+              onPlus={() => adjustSkill(skill, 1)}
+            />
+          </div>
+        ))}
+      </GameModal>
+
       {isKeyboardOpen && (
         <PalmKeyboard
           initialValue={name}

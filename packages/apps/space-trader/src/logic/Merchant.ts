@@ -10,7 +10,7 @@ import {
 
 // Max Skill in Spacer Trader is 10
 const MAXSKILL = 10;
-const DUBIOUSSCORE = -20; // Depending on PoliceRecord, criminals pay more
+const DUBIOUSSCORE = -5; // Depending on PoliceRecord, criminals pay more (matches original spacetrader.h)
 
 const getRandom = (max: number) => Math.floor(Math.random() * max);
 
@@ -144,7 +144,7 @@ export function determineSystemPrices(
   for (const item of TradeItems) {
     if (buyPrices[item.id] > 0) {
       buyPrices[item.id] = Math.floor(
-        (buyPrices[item.id] * (103 + (MAXSKILL - traderSkill))) / 100,
+        (buyPrices[item.id] * (100 + (MAXSKILL - traderSkill))) / 100,
       );
       if (buyPrices[item.id] <= sellPrices[item.id]) {
         buyPrices[item.id] = sellPrices[item.id] + 1;

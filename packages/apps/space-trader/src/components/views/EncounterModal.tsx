@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, SystemNames, Weapons, Shields } from '../../logic/DataTypes';
 import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../../logic/Encounter';
@@ -134,6 +134,7 @@ const pillBtnBase: React.CSSProperties = {
 
 export const EncounterModal: React.FC = () => {
   const [showInfo, setShowInfo] = useState(false);
+  const lastActionRef = useRef<'attack' | 'flee' | null>(null);
   const {
     encounter,
     ship,
@@ -146,7 +147,32 @@ export const EncounterModal: React.FC = () => {
     bribePolice,
     lootNPC,
     tradeWithNPC,
+    optIgnoreDealingTraders,
+    optContinuousFight,
+    optAttackFleeing,
+    optTextualEncounters,
   } = useSpaceTraderGame();
+
+  // Continuous fight: auto-advance combat after each unresolved round
+  useEffect(() => {
+    if (!optContinuousFight || !encounter || encounter.resolved) return;
+    if (lastActionRef.current === null) return;
+    const action = lastActionRef.current;
+    const timer = setTimeout(() => {
+      if (action === 'attack') attackInEncounter();
+      else if (action === 'flee') fleeFromEncounter();
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [encounter, optContinuousFight, attackInEncounter, fleeFromEncounter]);
+
+  // Attack fleeing: when encounter resolves as NPC fled (playerWon=false, was attacking), auto-clear
+  useEffect(() => {
+    if (!optAttackFleeing || !encounter || !encounter.resolved || encounter.playerWon) return;
+    if (lastActionRef.current !== 'attack') return;
+    // NPC fled — clear immediately (auto-dismiss)
+    const timer = setTimeout(() => clearEncounter(), 400);
+    return () => clearTimeout(timer);
+  }, [encounter, optAttackFleeing, clearEncounter]);
 
   if (!encounter) return null;
 
@@ -206,12 +232,24 @@ export const EncounterModal: React.FC = () => {
         </>
       ) : (
         <>
-          <button style={pillBtnBase} onClick={attackInEncounter}>
+          <button
+            style={pillBtnBase}
+            onClick={() => {
+              lastActionRef.current = 'attack';
+              attackInEncounter();
+            }}
+          >
             Attack
           </button>
           {encounter.type === ENCOUNTER_PIRATE && (
             <>
-              <button style={pillBtnBase} onClick={fleeFromEncounter}>
+              <button
+                style={pillBtnBase}
+                onClick={() => {
+                  lastActionRef.current = 'flee';
+                  fleeFromEncounter();
+                }}
+              >
                 Flee
               </button>
               <button style={pillBtnBase} onClick={surrenderToEncounter}>
@@ -221,7 +259,13 @@ export const EncounterModal: React.FC = () => {
           )}
           {encounter.type === ENCOUNTER_POLICE && (
             <>
-              <button style={pillBtnBase} onClick={fleeFromEncounter}>
+              <button
+                style={pillBtnBase}
+                onClick={() => {
+                  lastActionRef.current = 'flee';
+                  fleeFromEncounter();
+                }}
+              >
                 Flee
               </button>
               <button style={pillBtnBase} onClick={surrenderToEncounter}>
@@ -237,9 +281,11 @@ export const EncounterModal: React.FC = () => {
               <button style={pillBtnBase} onClick={surrenderToEncounter}>
                 Ignore
               </button>
-              <button style={pillBtnBase} onClick={tradeWithNPC}>
-                Trade
-              </button>
+              {!optIgnoreDealingTraders && (
+                <button style={pillBtnBase} onClick={tradeWithNPC}>
+                  Trade
+                </button>
+              )}
             </>
           )}
         </>
@@ -304,36 +350,38 @@ export const EncounterModal: React.FC = () => {
         infoPanel
       ) : (
         <>
-          {/* Ship sprites + encounter icon */}
-          <div style={{ position: 'relative', marginBottom: '12px' }}>
-            {/* Encounter type icon — top right */}
-            <div style={{ position: 'absolute', top: 0, right: 0 }}>
-              <EncounterIcon type={encounter.type} />
+          {/* Ship sprites + encounter icon (hidden in textual mode) */}
+          {!optTextualEncounters && (
+            <div style={{ position: 'relative', marginBottom: '12px' }}>
+              {/* Encounter type icon — top right */}
+              <div style={{ position: 'absolute', top: 0, right: 0 }}>
+                <EncounterIcon type={encounter.type} />
+              </div>
+              {/* Ships side by side */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-around',
+                  paddingTop: '4px',
+                }}
+              >
+                <ColoredShip
+                  spriteIndex={ship.type}
+                  scale={2}
+                  baseFilter={FILTER_BLUE}
+                  damageRatio={playerDamageRatio}
+                />
+                <ColoredShip
+                  spriteIndex={encounter.npc.ship.type}
+                  scale={2}
+                  baseFilter={FILTER_GREEN}
+                  damageRatio={npcDamageRatio}
+                  flip
+                />
+              </div>
             </div>
-            {/* Ships side by side */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-around',
-                paddingTop: '4px',
-              }}
-            >
-              <ColoredShip
-                spriteIndex={ship.type}
-                scale={2}
-                baseFilter={FILTER_BLUE}
-                damageRatio={playerDamageRatio}
-              />
-              <ColoredShip
-                spriteIndex={encounter.npc.ship.type}
-                scale={2}
-                baseFilter={FILTER_GREEN}
-                damageRatio={npcDamageRatio}
-                flip
-              />
-            </div>
-          </div>
+          )}
 
           {/* Narrative text */}
           <div style={{ marginBottom: '8px' }}>

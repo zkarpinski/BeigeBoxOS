@@ -8,8 +8,10 @@ interface TradeRowProps {
   qtyInSystem: number;
   tradeMode: 'buy' | 'sell';
   credits: number;
+  effectiveCredits: number;
   shipType: ShipType;
   usedCargo: number;
+  effectiveFreeBays: number;
   difficulty: number;
   onSelect: (id: number) => void;
   onAction: (id: number, amount: number) => void;
@@ -23,8 +25,10 @@ export const TradeRow: React.FC<TradeRowProps> = ({
   qtyInSystem,
   tradeMode,
   credits,
+  effectiveCredits,
   shipType,
   usedCargo,
+  effectiveFreeBays,
   difficulty,
   onSelect,
   onAction,
@@ -48,8 +52,8 @@ export const TradeRow: React.FC<TradeRowProps> = ({
             className="all-btn-authentic"
             onClick={() => {
               if (tradeMode === 'buy') {
-                const canAfford = Math.floor(credits / price);
-                const amount = Math.min(qtyInSystem, canAfford, shipType.cargoBays - usedCargo);
+                const canAfford = Math.floor(effectiveCredits / price);
+                const amount = Math.min(qtyInSystem, canAfford, effectiveFreeBays);
                 if (amount > 0) onAction(item.id, amount);
               } else {
                 if (qtyInShip > 0) onAction(item.id, qtyInShip);

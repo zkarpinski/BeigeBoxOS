@@ -1046,4 +1046,6 @@ export type ViewType =
   | 'equipment'
   | 'newgame'
   | 'buyShip'
-  | 'shipInfo';
+  | 'shipInfo'
+  | 'options'
+  | 'options2';

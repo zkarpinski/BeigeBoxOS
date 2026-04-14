@@ -26,6 +26,8 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
     dumpCargo,
     difficulty,
     tradeMode,
+    reserveBays,
+    optReserveMoney,
   } = useSpaceTraderGame();
 
   const [selectedGoodId, setSelectedGoodId] = useState<number | null>(null);
@@ -35,6 +37,9 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
 
   const usedCargo = ship.cargo.reduce((a: number, b: number) => a + b, 0);
   const shipType = ShipTypes[ship.type];
+  const reserveCredits = optReserveMoney ? shipType.fuelTanks * shipType.costOfFuel : 0;
+  const effectiveCredits = Math.max(0, credits - reserveCredits);
+  const effectiveFreeBays = Math.max(0, shipType.cargoBays - usedCargo - reserveBays);
 
   return (
     <div className="palm-window">
@@ -68,8 +73,10 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
               qtyInSystem={systemQuantities[item.id]}
               tradeMode={tradeMode as 'buy' | 'sell'}
               credits={credits}
+              effectiveCredits={effectiveCredits}
               shipType={shipType}
               usedCargo={usedCargo}
+              effectiveFreeBays={effectiveFreeBays}
               difficulty={difficulty}
               onSelect={setSelectedGoodId}
               onAction={tradeMode === 'buy' ? buyGood : sellGood}
@@ -95,7 +102,7 @@ export const MainTradeView: React.FC<MainTradeViewProps> = ({ onViewChange }) =>
             tradeMode === 'buy' ? systemQuantities[selectedGoodId] : ship.cargo[selectedGoodId]
           }
           maxAffordable={
-            tradeMode === 'buy' ? Math.floor(credits / buyPrices[selectedGoodId]) : 999
+            tradeMode === 'buy' ? Math.floor(effectiveCredits / buyPrices[selectedGoodId]) : 999
           }
           onConfirm={(amount) => {
             if (tradeMode === 'buy') buyGood(selectedGoodId, amount);

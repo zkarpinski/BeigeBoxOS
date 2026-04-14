@@ -3,6 +3,7 @@ import { SolarSystem, ShipTypes } from '../DataTypes';
 import { generateGalaxy } from '../SystemGenerator';
 import { generateSystemQuantities, determineSystemPrices } from '../Merchant';
 import { processWarp } from '../domain/travel';
+import { ENCOUNTER_POLICE, ENCOUNTER_PIRATE, ENCOUNTER_TRADER } from '../Encounter';
 import { SpaceTraderState, UniverseSlice } from './types';
 
 export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], UniverseSlice> = (
@@ -97,24 +98,40 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       debt: state.debt,
     });
 
-    // Auto-fuel and auto-repair on arrival (OG behaviour when options enabled)
     const arrivedShip = { ...result.ship };
-    let creditsAfter = state.credits; // credits aren't touched by processWarp directly
+    let creditsAfter = state.credits;
     const arrivedType = ShipTypes[arrivedShip.type];
 
-    const fuelNeeded = arrivedType.fuelTanks - arrivedShip.fuel;
-    const fuelCostTotal = fuelNeeded * arrivedType.costOfFuel;
-    if (fuelNeeded > 0 && creditsAfter >= fuelCostTotal) {
-      arrivedShip.fuel = arrivedType.fuelTanks;
-      creditsAfter -= fuelCostTotal;
+    if (state.optAutoFuel) {
+      const fuelNeeded = arrivedType.fuelTanks - arrivedShip.fuel;
+      const fuelCostTotal = fuelNeeded * arrivedType.costOfFuel;
+      if (fuelNeeded > 0 && creditsAfter >= fuelCostTotal) {
+        arrivedShip.fuel = arrivedType.fuelTanks;
+        creditsAfter -= fuelCostTotal;
+      }
     }
 
-    const hullNeeded = arrivedType.hullStrength - arrivedShip.hull;
-    const repairCostTotal = hullNeeded * arrivedType.repairCosts;
-    if (hullNeeded > 0 && creditsAfter >= repairCostTotal) {
-      arrivedShip.hull = arrivedType.hullStrength;
-      creditsAfter -= repairCostTotal;
+    if (state.optAutoRepair) {
+      const hullNeeded = arrivedType.hullStrength - arrivedShip.hull;
+      const repairCostTotal = hullNeeded * arrivedType.repairCosts;
+      if (hullNeeded > 0 && creditsAfter >= repairCostTotal) {
+        arrivedShip.hull = arrivedType.hullStrength;
+        creditsAfter -= repairCostTotal;
+      }
     }
+
+    // Filter encounters based on "ignore when safe" options
+    const hasNoCargo = state.ship.cargo.every((q) => q === 0);
+    const policeRecordSafe = state.policeRecordScore >= -10;
+    const filteredEncounters = result.encounters.filter((enc) => {
+      if (enc.type === ENCOUNTER_POLICE && state.optIgnorePolice && policeRecordSafe) return false;
+      if (enc.type === ENCOUNTER_PIRATE && state.optIgnorePirates && hasNoCargo) return false;
+      if (enc.type === ENCOUNTER_TRADER && state.optIgnoreTraders) return false;
+      return true;
+    });
+
+    const arrivedAtTracked =
+      state.optStopTrackingOnArrival && state.selectedMapSystemId === systemId;
 
     set({
       currentSystem: result.currentSystem,
@@ -127,8 +144,9 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       sellPrices: result.sellPrices,
       systemQuantities: result.systemQuantities,
       systems: result.systems,
-      encounter: result.encounters[0] ?? null,
-      pendingEncounters: result.encounters.slice(1),
+      encounter: filteredEncounters[0] ?? null,
+      pendingEncounters: filteredEncounters.slice(1),
+      ...(arrivedAtTracked ? { selectedMapSystemId: null } : {}),
     });
   },
 });

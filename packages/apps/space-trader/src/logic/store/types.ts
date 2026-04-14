@@ -68,4 +68,29 @@ export interface GameSlice {
   restartGame: () => void;
 }
 
-export type SpaceTraderState = PlayerSlice & UniverseSlice & EncounterSlice & GameSlice;
+export interface OptionsSlice {
+  optAutoFuel: boolean;
+  optAutoRepair: boolean;
+  optIgnorePolice: boolean;
+  optIgnorePirates: boolean;
+  optIgnoreTraders: boolean;
+  optIgnoreDealingTraders: boolean;
+  optReserveMoney: boolean;
+  optChartToInfo: boolean;
+  optContinuousFight: boolean;
+  optAttackFleeing: boolean;
+  reserveBays: number;
+  // Page 2 options
+  optPayForNewspaper: boolean;
+  optShowRangeToTracked: boolean;
+  optStopTrackingOnArrival: boolean;
+  optTextualEncounters: boolean;
+  optRemindAboutLoans: boolean;
+  setOption: (key: string, value: boolean | number) => void;
+}
+
+export type SpaceTraderState = PlayerSlice &
+  UniverseSlice &
+  EncounterSlice &
+  GameSlice &
+  OptionsSlice;

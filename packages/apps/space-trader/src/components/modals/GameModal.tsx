@@ -94,7 +94,7 @@ export const GameModal: React.FC<GameModalProps> = ({
           <div style={{ flex: 1 }}>{children}</div>
           {footer && (
             <div
-              style={{ marginTop: '20px', display: 'flex', justifyContent: 'left', flexShrink: 0 }}
+              style={{ marginTop: '5px', display: 'flex', justifyContent: 'left', flexShrink: 0 }}
             >
               {footer}
             </div>

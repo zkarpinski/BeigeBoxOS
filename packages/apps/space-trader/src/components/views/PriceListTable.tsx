@@ -31,7 +31,11 @@ export const PriceListTable: React.FC<PriceListTableProps> = ({
           <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{item.name}</span>
             <span style={{ fontFamily: 'monospace' }}>
-              {buyPrices[item.id] > 0 ? `+${buyPrices[item.id] - item.priceLowTech} cr.` : '---'}
+              {buyPrices[item.id] > 0
+                ? `${buyPrices[item.id] - item.priceLowTech >= 0 ? '+' : ''}${
+                    buyPrices[item.id] - item.priceLowTech
+                  } cr.`
+                : '---'}
             </span>
           </div>
         ))}

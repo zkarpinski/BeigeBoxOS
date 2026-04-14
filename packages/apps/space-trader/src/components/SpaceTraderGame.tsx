@@ -13,6 +13,8 @@ import { BuyShipListView } from './views/BuyShipListView';
 import { ShipInformationView } from './views/ShipInformationView';
 import { TargetSystemView } from './views/TargetSystemView';
 import { AveragePriceListView } from './views/AveragePriceListView';
+import { OptionsView } from './views/OptionsView';
+import { OptionsPage2View } from './views/OptionsPage2View';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
@@ -88,7 +90,12 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   }, [activeView, setTradeMode, onShortcutsChange]);
 
   useEffect(() => {
-    const modalActive = !!encounter || activeView === 'newgame' || activeView === 'shipInfo';
+    const modalActive =
+      !!encounter ||
+      activeView === 'newgame' ||
+      activeView === 'shipInfo' ||
+      activeView === 'options' ||
+      activeView === 'options2';
     onHideStatusBarChange?.(modalActive);
   }, [encounter, activeView, onHideStatusBarChange]);
 
@@ -107,6 +114,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       newgame: 'Space Trader',
       buyShip: 'Buy Ship',
       shipInfo: 'Ship Information',
+      options: 'Options',
+      options2: 'Options',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);
@@ -131,6 +140,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('system')} />}
         {activeView === 'buyShip' && <BuyShipListView onViewChange={setActiveView} />}
         {activeView === 'shipInfo' && <ShipInformationView onViewChange={setActiveView} />}
+        {activeView === 'options' && <OptionsView onViewChange={setActiveView} />}
+        {activeView === 'options2' && <OptionsPage2View onViewChange={setActiveView} />}
 
         {isGameOver && <GameOverView />}
         <EncounterModal />

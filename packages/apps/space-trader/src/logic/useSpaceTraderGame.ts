@@ -4,6 +4,7 @@ import { createPlayerSlice } from './store/playerSlice';
 import { createUniverseSlice } from './store/universeSlice';
 import { createEncounterSlice } from './store/encounterSlice';
 import { createGameSlice } from './store/gameSlice';
+import { createOptionsSlice } from './store/optionsSlice';
 import { SpaceTraderState } from './store/types';
 
 export const useSpaceTraderGame = create<SpaceTraderState>()(
@@ -13,6 +14,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
       ...createUniverseSlice(...a),
       ...createEncounterSlice(...a),
       ...createGameSlice(...a),
+      ...createOptionsSlice(...a),
     }),
     {
       name: 'space-trader-save',

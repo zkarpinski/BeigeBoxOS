@@ -29,8 +29,15 @@ const LABEL_DY = -14;
 
 export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, setSelectedMapSystem, selectedMapSystemId, ship } =
-    useSpaceTraderGame();
+  const {
+    systems,
+    currentSystem,
+    setSelectedMapSystem,
+    selectedMapSystemId,
+    ship,
+    optChartToInfo,
+    optShowRangeToTracked,
+  } = useSpaceTraderGame();
 
   const current = systems[currentSystem];
 
@@ -63,7 +70,7 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
 
   const handleMapClick = (idx: number) => {
     setSelectedMapSystem(idx);
-    onViewChange('target');
+    onViewChange(optChartToInfo ? 'system' : 'target');
   };
 
   // ── SHORT RANGE CHART ──
@@ -107,6 +114,26 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
             </filter>
           </defs>
           <circle cx={CX} cy={CY} r={warpRadius} fill="none" stroke="#000" strokeWidth="1" />
+          {optShowRangeToTracked &&
+            selectedMapSystemId !== null &&
+            selectedMapSystemId !== currentSystem &&
+            (() => {
+              const tracked = systems[selectedMapSystemId];
+              if (!tracked) return null;
+              const { x: tx, y: ty } = project(tracked.x, tracked.y);
+              const rangeR = maxFuel * scale;
+              return (
+                <circle
+                  cx={tx}
+                  cy={ty}
+                  r={rangeR}
+                  fill="none"
+                  stroke="#555"
+                  strokeWidth="0.75"
+                  strokeDasharray="3,2"
+                />
+              );
+            })()}
 
           <g clipPath="url(#chart-clip)">
             {systems.map((s, idx) => {

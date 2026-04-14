@@ -123,7 +123,10 @@ export function SpaceTraderMenu({ onViewChange, onClose }: SpaceTraderMenuProps)
                 <span style={{ color: '#888' }}>/O</span>
               </>,
               'opts',
-              onClose,
+              () => {
+                onViewChange('options');
+                onClose();
+              },
             )}
             {row(<span>Shortcuts</span>, 'sc', onClose)}
             <div style={{ borderTop: '1px solid #ccc', margin: '2px 0' }} />

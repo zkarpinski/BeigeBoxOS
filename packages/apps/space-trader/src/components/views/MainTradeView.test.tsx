@@ -40,6 +40,10 @@ const mockStore = {
   setTradeMode: jest.fn(),
   buyGood: jest.fn(),
   sellGood: jest.fn(),
+  dumpCargo: jest.fn(),
+  difficulty: 2,
+  reserveBays: 0,
+  optReserveMoney: false,
 };
 
 describe('MainTradeView Component', () => {

@@ -37,6 +37,17 @@ export function resolveCombatRound(
   const effectivePilot = skills.pilot + (hasNav || hasCloaking ? 3 : 0);
   const effectiveEngineer = skills.engineer + (hasAutoRepair ? 2 : 0);
 
+  // Gadget bonuses to NPC skills
+  const npcGadgets = npcEncounter.ship.gadget;
+  const npcHasTargeting = npcGadgets.includes(3);
+  const npcHasAutoRepair = npcGadgets.includes(1);
+  const npcHasNav = npcGadgets.includes(2);
+  const npcHasCloaking = npcGadgets.includes(4);
+
+  const npcEffectiveFighter = npcEncounter.fighterSkill + (npcHasTargeting ? 3 : 0);
+  const npcEffectivePilot = npcEncounter.pilotSkill + (npcHasNav || npcHasCloaking ? 3 : 0);
+  const npcEffectiveEngineer = npcEncounter.engineerSkill + (npcHasAutoRepair ? 2 : 0);
+
   let resolved = false;
   let playerWon = false;
   let bounty = 0;
@@ -48,9 +59,9 @@ export function resolveCombatRound(
     playerShipCopy,
     npcShipCopy,
     effectiveEngineer,
-    npcEncounter.engineerSkill,
+    npcEffectiveEngineer,
     effectiveFighter,
-    npcEncounter.pilotSkill,
+    npcEffectivePilot,
     false,
     difficulty,
     false,
@@ -86,9 +97,9 @@ export function resolveCombatRound(
   const npcHit = executeAttack(
     npcShipCopy,
     playerShipCopy,
-    npcEncounter.engineerSkill,
+    npcEffectiveEngineer,
     effectiveEngineer,
-    npcEncounter.fighterSkill,
+    npcEffectiveFighter,
     effectivePilot,
     false,
     difficulty,
@@ -135,8 +146,17 @@ export function resolveFlee(
   const effectivePilot = skills.pilot + (hasNav || hasCloaking ? 3 : 0);
   const effectiveEngineer = skills.engineer + (hasAutoRepair ? 2 : 0);
 
+  const npcGadgets = npcEncounter.ship.gadget;
+  const npcHasTargeting = npcGadgets.includes(3);
+  const npcHasAutoRepair = npcGadgets.includes(1);
+  const npcHasNav = npcGadgets.includes(2);
+  const npcHasCloaking = npcGadgets.includes(4);
+  const npcEffectiveFighter = npcEncounter.fighterSkill + (npcHasTargeting ? 3 : 0);
+  const npcEffectivePilot = npcEncounter.pilotSkill + (npcHasNav || npcHasCloaking ? 3 : 0);
+  const npcEffectiveEngineer = npcEncounter.engineerSkill + (npcHasAutoRepair ? 2 : 0);
+
   const fleeRoll = Math.random();
-  const fleeChance = 0.3 + effectivePilot * 0.04;
+  const fleeChance = Math.max(0.05, 0.3 + effectivePilot * 0.04 - npcEffectivePilot * 0.02);
 
   if (fleeRoll < fleeChance) {
     log.push('You successfully fled!');
@@ -159,9 +179,9 @@ export function resolveFlee(
   executeAttack(
     npcShipCopy,
     playerShipCopy,
-    npcEncounter.engineerSkill,
+    npcEffectiveEngineer,
     effectiveEngineer,
-    npcEncounter.fighterSkill,
+    npcEffectiveFighter,
     effectivePilot,
     true, // flees
     difficulty,

@@ -22,6 +22,7 @@ export function PalmDesktop() {
   const [appTitle, setAppTitle] = useState<string | undefined>(undefined);
   const [shortcuts, setShortcuts] = useState<AppShortcut[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [encounterActive, setEncounterActive] = useState(false);
 
   const openApp = (app: string) => {
     setCurrentApp(app);
@@ -49,12 +50,14 @@ export function PalmDesktop() {
   return (
     <PalmFrame onHomeClick={goHome} onMenuClick={handleMenuClick} onAppButtonClick={openApp}>
       <div className="flex h-full w-full flex-col bg-white">
-        <PalmStatusBar
-          appTitle={currentApp !== 'launcher' ? appTitle : undefined}
-          showCategory={SHOWS_CATEGORY.has(currentApp)}
-          shortcuts={currentApp !== 'launcher' ? shortcuts : undefined}
-          onTitleClick={currentApp === 'space_trader' ? () => setMenuOpen((o) => !o) : undefined}
-        />
+        {!encounterActive && (
+          <PalmStatusBar
+            appTitle={currentApp !== 'launcher' ? appTitle : undefined}
+            showCategory={SHOWS_CATEGORY.has(currentApp)}
+            shortcuts={currentApp !== 'launcher' ? shortcuts : undefined}
+            onTitleClick={currentApp === 'space_trader' ? () => setMenuOpen((o) => !o) : undefined}
+          />
+        )}
         <div className="flex-1 overflow-hidden">
           {currentApp === 'launcher' && <PalmLauncher onAppOpen={openApp} />}
           {currentApp === 'todo' && <PalmTodoApp />}
@@ -65,6 +68,7 @@ export function PalmDesktop() {
               TitleBar={null}
               onTitleChange={setAppTitle}
               onShortcutsChange={setShortcuts}
+              onEncounterActiveChange={setEncounterActive}
               menuOpen={menuOpen}
               onMenuClose={() => setMenuOpen(false)}
             />

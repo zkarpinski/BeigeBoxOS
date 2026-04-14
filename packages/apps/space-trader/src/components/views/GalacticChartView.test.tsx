@@ -11,7 +11,7 @@ const mockSystem = (nameIndex: number, x: number, y: number, overrides = {}) => 
   x,
   y,
   visited: false,
-  politics: 6, // Democracy
+  politics: 6,
   techLevel: 5,
   size: 1,
   specialResources: 0,
@@ -19,24 +19,25 @@ const mockSystem = (nameIndex: number, x: number, y: number, overrides = {}) => 
   ...overrides,
 });
 
-const mockStore = {
-  systems: [
-    mockSystem(0, 0, 0, { visited: true }), // current system
-    mockSystem(1, 10, 10), // in range (dist ~14)
-    mockSystem(2, 100, 100), // out of range (dist ~141)
-  ],
-  currentSystem: 0,
-  travelTo: jest.fn(),
-  ship: {
-    type: 1,
-    fuel: 20,
-    cargo: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  },
-};
+function makeStore(overrides = {}) {
+  return {
+    systems: [
+      mockSystem(0, 0, 0, { visited: true }), // current system
+      mockSystem(1, 10, 10), // in range (dist ~14)
+      mockSystem(2, 100, 100), // out of range (dist ~141)
+    ],
+    currentSystem: 0,
+    selectedMapSystemId: null,
+    setSelectedMapSystem: jest.fn(),
+    travelTo: jest.fn(),
+    ship: { type: 1, fuel: 20, cargo: new Array(10).fill(0) },
+    ...overrides,
+  };
+}
 
 describe('GalacticChartView Component', () => {
   beforeEach(() => {
-    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(mockStore);
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(makeStore());
     jest.clearAllMocks();
   });
 
@@ -46,72 +47,27 @@ describe('GalacticChartView Component', () => {
     expect(dots).toHaveLength(2); // 3 total - 1 current = 2
   });
 
-  it('clicking a dot navigates to Target System screen', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
+  it('clicking a dot calls setSelectedMapSystem and navigates to target view', () => {
+    const store = makeStore();
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(store);
+    const onViewChange = jest.fn();
+    const { container } = render(<GalacticChartView onViewChange={onViewChange} />);
+
+    const dots = container.querySelectorAll('.map-dot');
+    fireEvent.click(dots[0]); // clicks systems[1]
+
+    expect(store.setSelectedMapSystem).toHaveBeenCalledWith(1);
+    expect(onViewChange).toHaveBeenCalledWith('target');
+  });
+
+  it('clicking an in-range dot navigates to target view', () => {
+    const store = makeStore({ selectedMapSystemId: 1 });
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(store);
+    const onViewChange = jest.fn();
+    const { container } = render(<GalacticChartView onViewChange={onViewChange} />);
+
     const dots = container.querySelectorAll('.map-dot');
     fireEvent.click(dots[0]);
-    // Target System screen has these fields (TitleBar is null in tests so check content)
-    expect(screen.getByText('Government:')).toBeInTheDocument();
-    expect(screen.getByText('Pirates:')).toBeInTheDocument();
-  });
-
-  it('shows Warp button enabled when target is in range', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[0]); // systems[1], dist ~14, fuel 20
-
-    expect(screen.getByText('Warp')).not.toBeDisabled();
-    // Distance row shows "14 parsecs"
-    expect(screen.getByText('14 parsecs')).toBeInTheDocument();
-  });
-
-  it('shows Warp button disabled when target is too far', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[1]); // systems[2], dist ~141, fuel 20
-
-    expect(screen.getByText('Warp')).toBeDisabled();
-  });
-
-  it('calls travelTo when Warp button is clicked', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[0]);
-
-    fireEvent.click(screen.getByText('Warp'));
-    expect(mockStore.travelTo).toHaveBeenCalledWith(1);
-  });
-
-  it('Average Price List screen shows system name and trade goods', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[0]); // go to Target System screen
-
-    fireEvent.click(screen.getByText('Average Price List'));
-    // Prices screen shows all 10 trade goods and navigation buttons
-    expect(screen.getByText('Water')).toBeInTheDocument();
-    expect(screen.getByText('Robots')).toBeInTheDocument();
-    expect(screen.getByText('Price Differences')).toBeInTheDocument();
-    expect(screen.getByText('System Information')).toBeInTheDocument();
-  });
-
-  it('Short Range Chart button returns to the map', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[0]); // go to Target System
-
-    fireEvent.click(screen.getByText('Short Range Chart'));
-    // Back on the chart — dots are visible again
-    expect(container.querySelectorAll('.map-dot')).toHaveLength(2);
-  });
-
-  it('arrow buttons cycle through in-range systems', () => {
-    const { container } = render(<GalacticChartView onViewChange={jest.fn()} />);
-    const dots = container.querySelectorAll('.map-dot');
-    fireEvent.click(dots[0]); // select systems[1] (Adahn)
-
-    // Only 1 in-range system so arrows stay on the same one
-    fireEvent.click(screen.getByLabelText('Next system'));
-    expect(screen.getByText(/Adahn/i)).toBeInTheDocument();
+    expect(onViewChange).toHaveBeenCalledWith('target');
   });
 });

@@ -5,6 +5,8 @@ export interface PlayerSlice {
   debt: number;
   policeRecordScore: number;
   reputationScore: number;
+  killsPirate: number;
+  killsPolice: number;
   nameCommander: string;
   pilotSkill: number;
   fighterSkill: number;
@@ -43,6 +45,7 @@ export interface UniverseSlice {
 
 export interface EncounterSlice {
   encounter: ActiveEncounter | null;
+  pendingEncounters: ActiveEncounter[];
   isGameOver: boolean;
 
   clearEncounter: () => void;
@@ -51,14 +54,17 @@ export interface EncounterSlice {
   surrenderToEncounter: () => void;
   bribePolice: () => void;
   lootNPC: () => void;
+  tradeWithNPC: () => void;
 }
 
 export interface GameSlice {
   difficulty: number;
   tradeMode: 'buy' | 'sell' | 'price-list';
   viewingShipId: number | null;
+  selectedMapSystemId: number | null;
   setTradeMode: (mode: 'buy' | 'sell' | 'price-list') => void;
   setViewingShipId: (id: number | null) => void;
+  setSelectedMapSystem: (id: number | null) => void;
   restartGame: () => void;
 }
 

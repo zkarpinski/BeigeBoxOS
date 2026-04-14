@@ -13,22 +13,8 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
   const system = systems[currentSystem];
   const shipType = ShipTypes[ship.type];
 
-  // Yard only at tech level 4+
-  if (system.techLevel < 4) {
-    return (
-      <div className="palm-window">
-        {TitleBar && <TitleBar title="Ship Yard" onViewChange={onViewChange} />}
-        <div className="palm-content" style={{ padding: '20px', textAlign: 'center' }}>
-          This system is too primitive for a shipyard.
-        </div>
-        <div className="palm-footer" style={{ justifyContent: 'center' }}>
-          <button className="palm-btn" onClick={() => onViewChange('trade')}>
-            Back
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // OG rules: fuel always available; repairs at Medieval (2)+; ships filtered by minTechLevel
+  const canRepair = system.techLevel >= 2;
 
   // Calculate fuel and hull costs
   const fuelCost = shipType.costOfFuel;
@@ -77,31 +63,39 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
 
         {/* Hull Section */}
         <div style={{ marginBottom: '16px' }}>
-          <div>
-            Your hull strength is at {Math.floor((ship.hull / shipType.hullStrength) * 100)}%.
-          </div>
-          {ship.hull >= shipType.hullStrength ? (
-            <div style={{ marginBottom: '4px' }}>No repairs are needed.</div>
-          ) : (
+          {canRepair ? (
             <>
-              <div style={{ marginBottom: '4px' }}>Full repair will cost {repairCostTotal} cr.</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  className="palm-btn"
-                  disabled={credits < shipType.repairCosts}
-                  onClick={repairHull}
-                >
-                  Repair
-                </button>
-                <button
-                  className="palm-btn"
-                  disabled={credits < repairCostTotal}
-                  onClick={repairHull}
-                >
-                  Full Repairs
-                </button>
+              <div>
+                Your hull strength is at {Math.floor((ship.hull / shipType.hullStrength) * 100)}%.
               </div>
+              {ship.hull >= shipType.hullStrength ? (
+                <div style={{ marginBottom: '4px' }}>No repairs are needed.</div>
+              ) : (
+                <>
+                  <div style={{ marginBottom: '4px' }}>
+                    Full repair will cost {repairCostTotal} cr.
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      className="palm-btn"
+                      disabled={credits < shipType.repairCosts}
+                      onClick={repairHull}
+                    >
+                      Repair
+                    </button>
+                    <button
+                      className="palm-btn"
+                      disabled={credits < repairCostTotal}
+                      onClick={repairHull}
+                    >
+                      Full Repairs
+                    </button>
+                  </div>
+                </>
+              )}
             </>
+          ) : (
+            <div>This system is too primitive for hull repairs.</div>
           )}
         </div>
 

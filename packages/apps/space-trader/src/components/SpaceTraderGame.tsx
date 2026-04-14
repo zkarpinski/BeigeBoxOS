@@ -11,6 +11,8 @@ import { NewGameView } from './views/NewGameView';
 import { GameOverView } from './views/GameOverView';
 import { BuyShipListView } from './views/BuyShipListView';
 import { ShipInformationView } from './views/ShipInformationView';
+import { TargetSystemView } from './views/TargetSystemView';
+import { AveragePriceListView } from './views/AveragePriceListView';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
@@ -27,6 +29,7 @@ interface SpaceTraderGameProps {
   TitleBar?: React.ComponentType<TitleBarProps> | null;
   onTitleChange?: (title: string) => void;
   onShortcutsChange?: (shortcuts: AppShortcut[]) => void;
+  onEncounterActiveChange?: (active: boolean) => void;
   menuOpen?: boolean;
   onMenuClose?: () => void;
 }
@@ -37,10 +40,11 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   TitleBar = PalmHeader,
   onTitleChange,
   onShortcutsChange,
+  onEncounterActiveChange,
   menuOpen = false,
   onMenuClose,
 }) => {
-  const { nameCommander, isGameOver, tradeMode, setTradeMode } = useSpaceTraderGame();
+  const { nameCommander, isGameOver, tradeMode, setTradeMode, encounter } = useSpaceTraderGame();
   const [activeView, setActiveView] = useState<ViewType>('newgame');
   const [hydrated, setHydrated] = useState(false);
 
@@ -84,6 +88,10 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   }, [activeView, setTradeMode, onShortcutsChange]);
 
   useEffect(() => {
+    onEncounterActiveChange?.(!!encounter);
+  }, [encounter, onEncounterActiveChange]);
+
+  useEffect(() => {
     if (!onTitleChange) return;
     const titles: Record<ViewType, string> = {
       trade:
@@ -91,6 +99,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       system: 'System Info',
       ship: 'Commander Status',
       map: 'Short Range Chart',
+      target: 'Target System',
+      pricelist: 'Average Price List',
       shipyard: 'Ship Yard',
       equipment: 'Equipment',
       newgame: 'Space Trader',
@@ -113,6 +123,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
         {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
         {activeView === 'map' && <GalacticChartView onViewChange={setActiveView} />}
+        {activeView === 'target' && <TargetSystemView onViewChange={setActiveView} />}
+        {activeView === 'pricelist' && <AveragePriceListView onViewChange={setActiveView} />}
         {activeView === 'shipyard' && <ShipYardView onViewChange={setActiveView} />}
         {activeView === 'equipment' && <EquipmentView onViewChange={setActiveView} />}
         {activeView === 'newgame' && <NewGameView onStart={() => setActiveView('trade')} />}

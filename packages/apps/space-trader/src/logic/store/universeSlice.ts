@@ -51,6 +51,8 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       days: 0,
       policeRecordScore: 0,
       reputationScore: 0,
+      killsPirate: 0,
+      killsPolice: 0,
       pilotSkill: skills.pilot,
       fighterSkill: skills.fighter,
       traderSkill: skills.trader,
@@ -72,6 +74,7 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       sellPrices,
       systemQuantities,
       encounter: null,
+      pendingEncounters: [],
       isGameOver: false,
     });
   },
@@ -94,17 +97,38 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       debt: state.debt,
     });
 
+    // Auto-fuel and auto-repair on arrival (OG behaviour when options enabled)
+    const arrivedShip = { ...result.ship };
+    let creditsAfter = state.credits; // credits aren't touched by processWarp directly
+    const arrivedType = ShipTypes[arrivedShip.type];
+
+    const fuelNeeded = arrivedType.fuelTanks - arrivedShip.fuel;
+    const fuelCostTotal = fuelNeeded * arrivedType.costOfFuel;
+    if (fuelNeeded > 0 && creditsAfter >= fuelCostTotal) {
+      arrivedShip.fuel = arrivedType.fuelTanks;
+      creditsAfter -= fuelCostTotal;
+    }
+
+    const hullNeeded = arrivedType.hullStrength - arrivedShip.hull;
+    const repairCostTotal = hullNeeded * arrivedType.repairCosts;
+    if (hullNeeded > 0 && creditsAfter >= repairCostTotal) {
+      arrivedShip.hull = arrivedType.hullStrength;
+      creditsAfter -= repairCostTotal;
+    }
+
     set({
       currentSystem: result.currentSystem,
       days: result.days,
       debt: result.debt,
       policeRecordScore: result.policeRecordScore,
-      ship: result.ship,
+      ship: arrivedShip,
+      credits: creditsAfter,
       buyPrices: result.buyPrices,
       sellPrices: result.sellPrices,
       systemQuantities: result.systemQuantities,
       systems: result.systems,
-      encounter: result.encounter,
+      encounter: result.encounters[0] ?? null,
+      pendingEncounters: result.encounters.slice(1),
     });
   },
 });

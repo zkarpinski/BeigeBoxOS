@@ -2,16 +2,17 @@ import React from 'react';
 
 interface ShipSpriteProps {
   scale?: number;
+  style?: React.CSSProperties;
 }
 
-export const FleaSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const FleaSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 19 16"
     width={19 * scale}
     height={16 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Flea"
   >
@@ -110,14 +111,14 @@ export const FleaSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const GnatSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const GnatSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 27 26"
     width={27 * scale}
     height={26 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Gnat"
   >
@@ -353,14 +354,14 @@ export const GnatSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const FireflySprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const FireflySprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 27 22"
     width={27 * scale}
     height={22 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Firefly"
   >
@@ -543,14 +544,14 @@ export const FireflySprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const MosquitoSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const MosquitoSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 27 26"
     width={27 * scale}
     height={26 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Mosquito"
   >
@@ -757,14 +758,14 @@ export const MosquitoSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const BumblebeeSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const BumblebeeSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 40 34"
     width={40 * scale}
     height={34 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Bumblebee"
   >
@@ -1107,14 +1108,14 @@ export const BumblebeeSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const BeetleSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const BeetleSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 40 36"
     width={40 * scale}
     height={36 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Beetle"
   >
@@ -1485,14 +1486,14 @@ export const BeetleSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const HornetSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const HornetSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 50 40"
     width={50 * scale}
     height={40 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Hornet"
   >
@@ -1923,14 +1924,14 @@ export const HornetSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const GrasshopperSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const GrasshopperSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 50 40"
     width={50 * scale}
     height={40 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Grasshopper"
   >
@@ -2379,14 +2380,14 @@ export const GrasshopperSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const TermiteSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const TermiteSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 60 47"
     width={60 * scale}
     height={47 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Termite"
   >
@@ -3110,14 +3111,14 @@ export const TermiteSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
   </svg>
 );
 
-export const WaspSprite: React.FC<ShipSpriteProps> = ({ scale = 2 }) => (
+export const WaspSprite: React.FC<ShipSpriteProps> = ({ scale = 2, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 60 48"
     width={60 * scale}
     height={48 * scale}
     shapeRendering="crispEdges"
-    style={{ imageRendering: 'pixelated' }}
+    style={{ imageRendering: 'pixelated', ...style }}
     role="img"
     aria-label="Wasp"
   >

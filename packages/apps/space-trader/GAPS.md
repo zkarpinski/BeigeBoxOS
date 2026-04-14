@@ -49,18 +49,15 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ## Game Mechanics
 
-### Combat (EncounterForm) — ⚠️ Partial
+### Combat (EncounterForm) — ✅ Mostly fixed
 
 - **NPC ship generation**: `generateNPCEncounter()` picks ship type by occurrence weight, equips weapons/shields based on system tech level, scales NPC skills with difficulty.
 - **Attack**: uses `executeAttack()` with gadget-boosted player skills (Targeting +3 fighter, Auto-repair +2 engineer, Nav/Cloaking +3 pilot). NPC counterattacks each round.
-- **Flee**: pilot-skill-based flee chance (30–70%); NPC fires at fleeing player on failure.
-  - ⚠️ **Bug**: flee success does not factor in NPC pilot skill — original uses both sides' pilot skills.
+- **Flee**: ✅ flee chance accounts for both player pilot skill and NPC pilot skill (`0.3 + playerPilot×0.04 − npcPilot×0.02`, min 5%); NPC fires at fleeing player on failure.
 - **Submit to pirates**: pirates take NPC cargo-bay-capacity worth of goods from player hold.
-- **Submit/Inspect by police**: checks for narcotics/firearms; confiscates and levies fine on contraband.
-  - ⚠️ **Bug**: does not check `drugsOk`/`firearmsOk` from `PoliticalSystems` — police in anarchies should ignore contraband.
-- **Bribe police**: costs 5% × credits × (difficulty+1); skips inspection.
-  - ⚠️ **Bug**: ignores `bribeLevel` property in `PoliticalSystems`; bribe should be `Math.max(10, Math.floor(netWorth / (10 × bribeLevel)))`.
-- **NPC gadgets**: ❌ NPC ships always have `gadget: [-1,-1,-1]`; original game equipped NPCs with gadgets.
+- **Submit/Inspect by police**: ✅ checks `PoliticalSystems.drugsOk`/`firearmsOk` before fining — police in drug-friendly systems won't confiscate narcotics, etc.
+- **Bribe police**: ✅ uses `bribeLevel` from `PoliticalSystems`; formula `max(10, netWorth / (10 × bribeLevel))`; unbribable police (bribeLevel=0) refuse bribe.
+- **NPC gadgets**: ✅ `equipNPCShip()` fills gadget slots using weighted random selection by tech level; gadget bonuses applied to NPC effective skills in combat/flee.
 - **Kill/Loot**: bounty credited on NPC destruction; pirate kill +1 reputation; police kill −3 record; Loot button transfers NPC cargo.
 - **Escape pod**: activated automatically if hull reaches 0; player survives on Flea with no cargo/equipment.
 
@@ -75,14 +72,14 @@ Original C source (github.com/videogamepreservation/spacetrader)
 - **Sell equipment**: ✅ "Sell" tab in EquipmentView — 50% refund price.
 - **Dump cargo**: ✅ Dump button on sell rows for items not bought at current system.
 - **Gadget skill bonuses**: ✅ Auto-Repair +2 Engineer, Navigating/Cloaking +3 Pilot, Targeting +3 Fighter — applied in all combat calculations.
-- **Gadget skill bonuses in ShipInfoView**: ❌ Effective skills not displayed on Commander Status screen yet.
+- **Gadget skill bonuses in ShipInfoView**: ✅ Effective skills shown as `effValue (base+bonus)` on Commander Status screen.
 - **Escape pod price**: ✅ 2,000 cr in original; we use 5,000 cr (intentional design choice, noted).
 
 ### Travel / Warp — ⚠️ Partial
 
 - **Wormhole travel**: ❌ Shuffled correctly but no travel action or UI option.
-- **Auto-fuel on arrival**: ❌ Not in travelTo(). Original refuels if credits available.
-- **Auto-repair on arrival**: ❌ Not in travelTo(). Original repairs if credits available.
+- **Auto-fuel on arrival**: ✅ travelTo() fills tank if credits allow.
+- **Auto-repair on arrival**: ✅ travelTo() repairs hull to full if credits allow.
 - **Mercenary salary deduction**: ❌ No mercenaries.
 - **Tribble dynamics**: ❌ No tribbles.
 
@@ -95,7 +92,7 @@ Original C source (github.com/videogamepreservation/spacetrader)
 
 ### Police/Record System — ⚠️ Partial
 
-- **Contraband detection**: ⚠️ Police inspect and find narcotics/firearms, but do not check `PoliticalSystems[politics].drugsOk / firearmsOk` — police in anarchies/low-law systems should not care about contraband.
+- **Contraband detection**: ✅ Police inspect narcotics/firearms and check `PoliticalSystems[politics].drugsOk / firearmsOk` — police in drug-friendly or firearms-friendly systems will not confiscate those goods.
 - **Record decay**: ✅ Police record decays toward clean over time (every 3 warps).
 - **Reputation on kills**: ✅ Pirate kill +1 reputation; police kill −3 record.
 - **Arrest**: ❌ No full arrest mechanic (cargo confiscated, fine, record penalty) beyond inspection.
@@ -148,17 +145,17 @@ Original C source (github.com/videogamepreservation/spacetrader)
 | **Dump cargo**                                                 | High         | Low       | ✅ Done |
 | **Gadget skill bonuses** (combat)                              | High         | Low       | ✅ Done |
 | **Reputation updates on combat**                               | High         | Low       | ✅ Done |
-| **Fix: police ignore contraband per PoliticalSystems.drugsOk** | **High**     | Low       | ❌ Bug  |
-| **Fix: bribe cost uses bribeLevel + net worth**                | **High**     | Low       | ❌ Bug  |
-| **Fix: flee factors in NPC pilot skill**                       | Medium       | Low       | ❌ Bug  |
-| NPC ships receive gadgets                                      | Medium       | Low       | ❌      |
-| Display effective skills in Commander Status                   | Medium       | Low       | ❌      |
-| ShipInfoView: net worth, kill counts, rep/record titles, debt  | Medium       | Low       | ❌      |
+| **Fix: police ignore contraband per PoliticalSystems.drugsOk** | **High**     | Low       | ✅ Done |
+| **Fix: bribe cost uses bribeLevel + net worth**                | **High**     | Low       | ✅ Done |
+| **Fix: flee factors in NPC pilot skill**                       | Medium       | Low       | ✅ Done |
+| NPC ships receive gadgets                                      | Medium       | Low       | ✅ Done |
+| Display effective skills in Commander Status                   | Medium       | Low       | ✅ Done |
+| ShipInfoView: net worth, kill counts, rep/record titles, debt  | Medium       | Low       | ✅ Done |
+| Auto-fuel/repair on arrival                                    | Medium       | Low       | ✅ Done |
+| Fix price list: show actual system special resource            | Medium       | Low       | ✅ Done |
 | Bank / loans UI (BankForm)                                     | Medium       | Medium    | ❌      |
 | Wormhole travel                                                | Medium       | Medium    | ❌      |
 | Full contraband arrest flow                                    | Medium       | Medium    | ❌      |
-| Auto-fuel/repair on arrival                                    | Medium       | Low       | ❌      |
-| Fix price list: show actual system special resource            | Medium       | Low       | ❌      |
 | Mercenaries                                                    | Low          | High      | ❌      |
 | Quest system                                                   | Low          | Very High | ❌      |
 | Tribbles                                                       | Low          | Medium    | ❌      |

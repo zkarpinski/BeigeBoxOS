@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
-import { ActiveEncounter, ShipTypes } from '../DataTypes';
-import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE } from '../Encounter';
+import { ActiveEncounter, ShipTypes, PoliticalSystems } from '../DataTypes';
+import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../Encounter';
 import { resolveCombatRound, resolveFlee } from '../domain/combat';
 import { SpaceTraderState, EncounterSlice } from './types';
 
@@ -9,9 +9,18 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
   get,
 ) => ({
   encounter: null,
+  pendingEncounters: [],
   isGameOver: false,
 
-  clearEncounter: () => set({ encounter: null }),
+  clearEncounter: () => {
+    const { pendingEncounters } = get();
+    if (pendingEncounters.length > 0) {
+      const [next, ...rest] = pendingEncounters;
+      set({ encounter: next, pendingEncounters: rest });
+    } else {
+      set({ encounter: null });
+    }
+  },
 
   attackInEncounter: () => {
     const state = get();
@@ -51,13 +60,17 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
 
     // Handle Victory
     if (result.playerWon) {
-      const repGain = state.encounter.type === ENCOUNTER_PIRATE ? 1 : 0;
-      const policeHit = state.encounter.type === ENCOUNTER_POLICE ? -3 : 0;
+      const isPirate = state.encounter.type === ENCOUNTER_PIRATE;
+      const isPolice = state.encounter.type === ENCOUNTER_POLICE;
+      const repGain = isPirate ? 1 : 0;
+      const policeHit = isPolice ? -3 : state.encounter.type === ENCOUNTER_TRADER ? -2 : 0;
 
       set({
         credits: state.credits + result.bounty,
         reputationScore: state.reputationScore + repGain,
         policeRecordScore: state.policeRecordScore + policeHit,
+        killsPirate: state.killsPirate + (isPirate ? 1 : 0),
+        killsPolice: state.killsPolice + (isPolice ? 1 : 0),
         encounter: {
           ...state.encounter,
           npc: { ...state.encounter.npc, ship: result.npcShip },
@@ -148,14 +161,15 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
         encounter: { ...enc, log, resolved: true, playerWon: false },
       });
     } else if (enc.type === ENCOUNTER_POLICE) {
-      const hasNarcotics = state.ship.cargo[8] > 0;
-      const hasFirearms = state.ship.cargo[5] > 0;
+      const pol = PoliticalSystems[state.systems[state.currentSystem].politics];
+      const hasNarcotics = state.ship.cargo[8] > 0 && !pol.drugsOk;
+      const hasFirearms = state.ship.cargo[5] > 0 && !pol.firearmsOk;
       if (hasNarcotics || hasFirearms) {
         const newCargo = [...state.ship.cargo];
-        const narcoticsTaken = newCargo[8];
-        const firearmsTaken = newCargo[5];
-        newCargo[8] = 0;
-        newCargo[5] = 0;
+        const narcoticsTaken = hasNarcotics ? newCargo[8] : 0;
+        const firearmsTaken = hasFirearms ? newCargo[5] : 0;
+        if (hasNarcotics) newCargo[8] = 0;
+        if (hasFirearms) newCargo[5] = 0;
         const fine = (narcoticsTaken + firearmsTaken) * 50 * (state.difficulty + 1);
         log.push(
           `Police found contraband! Confiscated ${narcoticsTaken} narcotics, ${firearmsTaken} firearms. Fine: ${fine} cr.`,
@@ -180,8 +194,17 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
     const state = get();
     if (!state.encounter || state.encounter.resolved || state.encounter.type !== ENCOUNTER_POLICE)
       return;
-    const bribeCost = Math.max(100, Math.floor(state.credits * 0.05 * (state.difficulty + 1)));
+    const pol = PoliticalSystems[state.systems[state.currentSystem].politics];
     const log = [...state.encounter.log];
+    if (pol.bribeLevel === 0) {
+      log.push('These police cannot be bribed.');
+      set({ encounter: { ...state.encounter, log } });
+      return;
+    }
+    // Net worth proxy: credits + ship trade-in value (90% of ship price)
+    const netWorth =
+      state.credits + Math.floor(ShipTypes[state.ship.type].price * 0.9) - state.debt;
+    const bribeCost = Math.max(10, Math.floor(netWorth / (10 * pol.bribeLevel)));
     if (state.credits < bribeCost) {
       log.push(`You cannot afford the bribe (${bribeCost} cr).`);
       set({ encounter: { ...state.encounter, log } });
@@ -212,5 +235,12 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
       looted += take;
     }
     set({ ship: { ...state.ship, cargo: newCargo }, encounter: null });
+  },
+
+  tradeWithNPC: () => {
+    const state = get();
+    if (!state.encounter || state.encounter.resolved) return;
+    const log = [...state.encounter.log, 'You traded goods with the merchant.'];
+    set({ encounter: { ...state.encounter, log, resolved: true, playerWon: true } });
   },
 });

@@ -5,8 +5,10 @@ export const createGameSlice: StateCreator<SpaceTraderState, [], [], GameSlice> 
   difficulty: 2,
   tradeMode: 'buy',
   viewingShipId: null,
+  selectedMapSystemId: null,
   setTradeMode: (mode) => set({ tradeMode: mode }),
   setViewingShipId: (id) => set({ viewingShipId: id }),
+  setSelectedMapSystem: (id) => set({ selectedMapSystemId: id }),
   restartGame: () => {
     localStorage.removeItem('space-trader-save');
     window.location.reload(); // Original behavior or full reset

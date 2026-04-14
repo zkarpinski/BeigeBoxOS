@@ -50,6 +50,8 @@ function makeStore(playerShipType: number, npcShipType: number, overrides = {}) 
       round: 0,
       resolved: false,
       playerWon: false,
+      clickNumber: 5,
+      destinationSystemIdx: 0,
     },
     clearEncounter: jest.fn(),
     attackInEncounter: jest.fn(),
@@ -57,6 +59,8 @@ function makeStore(playerShipType: number, npcShipType: number, overrides = {}) 
     surrenderToEncounter: jest.fn(),
     bribePolice: jest.fn(),
     lootNPC: jest.fn(),
+    tradeWithNPC: jest.fn(),
+    pendingEncounters: [],
     ship: {
       type: playerShipType,
       hull: 100,
@@ -68,6 +72,20 @@ function makeStore(playerShipType: number, npcShipType: number, overrides = {}) 
       escapePod: false,
       fuel: 14,
     },
+    systems: [
+      {
+        nameIndex: 0,
+        x: 0,
+        y: 0,
+        visited: true,
+        politics: 6,
+        techLevel: 5,
+        size: 1,
+        specialResources: 0,
+        status: 0,
+      },
+    ],
+    currentSystem: 0,
     ...overrides,
   };
 }
@@ -203,14 +221,16 @@ describe('EncounterModal — combat UI', () => {
     expect(screen.queryByText('Surrender')).not.toBeInTheDocument();
   });
 
-  it('shows Ignore but no Attack for trader encounter', () => {
+  it('shows Attack, Ignore, and Trade for trader encounter', () => {
     (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
       ...makeStore(1, 1),
       encounter: { ...makeStore(1, 1).encounter, type: 'TRADER' },
     });
     render(<EncounterModal />);
+    expect(screen.getByText('Attack')).toBeInTheDocument();
     expect(screen.getByText('Ignore')).toBeInTheDocument();
-    expect(screen.queryByText('Attack')).not.toBeInTheDocument();
+    expect(screen.getByText('Trade')).toBeInTheDocument();
+    expect(screen.queryByText('Flee')).not.toBeInTheDocument();
   });
 
   it('shows Done and Encounter Over when resolved without winning', () => {

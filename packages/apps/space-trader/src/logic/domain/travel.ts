@@ -1,4 +1,11 @@
-import { SolarSystem, PlayerShip, ShipTypes, Shields, UNEVENTFUL } from '../DataTypes';
+import {
+  SolarSystem,
+  PlayerShip,
+  ShipTypes,
+  Shields,
+  UNEVENTFUL,
+  ActiveEncounter,
+} from '../DataTypes';
 import { determineSystemPrices } from '../Merchant';
 import {
   determineEncounter,
@@ -17,7 +24,7 @@ export interface TravelResult {
   sellPrices: number[];
   systemQuantities: number[];
   systems: SolarSystem[];
-  encounter: any | null; // using any for now to avoid circular dependency or complex typing here
+  encounters: ActiveEncounter[];
 }
 
 export function calculateDistance(
@@ -55,10 +62,10 @@ export function processWarp(
   const systemQuantities = target.qty ?? new Array(10).fill(0);
 
   // Encounter logic
-  const CLICKS = 21;
-  let encounter = null;
+  const CLICKS = Math.max(1, fuelCost);
+  const encounters: ActiveEncounter[] = [];
   let alreadyRaided = false;
-  for (let click = 0; click < CLICKS; click++) {
+  for (let click = 1; click <= CLICKS; click++) {
     const encounterType = determineEncounter(
       target,
       state.difficulty,
@@ -74,16 +81,17 @@ export function processWarp(
         state.days,
         target.techLevel,
       );
-      encounter = {
+      encounters.push({
         type: encounterType,
         npc,
         log: [],
         round: 0,
         resolved: false,
         playerWon: false,
-      };
+        clickNumber: click,
+        destinationSystemIdx: targetSystemId,
+      });
       if (encounterType === ENCOUNTER_PIRATE) alreadyRaided = true;
-      break;
     }
   }
 
@@ -135,6 +143,6 @@ export function processWarp(
     sellPrices,
     systemQuantities,
     systems: newSystems,
-    encounter,
+    encounters,
   };
 }

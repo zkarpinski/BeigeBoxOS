@@ -990,6 +990,8 @@ export interface ActiveEncounter {
   round: number;
   resolved: boolean;
   playerWon: boolean;
+  clickNumber: number;
+  destinationSystemIdx: number;
 }
 
 export interface SaveGameType {
@@ -1038,6 +1040,8 @@ export type ViewType =
   | 'system'
   | 'ship'
   | 'map'
+  | 'target'
+  | 'pricelist'
   | 'shipyard'
   | 'equipment'
   | 'newgame'

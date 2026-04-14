@@ -1,92 +1,38 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
-import {
-  SystemNames,
-  ViewType,
-  WAR,
-  TradeItems,
-  PoliticalSystems,
-  TechLevels,
-  ShipTypes,
-  SpecialResources,
-} from '../../logic/DataTypes';
+import { SystemNames, ViewType, WAR, ShipTypes } from '../../logic/DataTypes';
 import { useTitleBar } from '../TitleBarContext';
-import { getStandardPrice } from '../../logic/Merchant';
 
 interface GalacticChartViewProps {
   onViewChange: (view: ViewType) => void;
 }
 
-type MapScreen = 'chart' | 'target' | 'prices';
-
+// Coordinate space for projection math — SVG scales to fill the container
 const CHART_W = 264;
 const CHART_H = 220;
 const CX = CHART_W / 2;
 const CY = CHART_H / 2;
-
-const SIZE_LABELS = ['Tiny', 'Small', 'Medium', 'Large', 'Huge'];
-const STRENGTH_LABELS = [
-  'None',
-  'Harmless',
-  'Few',
-  'Some',
-  'Moderate',
-  'Many',
-  'Abundant',
-  'Swarms',
-];
+// Fraction of min(CX, CY) used as warp-circle radius on screen.
+// 0.65 matches the original PalmOS short-range chart proportions.
+const ZOOM = 0.65;
 
 function dist(ax: number, ay: number, bx: number, by: number) {
   return Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
 }
 
-function labelOffset(sx: number, sy: number): { dx: number; dy: number } {
-  const angle = Math.atan2(sy - CY, sx - CX);
-  const r = 10;
-  return { dx: Math.cos(angle) * r, dy: Math.sin(angle) * r };
-}
-
-const rowStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'baseline',
-  fontSize: '11px',
-  fontFamily: 'monospace',
-  lineHeight: '1.5',
-  padding: '0',
-};
-
-const smallBtnStyle: React.CSSProperties = {
-  fontSize: '10px',
-  fontFamily: 'monospace',
-  padding: '2px 8px',
-  background: '#f5f5f5',
-  border: '1px solid #888',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  textAlign: 'left',
-  whiteSpace: 'nowrap',
-};
+// Label sits above the dot. With font-size 14 and dominantBaseline="auto", the
+// text baseline is at sy+LABEL_DY. Descenders extend ~3px below baseline and
+// the filter adds ~2px padding, so the white box bottom ≈ sy+LABEL_DY+5.
+// Dot radius is 4.5, so we need LABEL_DY+5 < -4.5, i.e. LABEL_DY < -9.5.
+// -14 gives a comfortable 4-5px gap between the label box and the dot edge.
+const LABEL_DY = -14;
 
 export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, travelTo, ship } = useSpaceTraderGame();
-
-  const [screen, setScreen] = useState<MapScreen>('chart');
-  const [selectedSystem, setSelectedSystem] = useState<number>(currentSystem);
-  const [inRangePos, setInRangePos] = useState(0);
+  const { systems, currentSystem, setSelectedMapSystem, selectedMapSystemId, ship } =
+    useSpaceTraderGame();
 
   const current = systems[currentSystem];
-
-  // Sorted list of in-range system indices for arrow navigation
-  const inRangeSystems = useMemo(() => {
-    if (!current) return [];
-    return systems
-      .map((s, idx) => ({ idx, d: dist(s.x, s.y, current.x, current.y) }))
-      .filter(({ idx, d }) => idx !== currentSystem && d <= ship.fuel)
-      .sort((a, b) => a.d - b.d)
-      .map(({ idx }) => idx);
-  }, [systems, currentSystem, current, ship.fuel]);
 
   if (!current || !systems.length) {
     return (
@@ -113,291 +59,19 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
     );
   }
 
-  const target = systems[selectedSystem] ?? systems[0];
-  const targetDist = dist(target.x, target.y, current.x, current.y);
-  const fuelCost = Math.floor(targetDist);
-  const canTravel = selectedSystem !== currentSystem && fuelCost <= ship.fuel;
+  const selectedSystem = selectedMapSystemId ?? currentSystem;
 
-  // Click on map dot → Target System screen
   const handleMapClick = (idx: number) => {
-    setSelectedSystem(idx);
-    const pos = inRangeSystems.indexOf(idx);
-    setInRangePos(pos >= 0 ? pos : 0);
-    setScreen('target');
+    setSelectedMapSystem(idx);
+    onViewChange('target');
   };
 
-  // Arrow navigation through in-range systems
-  const navPrev = () => {
-    if (!inRangeSystems.length) return;
-    const newPos = (inRangePos - 1 + inRangeSystems.length) % inRangeSystems.length;
-    setInRangePos(newPos);
-    setSelectedSystem(inRangeSystems[newPos]);
-  };
-  const navNext = () => {
-    if (!inRangeSystems.length) return;
-    const newPos = (inRangePos + 1) % inRangeSystems.length;
-    setInRangePos(newPos);
-    setSelectedSystem(inRangeSystems[newPos]);
-  };
-
-  const handleWarp = () => {
-    travelTo(selectedSystem);
-    onViewChange('trade');
-  };
-
-  const warpBtnStyle: React.CSSProperties = {
-    fontSize: '13px',
-    fontFamily: 'monospace',
-    fontWeight: 'bold',
-    padding: '6px 14px',
-    minWidth: '60px',
-    minHeight: '54px',
-    background: canTravel ? '#f5f5f5' : '#e0e0e0',
-    color: canTravel ? '#000' : '#888',
-    border: '2px solid #888',
-    borderRadius: '8px',
-    cursor: canTravel ? 'pointer' : 'default',
-    alignSelf: 'stretch',
-  };
-
-  const NavArrows = () => (
-    <div style={{ display: 'flex', gap: '0' }}>
-      <button
-        onClick={navPrev}
-        disabled={inRangeSystems.length === 0}
-        style={{
-          padding: '1px 5px',
-          fontSize: '11px',
-          fontFamily: 'monospace',
-          background: '#f0f0f0',
-          border: '1px solid #888',
-          cursor: 'pointer',
-          lineHeight: '14px',
-        }}
-        aria-label="Previous system"
-      >
-        ◄
-      </button>
-      <button
-        onClick={navNext}
-        disabled={inRangeSystems.length === 0}
-        style={{
-          padding: '1px 5px',
-          fontSize: '11px',
-          fontFamily: 'monospace',
-          background: '#f0f0f0',
-          border: '1px solid #888',
-          borderLeft: 'none',
-          cursor: 'pointer',
-          lineHeight: '14px',
-        }}
-        aria-label="Next system"
-      >
-        ►
-      </button>
-    </div>
-  );
-
-  // ── TARGET SYSTEM SCREEN ──
-  if (screen === 'target') {
-    const pol = PoliticalSystems[target.politics ?? 0];
-    return (
-      <div
-        className="palm-window"
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-      >
-        {TitleBar && <TitleBar title="Target System" onViewChange={onViewChange} />}
-
-        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 8px' }}>
-          <div style={{ ...rowStyle, marginBottom: '1px' }}>
-            <span>
-              <strong>Name:</strong> {SystemNames[target.nameIndex]}
-            </span>
-            <NavArrows />
-          </div>
-          <div style={rowStyle}>
-            <strong>Size:</strong>&nbsp;{SIZE_LABELS[target.size ?? 1]}
-          </div>
-          <div style={rowStyle}>
-            <strong>Tech level:</strong>&nbsp;{TechLevels[target.techLevel ?? 0]}
-          </div>
-          <div style={rowStyle}>
-            <strong>Government:</strong>&nbsp;{pol?.name ?? '—'}
-          </div>
-          <div style={rowStyle}>
-            <strong>Distance:</strong>&nbsp;
-            <span>{fuelCost} parsecs</span>
-          </div>
-          <div style={rowStyle}>
-            <strong>Police:</strong>&nbsp;
-            {STRENGTH_LABELS[Math.min(pol?.strengthPolice ?? 0, 7)]}
-          </div>
-          <div style={rowStyle}>
-            <strong>Pirates:</strong>&nbsp;
-            {STRENGTH_LABELS[Math.min(pol?.strengthPirates ?? 0, 7)]}
-          </div>
-          <div style={rowStyle}>
-            <strong>Current costs:</strong>&nbsp;0 cr.
-          </div>
-        </div>
-
-        <div
-          style={{
-            borderTop: '1px solid #000',
-            padding: '4px 6px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '6px',
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1 }}>
-            <button style={smallBtnStyle} onClick={() => setScreen('prices')}>
-              Average Price List
-            </button>
-            <button style={smallBtnStyle} onClick={() => setScreen('chart')}>
-              Short Range Chart
-            </button>
-          </div>
-          <button style={warpBtnStyle} disabled={!canTravel} onClick={handleWarp}>
-            Warp
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── AVERAGE PRICE LIST SCREEN ──
-  if (screen === 'prices') {
-    const estimatedPrices = TradeItems.map((item) =>
-      getStandardPrice(
-        item,
-        target.size ?? 1,
-        target.techLevel ?? 5,
-        target.politics ?? 0,
-        target.specialResources ?? 0,
-      ),
-    );
-
-    const shipType = ShipTypes[ship.type];
-    const usedCargo = ship.cargo ? ship.cargo.reduce((a: number, b: number) => a + b, 0) : 0;
-    const leftItems = TradeItems.slice(0, 5);
-    const rightItems = TradeItems.slice(5, 10);
-
-    return (
-      <div
-        className="palm-window"
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-      >
-        {TitleBar && <TitleBar title="Average Price List" onViewChange={onViewChange} />}
-
-        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 8px' }}>
-          <div style={{ ...rowStyle, marginBottom: '2px' }}>
-            <span style={{ fontFamily: 'monospace', fontSize: '11px' }}>
-              {SystemNames[target.nameIndex]}
-            </span>
-            <NavArrows />
-          </div>
-
-          <div
-            style={{
-              fontSize: '10px',
-              fontFamily: 'monospace',
-              marginBottom: '4px',
-              color: '#444',
-            }}
-          >
-            {target.visited
-              ? SpecialResources[target.specialResources ?? 0]
-              : 'Special resources unknown'}
-          </div>
-
-          {/* Price grid — 5 rows × 2 columns */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              columnGap: '6px',
-              rowGap: '1px',
-            }}
-          >
-            {leftItems.map((leftItem, i) => {
-              const rightItem = rightItems[i];
-              const lp = estimatedPrices[leftItem.id];
-              const rp = estimatedPrices[rightItem.id];
-              // Items requiring tech level ≥ 3 to produce are highlighted (higher-value goods)
-              const lBold = leftItem.techProduction >= 3;
-              const rBold = rightItem.techProduction >= 3;
-              return (
-                <React.Fragment key={i}>
-                  <div
-                    style={{
-                      fontSize: '10px',
-                      fontFamily: 'monospace',
-                      fontWeight: lBold ? 'bold' : 'normal',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <span>{leftItem.name}</span>
-                    <span>{lp > 0 ? `${lp} cr.` : '---'}</span>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '10px',
-                      fontFamily: 'monospace',
-                      fontWeight: rBold ? 'bold' : 'normal',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <span>{rightItem.name}</span>
-                    <span>{rp > 0 ? `${rp} cr.` : '---'}</span>
-                  </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-
-        <div
-          style={{
-            borderTop: '1px solid #000',
-            padding: '4px 6px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '6px',
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button style={smallBtnStyle}>Price Differences</button>
-              <span style={{ fontSize: '10px', fontFamily: 'monospace' }}>
-                Bays: {usedCargo}/{shipType?.cargoBays ?? 15}
-              </span>
-            </div>
-            <button style={smallBtnStyle} onClick={() => setScreen('target')}>
-              System Information
-            </button>
-            <button style={smallBtnStyle} onClick={() => setScreen('chart')}>
-              Short Range Chart
-            </button>
-          </div>
-          <button style={warpBtnStyle} disabled={!canTravel} onClick={handleWarp}>
-            Warp
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── SHORT RANGE CHART (default) ──
-  const fuelRange = Math.max(ship.fuel, 1);
-  const scale = (Math.min(CX, CY) * 0.45) / fuelRange;
-  const warpRadius = fuelRange * scale;
+  // ── SHORT RANGE CHART ──
+  // Scale is fixed to the full tank capacity so visible systems never change.
+  // The warp circle shrinks with current fuel.
+  const maxFuel = Math.max(ShipTypes[ship.type]?.fuelTanks ?? 1, 1);
+  const scale = (Math.min(CX, CY) * ZOOM) / maxFuel;
+  const warpRadius = Math.max(ship.fuel, 0) * scale;
 
   const project = (sx: number, sy: number) => ({
     x: CX + (sx - current.x) * scale,
@@ -411,17 +85,26 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
     >
       {TitleBar && <TitleBar title="Short Range Chart" onViewChange={onViewChange} />}
 
-      <div style={{ flex: 1, overflow: 'hidden', background: 'white' }}>
+      <div style={{ flex: 1, overflow: 'hidden', background: 'white', position: 'relative' }}>
         <svg
-          width={CHART_W}
-          height={CHART_H}
+          width="100%"
+          height="100%"
           viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display: 'block', background: 'white' }}
         >
           <defs>
             <clipPath id="chart-clip">
               <rect x="0" y="0" width={CHART_W} height={CHART_H} />
             </clipPath>
+            {/* White background box behind each system name label */}
+            <filter id="label-bg" x="-5%" y="-15%" width="110%" height="140%">
+              <feFlood floodColor="white" result="bg" />
+              <feMerge>
+                <feMergeNode in="bg" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
           <circle cx={CX} cy={CY} r={warpRadius} fill="none" stroke="#000" strokeWidth="1" />
 
@@ -432,11 +115,6 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
               const inRange = dist(s.x, s.y, current.x, current.y) <= ship.fuel;
               const isSelected = idx === selectedSystem;
               const dotColor = s.status === WAR ? '#cc4400' : '#33aa00';
-              const { dx, dy } = labelOffset(sx, sy);
-              const textX = sx + dx;
-              const textY = sy + dy;
-              const anchor = dx > 0 ? 'start' : dx < -2 ? 'end' : 'middle';
-              const baseline = dy > 0 ? 'hanging' : dy < -2 ? 'auto' : 'middle';
 
               return (
                 <g
@@ -463,13 +141,14 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
                     fill={inRange ? dotColor : '#888'}
                   />
                   <text
-                    x={textX}
-                    y={textY}
-                    fontSize="9"
+                    x={sx}
+                    y={sy + LABEL_DY}
+                    fontSize="14"
                     fontFamily="'Courier New', monospace"
-                    fill="#000"
-                    textAnchor={anchor}
-                    dominantBaseline={baseline}
+                    fill="#000000"
+                    textAnchor="middle"
+                    dominantBaseline="auto"
+                    filter="url(#label-bg)"
                   >
                     {SystemNames[s.nameIndex]}
                   </text>
@@ -488,43 +167,6 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
             fill="#6688ff"
           />
         </svg>
-      </div>
-
-      {/* Chart footer: selected system info + warp */}
-      <div
-        style={{
-          borderTop: '1px solid #000',
-          padding: '3px 4px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#f0f0f0',
-          flexShrink: 0,
-        }}
-      >
-        <span style={{ fontSize: '10px', fontFamily: 'monospace' }}>
-          {selectedSystem === currentSystem
-            ? 'Select a system'
-            : `${SystemNames[target.nameIndex]} — ${fuelCost} parsecs`}
-        </span>
-        <button
-          disabled={!canTravel}
-          onClick={() => {
-            travelTo(selectedSystem);
-            onViewChange('trade');
-          }}
-          style={{
-            fontSize: '10px',
-            fontFamily: 'monospace',
-            padding: '2px 6px',
-            background: canTravel ? '#1A1A8C' : '#ccc',
-            color: canTravel ? 'white' : '#888',
-            border: '1px solid #000',
-            cursor: canTravel ? 'pointer' : 'default',
-          }}
-        >
-          Warp
-        </button>
       </div>
     </div>
   );

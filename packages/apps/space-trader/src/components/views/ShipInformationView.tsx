@@ -5,6 +5,7 @@ import { useTitleBar } from '../TitleBarContext';
 import { InformationButton } from '../common/InformationButton';
 import { TipsModal } from '../modals/TipsModal';
 import { GameModal } from '../modals/GameModal';
+import { SHIP_SPRITES } from '../../assets/ships/ShipSprites';
 
 interface ShipInformationViewProps {
   onViewChange: (view: ViewType) => void;
@@ -19,6 +20,7 @@ export const ShipInformationView: React.FC<ShipInformationViewProps> = ({ onView
   }
 
   const selectedShip = ShipTypes[viewingShipId];
+  const labelStyle: React.CSSProperties = { fontWeight: 'bold', width: '120px' };
   const shipSizes = ['Tiny', 'Small', 'Medium', 'Large', 'Huge'];
 
   return (
@@ -51,52 +53,61 @@ export const ShipInformationView: React.FC<ShipInformationViewProps> = ({ onView
         />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ position: 'relative', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Name:</span>
+            <span style={labelStyle}>Name:</span>
             <span>{selectedShip.name}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Size:</span>
+            <span style={labelStyle}>Size:</span>
             <span>{shipSizes[selectedShip.size]}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Cargo Bays:</span>
+            <span style={labelStyle}>Cargo Bays:</span>
             <span>{selectedShip.cargoBays}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Range:</span>
+            <span style={labelStyle}>Range:</span>
             <span>{selectedShip.fuelTanks} parsecs</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Hull Strength:</span>
+            <span style={labelStyle}>Hull Strength:</span>
             <span>{selectedShip.hullStrength}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Weapon Slots:</span>
+            <span style={labelStyle}>Weapon Slots:</span>
             <span>{selectedShip.weaponSlots}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Shield Slots:</span>
+            <span style={labelStyle}>Shield Slots:</span>
             <span>{selectedShip.shieldSlots}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Gadget Slots:</span>
+            <span style={labelStyle}>Gadget Slots:</span>
             <span>{selectedShip.gadgetSlots}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ fontWeight: 'bold', width: '120px' }}>Crew Quarters:</span>
+            <span style={labelStyle}>Crew Quarters:</span>
             <span>{selectedShip.crewQuarters}</span>
           </div>
         </div>
-        <div style={{ paddingRight: '12px', paddingTop: '40px' }}>
-          <img
-            src={`/apps/space-trader/ships/ship${selectedShip.id}.png`}
-            alt={selectedShip.name}
-            style={{ width: '64px', height: '64px', imageRendering: 'pixelated' }}
-            onError={(e) => (e.currentTarget.src = 'https://placehold.co/64x64?text=Ship')}
-          />
+
+        <div
+          style={{
+            position: 'absolute',
+            top: '90px', // Align with 'Weapon Slots' line
+            right: '0',
+            textAlign: 'right',
+          }}
+        >
+          {React.createElement(SHIP_SPRITES[selectedShip.id], {
+            style: {
+              transform: 'scale(0.8)',
+              transformOrigin: 'right center',
+              imageRendering: 'pixelated',
+            },
+          })}
         </div>
       </div>
 

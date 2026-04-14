@@ -6,6 +6,7 @@ interface GameModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  titleRight?: React.ReactNode;
 }
 
 export const GameModal: React.FC<GameModalProps> = ({
@@ -14,13 +15,14 @@ export const GameModal: React.FC<GameModalProps> = ({
   title,
   children,
   footer,
+  titleRight,
 }) => {
   if (!isOpen) return null;
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
@@ -34,11 +36,11 @@ export const GameModal: React.FC<GameModalProps> = ({
     >
       <div
         style={{
-          width: '96%',
+          width: '99%',
           maxWidth: '300px',
           height: 'calc(100% - 4px)',
           background: '#fff',
-          border: '2px solid #330099',
+          border: '3px solid #330099',
           borderRadius: '4px',
           overflow: 'hidden',
           marginTop: '2px',
@@ -55,17 +57,30 @@ export const GameModal: React.FC<GameModalProps> = ({
             background: '#330099',
             color: '#fff',
             padding: '4px 8px',
-            textAlign: 'center',
             fontWeight: 'bold',
             fontSize: '14px',
             flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
-          {title}
+          {/* Left spacer mirrors right slot to keep title visually centered */}
+          <div style={{ flex: '0 0 24px' }} />
+          <span style={{ flex: 1, textAlign: 'center' }}>{title}</span>
+          <div
+            style={{
+              flex: '0 0 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}
+          >
+            {titleRight}
+          </div>
         </div>
         <div
           style={{
-            padding: '12px',
+            padding: '5px',
             color: '#000',
             fontSize: '13px',
             lineHeight: '1.4',

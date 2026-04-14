@@ -5,6 +5,7 @@ import {
   ShipTypes,
   Weapons,
   Shields,
+  Gadgets,
   ShipType,
   TradeItems,
 } from './DataTypes';
@@ -92,13 +93,33 @@ function equipNPCShip(shipTypeId: number, techLevel: number): PlayerShip {
     }
   }
 
+  // Fill gadget slots
+  const gadget: number[] = [-1, -1, -1];
+  const availableGadgets = Gadgets.filter((g) => g.techLevel <= techLevel);
+  if (availableGadgets.length > 0) {
+    const totalGadgetChance = availableGadgets.reduce((acc, g) => acc + g.chance, 0);
+    for (let i = 0; i < shipType.gadgetSlots; i++) {
+      const roll = getRandom(totalGadgetChance);
+      let chosen = availableGadgets[0];
+      let cumChance = 0;
+      for (const g of availableGadgets) {
+        cumChance += g.chance;
+        if (roll < cumChance) {
+          chosen = g;
+          break;
+        }
+      }
+      gadget[i] = chosen.id;
+    }
+  }
+
   return {
     type: shipTypeId,
     cargo: new Array(10).fill(0),
     weapon,
     shield,
     shieldStrength,
-    gadget: [-1, -1, -1],
+    gadget,
     escapePod: false,
     fuel: shipType.fuelTanks,
     hull: shipType.hullStrength,

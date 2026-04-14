@@ -3,9 +3,11 @@ import {
   getTotalShieldStrength,
   getStrengthPolice,
   determineEncounter,
+  generateNPCEncounter,
   ENCOUNTER_POLICE,
   ENCOUNTER_PIRATE,
   ENCOUNTER_NONE,
+  ENCOUNTER_TRADER,
 } from '../Encounter';
 import { SolarSystem, PlayerShip, PoliticalSystems } from '../DataTypes';
 
@@ -78,6 +80,26 @@ describe('Encounter Logic', () => {
         .filter((e) => e !== ENCOUNTER_NONE).length;
 
       expect(fleaEncounters).toBeLessThan(gnatEncounters);
+    });
+  });
+
+  describe('NPC gadget equipping', () => {
+    it('NPC ships at tech level 4+ can have gadgets equipped', () => {
+      // Generate 200 pirates at high tech level — at least some should have gadgets
+      const npcs = Array.from({ length: 200 }, () =>
+        generateNPCEncounter(ENCOUNTER_PIRATE, 2, 0, 50, 7),
+      );
+      const hasAnyGadget = npcs.some((n) => n.ship.gadget.some((g) => g >= 0));
+      expect(hasAnyGadget).toBe(true);
+    });
+
+    it('NPC ships at tech level 1 have no gadgets', () => {
+      // At tech level 1, no gadgets are available (all require level 4+)
+      const npcs = Array.from({ length: 50 }, () =>
+        generateNPCEncounter(ENCOUNTER_PIRATE, 0, 0, 0, 1),
+      );
+      const allEmpty = npcs.every((n) => n.ship.gadget.every((g) => g === -1));
+      expect(allEmpty).toBe(true);
     });
   });
 });

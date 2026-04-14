@@ -30,7 +30,7 @@ const gridStyle: React.CSSProperties = {
   alignItems: 'baseline',
   fontSize: '13px',
   fontFamily: 'monospace',
-  lineHeight: '1.6',
+  lineHeight: '1.5',
 };
 
 const smallBtnStyle: React.CSSProperties = {

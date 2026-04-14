@@ -26,13 +26,13 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
   const availableShips = ShipTypes.filter((s) => s.minTechLevel <= system.techLevel);
 
   return (
-    <div className="palm-window" style={{ background: '#fff' }}>
+    <div
+      className="palm-window"
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
       {TitleBar && <TitleBar title="Ship Yard" onViewChange={onViewChange} />}
 
-      <div
-        className="palm-content"
-        style={{ padding: '8px 12px', color: '#000', fontSize: '13px' }}
-      >
+      <div style={{ flex: 1, overflow: 'hidden', background: 'white', position: 'relative' }}>
         {/* Fuel Section */}
         <div style={{ marginBottom: '16px' }}>
           <div>You have fuel to fly {ship.fuel} parsecs.</div>
@@ -62,7 +62,7 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
         </div>
 
         {/* Hull Section */}
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginTop: '25px', marginBottom: '16px' }}>
           {canRepair ? (
             <>
               <div>
@@ -100,7 +100,7 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
         </div>
 
         {/* Ships for Sale Section */}
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginTop: '25px', marginBottom: '16px' }}>
           <div style={{ marginBottom: '4px' }}>
             {availableShips.length > 0 ? 'Ships are for sale.' : 'No new ships are for sale.'}
           </div>
@@ -113,18 +113,10 @@ export const ShipYardView: React.FC<ShipYardViewProps> = ({ onViewChange }) => {
         <div style={{ marginBottom: '16px' }}>
           <div style={{ marginBottom: '4px' }}>No escape pods are for sale.</div>
         </div>
-      </div>
 
-      <div
-        className="palm-footer"
-        style={{
-          background: '#fff',
-          justifyContent: 'flex-end',
-          padding: '2px 8px',
-          borderTop: 'none',
-        }}
-      >
-        <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Cash: {credits} cr.</span>
+        <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 'bold', marginTop: '8px' }}>
+          Cash: {credits} cr.
+        </div>
       </div>
     </div>
   );

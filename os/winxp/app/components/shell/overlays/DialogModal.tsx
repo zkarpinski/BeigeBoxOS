@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useWindowManager } from '@retro-web/core/context';
+import { useWindowManager, escapeHtml } from '@retro-web/core';
 import { DIALOG_ICONS } from './dialogIcons';
 
 export function DialogModal() {
@@ -61,11 +61,7 @@ export function DialogModal() {
     }
   };
 
-  const safeMsg = message
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>');
+  const safeMsg = escapeHtml(message).replace(/\n/g, '<br>');
 
   return (
     <div className="w97dlg-overlay" onKeyDown={handleKey} tabIndex={-1}>

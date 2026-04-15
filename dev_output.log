@@ -1,0 +1,30 @@
+
+> retro-web@0.0.1 dev /app
+> pnpm --filter @retro-web/win98 dev
+
+
+> @retro-web/win98@0.0.1 dev /app/os/win98
+> next dev --turbopack
+
+   ▲ Next.js 15.5.13 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1721ms
+ ○ Compiling / ...
+ ✓ Compiled / in 10s
+ GET / 200 in 12683ms
+ GET / 200 in 960ms
+ GET /?app=aim 200 in 1599ms
+/app/os/win98:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @retro-web/win98@0.0.1 dev: `next dev --turbopack`
+Command failed with signal "SIGTERM"
+Terminated
+ ELIFECYCLE  Command failed with exit code 143.
+[?25h

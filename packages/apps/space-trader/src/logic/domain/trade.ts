@@ -14,6 +14,7 @@ export function executeBuy(
     ship: PlayerShip;
     buyPrices: number[];
     systemQuantities: number[];
+    specialCargoBays?: number;
   },
 ): TransactionResult | null {
   const price = state.buyPrices[goodId];
@@ -23,7 +24,7 @@ export function executeBuy(
 
   const usedCargo = state.ship.cargo.reduce((a, b) => a + b, 0);
   const shipType = ShipTypes[state.ship.type];
-  const freeCargo = shipType.cargoBays - usedCargo;
+  const freeCargo = shipType.cargoBays - usedCargo - (state.specialCargoBays ?? 0);
   const finalAmount = Math.min(amount, maxPoss, freeCargo);
 
   if (finalAmount <= 0) return null;

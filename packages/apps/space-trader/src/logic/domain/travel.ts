@@ -10,9 +10,30 @@ import { determineSystemPrices } from '../Merchant';
 import {
   determineEncounter,
   generateNPCEncounter,
+  generateQuestEncounter,
   ENCOUNTER_NONE,
   ENCOUNTER_PIRATE,
+  ENCOUNTER_MONSTER,
+  ENCOUNTER_DRAGONFLY,
+  ENCOUNTER_SCARAB,
 } from '../Encounter';
+import {
+  ACAMARSYSTEM,
+  ZALKONSYSTEM,
+  GEMULONSYSTEM,
+  DALEDSYSTEM,
+  ALIENINVASION,
+  GEMULONINVADED,
+  EXPERIMENT,
+  EXPERIMENTFAILED,
+} from '../SpecialEvents';
+
+export interface QuestState {
+  monsterStatus: number;
+  dragonflyStatus: number;
+  scarabStatus: number;
+  reactorOnBoard: boolean;
+}
 
 export interface TravelResult {
   currentSystem: number;
@@ -45,6 +66,7 @@ export function processWarp(
     difficulty: number;
     days: number;
     debt: number;
+    questState?: QuestState;
   },
 ): TravelResult {
   const current = state.systems[state.currentSystem];
@@ -95,8 +117,66 @@ export function processWarp(
     }
   }
 
+  // Quest encounters — inject boss fights when traveling to relevant systems
+  if (state.questState) {
+    const qs = state.questState;
+
+    // Space Monster: traveling to Acamar while quest is active
+    if (targetSystemId === ACAMARSYSTEM && qs.monsterStatus === 1) {
+      encounters.push({
+        type: ENCOUNTER_MONSTER,
+        npc: generateQuestEncounter(ENCOUNTER_MONSTER),
+        log: ['A massive space monster blocks your path!'],
+        round: 0,
+        resolved: false,
+        playerWon: false,
+        clickNumber: CLICKS,
+        destinationSystemIdx: targetSystemId,
+      });
+    }
+
+    // Dragonfly: traveling to Zalkon after tracking through chain
+    if (targetSystemId === ZALKONSYSTEM && qs.dragonflyStatus === 4) {
+      encounters.push({
+        type: ENCOUNTER_DRAGONFLY,
+        npc: generateQuestEncounter(ENCOUNTER_DRAGONFLY),
+        log: ['The Dragonfly attacks!'],
+        round: 0,
+        resolved: false,
+        playerWon: false,
+        clickNumber: CLICKS,
+        destinationSystemIdx: targetSystemId,
+      });
+    }
+
+    // Scarab: traveling to wormhole systems when scarab quest is active
+    if (qs.scarabStatus === 1) {
+      // Scarab appears near wormhole systems — check if target has a wormhole
+      const targetSys = state.systems[targetSystemId];
+      if (targetSys.wormholeDest !== undefined && targetSys.wormholeDest >= 0) {
+        encounters.push({
+          type: ENCOUNTER_SCARAB,
+          npc: generateQuestEncounter(ENCOUNTER_SCARAB),
+          log: ['The stolen Scarab ship engages you!'],
+          round: 0,
+          resolved: false,
+          playerWon: false,
+          clickNumber: CLICKS,
+          destinationSystemIdx: targetSystemId,
+        });
+      }
+    }
+  }
+
+  // Reactor radiation leak: random hull damage
+  const newShip = { ...state.ship };
+  if (state.questState?.reactorOnBoard && Math.random() < 0.2) {
+    const leak = Math.floor(Math.random() * 3) + 1;
+    newShip.hull = Math.max(1, newShip.hull - leak);
+  }
+
   // Reset shield strength (matches original DoWarp)
-  const newShieldStrength = state.ship.shield.map((s) => (s >= 0 ? Shields[s].power : -1));
+  const newShieldStrength = newShip.shield.map((s) => (s >= 0 ? Shields[s].power : -1));
 
   // Time and score decay
   const newDays = state.days + 1;
@@ -111,22 +191,42 @@ export function processWarp(
   // Debt interest
   const newDebt = state.debt > 0 ? Math.ceil(state.debt * 1.1) : 0;
 
-  // System updates (visited status, random status changes)
+  // System updates (visited status, random status changes, countdowns)
   const newSystems = state.systems.map((s, idx) => {
-    // Note: the original code flushed state.systemQuantities back to currentSystem here.
-    // We'll maintain that logic in the caller or handle it here if we passed it in.
+    let updated = s;
+
     if (idx === targetSystemId) {
-      return { ...s, visited: true };
+      updated = { ...updated, visited: true };
     }
+
+    // Countdown decrement for time-sensitive quests
+    if (updated.countDown > 0) {
+      const newCountDown = updated.countDown - 1;
+      if (newCountDown === 0) {
+        // Time expired — quest failed
+        if (updated.special === ALIENINVASION) {
+          // Gemulon invasion failed — devastate Gemulon
+          updated = { ...updated, countDown: 0, special: -1 };
+          // We'll mark GEMULONINVADED on Gemulon in the universe slice
+        } else if (updated.special === EXPERIMENT) {
+          // Experiment failed
+          updated = { ...updated, countDown: 0, special: -1 };
+        }
+      } else {
+        updated = { ...updated, countDown: newCountDown };
+      }
+    }
+
     // 10% chance for any system to clear status
-    if (s.status !== UNEVENTFUL && Math.random() < 0.1) {
-      return { ...s, status: UNEVENTFUL };
+    if (updated.status !== UNEVENTFUL && Math.random() < 0.1) {
+      updated = { ...updated, status: UNEVENTFUL };
     }
     // 5% chance for a random system to get a new status
-    if (s.status === UNEVENTFUL && Math.random() < 0.05) {
-      return { ...s, status: Math.floor(Math.random() * 8) };
+    if (updated.status === UNEVENTFUL && Math.random() < 0.05) {
+      updated = { ...updated, status: Math.floor(Math.random() * 8) };
     }
-    return s;
+
+    return updated;
   });
 
   return {
@@ -135,8 +235,8 @@ export function processWarp(
     debt: newDebt,
     policeRecordScore: newPoliceScore,
     ship: {
-      ...state.ship,
-      fuel: state.ship.fuel - fuelCost,
+      ...newShip,
+      fuel: newShip.fuel - fuelCost,
       shieldStrength: newShieldStrength,
     },
     buyPrices,

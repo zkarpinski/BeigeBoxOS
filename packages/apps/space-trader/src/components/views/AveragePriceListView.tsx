@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import {
   SystemNames,
@@ -42,8 +42,9 @@ const smallBtnStyle: React.CSSProperties = {
 
 export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, selectedMapSystemId, setSelectedMapSystem, ship } =
+  const { systems, currentSystem, selectedMapSystemId, setSelectedMapSystem, ship, travelTo } =
     useSpaceTraderGame();
+  const [showDiff, setShowDiff] = useState(false);
 
   const current = systems[currentSystem];
   const targetIdx = selectedMapSystemId ?? currentSystem;
@@ -82,6 +83,16 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
       target.techLevel ?? 5,
       target.politics ?? 0,
       target.specialResources ?? 0,
+    ),
+  );
+
+  const currentPrices = TradeItems.map((item) =>
+    getStandardPrice(
+      item,
+      current.size ?? 1,
+      current.techLevel ?? 5,
+      current.politics ?? 0,
+      current.specialResources ?? 0,
     ),
   );
 
@@ -179,8 +190,28 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
             const rightItem = rightItems[i];
             const lp = estimatedPrices[leftItem.id];
             const rp = estimatedPrices[rightItem.id];
-            const lBold = leftItem.techProduction >= 3;
-            const rBold = rightItem.techProduction >= 3;
+            const lcp = currentPrices[leftItem.id];
+            const rcp = currentPrices[rightItem.id];
+
+            let lLabel: string;
+            let rLabel: string;
+            let lBold: boolean;
+            let rBold: boolean;
+
+            if (showDiff) {
+              const lDiff = lp > 0 && lcp > 0 ? lp - lcp : null;
+              const rDiff = rp > 0 && rcp > 0 ? rp - rcp : null;
+              lLabel = lDiff !== null ? `${lDiff >= 0 ? '+' : ''}${lDiff} cr.` : '---';
+              rLabel = rDiff !== null ? `${rDiff >= 0 ? '+' : ''}${rDiff} cr.` : '---';
+              lBold = lDiff !== null && lDiff !== 0;
+              rBold = rDiff !== null && rDiff !== 0;
+            } else {
+              lLabel = lp > 0 ? `${lp} cr.` : '---';
+              rLabel = rp > 0 ? `${rp} cr.` : '---';
+              lBold = leftItem.techProduction >= 3;
+              rBold = rightItem.techProduction >= 3;
+            }
+
             return (
               <React.Fragment key={i}>
                 <div
@@ -193,7 +224,7 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
                   }}
                 >
                   <span>{leftItem.name}</span>
-                  <span>{lp > 0 ? `${lp} cr.` : '---'}</span>
+                  <span>{lLabel}</span>
                 </div>
                 <div
                   style={{
@@ -205,7 +236,7 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
                   }}
                 >
                   <span>{rightItem.name}</span>
-                  <span>{rp > 0 ? `${rp} cr.` : '---'}</span>
+                  <span>{rLabel}</span>
                 </div>
               </React.Fragment>
             );

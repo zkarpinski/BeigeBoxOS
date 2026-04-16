@@ -6,52 +6,60 @@ import {
   MAXRESOURCES,
   MAXSIZE,
   MAXSTATUS,
-  MAXCREWMEMBER,
   UNEVENTFUL,
   PoliticalSystems,
   SolarSystem,
 } from './DataTypes';
+import {
+  ACAMARSYSTEM,
+  BARATASSYSTEM,
+  DALEDSYSTEM,
+  DEVIDIASYSTEM,
+  GEMULONSYSTEM,
+  JAPORISYSTEM,
+  KRAVATSYSTEM,
+  MELINASYSTEM,
+  NIXSYSTEM,
+  REGULASSYSTEM,
+  UTOPIASYSTEM,
+  ZALKONSYSTEM,
+  // Destination/intermediate events
+  MONSTERKILLED,
+  FLYBARATAS,
+  FLYMELINA,
+  FLYREGULAS,
+  DRAGONFLYDESTROYED,
+  MEDICINEDELIVERY,
+  MOONBOUGHT,
+  JAREKGETSOUT,
+  WILDGETSOUT,
+  GETREACTOR,
+  REACTORDELIVERED,
+  ARTIFACTDELIVERY,
+  GEMULONRESCUED,
+  EXPERIMENTSTOPPED,
+  // Quest-starting events
+  SPACEMONSTER,
+  DRAGONFLY,
+  JAPORIDISEASE,
+  JAREK,
+  WILD,
+  ALIENARTIFACT,
+  SCARAB,
+  ALIENINVASION,
+  EXPERIMENT,
+  // One-off events
+  SKILLINCREASE,
+  ERASERECORD,
+  CARGOFORSALE,
+  LOTTERYWINNER,
+} from './SpecialEvents';
 
 // Distances based on spacetrader.h
 const GALAXYWIDTH = 150;
 const GALAXYHEIGHT = 110;
 const CLOSEDISTANCE = 13;
 const MINDISTANCE = 6;
-
-// Fixed system indexes
-const ACAMARSYSTEM = 0;
-const BARATASSYSTEM = 6;
-const DALEDSYSTEM = 17;
-const DEVIDIASYSTEM = 22;
-const GEMULONSYSTEM = 32;
-const JAPORISYSTEM = 41;
-const KRAVATSYSTEM = 50;
-const MELINASYSTEM = 59;
-const NIXSYSTEM = 67;
-const OGSYSTEM = 70;
-const REGULASSYSTEM = 82;
-const SOLSYSTEM = 92;
-const UTOPIASYSTEM = 109;
-const ZALKONSYSTEM = 118;
-
-// Special events for placement
-const MONSTERKILLED = 4;
-const FLYBARATAS = 1;
-const FLYMELINA = 2;
-const FLYREGULAS = 3;
-const DRAGONFLYDESTROYED = 0;
-const MEDICINEDELIVERY = 5;
-const MOONBOUGHT = 6;
-const JAREKGETSOUT = 32;
-const WILDGETSOUT = 36;
-const SCARABDESTROYED = 30;
-const GETREACTOR = 26;
-const REACTORDELIVERED = 31;
-const ARTIFACTDELIVERY = 18;
-const ALIENINVASION = 21;
-const GEMULONRESCUED = 33;
-const EXPERIMENT = 24;
-const EXPERIMENTSTOPPED = 34;
 
 // Math Helpers
 const getRandom = (max: number) => Math.floor(Math.random() * max);
@@ -60,6 +68,21 @@ const sqrDistance = (a: { x: number; y: number }, b: { x: number; y: number }) =
   sqr(a.x - b.x) + sqr(a.y - b.y);
 const realDistance = (a: { x: number; y: number }, b: { x: number; y: number }) =>
   Math.sqrt(sqrDistance(a, b));
+
+/** Place an event on a random unoccupied system */
+function placeOnRandom(
+  systems: { special: number }[],
+  eventId: number,
+  reserved: Set<number>,
+): void {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const idx = getRandom(systems.length);
+    if (systems[idx].special === -1 && !reserved.has(idx)) {
+      systems[idx].special = eventId;
+      return;
+    }
+  }
+}
 
 export function generateGalaxy() {
   const systems: SolarSystem[] = [];
@@ -126,6 +149,8 @@ export function generateGalaxy() {
       specialResources,
       size,
       visited: false,
+      special: -1,
+      countDown: 0,
     });
 
     i++;
@@ -134,7 +159,7 @@ export function generateGalaxy() {
   // Randomize locations so alphabet naming isn't all clumping together
   for (let idx = 0; idx < MAXSOLARSYSTEM; idx++) {
     const isWormhole = wormholes.includes(idx);
-    let swapIdx = getRandom(MAXSOLARSYSTEM);
+    const swapIdx = getRandom(MAXSOLARSYSTEM);
     if (wormholes.includes(swapIdx)) continue; // Don't swap two wormholes randomly here
 
     const tempX = systems[idx].x;
@@ -150,8 +175,27 @@ export function generateGalaxy() {
     }
   }
 
-  // Assign special events to specific locations
-  const specialLocations = [
+  // Shuffle wormhole endpoint assignments (from NewGame.c)
+  for (let wi = 0; wi < wormholes.length; wi++) {
+    const j = getRandom(MAXWORMHOLE);
+    const temp = wormholes[wi];
+    wormholes[wi] = wormholes[j];
+    wormholes[j] = temp;
+  }
+
+  // Add wormhole destinations and qty arrays
+  const systemState = systems.map((s, idx) => {
+    const wormholeIdx = wormholes.indexOf(idx);
+    return {
+      ...s,
+      qty: new Array(10).fill(0),
+      // Each wormhole system points to the next in the shuffled ring
+      wormholeDest: wormholeIdx >= 0 ? wormholes[(wormholeIdx + 1) % MAXWORMHOLE] : -1,
+    };
+  });
+
+  // --- Fixed destination events (always at specific named systems) ---
+  const fixedLocations = [
     { target: ACAMARSYSTEM, spec: MONSTERKILLED },
     { target: BARATASSYSTEM, spec: FLYBARATAS },
     { target: MELINASYSTEM, spec: FLYMELINA },
@@ -161,55 +205,95 @@ export function generateGalaxy() {
     { target: UTOPIASYSTEM, spec: MOONBOUGHT },
     { target: DEVIDIASYSTEM, spec: JAREKGETSOUT },
     { target: KRAVATSYSTEM, spec: WILDGETSOUT },
+    { target: GEMULONSYSTEM, spec: GEMULONRESCUED },
+    { target: DALEDSYSTEM, spec: EXPERIMENTSTOPPED },
   ];
 
-  // Shuffle wormhole endpoint assignments (from NewGame.c)
-  for (let i = 0; i < wormholes.length; i++) {
-    const j = getRandom(MAXWORMHOLE);
-    const temp = wormholes[i];
-    wormholes[i] = wormholes[j];
-    wormholes[j] = temp;
-  }
-
-  // Expose an extra property 'special' to track quests, just like original
-  const systemState = systems.map((s, idx) => {
-    const wormholeIdx = wormholes.indexOf(idx);
-    return {
-      ...s,
-      special: -1,
-      qty: new Array(10).fill(0),
-      countDown: 0,
-      // Each wormhole system points to the next in the shuffled ring
-      wormholeDest: wormholeIdx >= 0 ? wormholes[(wormholeIdx + 1) % MAXWORMHOLE] : -1,
-    };
-  });
-
-  for (const loc of specialLocations) {
+  for (const loc of fixedLocations) {
     if (systemState[loc.target]) {
       systemState[loc.target].special = loc.spec;
     }
   }
 
-  // Distance quests (Reactor)
-  let d = 999;
-  let k = -1;
+  // --- Distance-based events ---
+  // Reactor: find system >= 70 parsecs from Nix
+  let bestDist = 999;
+  let reactorSystem = -1;
   for (let j = 0; j < MAXSOLARSYSTEM; j++) {
     const dist = realDistance(systemState[NIXSYSTEM], systemState[j]);
     if (
       dist >= 70 &&
-      dist < d &&
+      dist < bestDist &&
       systemState[j].special < 0 &&
       j !== GEMULONSYSTEM &&
       j !== DALEDSYSTEM
     ) {
-      k = j;
-      d = dist;
+      reactorSystem = j;
+      bestDist = dist;
     }
   }
-  if (k >= 0) {
-    systemState[k].special = GETREACTOR;
+  if (reactorSystem >= 0) {
+    systemState[reactorSystem].special = GETREACTOR;
     systemState[NIXSYSTEM].special = REACTORDELIVERED;
   }
 
+  // --- Quest-starting events on random systems ---
+  // Reserve fixed-event systems so starters don't overwrite them
+  const reserved = new Set([
+    ACAMARSYSTEM,
+    BARATASSYSTEM,
+    DALEDSYSTEM,
+    DEVIDIASYSTEM,
+    GEMULONSYSTEM,
+    JAPORISYSTEM,
+    KRAVATSYSTEM,
+    MELINASYSTEM,
+    NIXSYSTEM,
+    REGULASSYSTEM,
+    UTOPIASYSTEM,
+    ZALKONSYSTEM,
+    ...(reactorSystem >= 0 ? [reactorSystem] : []),
+  ]);
+
+  placeOnRandom(systemState, SPACEMONSTER, reserved);
+  placeOnRandom(systemState, DRAGONFLY, reserved);
+  placeOnRandom(systemState, JAPORIDISEASE, reserved);
+  placeOnRandom(systemState, JAREK, reserved);
+  placeOnRandom(systemState, WILD, reserved);
+  placeOnRandom(systemState, ALIENARTIFACT, reserved);
+  placeOnRandom(systemState, SCARAB, reserved);
+
+  // Artifact delivery destination
+  placeOnRandom(systemState, ARTIFACTDELIVERY, reserved);
+
+  // Time-sensitive quest starters
+  const invasionIdx = placeOnRandomReturn(systemState, ALIENINVASION, reserved);
+  if (invasionIdx >= 0) systemState[invasionIdx].countDown = 7;
+  const experimentIdx = placeOnRandomReturn(systemState, EXPERIMENT, reserved);
+  if (experimentIdx >= 0) systemState[experimentIdx].countDown = 6;
+
+  // One-off events scattered on random systems
+  placeOnRandom(systemState, SKILLINCREASE, reserved);
+  placeOnRandom(systemState, SKILLINCREASE, reserved); // Two skill tonics
+  placeOnRandom(systemState, ERASERECORD, reserved);
+  placeOnRandom(systemState, CARGOFORSALE, reserved);
+  placeOnRandom(systemState, LOTTERYWINNER, reserved);
+
   return { systems: systemState, wormholes };
+}
+
+/** Like placeOnRandom but returns the index where it was placed (-1 if failed) */
+function placeOnRandomReturn(
+  systems: { special: number; countDown: number }[],
+  eventId: number,
+  reserved: Set<number>,
+): number {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const idx = getRandom(systems.length);
+    if (systems[idx].special === -1 && !reserved.has(idx)) {
+      systems[idx].special = eventId;
+      return idx;
+    }
+  }
+  return -1;
 }

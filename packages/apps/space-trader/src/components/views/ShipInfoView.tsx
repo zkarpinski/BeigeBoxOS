@@ -161,6 +161,12 @@ export const ShipInfoView: React.FC<ShipInfoViewProps> = ({ onViewChange }) => {
             .join(', ') || 'None',
         )}
         {row('Escape pod', ship.escapePod ? 'Yes' : 'No')}
+
+        <div style={{ marginTop: '8px' }}>
+          <button className="palm-btn" onClick={() => onViewChange('quests')}>
+            Quests
+          </button>
+        </div>
       </div>
 
       <div className="palm-footer">

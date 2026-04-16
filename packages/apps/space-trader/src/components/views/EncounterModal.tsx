@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, SystemNames, Weapons, Shields } from '../../logic/DataTypes';
-import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../../logic/Encounter';
+import {
+  ENCOUNTER_PIRATE,
+  ENCOUNTER_POLICE,
+  ENCOUNTER_TRADER,
+  ENCOUNTER_MONSTER,
+  ENCOUNTER_DRAGONFLY,
+  ENCOUNTER_SCARAB,
+} from '../../logic/Encounter';
 import { SHIP_SPRITES } from '../../assets/ships/ShipSprites';
 import { GameModal } from '../modals/GameModal';
 import { InformationButton } from '../common/InformationButton';
@@ -78,6 +85,17 @@ function EncounterIcon({ type }: { type: string }) {
       </svg>
     );
   }
+  if (type === ENCOUNTER_MONSTER || type === ENCOUNTER_DRAGONFLY || type === ENCOUNTER_SCARAB) {
+    // Boss: red diamond
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28">
+        <polygon points="14,2 26,14 14,26 2,14" fill="#cc0000" stroke="#800" strokeWidth="1" />
+        <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#fff">
+          !
+        </text>
+      </svg>
+    );
+  }
   // Trader: coin
   return (
     <svg width="28" height="28" viewBox="0 0 28 28">
@@ -109,6 +127,20 @@ function buildNarrativeText(
     if (type === ENCOUNTER_PIRATE) return ['You escaped the pirate!'];
     if (type === ENCOUNTER_POLICE) return ['The police let you go.'];
     return ['You parted ways with the trader.'];
+  }
+
+  // Boss encounters
+  if (type === ENCOUNTER_MONSTER) {
+    if (resolved && playerWon) return ['You destroyed the space monster!'];
+    return ['A massive space monster blocks your path!', 'It attacks with terrifying force!'];
+  }
+  if (type === ENCOUNTER_DRAGONFLY) {
+    if (resolved && playerWon) return ['You destroyed the Dragonfly!'];
+    return ['The experimental Dragonfly ship attacks!', 'It is extremely fast and dangerous!'];
+  }
+  if (type === ENCOUNTER_SCARAB) {
+    if (resolved && playerWon) return ['You destroyed the Scarab!'];
+    return ['The stolen Scarab ship engages you!', 'It is heavily armored!'];
   }
 
   const typeLabel =
@@ -181,8 +213,18 @@ export const EncounterModal: React.FC = () => {
   const destIdx = encounter.destinationSystemIdx ?? currentSystem;
   const systemName = SystemNames[systems[destIdx]?.nameIndex ?? 0] ?? 'Unknown';
 
-  const typeLabel =
-    encounter.type === ENCOUNTER_PIRATE
+  const isBoss =
+    encounter.type === ENCOUNTER_MONSTER ||
+    encounter.type === ENCOUNTER_DRAGONFLY ||
+    encounter.type === ENCOUNTER_SCARAB;
+
+  const typeLabel = isBoss
+    ? encounter.type === ENCOUNTER_MONSTER
+      ? 'Space Monster'
+      : encounter.type === ENCOUNTER_DRAGONFLY
+        ? 'Dragonfly'
+        : 'Scarab'
+    : encounter.type === ENCOUNTER_PIRATE
       ? 'Pirate'
       : encounter.type === ENCOUNTER_POLICE
         ? 'Police'
@@ -287,6 +329,17 @@ export const EncounterModal: React.FC = () => {
                 </button>
               )}
             </>
+          )}
+          {isBoss && (
+            <button
+              style={pillBtnBase}
+              onClick={() => {
+                lastActionRef.current = 'flee';
+                fleeFromEncounter();
+              }}
+            >
+              Flee
+            </button>
           )}
         </>
       )}

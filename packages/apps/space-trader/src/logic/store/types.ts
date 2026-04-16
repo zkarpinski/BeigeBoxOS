@@ -89,8 +89,35 @@ export interface OptionsSlice {
   setOption: (key: string, value: boolean | number) => void;
 }
 
+export interface QuestSlice {
+  // Multi-step quest progress (0 = not started, increments through stages)
+  monsterStatus: number;
+  dragonflyStatus: number;
+  japoriStatus: number;
+  reactorStatus: number;
+  jarekStatus: number;
+  wildStatus: number;
+  artifactStatus: number;
+  scarabStatus: number;
+  invasionStatus: number;
+  experimentStatus: number;
+  moonBought: boolean;
+
+  // Special cargo flags
+  jarekOnBoard: boolean;
+  wildOnBoard: boolean;
+  reactorOnBoard: boolean;
+  artifactOnBoard: boolean;
+  antidoteOnBoard: boolean;
+
+  // Actions
+  triggerSpecialEvent: (systemIdx: number) => void;
+  handleQuestEncounterVictory: (encounterType: string) => void;
+}
+
 export type SpaceTraderState = PlayerSlice &
   UniverseSlice &
   EncounterSlice &
   GameSlice &
-  OptionsSlice;
+  OptionsSlice &
+  QuestSlice;

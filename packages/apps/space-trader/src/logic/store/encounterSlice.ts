@@ -1,6 +1,13 @@
 import { StateCreator } from 'zustand';
 import { ActiveEncounter, ShipTypes, PoliticalSystems } from '../DataTypes';
-import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../Encounter';
+import {
+  ENCOUNTER_PIRATE,
+  ENCOUNTER_POLICE,
+  ENCOUNTER_TRADER,
+  ENCOUNTER_MONSTER,
+  ENCOUNTER_DRAGONFLY,
+  ENCOUNTER_SCARAB,
+} from '../Encounter';
 import { resolveCombatRound, resolveFlee } from '../domain/combat';
 import { SpaceTraderState, EncounterSlice } from './types';
 
@@ -80,6 +87,16 @@ export const createEncounterSlice: StateCreator<SpaceTraderState, [], [], Encoun
           playerWon: true,
         },
       });
+
+      // Quest encounter victory hooks
+      const encType = state.encounter.type;
+      if (
+        encType === ENCOUNTER_MONSTER ||
+        encType === ENCOUNTER_DRAGONFLY ||
+        encType === ENCOUNTER_SCARAB
+      ) {
+        state.handleQuestEncounterVictory(encType);
+      }
       return;
     }
 

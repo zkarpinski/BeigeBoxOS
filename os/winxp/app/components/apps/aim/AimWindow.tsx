@@ -9,6 +9,7 @@ import { AimRunningManIcon } from './AimRunningManIcon';
 import { AimBanner } from './AimBanner';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { escapeHtml } from '@retro-web/core';
 
 const SCREEN_NAME = 'F4$tRunn3r200';
 
@@ -613,7 +614,7 @@ export function AimWindow() {
             className="aim-profile-content"
             dangerouslySetInnerHTML={{
               __html:
-                `<b>Screen Name:</b> ${currentBuddy.name}<br>` +
+                `<b>Screen Name:</b> ${escapeHtml(currentBuddy.name)}<br>` +
                 `<b>Member Since:</b> February 1998<br>` +
                 `<b>Last On:</b> Today<br><br><hr>` +
                 `<i>:: my info ::</i><br>` +

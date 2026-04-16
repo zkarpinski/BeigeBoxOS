@@ -85,12 +85,7 @@ async function verifySignature(secret, payloadB64, sigB64) {
     ['verify'],
   );
   const actualSig = b64UrlDecode(sigB64);
-  return await crypto.subtle.verify(
-    'HMAC',
-    key,
-    actualSig,
-    new TextEncoder().encode(payloadB64),
-  );
+  return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
 }
 
 export async function onRequestPost(context) {

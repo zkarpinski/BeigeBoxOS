@@ -403,8 +403,59 @@ export const EncounterModal: React.FC = () => {
         infoPanel
       ) : (
         <>
-          {/* Ship sprites + encounter icon (hidden in textual mode) */}
-          {!optTextualEncounters && (
+          {/* Ship visuals: graphical sprites or textual stats */}
+          {optTextualEncounters ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                columnGap: '12px',
+                marginBottom: '10px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+                lineHeight: '1.5',
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 'bold' }}>You</div>
+                <div>{playerShipType.name}</div>
+                <div>
+                  Hull at{' '}
+                  {playerShipType.hullStrength > 0
+                    ? Math.round((ship.hull / playerShipType.hullStrength) * 100)
+                    : 100}
+                  %
+                </div>
+                <div>
+                  {ship.shield.some((s) => s >= 0)
+                    ? ship.shield
+                        .filter((s) => s >= 0)
+                        .map((s) => Shields[s]?.name ?? '?')
+                        .join(', ')
+                    : 'No shields'}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold' }}>Opponent</div>
+                <div>{npcShipType.name}</div>
+                <div>
+                  Hull at{' '}
+                  {npcShipType.hullStrength > 0
+                    ? Math.round((encounter.npc.ship.hull / npcShipType.hullStrength) * 100)
+                    : 100}
+                  %
+                </div>
+                <div>
+                  {encounter.npc.ship.shield.some((s) => s >= 0)
+                    ? encounter.npc.ship.shield
+                        .filter((s) => s >= 0)
+                        .map((s) => Shields[s]?.name ?? '?')
+                        .join(', ')
+                    : 'No shields'}
+                </div>
+              </div>
+            </div>
+          ) : (
             <div style={{ position: 'relative', marginBottom: '12px' }}>
               {/* Encounter type icon — top right */}
               <div style={{ position: 'absolute', top: 0, right: 0 }}>

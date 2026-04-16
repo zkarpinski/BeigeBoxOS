@@ -9,6 +9,7 @@ import {
 } from '../../logic/DataTypes';
 import { useTitleBar } from '../TitleBarContext';
 import { getStandardPrice } from '../../logic/Merchant';
+import { getSpecialCargoBays } from '../../logic/store/questSlice';
 
 interface AveragePriceListViewProps {
   onViewChange: (view: ViewType) => void;
@@ -40,11 +41,37 @@ const smallBtnStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
+const modalBtnStyle: React.CSSProperties = {
+  fontSize: '12px',
+  fontFamily: 'monospace',
+  padding: '4px 16px',
+  background: '#fff',
+  border: '2px solid #000',
+  borderRadius: '6px',
+  cursor: 'pointer',
+};
+
 export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem, selectedMapSystemId, setSelectedMapSystem, ship, travelTo } =
-    useSpaceTraderGame();
+  const {
+    systems,
+    currentSystem,
+    selectedMapSystemId,
+    setSelectedMapSystem,
+    ship,
+    travelTo,
+    credits,
+    buyPrices,
+    buyGood,
+    antidoteOnBoard,
+    reactorOnBoard,
+    jarekOnBoard,
+    wildOnBoard,
+    artifactOnBoard,
+  } = useSpaceTraderGame();
   const [showDiff, setShowDiff] = useState(false);
+  const [buyItemId, setBuyItemId] = useState<number | null>(null);
+  const [buyQty, setBuyQty] = useState(1);
 
   const current = systems[currentSystem];
   const targetIdx = selectedMapSystemId ?? currentSystem;
@@ -98,8 +125,48 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
 
   const shipType = ShipTypes[ship.type];
   const usedCargo = ship.cargo ? ship.cargo.reduce((a: number, b: number) => a + b, 0) : 0;
+  const specialBays = getSpecialCargoBays({
+    antidoteOnBoard,
+    reactorOnBoard,
+    jarekOnBoard,
+    wildOnBoard,
+    artifactOnBoard,
+  });
+  const freeBays = shipType.cargoBays - usedCargo - specialBays;
   const leftItems = TradeItems.slice(0, 5);
   const rightItems = TradeItems.slice(5, 10);
+
+  // Buy popup logic
+  const buyItem = buyItemId !== null ? TradeItems[buyItemId] : null;
+  const buyPrice = buyItemId !== null ? buyPrices[buyItemId] : 0;
+  const canAfford = buyPrice > 0 ? Math.floor(credits / buyPrice) : 0;
+  const maxBuyable = Math.min(canAfford, freeBays);
+
+  const handleItemClick = (itemId: number) => {
+    const price = buyPrices[itemId];
+    if (price <= 0) return;
+    if (freeBays <= 0) return;
+    const afford = Math.floor(credits / price);
+    setBuyItemId(itemId);
+    setBuyQty(Math.min(1, Math.min(afford, freeBays)));
+  };
+
+  const handleBuy = () => {
+    if (buyItemId === null || buyQty <= 0) return;
+    buyGood(buyItemId, buyQty);
+    setBuyItemId(null);
+  };
+
+  const handleBuyAll = () => {
+    if (buyItemId === null) return;
+    const price = buyPrices[buyItemId];
+    if (price <= 0) return;
+    const maxAfford = Math.floor(credits / price);
+    const currentFree = shipType.cargoBays - usedCargo - specialBays;
+    const qty = Math.min(maxAfford, currentFree);
+    if (qty > 0) buyGood(buyItemId, qty);
+    setBuyItemId(null);
+  };
 
   const warpBtnStyle: React.CSSProperties = {
     fontSize: '13px',
@@ -119,7 +186,7 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
   return (
     <div
       className="palm-window"
-      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}
     >
       {TitleBar && <TitleBar title="Average Price List" onViewChange={onViewChange} />}
 
@@ -221,7 +288,9 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
                     fontWeight: lBold ? 'bold' : 'normal',
                     display: 'flex',
                     justifyContent: 'space-between',
+                    cursor: buyPrices[leftItem.id] > 0 ? 'pointer' : 'default',
                   }}
+                  onClick={() => handleItemClick(leftItem.id)}
                 >
                   <span>{leftItem.name}</span>
                   <span>{lLabel}</span>
@@ -233,7 +302,9 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
                     fontWeight: rBold ? 'bold' : 'normal',
                     display: 'flex',
                     justifyContent: 'space-between',
+                    cursor: buyPrices[rightItem.id] > 0 ? 'pointer' : 'default',
                   }}
+                  onClick={() => handleItemClick(rightItem.id)}
                 >
                   <span>{rightItem.name}</span>
                   <span>{rLabel}</span>
@@ -257,7 +328,9 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button style={smallBtnStyle}>Price Differences</button>
+            <button style={smallBtnStyle} onClick={() => setShowDiff((v) => !v)}>
+              {showDiff ? 'Absolute Prices' : 'Price Differences'}
+            </button>
             <span style={{ fontSize: '10px', fontFamily: 'monospace' }}>
               Bays: {usedCargo}/{shipType?.cargoBays ?? 15}
             </span>
@@ -273,12 +346,81 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
           style={warpBtnStyle}
           disabled={!canTravel}
           onClick={() => {
-            /* warp handled from target */
+            travelTo(targetIdx);
+            onViewChange('trade');
           }}
         >
           Warp
         </button>
       </div>
+
+      {/* Buy popup */}
+      {buyItemId !== null && buyItem && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            border: '3px solid #330099',
+            borderRadius: '4px',
+            background: '#fff',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              background: '#330099',
+              color: '#fff',
+              padding: '2px 6px',
+              fontWeight: 'bold',
+              fontSize: '13px',
+              fontFamily: 'monospace',
+              textAlign: 'center',
+            }}
+          >
+            Buy {buyItem.name}
+          </div>
+          <div style={{ padding: '8px 10px', fontFamily: 'monospace', fontSize: '12px' }}>
+            <div style={{ marginBottom: '6px' }}>
+              At {buyPrice} cr. each, you can afford {canAfford}.
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+              <span>How many do you want to buy?</span>
+              <input
+                type="number"
+                min={0}
+                max={maxBuyable}
+                value={buyQty}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(maxBuyable, parseInt(e.target.value) || 0));
+                  setBuyQty(v);
+                }}
+                style={{
+                  width: '40px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  textAlign: 'right',
+                  border: '1px solid #888',
+                  padding: '1px 3px',
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button style={modalBtnStyle} onClick={handleBuy} disabled={buyQty <= 0}>
+                OK
+              </button>
+              <button style={modalBtnStyle} onClick={handleBuyAll} disabled={maxBuyable <= 0}>
+                All
+              </button>
+              <button style={modalBtnStyle} onClick={() => setBuyItemId(null)}>
+                None
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

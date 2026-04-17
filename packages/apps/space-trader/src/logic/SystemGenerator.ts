@@ -160,7 +160,22 @@ export function generateGalaxy() {
   for (let idx = 0; idx < MAXSOLARSYSTEM; idx++) {
     const isWormhole = wormholes.includes(idx);
     const swapIdx = getRandom(MAXSOLARSYSTEM);
+    if (swapIdx === idx) continue;
     if (wormholes.includes(swapIdx)) continue; // Don't swap two wormholes randomly here
+
+    // If either system is a wormhole, ensure the swap doesn't cluster wormholes together
+    if (isWormhole) {
+      const newPos = { x: systems[swapIdx].x, y: systems[swapIdx].y };
+      let tooClose = false;
+      for (const wi of wormholes) {
+        if (wi === idx) continue; // skip self
+        if (sqrDistance(newPos, systems[wi]) < sqr(CLOSEDISTANCE * 2)) {
+          tooClose = true;
+          break;
+        }
+      }
+      if (tooClose) continue;
+    }
 
     const tempX = systems[idx].x;
     const tempY = systems[idx].y;

@@ -17,6 +17,8 @@ import { OptionsView } from './views/OptionsView';
 import { OptionsPage2View } from './views/OptionsPage2View';
 import { SpecialEventView } from './views/SpecialEventView';
 import { QuestsView } from './views/QuestsView';
+import { BankView } from './views/BankView';
+import { NewsView } from './views/NewsView';
 import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
@@ -99,7 +101,9 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       activeView === 'options' ||
       activeView === 'options2' ||
       activeView === 'specialEvent' ||
-      activeView === 'quests';
+      activeView === 'quests' ||
+      activeView === 'bank' ||
+      activeView === 'news';
     onHideStatusBarChange?.(modalActive);
   }, [encounter, activeView, onHideStatusBarChange]);
 
@@ -122,6 +126,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       options2: 'Options',
       specialEvent: 'Special Event',
       quests: 'Quests',
+      bank: 'Bank',
+      news: 'News',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);
@@ -150,6 +156,8 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         {activeView === 'options2' && <OptionsPage2View onViewChange={setActiveView} />}
         {activeView === 'specialEvent' && <SpecialEventView onViewChange={setActiveView} />}
         {activeView === 'quests' && <QuestsView onViewChange={setActiveView} />}
+        {activeView === 'bank' && <BankView onViewChange={setActiveView} />}
+        {activeView === 'news' && <NewsView onViewChange={setActiveView} />}
 
         {isGameOver && <GameOverView />}
         <EncounterModal />

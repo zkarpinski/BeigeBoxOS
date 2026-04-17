@@ -11,6 +11,7 @@ import {
   determineEncounter,
   generateNPCEncounter,
   generateQuestEncounter,
+  determineEncounterAction,
   ENCOUNTER_NONE,
   ENCOUNTER_PIRATE,
   ENCOUNTER_MONSTER,
@@ -103,6 +104,12 @@ export function processWarp(
         state.days,
         target.techLevel,
       );
+      const action = determineEncounterAction(
+        encounterType,
+        state.policeRecordScore,
+        state.ship,
+        npc.ship,
+      );
       encounters.push({
         type: encounterType,
         npc,
@@ -112,6 +119,7 @@ export function processWarp(
         playerWon: false,
         clickNumber: click,
         destinationSystemIdx: targetSystemId,
+        encounterAction: action,
       });
       if (encounterType === ENCOUNTER_PIRATE) alreadyRaided = true;
     }
@@ -132,6 +140,7 @@ export function processWarp(
         playerWon: false,
         clickNumber: CLICKS,
         destinationSystemIdx: targetSystemId,
+        encounterAction: 'ATTACK',
       });
     }
 
@@ -146,6 +155,7 @@ export function processWarp(
         playerWon: false,
         clickNumber: CLICKS,
         destinationSystemIdx: targetSystemId,
+        encounterAction: 'ATTACK',
       });
     }
 
@@ -163,6 +173,7 @@ export function processWarp(
           playerWon: false,
           clickNumber: CLICKS,
           destinationSystemIdx: targetSystemId,
+          encounterAction: 'ATTACK',
         });
       }
     }

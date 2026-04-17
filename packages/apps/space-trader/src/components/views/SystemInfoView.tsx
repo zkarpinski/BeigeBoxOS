@@ -77,8 +77,11 @@ export const SystemInfoView: React.FC<SystemInfoViewProps> = ({ onViewChange }) 
 
       <div className="palm-footer">
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 4px' }}>
-          <button className="palm-btn" onClick={() => {}} disabled>
+          <button className="palm-btn" onClick={() => onViewChange('news')}>
             News
+          </button>
+          <button className="palm-btn" onClick={() => onViewChange('bank')}>
+            Bank
           </button>
           <button
             className="palm-btn"

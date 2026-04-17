@@ -8,6 +8,7 @@ import { SpaceTraderState, UniverseSlice } from './types';
 import {
   GEMULONSYSTEM,
   DALEDSYSTEM,
+  SOLSYSTEM,
   GEMULONINVADED,
   EXPERIMENTFAILED,
   ALIENINVASION,
@@ -32,21 +33,8 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       qty: generateSystemQuantities(sys, diff),
     }));
 
-    const START_FUEL = ShipTypes[1].fuelTanks;
-    let startSystem = 0;
-    for (let attempt = 0; attempt < 200; attempt++) {
-      const candidate = Math.floor(Math.random() * systems.length);
-      const sys = systems[candidate];
-      if (sys.techLevel < 1 || sys.techLevel > 5) continue;
-      const neighbors = systems.filter((s, idx) => {
-        if (idx === candidate) return false;
-        return Math.sqrt(Math.pow(s.x - sys.x, 2) + Math.pow(s.y - sys.y, 2)) <= START_FUEL;
-      });
-      if (neighbors.length >= 3) {
-        startSystem = candidate;
-        break;
-      }
-    }
+    // OG: Player always starts at Sol (index 92)
+    const startSystem = SOLSYSTEM;
 
     const sys = systems[startSystem];
     const { buyPrices, sellPrices } = determineSystemPrices(sys, skills.trader, 0);

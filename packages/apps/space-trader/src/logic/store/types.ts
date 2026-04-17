@@ -55,6 +55,8 @@ export interface EncounterSlice {
   bribePolice: () => void;
   lootNPC: () => void;
   tradeWithNPC: () => void;
+  letNPCGo: () => void;
+  ignoreEncounter: () => void;
 }
 
 export interface GameSlice {
@@ -89,6 +91,11 @@ export interface OptionsSlice {
   setOption: (key: string, value: boolean | number) => void;
 }
 
+export interface BankSlice {
+  borrowCredits: (amount: number) => void;
+  repayDebt: (amount: number) => void;
+}
+
 export interface QuestSlice {
   // Multi-step quest progress (0 = not started, increments through stages)
   monsterStatus: number;
@@ -120,4 +127,5 @@ export type SpaceTraderState = PlayerSlice &
   EncounterSlice &
   GameSlice &
   OptionsSlice &
+  BankSlice &
   QuestSlice;

@@ -987,6 +987,14 @@ export interface NPCEncounterData {
   lootCargo: number[];
 }
 
+// What the NPC is doing in this encounter (matches OG sub-states)
+export type EncounterAction =
+  | 'ATTACK' // NPC attacking player (pirates, police vs criminals, bosses)
+  | 'INSPECT' // Police want to inspect cargo (clean record)
+  | 'FLEE_NPC' // NPC is fleeing from player (weak NPC or losing)
+  | 'TRADE_OFFER' // Trader offering goods
+  | 'IGNORE'; // NPC passing by
+
 export interface ActiveEncounter {
   type: string;
   npc: NPCEncounterData;
@@ -996,6 +1004,7 @@ export interface ActiveEncounter {
   playerWon: boolean;
   clickNumber: number;
   destinationSystemIdx: number;
+  encounterAction: EncounterAction;
 }
 
 export interface SaveGameType {
@@ -1054,4 +1063,6 @@ export type ViewType =
   | 'options'
   | 'options2'
   | 'specialEvent'
-  | 'quests';
+  | 'quests'
+  | 'bank'
+  | 'news';

@@ -52,6 +52,7 @@ function makeStore(playerShipType: number, npcShipType: number, overrides = {}) 
       playerWon: false,
       clickNumber: 5,
       destinationSystemIdx: 0,
+      encounterAction: 'ATTACK',
     },
     clearEncounter: jest.fn(),
     attackInEncounter: jest.fn(),
@@ -60,6 +61,8 @@ function makeStore(playerShipType: number, npcShipType: number, overrides = {}) 
     bribePolice: jest.fn(),
     lootNPC: jest.fn(),
     tradeWithNPC: jest.fn(),
+    letNPCGo: jest.fn(),
+    ignoreEncounter: jest.fn(),
     pendingEncounters: [],
     ship: {
       type: playerShipType,
@@ -209,28 +212,38 @@ describe('EncounterModal — combat UI', () => {
     expect(store.surrenderToEncounter).toHaveBeenCalled();
   });
 
-  it('shows Submit and Bribe buttons for police encounter', () => {
+  it('shows Submit and Bribe buttons for police inspection encounter', () => {
     (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
       ...makeStore(1, 1),
-      encounter: { ...makeStore(1, 1).encounter, type: 'POLICE' },
+      encounter: { ...makeStore(1, 1).encounter, type: 'POLICE', encounterAction: 'INSPECT' },
     });
     render(<EncounterModal />);
     expect(screen.getByText('Submit')).toBeInTheDocument();
     expect(screen.getByText('Bribe')).toBeInTheDocument();
     expect(screen.queryByText('Attack')).toBeInTheDocument();
-    expect(screen.queryByText('Surrender')).not.toBeInTheDocument();
+  });
+
+  it('shows Surrender and Bribe for police attack encounter', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...makeStore(1, 1),
+      encounter: { ...makeStore(1, 1).encounter, type: 'POLICE', encounterAction: 'ATTACK' },
+    });
+    render(<EncounterModal />);
+    expect(screen.getByText('Surrender')).toBeInTheDocument();
+    expect(screen.getByText('Bribe')).toBeInTheDocument();
+    expect(screen.getByText('Attack')).toBeInTheDocument();
+    expect(screen.getByText('Flee')).toBeInTheDocument();
   });
 
   it('shows Attack, Ignore, and Trade for trader encounter', () => {
     (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
       ...makeStore(1, 1),
-      encounter: { ...makeStore(1, 1).encounter, type: 'TRADER' },
+      encounter: { ...makeStore(1, 1).encounter, type: 'TRADER', encounterAction: 'TRADE_OFFER' },
     });
     render(<EncounterModal />);
     expect(screen.getByText('Attack')).toBeInTheDocument();
     expect(screen.getByText('Ignore')).toBeInTheDocument();
     expect(screen.getByText('Trade')).toBeInTheDocument();
-    expect(screen.queryByText('Flee')).not.toBeInTheDocument();
   });
 
   it('shows Done and Encounter Over when resolved without winning', () => {

@@ -8,6 +8,7 @@ import {
   Gadgets,
   ShipType,
   TradeItems,
+  EncounterAction,
 } from './DataTypes';
 
 // Encounter types
@@ -399,4 +400,53 @@ export function executeAttack(
   }
 
   return true; // Hit successful
+}
+
+/**
+ * Approximate "strength" of a ship — used to decide if NPCs flee.
+ * Matches OG: hull + total weapons power + total shield power.
+ */
+export function shipStrength(ship: PlayerShip): number {
+  const weaponPower = getTotalWeapons(ship);
+  const shieldPower = ship.shield
+    .filter((s) => s >= 0)
+    .reduce((acc, s) => acc + Shields[s].power, 0);
+  return ship.hull + weaponPower * 5 + shieldPower * 2;
+}
+
+/**
+ * Determine what the NPC is doing at encounter start (OG sub-states).
+ * In OG: police inspect clean players, attack criminals;
+ * pirates flee from strong players; traders offer to trade.
+ */
+export function determineEncounterAction(
+  encounterType: string,
+  policeRecordScore: number,
+  playerShip: PlayerShip,
+  npcShip: PlayerShip,
+): EncounterAction {
+  if (
+    encounterType === ENCOUNTER_MONSTER ||
+    encounterType === ENCOUNTER_DRAGONFLY ||
+    encounterType === ENCOUNTER_SCARAB
+  ) {
+    return 'ATTACK';
+  }
+
+  if (encounterType === ENCOUNTER_POLICE) {
+    // OG: police attack criminals (score <= -30), inspect everyone else
+    if (policeRecordScore <= -30) return 'ATTACK';
+    return 'INSPECT';
+  }
+
+  if (encounterType === ENCOUNTER_PIRATE) {
+    // OG: weak pirates flee from strong players
+    const playerStr = shipStrength(playerShip);
+    const npcStr = shipStrength(npcShip);
+    if (npcStr * 2 < playerStr) return 'FLEE_NPC';
+    return 'ATTACK';
+  }
+
+  // Trader
+  return 'TRADE_OFFER';
 }

@@ -115,6 +115,7 @@ function buildNarrativeText(
   resolved: boolean,
   playerWon: boolean,
   clickNumber: number,
+  encounterAction: string,
 ): string[] {
   if (resolved) {
     if (playerWon) {
@@ -122,6 +123,9 @@ function buildNarrativeText(
         return [`You destroyed the pirate's ${npcShipName}!`, 'Check for loot before departing.'];
       if (type === ENCOUNTER_POLICE)
         return [`You destroyed the police ${npcShipName}!`, 'Your criminal record worsens.'];
+      if (type === ENCOUNTER_MONSTER) return ['You destroyed the space monster!'];
+      if (type === ENCOUNTER_DRAGONFLY) return ['You destroyed the Dragonfly!'];
+      if (type === ENCOUNTER_SCARAB) return ['You destroyed the Scarab!'];
       return [`You destroyed the trader's ${npcShipName}!`];
     }
     if (type === ENCOUNTER_PIRATE) return ['You escaped the pirate!'];
@@ -131,23 +135,30 @@ function buildNarrativeText(
 
   // Boss encounters
   if (type === ENCOUNTER_MONSTER) {
-    if (resolved && playerWon) return ['You destroyed the space monster!'];
     return ['A massive space monster blocks your path!', 'It attacks with terrifying force!'];
   }
   if (type === ENCOUNTER_DRAGONFLY) {
-    if (resolved && playerWon) return ['You destroyed the Dragonfly!'];
     return ['The experimental Dragonfly ship attacks!', 'It is extremely fast and dangerous!'];
   }
   if (type === ENCOUNTER_SCARAB) {
-    if (resolved && playerWon) return ['You destroyed the Scarab!'];
     return ['The stolen Scarab ship engages you!', 'It is heavily armored!'];
   }
 
   const typeLabel =
     type === ENCOUNTER_PIRATE ? 'pirate' : type === ENCOUNTER_POLICE ? 'police' : 'trader';
   const intro = `At ${clickNumber} clicks from ${systemName}, you encounter a ${typeLabel} ${npcShipName.toLowerCase()}.`;
+
+  if (encounterAction === 'FLEE_NPC') {
+    return [intro, `The ${typeLabel} is trying to get away!`];
+  }
+  if (encounterAction === 'INSPECT') {
+    return [intro, 'They order you to submit for inspection.'];
+  }
+  if (encounterAction === 'TRADE_OFFER') {
+    return [intro, 'You are hailed with an offer to trade goods.'];
+  }
   if (type === ENCOUNTER_PIRATE) return [intro, 'They hail you with weapons hot.'];
-  if (type === ENCOUNTER_POLICE) return [intro, 'They order you to submit for inspection.'];
+  if (type === ENCOUNTER_POLICE) return [intro, 'They open fire!'];
   return [intro, 'You are hailed with an offer to trade goods.'];
 }
 
@@ -179,6 +190,8 @@ export const EncounterModal: React.FC = () => {
     bribePolice,
     lootNPC,
     tradeWithNPC,
+    letNPCGo,
+    ignoreEncounter,
     optIgnoreDealingTraders,
     optContinuousFight,
     optAttackFleeing,
@@ -251,6 +264,7 @@ export const EncounterModal: React.FC = () => {
     encounter.resolved,
     encounter.playerWon,
     encounter.clickNumber,
+    encounter.encounterAction,
   );
 
   const modalTitle = encounter.resolved
@@ -259,91 +273,129 @@ export const EncounterModal: React.FC = () => {
       : 'Encounter Over'
     : 'Encounter!';
 
+  const action = encounter.encounterAction;
+
+  const attackBtn = (
+    <button
+      style={pillBtnBase}
+      onClick={() => {
+        lastActionRef.current = 'attack';
+        attackInEncounter();
+      }}
+    >
+      Attack
+    </button>
+  );
+  const fleeBtn = (
+    <button
+      style={pillBtnBase}
+      onClick={() => {
+        lastActionRef.current = 'flee';
+        fleeFromEncounter();
+      }}
+    >
+      Flee
+    </button>
+  );
+
+  let actionButtons: React.ReactNode = null;
+  if (encounter.resolved) {
+    actionButtons = (
+      <>
+        {hasLoot && (
+          <button style={pillBtnBase} onClick={lootNPC}>
+            Loot
+          </button>
+        )}
+        <button style={pillBtnBase} onClick={clearEncounter}>
+          Done
+        </button>
+      </>
+    );
+  } else if (action === 'FLEE_NPC') {
+    // NPC is fleeing — player can pursue (attack) or let them go
+    actionButtons = (
+      <>
+        {attackBtn}
+        <button style={pillBtnBase} onClick={letNPCGo}>
+          Let them go
+        </button>
+      </>
+    );
+  } else if (action === 'INSPECT') {
+    // Police inspection — submit, flee, attack, or bribe
+    actionButtons = (
+      <>
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Submit
+        </button>
+        {fleeBtn}
+        {attackBtn}
+        <button style={pillBtnBase} onClick={bribePolice}>
+          Bribe
+        </button>
+      </>
+    );
+  } else if (action === 'TRADE_OFFER') {
+    // Trader offering goods
+    actionButtons = (
+      <>
+        {attackBtn}
+        <button style={pillBtnBase} onClick={ignoreEncounter}>
+          Ignore
+        </button>
+        {!optIgnoreDealingTraders && (
+          <button style={pillBtnBase} onClick={tradeWithNPC}>
+            Trade
+          </button>
+        )}
+      </>
+    );
+  } else if (isBoss) {
+    // Boss: attack or flee only
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+      </>
+    );
+  } else if (encounter.type === ENCOUNTER_PIRATE) {
+    // Pirate attacking
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Surrender
+        </button>
+      </>
+    );
+  } else if (encounter.type === ENCOUNTER_POLICE) {
+    // Police attacking (criminal record)
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Surrender
+        </button>
+        <button style={pillBtnBase} onClick={bribePolice}>
+          Bribe
+        </button>
+      </>
+    );
+  } else {
+    // Fallback
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+      </>
+    );
+  }
+
   const footer = (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-      {encounter.resolved ? (
-        <>
-          {hasLoot && (
-            <button style={pillBtnBase} onClick={lootNPC}>
-              Loot
-            </button>
-          )}
-          <button style={pillBtnBase} onClick={clearEncounter}>
-            Done
-          </button>
-        </>
-      ) : (
-        <>
-          <button
-            style={pillBtnBase}
-            onClick={() => {
-              lastActionRef.current = 'attack';
-              attackInEncounter();
-            }}
-          >
-            Attack
-          </button>
-          {encounter.type === ENCOUNTER_PIRATE && (
-            <>
-              <button
-                style={pillBtnBase}
-                onClick={() => {
-                  lastActionRef.current = 'flee';
-                  fleeFromEncounter();
-                }}
-              >
-                Flee
-              </button>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Surrender
-              </button>
-            </>
-          )}
-          {encounter.type === ENCOUNTER_POLICE && (
-            <>
-              <button
-                style={pillBtnBase}
-                onClick={() => {
-                  lastActionRef.current = 'flee';
-                  fleeFromEncounter();
-                }}
-              >
-                Flee
-              </button>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Submit
-              </button>
-              <button style={pillBtnBase} onClick={bribePolice}>
-                Bribe
-              </button>
-            </>
-          )}
-          {encounter.type === ENCOUNTER_TRADER && (
-            <>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Ignore
-              </button>
-              {!optIgnoreDealingTraders && (
-                <button style={pillBtnBase} onClick={tradeWithNPC}>
-                  Trade
-                </button>
-              )}
-            </>
-          )}
-          {isBoss && (
-            <button
-              style={pillBtnBase}
-              onClick={() => {
-                lastActionRef.current = 'flee';
-                fleeFromEncounter();
-              }}
-            >
-              Flee
-            </button>
-          )}
-        </>
-      )}
-    </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>{actionButtons}</div>
   );
 
   // Info panel: NPC ship stats

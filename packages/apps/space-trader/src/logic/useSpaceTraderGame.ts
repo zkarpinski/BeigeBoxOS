@@ -5,6 +5,7 @@ import { createUniverseSlice } from './store/universeSlice';
 import { createEncounterSlice } from './store/encounterSlice';
 import { createGameSlice } from './store/gameSlice';
 import { createOptionsSlice } from './store/optionsSlice';
+import { createBankSlice } from './store/bankSlice';
 import { createQuestSlice } from './store/questSlice';
 import { SpaceTraderState } from './store/types';
 
@@ -16,6 +17,7 @@ export const useSpaceTraderGame = create<SpaceTraderState>()(
       ...createEncounterSlice(...a),
       ...createGameSlice(...a),
       ...createOptionsSlice(...a),
+      ...createBankSlice(...a),
       ...createQuestSlice(...a),
     }),
     {

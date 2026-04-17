@@ -960,6 +960,10 @@ export interface SolarSystem {
   qty?: number[];
   // Wormhole destination system index (-1 if not a wormhole system)
   wormholeDest?: number;
+  // Special event ID (-1 = none). Set during galaxy generation, cleared on event trigger.
+  special: number;
+  // Countdown timer for time-sensitive events (0 = not active)
+  countDown: number;
 }
 
 export interface PlayerShip {
@@ -983,6 +987,14 @@ export interface NPCEncounterData {
   lootCargo: number[];
 }
 
+// What the NPC is doing in this encounter (matches OG sub-states)
+export type EncounterAction =
+  | 'ATTACK' // NPC attacking player (pirates, police vs criminals, bosses)
+  | 'INSPECT' // Police want to inspect cargo (clean record)
+  | 'FLEE_NPC' // NPC is fleeing from player (weak NPC or losing)
+  | 'TRADE_OFFER' // Trader offering goods
+  | 'IGNORE'; // NPC passing by
+
 export interface ActiveEncounter {
   type: string;
   npc: NPCEncounterData;
@@ -992,6 +1004,7 @@ export interface ActiveEncounter {
   playerWon: boolean;
   clickNumber: number;
   destinationSystemIdx: number;
+  encounterAction: EncounterAction;
 }
 
 export interface SaveGameType {
@@ -1048,4 +1061,8 @@ export type ViewType =
   | 'buyShip'
   | 'shipInfo'
   | 'options'
-  | 'options2';
+  | 'options2'
+  | 'specialEvent'
+  | 'quests'
+  | 'bank'
+  | 'news';

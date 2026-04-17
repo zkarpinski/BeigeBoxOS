@@ -10,6 +10,7 @@ import {
 } from '../DataTypes';
 import { executeBuy, executeSell } from '../domain/trade';
 import { SpaceTraderState, PlayerSlice } from './types';
+import { getSpecialCargoBays } from './questSlice';
 
 export const createPlayerSlice: StateCreator<SpaceTraderState, [], [], PlayerSlice> = (
   set,
@@ -39,8 +40,16 @@ export const createPlayerSlice: StateCreator<SpaceTraderState, [], [], PlayerSli
   },
 
   buyGood: (goodId, amount) => {
-    const { credits, ship, buyPrices, systemQuantities, systems, currentSystem } = get();
-    const result = executeBuy(goodId, amount, { credits, ship, buyPrices, systemQuantities });
+    const state = get();
+    const { credits, ship, buyPrices, systemQuantities, systems, currentSystem } = state;
+    const specialCargoBays = getSpecialCargoBays(state);
+    const result = executeBuy(goodId, amount, {
+      credits,
+      ship,
+      buyPrices,
+      systemQuantities,
+      specialCargoBays,
+    });
     if (!result) return;
 
     // Persist depletion back to system

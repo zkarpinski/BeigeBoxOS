@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
 import { ShipTypes, SystemNames, Weapons, Shields } from '../../logic/DataTypes';
-import { ENCOUNTER_PIRATE, ENCOUNTER_POLICE, ENCOUNTER_TRADER } from '../../logic/Encounter';
+import {
+  ENCOUNTER_PIRATE,
+  ENCOUNTER_POLICE,
+  ENCOUNTER_TRADER,
+  ENCOUNTER_MONSTER,
+  ENCOUNTER_DRAGONFLY,
+  ENCOUNTER_SCARAB,
+} from '../../logic/Encounter';
 import { SHIP_SPRITES } from '../../assets/ships/ShipSprites';
 import { GameModal } from '../modals/GameModal';
 import { InformationButton } from '../common/InformationButton';
@@ -78,6 +85,17 @@ function EncounterIcon({ type }: { type: string }) {
       </svg>
     );
   }
+  if (type === ENCOUNTER_MONSTER || type === ENCOUNTER_DRAGONFLY || type === ENCOUNTER_SCARAB) {
+    // Boss: red diamond
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28">
+        <polygon points="14,2 26,14 14,26 2,14" fill="#cc0000" stroke="#800" strokeWidth="1" />
+        <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#fff">
+          !
+        </text>
+      </svg>
+    );
+  }
   // Trader: coin
   return (
     <svg width="28" height="28" viewBox="0 0 28 28">
@@ -97,6 +115,7 @@ function buildNarrativeText(
   resolved: boolean,
   playerWon: boolean,
   clickNumber: number,
+  encounterAction: string,
 ): string[] {
   if (resolved) {
     if (playerWon) {
@@ -104,6 +123,9 @@ function buildNarrativeText(
         return [`You destroyed the pirate's ${npcShipName}!`, 'Check for loot before departing.'];
       if (type === ENCOUNTER_POLICE)
         return [`You destroyed the police ${npcShipName}!`, 'Your criminal record worsens.'];
+      if (type === ENCOUNTER_MONSTER) return ['You destroyed the space monster!'];
+      if (type === ENCOUNTER_DRAGONFLY) return ['You destroyed the Dragonfly!'];
+      if (type === ENCOUNTER_SCARAB) return ['You destroyed the Scarab!'];
       return [`You destroyed the trader's ${npcShipName}!`];
     }
     if (type === ENCOUNTER_PIRATE) return ['You escaped the pirate!'];
@@ -111,11 +133,32 @@ function buildNarrativeText(
     return ['You parted ways with the trader.'];
   }
 
+  // Boss encounters
+  if (type === ENCOUNTER_MONSTER) {
+    return ['A massive space monster blocks your path!', 'It attacks with terrifying force!'];
+  }
+  if (type === ENCOUNTER_DRAGONFLY) {
+    return ['The experimental Dragonfly ship attacks!', 'It is extremely fast and dangerous!'];
+  }
+  if (type === ENCOUNTER_SCARAB) {
+    return ['The stolen Scarab ship engages you!', 'It is heavily armored!'];
+  }
+
   const typeLabel =
     type === ENCOUNTER_PIRATE ? 'pirate' : type === ENCOUNTER_POLICE ? 'police' : 'trader';
   const intro = `At ${clickNumber} clicks from ${systemName}, you encounter a ${typeLabel} ${npcShipName.toLowerCase()}.`;
+
+  if (encounterAction === 'FLEE_NPC') {
+    return [intro, `The ${typeLabel} is trying to get away!`];
+  }
+  if (encounterAction === 'INSPECT') {
+    return [intro, 'They order you to submit for inspection.'];
+  }
+  if (encounterAction === 'TRADE_OFFER') {
+    return [intro, 'You are hailed with an offer to trade goods.'];
+  }
   if (type === ENCOUNTER_PIRATE) return [intro, 'They hail you with weapons hot.'];
-  if (type === ENCOUNTER_POLICE) return [intro, 'They order you to submit for inspection.'];
+  if (type === ENCOUNTER_POLICE) return [intro, 'They open fire!'];
   return [intro, 'You are hailed with an offer to trade goods.'];
 }
 
@@ -147,6 +190,8 @@ export const EncounterModal: React.FC = () => {
     bribePolice,
     lootNPC,
     tradeWithNPC,
+    letNPCGo,
+    ignoreEncounter,
     optIgnoreDealingTraders,
     optContinuousFight,
     optAttackFleeing,
@@ -181,8 +226,18 @@ export const EncounterModal: React.FC = () => {
   const destIdx = encounter.destinationSystemIdx ?? currentSystem;
   const systemName = SystemNames[systems[destIdx]?.nameIndex ?? 0] ?? 'Unknown';
 
-  const typeLabel =
-    encounter.type === ENCOUNTER_PIRATE
+  const isBoss =
+    encounter.type === ENCOUNTER_MONSTER ||
+    encounter.type === ENCOUNTER_DRAGONFLY ||
+    encounter.type === ENCOUNTER_SCARAB;
+
+  const typeLabel = isBoss
+    ? encounter.type === ENCOUNTER_MONSTER
+      ? 'Space Monster'
+      : encounter.type === ENCOUNTER_DRAGONFLY
+        ? 'Dragonfly'
+        : 'Scarab'
+    : encounter.type === ENCOUNTER_PIRATE
       ? 'Pirate'
       : encounter.type === ENCOUNTER_POLICE
         ? 'Police'
@@ -209,6 +264,7 @@ export const EncounterModal: React.FC = () => {
     encounter.resolved,
     encounter.playerWon,
     encounter.clickNumber,
+    encounter.encounterAction,
   );
 
   const modalTitle = encounter.resolved
@@ -217,80 +273,129 @@ export const EncounterModal: React.FC = () => {
       : 'Encounter Over'
     : 'Encounter!';
 
+  const action = encounter.encounterAction;
+
+  const attackBtn = (
+    <button
+      style={pillBtnBase}
+      onClick={() => {
+        lastActionRef.current = 'attack';
+        attackInEncounter();
+      }}
+    >
+      Attack
+    </button>
+  );
+  const fleeBtn = (
+    <button
+      style={pillBtnBase}
+      onClick={() => {
+        lastActionRef.current = 'flee';
+        fleeFromEncounter();
+      }}
+    >
+      Flee
+    </button>
+  );
+
+  let actionButtons: React.ReactNode = null;
+  if (encounter.resolved) {
+    actionButtons = (
+      <>
+        {hasLoot && (
+          <button style={pillBtnBase} onClick={lootNPC}>
+            Loot
+          </button>
+        )}
+        <button style={pillBtnBase} onClick={clearEncounter}>
+          Done
+        </button>
+      </>
+    );
+  } else if (action === 'FLEE_NPC') {
+    // NPC is fleeing — player can pursue (attack) or let them go
+    actionButtons = (
+      <>
+        {attackBtn}
+        <button style={pillBtnBase} onClick={letNPCGo}>
+          Let them go
+        </button>
+      </>
+    );
+  } else if (action === 'INSPECT') {
+    // Police inspection — submit, flee, attack, or bribe
+    actionButtons = (
+      <>
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Submit
+        </button>
+        {fleeBtn}
+        {attackBtn}
+        <button style={pillBtnBase} onClick={bribePolice}>
+          Bribe
+        </button>
+      </>
+    );
+  } else if (action === 'TRADE_OFFER') {
+    // Trader offering goods
+    actionButtons = (
+      <>
+        {attackBtn}
+        <button style={pillBtnBase} onClick={ignoreEncounter}>
+          Ignore
+        </button>
+        {!optIgnoreDealingTraders && (
+          <button style={pillBtnBase} onClick={tradeWithNPC}>
+            Trade
+          </button>
+        )}
+      </>
+    );
+  } else if (isBoss) {
+    // Boss: attack or flee only
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+      </>
+    );
+  } else if (encounter.type === ENCOUNTER_PIRATE) {
+    // Pirate attacking
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Surrender
+        </button>
+      </>
+    );
+  } else if (encounter.type === ENCOUNTER_POLICE) {
+    // Police attacking (criminal record)
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+        <button style={pillBtnBase} onClick={surrenderToEncounter}>
+          Surrender
+        </button>
+        <button style={pillBtnBase} onClick={bribePolice}>
+          Bribe
+        </button>
+      </>
+    );
+  } else {
+    // Fallback
+    actionButtons = (
+      <>
+        {attackBtn}
+        {fleeBtn}
+      </>
+    );
+  }
+
   const footer = (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-      {encounter.resolved ? (
-        <>
-          {hasLoot && (
-            <button style={pillBtnBase} onClick={lootNPC}>
-              Loot
-            </button>
-          )}
-          <button style={pillBtnBase} onClick={clearEncounter}>
-            Done
-          </button>
-        </>
-      ) : (
-        <>
-          <button
-            style={pillBtnBase}
-            onClick={() => {
-              lastActionRef.current = 'attack';
-              attackInEncounter();
-            }}
-          >
-            Attack
-          </button>
-          {encounter.type === ENCOUNTER_PIRATE && (
-            <>
-              <button
-                style={pillBtnBase}
-                onClick={() => {
-                  lastActionRef.current = 'flee';
-                  fleeFromEncounter();
-                }}
-              >
-                Flee
-              </button>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Surrender
-              </button>
-            </>
-          )}
-          {encounter.type === ENCOUNTER_POLICE && (
-            <>
-              <button
-                style={pillBtnBase}
-                onClick={() => {
-                  lastActionRef.current = 'flee';
-                  fleeFromEncounter();
-                }}
-              >
-                Flee
-              </button>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Submit
-              </button>
-              <button style={pillBtnBase} onClick={bribePolice}>
-                Bribe
-              </button>
-            </>
-          )}
-          {encounter.type === ENCOUNTER_TRADER && (
-            <>
-              <button style={pillBtnBase} onClick={surrenderToEncounter}>
-                Ignore
-              </button>
-              {!optIgnoreDealingTraders && (
-                <button style={pillBtnBase} onClick={tradeWithNPC}>
-                  Trade
-                </button>
-              )}
-            </>
-          )}
-        </>
-      )}
-    </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>{actionButtons}</div>
   );
 
   // Info panel: NPC ship stats
@@ -350,8 +455,59 @@ export const EncounterModal: React.FC = () => {
         infoPanel
       ) : (
         <>
-          {/* Ship sprites + encounter icon (hidden in textual mode) */}
-          {!optTextualEncounters && (
+          {/* Ship visuals: graphical sprites or textual stats */}
+          {optTextualEncounters ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                columnGap: '12px',
+                marginBottom: '10px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+                lineHeight: '1.5',
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 'bold' }}>You</div>
+                <div>{playerShipType.name}</div>
+                <div>
+                  Hull at{' '}
+                  {playerShipType.hullStrength > 0
+                    ? Math.round((ship.hull / playerShipType.hullStrength) * 100)
+                    : 100}
+                  %
+                </div>
+                <div>
+                  {ship.shield.some((s) => s >= 0)
+                    ? ship.shield
+                        .filter((s) => s >= 0)
+                        .map((s) => Shields[s]?.name ?? '?')
+                        .join(', ')
+                    : 'No shields'}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold' }}>Opponent</div>
+                <div>{npcShipType.name}</div>
+                <div>
+                  Hull at{' '}
+                  {npcShipType.hullStrength > 0
+                    ? Math.round((encounter.npc.ship.hull / npcShipType.hullStrength) * 100)
+                    : 100}
+                  %
+                </div>
+                <div>
+                  {encounter.npc.ship.shield.some((s) => s >= 0)
+                    ? encounter.npc.ship.shield
+                        .filter((s) => s >= 0)
+                        .map((s) => Shields[s]?.name ?? '?')
+                        .join(', ')
+                    : 'No shields'}
+                </div>
+              </div>
+            </div>
+          ) : (
             <div style={{ position: 'relative', marginBottom: '12px' }}>
               {/* Encounter type icon — top right */}
               <div style={{ position: 'absolute', top: 0, right: 0 }}>

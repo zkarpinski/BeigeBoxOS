@@ -8,6 +8,7 @@ import {
   Gadgets,
   ShipType,
   TradeItems,
+  EncounterAction,
 } from './DataTypes';
 
 // Encounter types
@@ -204,6 +205,74 @@ const VILLAINSCORE = -30;
 const getRandom = (max: number) => Math.floor(Math.random() * max);
 
 /**
+ * Generate a hardcoded quest boss encounter (Monster, Dragonfly, Scarab).
+ * These have fixed stats instead of random generation.
+ */
+export function generateQuestEncounter(encounterType: string): NPCEncounterData {
+  if (encounterType === ENCOUNTER_MONSTER) {
+    return {
+      ship: {
+        type: 9, // Wasp hull (largest)
+        cargo: new Array(10).fill(0),
+        weapon: [0, 0, 0], // Three pulse lasers
+        shield: [-1, -1, -1],
+        shieldStrength: [-1, -1, -1],
+        gadget: [-1, -1, -1],
+        escapePod: false,
+        fuel: 0,
+        hull: 150,
+      },
+      fighterSkill: 10,
+      pilotSkill: 8,
+      engineerSkill: 10,
+      bounty: 0,
+      lootCargo: new Array(10).fill(0),
+    };
+  }
+
+  if (encounterType === ENCOUNTER_DRAGONFLY) {
+    return {
+      ship: {
+        type: 4, // Bumblebee-class
+        cargo: new Array(10).fill(0),
+        weapon: [1, 1, -1], // Two beam lasers
+        shield: [0, -1, -1], // Energy shield
+        shieldStrength: [40, -1, -1],
+        gadget: [-1, -1, -1],
+        escapePod: false,
+        fuel: 0,
+        hull: 100,
+      },
+      fighterSkill: 8,
+      pilotSkill: 12, // Very fast
+      engineerSkill: 8,
+      bounty: 0,
+      lootCargo: new Array(10).fill(0),
+    };
+  }
+
+  // ENCOUNTER_SCARAB
+  return {
+    ship: {
+      type: 8, // Termite-class (heavy)
+      cargo: new Array(10).fill(0),
+      weapon: [2, 2, -1], // Two military lasers
+      shield: [1, 1, -1], // Two reflective shields
+      shieldStrength: [60, 60, -1],
+      gadget: [-1, -1, -1],
+      escapePod: false,
+      fuel: 0,
+      hull: 200,
+    },
+    fighterSkill: 10,
+    pilotSkill: 6,
+    engineerSkill: 10,
+    bounty: 0,
+    lootCargo: new Array(10).fill(0),
+  };
+}
+
+/**
  * Total weapons power of a ship
  */
 export function getTotalWeapons(ship: PlayerShip, minWeapon = -1, maxWeapon = -1): number {
@@ -331,4 +400,53 @@ export function executeAttack(
   }
 
   return true; // Hit successful
+}
+
+/**
+ * Approximate "strength" of a ship — used to decide if NPCs flee.
+ * Matches OG: hull + total weapons power + total shield power.
+ */
+export function shipStrength(ship: PlayerShip): number {
+  const weaponPower = getTotalWeapons(ship);
+  const shieldPower = ship.shield
+    .filter((s) => s >= 0)
+    .reduce((acc, s) => acc + Shields[s].power, 0);
+  return ship.hull + weaponPower * 5 + shieldPower * 2;
+}
+
+/**
+ * Determine what the NPC is doing at encounter start (OG sub-states).
+ * In OG: police inspect clean players, attack criminals;
+ * pirates flee from strong players; traders offer to trade.
+ */
+export function determineEncounterAction(
+  encounterType: string,
+  policeRecordScore: number,
+  playerShip: PlayerShip,
+  npcShip: PlayerShip,
+): EncounterAction {
+  if (
+    encounterType === ENCOUNTER_MONSTER ||
+    encounterType === ENCOUNTER_DRAGONFLY ||
+    encounterType === ENCOUNTER_SCARAB
+  ) {
+    return 'ATTACK';
+  }
+
+  if (encounterType === ENCOUNTER_POLICE) {
+    // OG: police attack criminals (score <= -30), inspect everyone else
+    if (policeRecordScore <= -30) return 'ATTACK';
+    return 'INSPECT';
+  }
+
+  if (encounterType === ENCOUNTER_PIRATE) {
+    // OG: weak pirates flee from strong players
+    const playerStr = shipStrength(playerShip);
+    const npcStr = shipStrength(npcShip);
+    if (npcStr * 2 < playerStr) return 'FLEE_NPC';
+    return 'ATTACK';
+  }
+
+  // Trader
+  return 'TRADE_OFFER';
 }

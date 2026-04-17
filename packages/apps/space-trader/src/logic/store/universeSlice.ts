@@ -5,6 +5,15 @@ import { generateSystemQuantities, determineSystemPrices } from '../Merchant';
 import { processWarp } from '../domain/travel';
 import { ENCOUNTER_POLICE, ENCOUNTER_PIRATE, ENCOUNTER_TRADER } from '../Encounter';
 import { SpaceTraderState, UniverseSlice } from './types';
+import {
+  GEMULONSYSTEM,
+  DALEDSYSTEM,
+  SOLSYSTEM,
+  GEMULONINVADED,
+  EXPERIMENTFAILED,
+  ALIENINVASION,
+  EXPERIMENT,
+} from '../SpecialEvents';
 
 export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], UniverseSlice> = (
   set,
@@ -24,21 +33,8 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       qty: generateSystemQuantities(sys, diff),
     }));
 
-    const START_FUEL = ShipTypes[1].fuelTanks;
-    let startSystem = 0;
-    for (let attempt = 0; attempt < 200; attempt++) {
-      const candidate = Math.floor(Math.random() * systems.length);
-      const sys = systems[candidate];
-      if (sys.techLevel < 1 || sys.techLevel > 5) continue;
-      const neighbors = systems.filter((s, idx) => {
-        if (idx === candidate) return false;
-        return Math.sqrt(Math.pow(s.x - sys.x, 2) + Math.pow(s.y - sys.y, 2)) <= START_FUEL;
-      });
-      if (neighbors.length >= 3) {
-        startSystem = candidate;
-        break;
-      }
-    }
+    // OG: Player always starts at Sol (index 92)
+    const startSystem = SOLSYSTEM;
 
     const sys = systems[startSystem];
     const { buyPrices, sellPrices } = determineSystemPrices(sys, skills.trader, 0);
@@ -77,6 +73,23 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       encounter: null,
       pendingEncounters: [],
       isGameOver: false,
+      // Reset quest state
+      monsterStatus: 0,
+      dragonflyStatus: 0,
+      japoriStatus: 0,
+      reactorStatus: 0,
+      jarekStatus: 0,
+      wildStatus: 0,
+      artifactStatus: 0,
+      scarabStatus: 0,
+      invasionStatus: 0,
+      experimentStatus: 0,
+      moonBought: false,
+      jarekOnBoard: false,
+      wildOnBoard: false,
+      reactorOnBoard: false,
+      artifactOnBoard: false,
+      antidoteOnBoard: false,
     });
   },
 
@@ -96,6 +109,12 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       difficulty: state.difficulty,
       days: state.days,
       debt: state.debt,
+      questState: {
+        monsterStatus: state.monsterStatus,
+        dragonflyStatus: state.dragonflyStatus,
+        scarabStatus: state.scarabStatus,
+        reactorOnBoard: state.reactorOnBoard,
+      },
     });
 
     const arrivedShip = { ...result.ship };
@@ -133,6 +152,45 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
     const arrivedAtTracked =
       state.optStopTrackingOnArrival && state.selectedMapSystemId === systemId;
 
+    // Check for time-sensitive quest failures after countdown decrement
+    const postWarpSystems = [...result.systems];
+    const questUpdates: Record<string, number> = {};
+
+    // Check if invasion countdown expired (the countdown was decremented in processWarp)
+    if (state.invasionStatus === 1) {
+      const invasionExpired = !postWarpSystems.some(
+        (s) => s.special === ALIENINVASION && s.countDown > 0,
+      );
+      if (invasionExpired) {
+        // Check if player arrived at Gemulon in time
+        if (systemId !== GEMULONSYSTEM) {
+          postWarpSystems[GEMULONSYSTEM] = {
+            ...postWarpSystems[GEMULONSYSTEM],
+            special: GEMULONINVADED,
+            techLevel: 0,
+          };
+          questUpdates.invasionStatus = -1;
+        }
+      }
+    }
+
+    // Check if experiment countdown expired
+    if (state.experimentStatus === 1) {
+      const experimentExpired = !postWarpSystems.some(
+        (s) => s.special === EXPERIMENT && s.countDown > 0,
+      );
+      if (experimentExpired) {
+        if (systemId !== DALEDSYSTEM) {
+          postWarpSystems[DALEDSYSTEM] = {
+            ...postWarpSystems[DALEDSYSTEM],
+            special: EXPERIMENTFAILED,
+            techLevel: 0,
+          };
+          questUpdates.experimentStatus = -1;
+        }
+      }
+    }
+
     set({
       currentSystem: result.currentSystem,
       days: result.days,
@@ -143,10 +201,11 @@ export const createUniverseSlice: StateCreator<SpaceTraderState, [], [], Univers
       buyPrices: result.buyPrices,
       sellPrices: result.sellPrices,
       systemQuantities: result.systemQuantities,
-      systems: result.systems,
+      systems: postWarpSystems,
       encounter: filteredEncounters[0] ?? null,
       pendingEncounters: filteredEncounters.slice(1),
       ...(arrivedAtTracked ? { selectedMapSystemId: null } : {}),
+      ...questUpdates,
     });
   },
 });

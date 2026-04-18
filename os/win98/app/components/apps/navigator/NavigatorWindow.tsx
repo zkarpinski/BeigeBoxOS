@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { AppConfig } from '@/app/types/app-config';
 import { useOsShell } from '@retro-web/core/context';
+import { escapeHtml } from '@retro-web/core';
 
 export const navigatorAppConfig: AppConfig = {
   id: 'navigator',
@@ -81,6 +82,8 @@ function getHomePage(): string {
 
 function getErrorPage(url: string, reason?: string): string {
   const msg = reason || 'Netscape is unable to find the server or DNS error.';
+  const safeUrl = escapeHtml(url);
+  const safeMsg = escapeHtml(msg);
   return [
     '<!DOCTYPE html><html><head><meta charset="UTF-8">',
     '<title>Netscape: Server not found</title>',
@@ -88,8 +91,8 @@ function getErrorPage(url: string, reason?: string): string {
     'h1{color:#cc0000;font-size:18px;}h2{font-size:14px;margin-top:20px;}',
     'ul{font-size:12px;line-height:1.8;}',
     '.url{font-family:monospace;background:#f0f0f0;padding:2px 6px;border:1px solid #ccc;}</style></head><body>',
-    '<h1>Netscape is unable to find the server at <span class="url">' + url + '</span></h1>',
-    '<p>' + msg + '</p>',
+    '<h1>Netscape is unable to find the server at <span class="url">' + safeUrl + '</span></h1>',
+    '<p>' + safeMsg + '</p>',
     '<h2>The page could not be displayed. Here are some suggestions:</h2>',
     '<ul>',
     '<li>Check the address for typing errors such as <b>ww.example.com</b> instead of <b>www.example.com</b></li>',
@@ -170,7 +173,7 @@ export function NavigatorWindow() {
     abortRef.current = controller;
 
     function onSuccess(html: string) {
-      const baseTag = '<base href="' + url + '">';
+      const baseTag = '<base href="' + escapeHtml(url) + '">';
       let modified = html;
       if (/(<head[^>]*>)/i.test(modified)) {
         modified = modified.replace(/(<head[^>]*>)/i, '$1' + baseTag);

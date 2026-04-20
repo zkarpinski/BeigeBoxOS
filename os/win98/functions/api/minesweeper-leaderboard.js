@@ -97,12 +97,7 @@ async function verifyGameTokenSignature(secret, payloadB64, sigB64) {
     ['verify'],
   );
   const actualSig = b64UrlDecode(sigB64);
-  return await crypto.subtle.verify(
-    'HMAC',
-    key,
-    actualSig,
-    new TextEncoder().encode(payloadB64),
-  );
+  return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
 }
 
 const CONFIG_HINT =
@@ -200,13 +195,7 @@ export async function onRequestPost(context) {
     }
     const elapsedSec = ageMs / 1000;
     if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
-      return jsonResponse(
-        {
-          error: `Claimed time (${time}s) does not match elapsed time (${Math.round(elapsedSec)}s)`,
-          rank: 0,
-        },
-        400,
-      );
+      return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
     }
     const { error: usedError } = await supabase
       .from('minesweeper_used_tokens')

@@ -40,7 +40,7 @@ export const GameModal: React.FC<GameModalProps> = ({
           maxWidth: '300px',
           height: 'calc(100% - 4px)',
           background: '#fff',
-          border: '3px solid #330099',
+          border: '2px solid #000',
           borderRadius: '4px',
           overflow: 'hidden',
           marginTop: '2px',
@@ -54,7 +54,7 @@ export const GameModal: React.FC<GameModalProps> = ({
       >
         <div
           style={{
-            background: '#330099',
+            background: '#1a1a8c',
             color: '#fff',
             padding: '1px 2px',
             fontWeight: 'bold',

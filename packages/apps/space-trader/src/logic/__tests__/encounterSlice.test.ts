@@ -9,6 +9,7 @@ import {
   ENCOUNTER_PIRATE,
   ENCOUNTER_POLICE,
   ENCOUNTER_TRADER,
+  ENCOUNTER_MONSTER,
   NPCEncounterData,
 } from '../Encounter';
 import { SpaceTraderState, EncounterSlice } from '../store/types';
@@ -240,8 +241,13 @@ describe('encounterSlice — attackInEncounter', () => {
       ship: makePlayerShip({ weapon: [2, 2, 2] }), // Strong player
     });
 
+    // Mock random to ensure hit
+    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.9);
+
     store.getState().attackInEncounter();
     const state = store.getState();
+
+    randomSpy.mockRestore();
 
     if (state.encounter?.playerWon) {
       expect(state.credits).toBe(5000 + 100); // bounty added
@@ -611,5 +617,58 @@ describe('encounterSlice — ignoreEncounter', () => {
     expect(state.encounter?.encounterAction).toBe('ATTACK');
     expect(state.encounter?.resolved).toBe(false);
     expect(state.policeRecordScore).toBe(-11); // Worsened
+  });
+});
+
+describe('encounterSlice — quest and escape pod', () => {
+  it('triggers handleQuestEncounterVictory when boss is defeated', () => {
+    const handleQuestEncounterVictory = jest.fn();
+    const store = createTestStore({
+      fighterSkill: 100, // Guaranteed hit
+      encounter: makeEncounter({
+        type: ENCOUNTER_MONSTER,
+        npc: makeNPC({
+          ship: makePlayerShip({ hull: 1, weapon: [-1, -1, -1], shield: [-1, -1, -1] }),
+        }),
+      }),
+      handleQuestEncounterVictory,
+    });
+
+    // Mock random to ensure damage is positive regardless of skill
+    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.9);
+
+    store.getState().attackInEncounter();
+
+    randomSpy.mockRestore();
+
+    expect(handleQuestEncounterVictory).toHaveBeenCalledWith(ENCOUNTER_MONSTER);
+  });
+
+  it('resets ship to Flea when player is destroyed with escape pod', () => {
+    const store = createTestStore({
+      encounter: makeEncounter({
+        npc: makeNPC({
+          ship: makePlayerShip({ hull: 500, weapon: [2, 2, 2] }),
+          fighterSkill: 20,
+        }),
+      }),
+      ship: makePlayerShip({ hull: 1, escapePod: true }),
+    });
+
+    // Force a combat round where player takes damage
+    // We need NPC to hit player. Mocking random for encounterSlice.test.ts might be needed if it fails flakily.
+    // However, NPC has high fighterSkill and player has 1 hull, so it's likely.
+    // Let's mock random here too for safety.
+    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.9); // High hit chance
+
+    store.getState().attackInEncounter();
+    const state = store.getState();
+    randomSpy.mockRestore();
+
+    expect(state.isGameOver).toBe(false);
+    expect(state.ship.type).toBe(0); // Flea
+    expect(state.ship.escapePod).toBe(false);
+    expect(state.encounter?.resolved).toBe(true);
+    expect(state.encounter?.playerWon).toBe(false);
   });
 });

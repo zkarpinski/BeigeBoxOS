@@ -17,6 +17,9 @@ const fs = require('fs');
 const BASE_URL = process.env.PALMOS_URL || 'http://localhost:3000';
 const OUTPUT_DIR = path.join(__dirname, '..', 'docs', 'images');
 
+// Current view title, maintained so we can click it to open the menu
+let currentTitle = 'Buy Cargo';
+
 async function capture(page, name) {
   const el = page.locator('.palm-screen').first();
   await el.waitFor({ state: 'visible', timeout: 5000 });
@@ -25,21 +28,44 @@ async function capture(page, name) {
   console.log(`  ✓ ${name}.png`);
 }
 
-/** Click a menu item in the PalmHeader dropdown. */
+/** Open the menu by going to Buy Cargo first (unambiguous title), then click an item. */
 async function menuNavigate(page, itemText) {
-  await page.locator('.palm-header-title').click();
-  await page.waitForSelector('.palm-dropdown-list', { timeout: 3000 });
-  await page.locator('.palm-dropdown-item', { hasText: itemText }).first().click();
+  // Go to Buy Cargo so we have a unique title to click
+  await shortcut(page, 'B');
+  await page.waitForTimeout(300);
+  await page.getByText('Buy Cargo').first().click();
+  await page.waitForTimeout(300);
+  await page.getByText(itemText, { exact: false }).first().click();
+  await page.waitForTimeout(300);
 }
 
-/** Dismiss any pending encounters so the game can continue.
- *  Prefers safe actions (no ship damage risk): Done > Ignore > Surrender > Submit > Flee.
- */
+/** Open the menu via Buy Cargo, switch to a tab, then click an item. */
+async function menuNavigateTab(page, tabName, itemText) {
+  await shortcut(page, 'B');
+  await page.waitForTimeout(300);
+  await page.getByText('Buy Cargo').first().click();
+  await page.waitForTimeout(300);
+  await page.getByText(tabName).first().click();
+  await page.waitForTimeout(200);
+  await page.getByText(itemText).first().click();
+  await page.waitForTimeout(300);
+}
+
+/** Click one of the B/S/Y/W shortcut buttons in the header. */
+async function shortcut(page, letter) {
+  await page
+    .locator('button')
+    .filter({ hasText: new RegExp(`^${letter}$`) })
+    .first()
+    .click({ force: true });
+}
+
+/** Dismiss any pending encounters so the game can continue. */
 async function dismissEncounters(page) {
   const actionOrder = ['Done', 'Loot', 'Ignore', 'Surrender', 'Submit', 'Flee', 'Attack'];
   while (true) {
     try {
-      await page.waitForSelector('text=Encounter!', { timeout: 3000 });
+      await page.waitForSelector('text=Encounter', { timeout: 3000 });
       let dismissed = false;
       for (const label of actionOrder) {
         const btn = page.locator(`button:has-text("${label}")`).first();
@@ -51,34 +77,37 @@ async function dismissEncounters(page) {
       }
       if (!dismissed) break;
     } catch {
-      break; // no more encounters
+      break;
     }
   }
 }
 
 /** After travel, wait for the trade view or handle a Game Over by restarting. */
 async function waitForTradeView(page) {
-  // tradeMode may be 'buy' or 'sell' — match the trade table which is present in both
   await Promise.race([
-    page.waitForSelector('.trade-table-authentic', { timeout: 25000 }),
-    page.waitForSelector('text=Game Over', { timeout: 25000 }),
+    page.waitForSelector('.trade-table-authentic', { timeout: 15000 }),
+    page.waitForSelector('text=DEFEAT', { timeout: 15000 }),
+    page.waitForSelector('text=Congratulations', { timeout: 15000 }),
   ]).catch(() => {});
 
-  if (
-    await page
-      .locator('text=Game Over')
+  const isGameOver =
+    (await page
+      .locator('text=DEFEAT')
       .isVisible()
-      .catch(() => false)
-  ) {
-    console.log('  ⚠ Game Over — restarting...');
-    await page.locator('.palm-header-title').click();
-    await page.waitForSelector('.palm-dropdown-list', { timeout: 3000 });
-    await page.locator('.palm-dropdown-tab', { hasText: 'Game' }).click();
-    await page.locator('.palm-dropdown-item', { hasText: 'New Game' }).click();
+      .catch(() => false)) ||
+    (await page
+      .locator('text=Congratulations')
+      .isVisible()
+      .catch(() => false));
+
+  if (isGameOver) {
+    console.log('  ⚠ Game Over — restarting…');
+    await page.locator('button:has-text("New Game")').click({ force: true });
     await page.waitForSelector('text=Skill Points', { timeout: 10000 });
-    await page.click('text=Start Trading', { force: true });
+    await page.locator('button:has-text("OK")').click({ force: true });
     await page.waitForSelector('.trade-table-authentic', { timeout: 10000 });
   }
+  currentTitle = 'Buy Cargo';
 }
 
 async function main() {
@@ -100,33 +129,102 @@ async function main() {
     await page.click('text=Space Trader', { force: true });
     await page.waitForSelector('text=Skill Points', { timeout: 15000 });
 
-    // ── 1. New Game ────────────────────────────────────────────────────────
+    // ── 1. New Commander ─────────────────────────────────────────────────
     console.log('\nCapturing screens:');
-    await capture(page, 'Space Trader');
+    await capture(page, 'New Commander');
 
     // Start the game
-    await page.click('text=Start Trading', { force: true });
-    await page.waitForSelector('text=Buy Cargo', { timeout: 10000 });
+    await page.locator('button:has-text("OK")').click({ force: true });
+    await page.waitForSelector('.trade-table-authentic', { timeout: 10000 });
+    currentTitle = 'Buy Cargo';
 
     // ── 2. Buy Cargo ───────────────────────────────────────────────────────
     await capture(page, 'Buy Cargo');
 
     // ── 3. Sell Cargo ──────────────────────────────────────────────────────
-    await page.locator('button', { hasText: /^S$/ }).click({ force: true });
-    await page.waitForSelector('text=Sell Cargo');
+    await shortcut(page, 'S');
+    await page.waitForTimeout(300);
+    currentTitle = 'Sell Cargo';
     await capture(page, 'Sell Cargo');
 
-    // ── 4. Short Range Chart ───────────────────────────────────────────────
-    await page.locator('button', { hasText: /^W$/ }).click({ force: true });
-    await page.waitForSelector('text=Short Range Chart');
+    // ── 4. System Info (menu) ────────────────────────────────────────────
+    await menuNavigate(page, 'System Information');
+    currentTitle = 'System Info';
+    await capture(page, 'System Info');
+
+    // ── 5. News (from System Info) ───────────────────────────────────────
+    try {
+      await page.locator('button:has-text("News")').click();
+      await page.waitForTimeout(500);
+      await capture(page, 'News');
+      await page.locator('button:has-text("Done")').click();
+      await page.waitForTimeout(300);
+      currentTitle = 'System Info';
+    } catch {
+      console.log('  ⚠ News.png skipped');
+    }
+
+    // ── 6. Bank (from System Info) ──────────────────────────────────────
+    try {
+      await page.locator('button:has-text("Bank")').click();
+      await page.waitForTimeout(500);
+      await capture(page, 'Bank');
+      // Bank hides shortcuts — go back to System Info
+      await page.locator('button:has-text("Done")').click();
+      await page.waitForTimeout(300);
+    } catch {
+      console.log('  ⚠ Bank.png skipped');
+    }
+
+    // ── 7. Commander Status (menu) ──────────────────────────────────────
+    await menuNavigate(page, 'Commander Status');
+    currentTitle = 'Commander Status';
+    await capture(page, 'Commander Status');
+
+    // ── 8. Equipment (menu) ─────────────────────────────────────────────
+    await menuNavigate(page, 'Buy Equipment');
+    currentTitle = 'Equipment';
+    await capture(page, 'Equipment');
+
+    // ── 9. Ship Yard ────────────────────────────────────────────────────
+    await shortcut(page, 'Y');
+    await page.waitForTimeout(300);
+    currentTitle = 'Ship Yard';
+    await capture(page, 'Ship Yard');
+
+    // ── 10. Buy Ship ─────────────────────────────────────────────────────
+    try {
+      await page.locator('button:has-text("View Ship Info")').click();
+      await page.waitForTimeout(500);
+      await capture(page, 'Buy Ship');
+
+      // ── 11. Ship Information ───────────────────────────────────────────
+      await page.locator('button:has-text("Info")').first().click();
+      await page.waitForTimeout(500);
+      await capture(page, 'Ship Information');
+      // Ship Information is modal — go back to Buy Ship
+      await page.locator('button:has-text("Ship For Sale List")').click();
+      await page.waitForTimeout(300);
+    } catch {
+      console.log('  ⚠ Buy Ship / Ship Information skipped');
+    }
+
+    // ── 12. Personnel Roster (menu) ─────────────────────────────────────
+    try {
+      await menuNavigate(page, 'Personnel Roster');
+      await page.waitForTimeout(300);
+      await capture(page, 'Personnel Roster');
+    } catch {
+      console.log('  ⚠ Personnel Roster.png skipped');
+    }
+
+    // ── 13. Short Range Chart ───────────────────────────────────────────
+    await shortcut(page, 'W');
+    await page.waitForTimeout(300);
+    currentTitle = 'Short Range Chart';
     await capture(page, 'Short Range Chart');
 
-    // ── 5. Target System (click first map dot) ─────────────────────────────
-    // The Average Price List button only appears for in-range systems, so find
-    // an in-range dot by trying each one until that button is visible.
-    await page.locator('button', { hasText: /^W$/ }).click({ force: true });
-    await page.waitForSelector('text=Short Range Chart');
-
+    // ── 14. Target System ───────────────────────────────────────────────
     const dots = page.locator('.map-dot');
     await dots.first().waitFor({ state: 'visible', timeout: 10000 });
     const dotCount = await dots.count();
@@ -134,61 +232,54 @@ async function main() {
     let inRangeDotFound = false;
     for (let i = 0; i < dotCount; i++) {
       await dots.nth(i).dispatchEvent('click');
-      await page.waitForSelector('text=Target System', { timeout: 5000 });
-
-      const priceListBtn = page.locator('button', { hasText: 'Average Price List' });
+      await page.waitForTimeout(300);
+      const priceListBtn = page.locator('button:has-text("Average Price List")');
       if (await priceListBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
         inRangeDotFound = true;
         break;
       }
-      // Out of range — go back to map and try the next dot
-      await page.locator('button', { hasText: /^W$/ }).click({ force: true });
-      await page.waitForSelector('text=Short Range Chart');
+      await shortcut(page, 'W');
+      await page.waitForTimeout(300);
     }
 
+    currentTitle = 'Target System';
     await capture(page, 'Target System');
 
-    // ── 6. Average Price List (button on Target System screen) ─────────────
+    // ── 15. Average Price List ──────────────────────────────────────────
     if (!inRangeDotFound) {
       console.log('  ⚠ Average Price List.png skipped (no in-range system found)');
     } else {
-      await page.locator('button', { hasText: 'Average Price List' }).click();
-      await page.waitForSelector('text=Average Price List');
+      await page.locator('button:has-text("Average Price List")').click();
+      await page.waitForTimeout(500);
+      currentTitle = 'Average Price List';
       await capture(page, 'Average Price List');
     }
 
-    // ── 7. Encounter (best-effort — triggered by warping) ──────────────────
-    // Encounters are random; warp several times to try to trigger one.
+    // ── 16. Encounter (best-effort — triggered by warping) ──────────────
     let encounterCaptured = false;
-    for (let attempt = 0; attempt < 8 && !encounterCaptured; attempt++) {
-      // Go to map
-      await page.locator('button', { hasText: /^W$/ }).click({ force: true });
-      await page.waitForSelector('text=Short Range Chart');
+    for (let attempt = 0; attempt < 10 && !encounterCaptured; attempt++) {
+      await shortcut(page, 'W');
+      await page.waitForTimeout(300);
 
-      // Find an in-range system: try each dot, returning to map between attempts
       let foundWarpTarget = false;
-      const dotCount = await page.locator('.map-dot').count();
-      for (let d = 0; d < dotCount; d++) {
+      const warpDotCount = await page.locator('.map-dot').count();
+      for (let d = 0; d < warpDotCount; d++) {
         await page.locator('.map-dot').nth(d).dispatchEvent('click');
-        await page.waitForSelector('text=Target System', { timeout: 3000 }).catch(() => {});
-        const warpVisible = await page
-          .locator('button', { hasText: 'Warp' })
-          .isVisible({ timeout: 1000 })
-          .catch(() => false);
-        if (warpVisible) {
+        await page.waitForTimeout(300);
+        const warpBtn = page.locator('button:has-text("Warp")');
+        if (await warpBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
           foundWarpTarget = true;
           break;
         }
-        // Not in range — back to map
-        await page.locator('button', { hasText: /^W$/ }).click({ force: true });
-        await page.waitForSelector('text=Short Range Chart');
+        await shortcut(page, 'W');
+        await page.waitForTimeout(300);
       }
       if (!foundWarpTarget) break;
 
-      await page.locator('button', { hasText: 'Warp' }).click();
+      await page.locator('button:has-text("Warp")').click();
 
       try {
-        await page.waitForSelector('text=Encounter!', { timeout: 5000 });
+        await page.waitForSelector('text=Encounter', { timeout: 5000 });
         await capture(page, 'Encounter');
         encounterCaptured = true;
       } catch {
@@ -196,45 +287,24 @@ async function main() {
       }
 
       await dismissEncounters(page);
-      // Wait for PalmStatusBar shortcuts to re-appear (they're hidden during encounters)
-      await page
-        .locator('button', { hasText: /^W$/ })
-        .waitFor({ state: 'visible', timeout: 15000 });
+      await waitForTradeView(page);
     }
 
     if (!encounterCaptured) {
-      console.log('  ⚠ Encounter.png skipped (no encounter appeared in 5 trips)');
+      console.log('  ⚠ Encounter.png skipped (no encounter appeared in 10 trips)');
     }
 
-    // ── 8. Ship Yard ───────────────────────────────────────────────────────
-    await page.locator('button', { hasText: /^Y$/ }).click({ force: true });
-    await page.waitForSelector('text=Ship Yard');
-    await capture(page, 'Ship Yard');
-
-    // ── 9. Buy Ship ────────────────────────────────────────────────────────
-    await page.locator('button', { hasText: 'View Ship Info' }).click();
-    await page.waitForSelector('text=Buy Ship');
-    await capture(page, 'Buy Ship');
-
-    // ── 10. Ship Information ───────────────────────────────────────────────
-    await page.locator('button', { hasText: 'Info' }).first().click();
-    await page.waitForSelector('text=Ship Information');
-    await capture(page, 'Ship Information');
-
-    // ── 11. System Info (menu) ─────────────────────────────────────────────
-    await menuNavigate(page, 'System Information');
-    await page.waitForSelector('text=System Info');
-    await capture(page, 'System Info');
-
-    // ── 12. Commander Status (menu) ────────────────────────────────────────
-    await menuNavigate(page, 'Commander Status');
-    await page.waitForSelector('text=Commander Status');
-    await capture(page, 'Commander Status');
-
-    // ── 13. Equipment (menu) ───────────────────────────────────────────────
-    await menuNavigate(page, 'Buy Equipment');
-    await page.waitForSelector('text=Equipment');
-    await capture(page, 'Equipment');
+    // ── 17. High Scores (Game menu tab) ──────────────────────────────────
+    try {
+      currentTitle = 'Buy Cargo';
+      await shortcut(page, 'B');
+      await page.waitForTimeout(300);
+      await menuNavigateTab(page, 'Game', 'High Scores');
+      await page.waitForTimeout(500);
+      await capture(page, 'High Scores');
+    } catch {
+      console.log('  ⚠ High Scores.png skipped');
+    }
   } finally {
     await browser.close();
   }

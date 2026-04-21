@@ -104,14 +104,10 @@ export const NewGameView: React.FC<NewGameViewProps> = ({ onStart }) => {
                 startNewGame(name, difficulty, skills);
                 onStart();
               }}
+              className="palm-btn"
               style={{
-                padding: '4px 32px',
-                border: '2px solid #000',
-                borderRadius: '10px',
-                background: '#fff',
-                fontSize: '14px',
-                cursor: 'pointer',
-                fontFamily: 'monospace',
+                padding: '2px 32px',
+                fontSize: '11px',
               }}
             >
               OK

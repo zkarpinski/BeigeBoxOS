@@ -363,7 +363,7 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
             left: 0,
             right: 0,
             zIndex: 100,
-            border: '3px solid #330099',
+            border: '2px solid #000',
             borderRadius: '4px',
             background: '#fff',
             overflow: 'hidden',
@@ -371,7 +371,7 @@ export const AveragePriceListView: React.FC<AveragePriceListViewProps> = ({ onVi
         >
           <div
             style={{
-              background: '#330099',
+              background: '#1a1a8c',
               color: '#fff',
               padding: '2px 6px',
               fontWeight: 'bold',

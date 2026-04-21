@@ -8,29 +8,137 @@ import {
   ENCOUNTER_MONSTER,
   ENCOUNTER_DRAGONFLY,
   ENCOUNTER_SCARAB,
+  getTotalShieldStrength,
 } from '../../logic/Encounter';
 import { SHIP_SPRITES } from '../../assets/ships/ShipSprites';
 import { GameModal } from '../modals/GameModal';
 import { InformationButton } from '../common/InformationButton';
 
-const FILTER_BLUE = 'brightness(0) invert(1) sepia(1) saturate(6) hue-rotate(190deg)';
-const FILTER_GREEN = 'brightness(0) invert(1) sepia(1) saturate(6) hue-rotate(90deg)';
-const FILTER_RED = 'brightness(0) invert(1) sepia(1) saturate(8) hue-rotate(330deg)';
+/**
+ * Per-ship-type color schemes matching the original PalmOS colored bitmaps.
+ * Colors derived from reference screenshots (ScrPirateColor.gif, ScrPoliceColor.gif, etc.)
+ * Index matches ShipTypes array: 0=Flea, 1=Gnat, ..., 9=Wasp.
+ */
+const SHIP_COLORS: { fill: string; outline: string }[] = [
+  /* 0 Flea        */ { fill: '#88aadd', outline: '#2244aa' },
+  /* 1 Gnat        */ { fill: '#77bb77', outline: '#226622' },
+  /* 2 Firefly     */ { fill: '#ddaa44', outline: '#885500' },
+  /* 3 Mosquito    */ { fill: '#cc7744', outline: '#773311' },
+  /* 4 Bumblebee   */ { fill: '#ddcc44', outline: '#887700' },
+  /* 5 Beetle      */ { fill: '#55aa77', outline: '#226644' },
+  /* 6 Hornet      */ { fill: '#5577cc', outline: '#1a1a6c' },
+  /* 7 Grasshopper */ { fill: '#77aa55', outline: '#335522' },
+  /* 8 Termite     */ { fill: '#aa8866', outline: '#664422' },
+  /* 9 Wasp        */ { fill: '#99aa77', outline: '#556633' },
+];
 
+const DAMAGE_COLORS = { fill: '#cc4444', outline: '#6c1a1a' };
+
+/**
+ * Shielded ship filter: same fill approach but with a bright yellow/gold outline
+ * to visually indicate active shields, matching the original PalmOS shielded bitmaps.
+ */
+function shieldedColors(baseColors: { fill: string; outline: string }) {
+  return { fill: baseColors.fill, outline: '#ccaa00' };
+}
+
+/**
+ * SVG filter definitions for two-tone ship rendering.
+ * Uses morphological close to flood-fill the outline interior,
+ * then composites the original outline on top for definition.
+ * Filters: per-ship-type (normal + shielded variant) + damage.
+ */
+function ShipFilterDefs() {
+  const allSchemes: [string, { fill: string; outline: string }][] = [
+    ...SHIP_COLORS.map(
+      (c, i) => [`ship-type-${i}`, c] as [string, { fill: string; outline: string }],
+    ),
+    ...SHIP_COLORS.map(
+      (c, i) =>
+        [`ship-shield-${i}`, shieldedColors(c)] as [string, { fill: string; outline: string }],
+    ),
+    ['ship-damage', DAMAGE_COLORS],
+  ];
+  return (
+    <svg
+      style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
+      aria-hidden="true"
+    >
+      <defs>
+        {allSchemes.map(([id, { fill, outline }]) => (
+          <filter key={id} id={id} x="-100%" y="-100%" width="300%" height="300%">
+            {/* Fill interior via morphological close */}
+            <feMorphology in="SourceAlpha" operator="dilate" radius="12" result="dilated" />
+            <feMorphology in="dilated" operator="erode" radius="12" result="closed" />
+            <feFlood floodColor={fill} result="fillColor" />
+            <feComposite in="fillColor" in2="closed" operator="in" result="filledShape" />
+            {/* Dark outline from original sprite pixels */}
+            <feFlood floodColor={outline} result="outlineColor" />
+            <feComposite in="outlineColor" in2="SourceAlpha" operator="in" result="outlineLayer" />
+            {/* Composite: outline on top of fill */}
+            <feComposite in="outlineLayer" in2="filledShape" operator="over" />
+          </filter>
+        ))}
+      </defs>
+    </svg>
+  );
+}
+
+/**
+ * Renders a ship sprite with per-type coloring and 3-region horizontal compositing,
+ * matching the original PalmOS ShowShip() in Encounter.c.
+ *
+ * Three horizontal regions (left-to-right):
+ * - Left:  damaged + no shield (worst state)
+ * - Mid:   intact + no shield  OR  damaged + shielded
+ * - Right: intact + shielded (best state)
+ *
+ * damageRatio: 0 = full hull, 1 = destroyed
+ * shieldRatio: 0 = no shields, 1 = full shields
+ */
 function ColoredShip({
   spriteIndex,
   scale,
-  baseFilter,
   damageRatio,
+  shieldRatio,
   flip,
 }: {
   spriteIndex: number;
   scale: number;
-  baseFilter: string;
   damageRatio: number;
+  shieldRatio: number;
   flip?: boolean;
 }) {
   const Sprite = SHIP_SPRITES[spriteIndex] ?? SHIP_SPRITES[0];
+  const idx = spriteIndex < SHIP_COLORS.length ? spriteIndex : 0;
+  const normalFilter = `ship-type-${idx}`;
+  const shieldFilter = `ship-shield-${idx}`;
+  const damageFilter = 'ship-damage';
+
+  // Thresholds as percentages from left edge (0% = left, 100% = right)
+  // damage threshold: how far from left the damage region extends
+  const dmgPct = damageRatio * 100;
+  // shield threshold: how far from right the shield region extends (measured from left)
+  const shieldPct = (1 - shieldRatio) * 100;
+
+  const hasDamage = damageRatio > 0;
+  const hasShield = shieldRatio > 0;
+
+  // Simple case: no damage and no shields
+  if (!hasDamage && !hasShield) {
+    return (
+      <div
+        style={{
+          display: 'inline-block',
+          transform: flip ? 'scaleX(-1)' : undefined,
+          lineHeight: 0,
+        }}
+      >
+        <Sprite scale={scale} style={{ filter: `url(#${normalFilter})` }} />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -40,12 +148,55 @@ function ColoredShip({
         lineHeight: 0,
       }}
     >
-      <Sprite scale={scale} style={{ filter: baseFilter }} />
-      {damageRatio > 0 && (
-        <div style={{ position: 'absolute', top: 0, left: 0, opacity: damageRatio }}>
-          <Sprite scale={scale} style={{ filter: FILTER_RED }} />
+      {/* Region 1 (leftmost): damaged, no shield — worst state */}
+      {hasDamage && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            clipPath: `inset(0 ${100 - Math.min(dmgPct, shieldPct)}% 0 0)`,
+          }}
+        >
+          <Sprite scale={scale} style={{ filter: `url(#${damageFilter})` }} />
         </div>
       )}
+
+      {/* Region 2 (middle): intermediate state */}
+      {dmgPct !== shieldPct && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            clipPath: `inset(0 ${100 - Math.max(dmgPct, shieldPct)}% 0 ${Math.min(dmgPct, shieldPct)}%)`,
+          }}
+        >
+          {dmgPct < shieldPct ? (
+            // Intact but no shield
+            <Sprite scale={scale} style={{ filter: `url(#${normalFilter})` }} />
+          ) : (
+            // Damaged but shielded
+            <Sprite scale={scale} style={{ filter: `url(#${damageFilter})` }} />
+          )}
+        </div>
+      )}
+
+      {/* Region 3 (rightmost): intact + shielded — best state */}
+      <div
+        style={{
+          clipPath: hasShield
+            ? `inset(0 0 0 ${Math.max(dmgPct, shieldPct)}%)`
+            : hasDamage
+              ? `inset(0 0 0 ${dmgPct}%)`
+              : undefined,
+        }}
+      >
+        <Sprite
+          scale={scale}
+          style={{ filter: `url(#${hasShield ? shieldFilter : normalFilter})` }}
+        />
+      </div>
     </div>
   );
 }
@@ -163,15 +314,14 @@ function buildNarrativeText(
 }
 
 const pillBtnBase: React.CSSProperties = {
-  fontSize: '12px',
-  fontFamily: "'MS Sans Serif', Tahoma, sans-serif",
-  padding: '5px 14px',
-  borderRadius: '20px',
-  border: '1.5px solid #330099',
+  fontSize: '11px',
+  fontFamily: 'inherit',
+  padding: '2px 14px',
+  borderRadius: '12px',
+  border: '1px solid #000',
   background: '#fff',
-  color: '#330099',
+  color: '#000',
   cursor: 'pointer',
-  fontWeight: 'bold',
   whiteSpace: 'nowrap',
 };
 
@@ -255,6 +405,24 @@ export const EncounterModal: React.FC = () => {
   const npcDamageRatio =
     npcShipType.hullStrength > 0
       ? Math.max(0, Math.min(1, 1 - encounter.npc.ship.hull / npcShipType.hullStrength))
+      : 0;
+
+  // Shield ratios: current shield strength / max possible shield strength
+  const playerMaxShields = ship.shield.reduce(
+    (sum, id) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
+    0,
+  );
+  const playerShieldRatio =
+    playerMaxShields > 0
+      ? Math.max(0, Math.min(1, getTotalShieldStrength(ship) / playerMaxShields))
+      : 0;
+  const npcMaxShields = encounter.npc.ship.shield.reduce(
+    (sum, id) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
+    0,
+  );
+  const npcShieldRatio =
+    npcMaxShields > 0
+      ? Math.max(0, Math.min(1, getTotalShieldStrength(encounter.npc.ship) / npcMaxShields))
       : 0;
 
   const narrativeLines = buildNarrativeText(
@@ -446,11 +614,12 @@ export const EncounterModal: React.FC = () => {
             position: 'relative',
             right: 'auto',
             background: showInfo ? '#fff' : 'rgba(255,255,255,0.3)',
-            color: showInfo ? '#330099' : '#fff',
+            color: showInfo ? '#1a1a8c' : '#fff',
           }}
         />
       }
     >
+      <ShipFilterDefs />
       {showInfo ? (
         infoPanel
       ) : (
@@ -525,14 +694,14 @@ export const EncounterModal: React.FC = () => {
                 <ColoredShip
                   spriteIndex={ship.type}
                   scale={2}
-                  baseFilter={FILTER_BLUE}
                   damageRatio={playerDamageRatio}
+                  shieldRatio={playerShieldRatio}
                 />
                 <ColoredShip
                   spriteIndex={encounter.npc.ship.type}
                   scale={2}
-                  baseFilter={FILTER_GREEN}
                   damageRatio={npcDamageRatio}
+                  shieldRatio={npcShieldRatio}
                   flip
                 />
               </div>

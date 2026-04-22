@@ -98,7 +98,22 @@ export const NewGameView: React.FC<NewGameViewProps> = ({ onStart }) => {
           <InformationButton onClick={() => {}} style={{ position: 'relative', right: 'auto' }} />
         }
         footer={
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+            <button
+              onClick={() => {
+                const optSkills = { pilot: 7, fighter: 3, trader: 7, engineer: 3 };
+                startNewGame(name, 2, optSkills);
+                onStart();
+              }}
+              className="palm-btn"
+              style={{
+                padding: '2px 12px',
+                fontSize: '11px',
+                background: '#dfd',
+              }}
+            >
+              Optimal AI Start
+            </button>
             <button
               onClick={() => {
                 startNewGame(name, difficulty, skills);

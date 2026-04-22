@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { useSpaceTraderGame } from '../useSpaceTraderGame';
 import { getAiDecision, findBestTrade, AiAction } from './strategy';
 import { ShipTypes, TradeItems, SystemNames } from '../DataTypes';
@@ -7,9 +8,23 @@ import { ViewType } from '../DataTypes';
 
 type AppView = ViewType | 'gameOver';
 
+const MOBILE_BREAKPOINT = 600;
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < MOBILE_BREAKPOINT);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+}
+
 export const AiController: React.FC = () => {
   const state = useSpaceTraderGame();
   const { isAiEnabled, toggleAi } = state;
+  const isMobile = useIsMobile();
   const [log, setLog] = useState<string[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [logExpanded, setLogExpanded] = useState(false);
@@ -269,98 +284,186 @@ export const AiController: React.FC = () => {
     return `${itemName} → ${destName} (~${best.profit}cr/unit)`;
   })();
 
-  const sharedStyle: React.CSSProperties = {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    background: 'rgba(0,0,0,0.92)',
-    color: '#0f0',
-    fontFamily: 'monospace',
-    fontSize: '11px',
-    zIndex: 500,
-    borderTop: '1px solid #0a0',
-  };
+  const sharedStyle: React.CSSProperties = isMobile
+    ? {
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'rgba(0,0,0,0.92)',
+        color: '#0f0',
+        fontFamily: 'monospace',
+        fontSize: '11px',
+        zIndex: 10000,
+        borderTop: '1px solid #0a0',
+      }
+    : {
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        background: 'rgba(0,0,0,0.88)',
+        color: '#0f0',
+        fontFamily: 'monospace',
+        fontSize: '11px',
+        zIndex: 10000,
+        border: '1px solid #0a0',
+        borderRadius: '6px',
+        width: '230px',
+      };
 
-  // ── Collapsed bar ──────────────────────────────────────────────────────────
+  // Portal escapes the BeigeBoxOS transform container so position:fixed is truly viewport-relative
+  const asPortal = (el: React.ReactElement) => ReactDOM.createPortal(el, document.body);
+
+  // ── Collapsed state ────────────────────────────────────────────────────────
+  // Mobile: full-width thin bar (portalled to body). Desktop: compact corner box.
   if (!panelOpen) {
-    return (
-      <div
-        style={{
-          ...sharedStyle,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '4px 8px',
-        }}
-      >
-        {/* Status dot */}
-        <span
+    return isMobile ? (
+      asPortal(
+        // Mobile bar
+        <div
           style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            background: isAiEnabled ? '#0f0' : '#040',
-            flexShrink: 0,
-            boxShadow: isAiEnabled ? '0 0 4px #0f0' : 'none',
-          }}
-        />
-
-        {/* Label + last action */}
-        <span style={{ fontWeight: 'bold', letterSpacing: '1px', flexShrink: 0 }}>AI</span>
-        <span
-          style={{
-            flex: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            color: '#080',
-            fontSize: '10px',
+            ...sharedStyle,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 8px',
           }}
         >
-          {isAiEnabled ? (log[0] ?? 'running...') : 'off'}
-        </span>
+          {/* Status dot */}
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: isAiEnabled ? '#0f0' : '#040',
+              flexShrink: 0,
+              boxShadow: isAiEnabled ? '0 0 4px #0f0' : 'none',
+            }}
+          />
 
-        {/* Start/Stop */}
-        <button
-          onClick={toggleAi}
+          {/* Label + last action */}
+          <span style={{ fontWeight: 'bold', letterSpacing: '1px', flexShrink: 0 }}>AI</span>
+          <span
+            style={{
+              flex: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: '#080',
+              fontSize: '10px',
+            }}
+          >
+            {isAiEnabled ? (log[0] ?? 'running...') : 'off'}
+          </span>
+
+          {/* Start/Stop */}
+          <button
+            onClick={toggleAi}
+            style={{
+              background: isAiEnabled ? '#500' : '#040',
+              color: isAiEnabled ? '#f88' : '#0d0',
+              border: `1px solid ${isAiEnabled ? '#800' : '#0a0'}`,
+              padding: '1px 6px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '9px',
+              fontWeight: 'bold',
+              flexShrink: 0,
+            }}
+          >
+            {isAiEnabled ? 'STOP' : 'START'}
+          </button>
+
+          {/* Expand */}
+          <button
+            onClick={() => setPanelOpen(true)}
+            style={{
+              background: 'none',
+              border: '1px solid #040',
+              color: '#060',
+              padding: '1px 5px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '9px',
+              flexShrink: 0,
+            }}
+          >
+            ▲
+          </button>
+        </div>,
+      )
+    ) : (
+      // Desktop corner box (collapsed) — no portal needed
+      <div style={{ ...sharedStyle, padding: '8px 10px' }}>
+        <div
           style={{
-            background: isAiEnabled ? '#500' : '#040',
-            color: isAiEnabled ? '#f88' : '#0d0',
-            border: `1px solid ${isAiEnabled ? '#800' : '#0a0'}`,
-            padding: '1px 6px',
-            borderRadius: '3px',
-            cursor: 'pointer',
-            fontSize: '9px',
-            fontWeight: 'bold',
-            flexShrink: 0,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '6px',
           }}
         >
-          {isAiEnabled ? 'STOP' : 'START'}
-        </button>
-
-        {/* Expand */}
-        <button
-          onClick={() => setPanelOpen(true)}
-          style={{
-            background: 'none',
-            border: '1px solid #040',
-            color: '#060',
-            padding: '1px 5px',
-            borderRadius: '3px',
-            cursor: 'pointer',
-            fontSize: '9px',
-            flexShrink: 0,
-          }}
-        >
-          ▲
-        </button>
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: isAiEnabled ? '#0f0' : '#040',
+              flexShrink: 0,
+              boxShadow: isAiEnabled ? '0 0 4px #0f0' : 'none',
+            }}
+          />
+          <span style={{ fontWeight: 'bold', letterSpacing: '1px', flexShrink: 0 }}>AI CORE</span>
+          <span
+            style={{
+              flex: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: '#080',
+              fontSize: '10px',
+            }}
+          >
+            {isAiEnabled ? (log[0] ?? 'running...') : 'off'}
+          </span>
+          <button
+            onClick={toggleAi}
+            style={{
+              background: isAiEnabled ? '#500' : '#040',
+              color: isAiEnabled ? '#f88' : '#0d0',
+              border: `1px solid ${isAiEnabled ? '#800' : '#0a0'}`,
+              padding: '1px 6px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '9px',
+              fontWeight: 'bold',
+              flexShrink: 0,
+            }}
+          >
+            {isAiEnabled ? 'STOP' : 'START'}
+          </button>
+          <button
+            onClick={() => setPanelOpen(true)}
+            style={{
+              background: 'none',
+              border: '1px solid #040',
+              color: '#060',
+              padding: '1px 5px',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '9px',
+              flexShrink: 0,
+            }}
+          >
+            ▲
+          </button>
+        </div>
       </div>
     );
   }
 
   // ── Expanded panel ─────────────────────────────────────────────────────────
-  return (
+  const expandedPanel = (
     <div style={{ ...sharedStyle, padding: '10px 12px' }}>
       {/* Header */}
       <div
@@ -519,4 +622,5 @@ export const AiController: React.FC = () => {
       </div>
     </div>
   );
+  return isMobile ? asPortal(expandedPanel) : expandedPanel;
 };

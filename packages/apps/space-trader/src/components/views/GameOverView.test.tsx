@@ -38,29 +38,14 @@ describe('GameOverView Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders defeat message and commander name', () => {
+  it('renders defeat message', () => {
     render(<GameOverView />);
-    expect(screen.getByText('DEFEAT')).toBeInTheDocument();
-    expect(screen.getByText(/Commander Jameson is lost in the void/)).toBeInTheDocument();
+    expect(screen.getByText('YOU ARE DESTROYED')).toBeInTheDocument();
   });
 
-  it('shows score breakdown', () => {
+  it('renders OK button that calls restartGame', () => {
     render(<GameOverView />);
-    expect(screen.getByText('Final Score')).toBeInTheDocument();
-    expect(screen.getByText('15')).toBeInTheDocument(); // days
-    expect(screen.getByText('3')).toBeInTheDocument(); // pirate kills
-  });
-
-  it('shows rating', () => {
-    render(<GameOverView />);
-    // Should show some rating title
-    const ratingEl = screen.getByText(/Beginner|Trainee|Amateur|Competent/);
-    expect(ratingEl).toBeInTheDocument();
-  });
-
-  it('calls restartGame when clicking New Game', () => {
-    render(<GameOverView />);
-    fireEvent.click(screen.getByText('New Game'));
+    fireEvent.click(screen.getByText('OK'));
     expect(mockStore.restartGame).toHaveBeenCalled();
   });
 
@@ -70,7 +55,6 @@ describe('GameOverView Component', () => {
       moonBought: true,
     });
     render(<GameOverView />);
-    expect(screen.getByText('Congratulations!')).toBeInTheDocument();
-    expect(screen.getByText('VICTORY!')).toBeInTheDocument();
+    expect(screen.getByText('CONGRATULATIONS')).toBeInTheDocument();
   });
 });

@@ -15,86 +15,48 @@ import { GameModal } from '../modals/GameModal';
 import { InformationButton } from '../common/InformationButton';
 
 /**
- * Per-ship-type color schemes matching the original PalmOS colored bitmaps.
- * Colors derived from reference screenshots (ScrPirateColor.gif, ScrPoliceColor.gif, etc.)
- * Index matches ShipTypes array: 0=Flea, 1=Gnat, ..., 9=Wasp.
- */
-const SHIP_COLORS: { fill: string; outline: string }[] = [
-  /* 0 Flea        */ { fill: '#88aadd', outline: '#2244aa' },
-  /* 1 Gnat        */ { fill: '#77bb77', outline: '#226622' },
-  /* 2 Firefly     */ { fill: '#ddaa44', outline: '#885500' },
-  /* 3 Mosquito    */ { fill: '#cc7744', outline: '#773311' },
-  /* 4 Bumblebee   */ { fill: '#ddcc44', outline: '#887700' },
-  /* 5 Beetle      */ { fill: '#55aa77', outline: '#226644' },
-  /* 6 Hornet      */ { fill: '#5577cc', outline: '#1a1a6c' },
-  /* 7 Grasshopper */ { fill: '#77aa55', outline: '#335522' },
-  /* 8 Termite     */ { fill: '#aa8866', outline: '#664422' },
-  /* 9 Wasp        */ { fill: '#99aa77', outline: '#556633' },
-];
-
-const DAMAGE_COLORS = { fill: '#cc4444', outline: '#6c1a1a' };
-
-/**
- * Shielded ship filter: same fill approach but with a bright yellow/gold outline
- * to visually indicate active shields, matching the original PalmOS shielded bitmaps.
- */
-function shieldedColors(baseColors: { fill: string; outline: string }) {
-  return { fill: baseColors.fill, outline: '#ccaa00' };
-}
-
-/**
- * SVG filter definitions for two-tone ship rendering.
- * Uses morphological close to flood-fill the outline interior,
- * then composites the original outline on top for definition.
- * Filters: per-ship-type (normal + shielded variant) + damage.
+ * SVG filter definitions for ship rendering states.
+ * Sprites now have multi-color fills baked in, so normal rendering needs no filter.
+ * Only damage (red recolor) and shield (gold glow) need filters.
  */
 function ShipFilterDefs() {
-  const allSchemes: [string, { fill: string; outline: string }][] = [
-    ...SHIP_COLORS.map(
-      (c, i) => [`ship-type-${i}`, c] as [string, { fill: string; outline: string }],
-    ),
-    ...SHIP_COLORS.map(
-      (c, i) =>
-        [`ship-shield-${i}`, shieldedColors(c)] as [string, { fill: string; outline: string }],
-    ),
-    ['ship-damage', DAMAGE_COLORS],
-  ];
   return (
     <svg
       style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
       aria-hidden="true"
     >
       <defs>
-        {allSchemes.map(([id, { fill, outline }]) => (
-          <filter key={id} id={id} x="-100%" y="-100%" width="300%" height="300%">
-            {/* Fill interior via morphological close */}
-            <feMorphology in="SourceAlpha" operator="dilate" radius="12" result="dilated" />
-            <feMorphology in="dilated" operator="erode" radius="12" result="closed" />
-            <feFlood floodColor={fill} result="fillColor" />
-            <feComposite in="fillColor" in2="closed" operator="in" result="filledShape" />
-            {/* Dark outline from original sprite pixels */}
-            <feFlood floodColor={outline} result="outlineColor" />
-            <feComposite in="outlineColor" in2="SourceAlpha" operator="in" result="outlineLayer" />
-            {/* Composite: outline on top of fill */}
-            <feComposite in="outlineLayer" in2="filledShape" operator="over" />
-          </filter>
-        ))}
+        {/* Damage filter: recolor all pixels red via SourceAlpha */}
+        <filter id="ship-damage">
+          <feFlood floodColor="#cc4444" result="damageColor" />
+          <feComposite in="damageColor" in2="SourceAlpha" operator="in" />
+        </filter>
+        {/* Shield filter: gold glow around the ship (React 18 compatible) */}
+        <filter id="ship-shield" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur" />
+          <feFlood floodColor="#ccaa00" floodOpacity="0.8" result="gold" />
+          <feComposite in="gold" in2="blur" operator="in" result="glow" />
+          <feMerge>
+            <feMergeNode in="glow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
     </svg>
   );
 }
 
 /**
- * Renders a ship sprite with per-type coloring and 3-region horizontal compositing,
+ * Renders a ship sprite with 3-region horizontal compositing,
  * matching the original PalmOS ShowShip() in Encounter.c.
  *
- * Three horizontal regions (left-to-right):
- * - Left:  damaged + no shield (worst state)
- * - Mid:   intact + no shield  OR  damaged + shielded
- * - Right: intact + shielded (best state)
+ * Sprites have multi-color fills baked in — no filter needed for normal state.
+ * Damage (red) uses SourceAlpha filter. Shield adds a gold glow.
  *
- * damageRatio: 0 = full hull, 1 = destroyed
- * shieldRatio: 0 = no shields, 1 = full shields
+ * Three horizontal regions (left-to-right):
+ * - Left:  damaged, no shield (worst state) — red filter
+ * - Mid:   intact no-shield OR damaged shielded
+ * - Right: intact + shielded (best state) — gold glow
  */
 function ColoredShip({
   spriteIndex,
@@ -110,21 +72,13 @@ function ColoredShip({
   flip?: boolean;
 }) {
   const Sprite = SHIP_SPRITES[spriteIndex] ?? SHIP_SPRITES[0];
-  const idx = spriteIndex < SHIP_COLORS.length ? spriteIndex : 0;
-  const normalFilter = `ship-type-${idx}`;
-  const shieldFilter = `ship-shield-${idx}`;
-  const damageFilter = 'ship-damage';
 
-  // Thresholds as percentages from left edge (0% = left, 100% = right)
-  // damage threshold: how far from left the damage region extends
   const dmgPct = damageRatio * 100;
-  // shield threshold: how far from right the shield region extends (measured from left)
   const shieldPct = (1 - shieldRatio) * 100;
-
   const hasDamage = damageRatio > 0;
   const hasShield = shieldRatio > 0;
 
-  // Simple case: no damage and no shields
+  // Simple case: no damage and no shields — render baked-in colors directly
   if (!hasDamage && !hasShield) {
     return (
       <div
@@ -134,7 +88,7 @@ function ColoredShip({
           lineHeight: 0,
         }}
       >
-        <Sprite scale={scale} style={{ filter: `url(#${normalFilter})` }} />
+        <Sprite scale={scale} />
       </div>
     );
   }
@@ -148,7 +102,7 @@ function ColoredShip({
         lineHeight: 0,
       }}
     >
-      {/* Region 1 (leftmost): damaged, no shield — worst state */}
+      {/* Region 1 (leftmost): damaged, no shield — red recolor */}
       {hasDamage && (
         <div
           style={{
@@ -158,11 +112,11 @@ function ColoredShip({
             clipPath: `inset(0 ${100 - Math.min(dmgPct, shieldPct)}% 0 0)`,
           }}
         >
-          <Sprite scale={scale} style={{ filter: `url(#${damageFilter})` }} />
+          <Sprite scale={scale} style={{ filter: 'url(#ship-damage)' }} />
         </div>
       )}
 
-      {/* Region 2 (middle): intermediate state */}
+      {/* Region 2 (middle): intact no-shield OR damaged shielded */}
       {dmgPct !== shieldPct && (
         <div
           style={{
@@ -173,16 +127,14 @@ function ColoredShip({
           }}
         >
           {dmgPct < shieldPct ? (
-            // Intact but no shield
-            <Sprite scale={scale} style={{ filter: `url(#${normalFilter})` }} />
+            <Sprite scale={scale} />
           ) : (
-            // Damaged but shielded
-            <Sprite scale={scale} style={{ filter: `url(#${damageFilter})` }} />
+            <Sprite scale={scale} style={{ filter: 'url(#ship-damage)' }} />
           )}
         </div>
       )}
 
-      {/* Region 3 (rightmost): intact + shielded — best state */}
+      {/* Region 3 (rightmost): intact + shielded — gold glow */}
       <div
         style={{
           clipPath: hasShield
@@ -192,71 +144,176 @@ function ColoredShip({
               : undefined,
         }}
       >
-        <Sprite
-          scale={scale}
-          style={{ filter: `url(#${hasShield ? shieldFilter : normalFilter})` }}
-        />
+        <Sprite scale={scale} style={hasShield ? { filter: 'url(#ship-shield)' } : undefined} />
       </div>
     </div>
   );
 }
 
-function EncounterIcon({ type }: { type: string }) {
-  if (type === ENCOUNTER_POLICE) {
-    // Police badge: shield shape with a star
-    return (
-      <svg width="28" height="28" viewBox="0 0 28 28">
-        <path
-          d="M14 2 L24 6 L24 16 Q24 23 14 27 Q4 23 4 16 L4 6 Z"
-          fill="#1a1a8c"
-          stroke="#000"
-          strokeWidth="1"
-        />
-        <polygon
-          points="14,8 15.5,12.5 20,12.5 16.5,15.5 18,20 14,17 10,20 11.5,15.5 8,12.5 12.5,12.5"
-          fill="#fff"
-        />
-      </svg>
-    );
-  }
-  if (type === ENCOUNTER_PIRATE) {
-    // Skull
-    return (
-      <svg width="28" height="28" viewBox="0 0 28 28">
-        <ellipse cx="14" cy="12" rx="9" ry="9" fill="#333" stroke="#000" strokeWidth="1" />
-        <rect x="8" y="19" width="12" height="5" rx="2" fill="#333" stroke="#000" strokeWidth="1" />
-        <rect x="10" y="21" width="2" height="3" fill="#fff" />
-        <rect x="13" y="21" width="2" height="3" fill="#fff" />
-        <rect x="16" y="21" width="2" height="3" fill="#fff" />
-        <circle cx="10.5" cy="12" r="2.5" fill="#fff" />
-        <circle cx="17.5" cy="12" r="2.5" fill="#fff" />
-        <circle cx="10.5" cy="12" r="1" fill="#333" />
-        <circle cx="17.5" cy="12" r="1" fill="#333" />
-        <path d="M11 16.5 Q14 18 17 16.5" stroke="#fff" strokeWidth="1" fill="none" />
-      </svg>
-    );
-  }
-  if (type === ENCOUNTER_MONSTER || type === ENCOUNTER_DRAGONFLY || type === ENCOUNTER_SCARAB) {
-    // Boss: red diamond
-    return (
-      <svg width="28" height="28" viewBox="0 0 28 28">
-        <polygon points="14,2 26,14 14,26 2,14" fill="#cc0000" stroke="#800" strokeWidth="1" />
-        <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#fff">
-          !
-        </text>
-      </svg>
-    );
-  }
-  // Trader: coin
+/**
+ * Pixel-art encounter icons matching the original PalmOS bitmaps.
+ * PirateBitmapFamily=9500, PoliceBitmapFamily=9600, TraderBitmapFamily=9700
+ */
+function PirateIcon() {
+  // Skull and crossbones on dark purple background
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28">
-      <circle cx="14" cy="14" r="11" fill="#c8a000" stroke="#8b6000" strokeWidth="1.5" />
-      <circle cx="14" cy="14" r="8" fill="none" stroke="#8b6000" strokeWidth="1" />
-      <text x="14" y="18" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#8b6000">
-        $
-      </text>
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 14 14"
+      shapeRendering="crispEdges"
+      style={{ imageRendering: 'pixelated' }}
+    >
+      <rect width="14" height="14" fill="#330066" />
+      {/* Skull */}
+      <g fill="#ffffff">
+        <rect x={5} y={1} width={4} height={1} />
+        <rect x={4} y={2} width={6} height={1} />
+        <rect x={4} y={3} width={6} height={1} />
+        <rect x={4} y={4} width={6} height={1} />
+        <rect x={5} y={5} width={4} height={1} />
+        <rect x={6} y={6} width={2} height={1} />
+        <rect x={5} y={7} width={4} height={1} />
+      </g>
+      {/* Eye sockets */}
+      <g fill="#330066">
+        <rect x={5} y={3} width={2} height={2} />
+        <rect x={8} y={3} width={2} height={2} />
+      </g>
+      {/* Crossbones */}
+      <g fill="#ffffff">
+        <rect x={3} y={9} width={1} height={1} />
+        <rect x={10} y={9} width={1} height={1} />
+        <rect x={4} y={10} width={1} height={1} />
+        <rect x={9} y={10} width={1} height={1} />
+        <rect x={5} y={11} width={4} height={1} />
+        <rect x={4} y={12} width={1} height={1} />
+        <rect x={9} y={12} width={1} height={1} />
+        <rect x={3} y={13} width={1} height={1} />
+        <rect x={10} y={13} width={1} height={1} />
+      </g>
     </svg>
   );
+}
+
+function PoliceIcon() {
+  // Gold badge/star on blue background
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 14 14"
+      shapeRendering="crispEdges"
+      style={{ imageRendering: 'pixelated' }}
+    >
+      <rect width="14" height="14" fill="#000088" />
+      {/* Badge shield shape */}
+      <g fill="#ccaa00">
+        <rect x={4} y={1} width={6} height={1} />
+        <rect x={3} y={2} width={8} height={1} />
+        <rect x={3} y={3} width={8} height={1} />
+        <rect x={3} y={4} width={8} height={1} />
+        <rect x={3} y={5} width={8} height={1} />
+        <rect x={4} y={6} width={6} height={1} />
+        <rect x={4} y={7} width={6} height={1} />
+        <rect x={5} y={8} width={4} height={1} />
+        <rect x={5} y={9} width={4} height={1} />
+        <rect x={6} y={10} width={2} height={1} />
+        <rect x={6} y={11} width={2} height={1} />
+      </g>
+      {/* Star cutout */}
+      <g fill="#ffffff">
+        <rect x={7} y={3} width={1} height={1} />
+        <rect x={6} y={4} width={3} height={1} />
+        <rect x={5} y={5} width={5} height={1} />
+        <rect x={6} y={6} width={3} height={1} />
+        <rect x={6} y={7} width={1} height={1} />
+        <rect x={8} y={7} width={1} height={1} />
+      </g>
+    </svg>
+  );
+}
+
+function TraderIcon() {
+  // Green dollar/trade icon on dark green background
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 14 14"
+      shapeRendering="crispEdges"
+      style={{ imageRendering: 'pixelated' }}
+    >
+      <rect width="14" height="14" fill="#005500" />
+      {/* Coin/circle */}
+      <g fill="#44cc44">
+        <rect x={5} y={2} width={4} height={1} />
+        <rect x={4} y={3} width={6} height={1} />
+        <rect x={3} y={4} width={8} height={1} />
+        <rect x={3} y={5} width={8} height={1} />
+        <rect x={3} y={6} width={8} height={1} />
+        <rect x={3} y={7} width={8} height={1} />
+        <rect x={3} y={8} width={8} height={1} />
+        <rect x={3} y={9} width={8} height={1} />
+        <rect x={4} y={10} width={6} height={1} />
+        <rect x={5} y={11} width={4} height={1} />
+      </g>
+      {/* $ symbol */}
+      <g fill="#005500">
+        <rect x={7} y={3} width={1} height={1} />
+        <rect x={5} y={4} width={4} height={1} />
+        <rect x={5} y={5} width={1} height={1} />
+        <rect x={5} y={6} width={4} height={1} />
+        <rect x={9} y={7} width={1} height={1} />
+        <rect x={9} y={8} width={1} height={1} />
+        <rect x={5} y={9} width={4} height={1} />
+        <rect x={7} y={10} width={1} height={1} />
+      </g>
+    </svg>
+  );
+}
+
+function AlienIcon() {
+  // Red alien/mantis icon
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 14 14"
+      shapeRendering="crispEdges"
+      style={{ imageRendering: 'pixelated' }}
+    >
+      <rect width="14" height="14" fill="#880000" />
+      <g fill="#ff4444">
+        <rect x={4} y={2} width={2} height={1} />
+        <rect x={8} y={2} width={2} height={1} />
+        <rect x={3} y={3} width={3} height={1} />
+        <rect x={8} y={3} width={3} height={1} />
+        <rect x={3} y={4} width={8} height={1} />
+        <rect x={4} y={5} width={6} height={1} />
+        <rect x={5} y={6} width={4} height={1} />
+        <rect x={5} y={7} width={4} height={1} />
+        <rect x={4} y={8} width={6} height={1} />
+        <rect x={3} y={9} width={3} height={1} />
+        <rect x={8} y={9} width={3} height={1} />
+        <rect x={3} y={10} width={2} height={1} />
+        <rect x={9} y={10} width={2} height={1} />
+      </g>
+      {/* Eyes */}
+      <g fill="#ffffff">
+        <rect x={5} y={4} width={1} height={1} />
+        <rect x={8} y={4} width={1} height={1} />
+      </g>
+    </svg>
+  );
+}
+
+function EncounterIcon({ type }: { type: string }) {
+  if (type === ENCOUNTER_PIRATE) return <PirateIcon />;
+  if (type === ENCOUNTER_POLICE) return <PoliceIcon />;
+  if (type === ENCOUNTER_MONSTER || type === ENCOUNTER_DRAGONFLY || type === ENCOUNTER_SCARAB)
+    return <AlienIcon />;
+  return <TraderIcon />;
 }
 
 function buildNarrativeText(
@@ -408,21 +465,23 @@ export const EncounterModal: React.FC = () => {
       : 0;
 
   // Shield ratios: current shield strength / max possible shield strength
-  const playerMaxShields = ship.shield.reduce(
-    (sum, id) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
+  // Guard against old persisted state missing shieldStrength
+  const safeShieldStrength = (s: typeof ship) => (s.shieldStrength ? getTotalShieldStrength(s) : 0);
+  const playerMaxShields = (ship.shield ?? []).reduce(
+    (sum: number, id: number) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
     0,
   );
   const playerShieldRatio =
     playerMaxShields > 0
-      ? Math.max(0, Math.min(1, getTotalShieldStrength(ship) / playerMaxShields))
+      ? Math.max(0, Math.min(1, safeShieldStrength(ship) / playerMaxShields))
       : 0;
-  const npcMaxShields = encounter.npc.ship.shield.reduce(
-    (sum, id) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
+  const npcMaxShields = (encounter.npc.ship.shield ?? []).reduce(
+    (sum: number, id: number) => sum + (id >= 0 && Shields[id] ? Shields[id].power : 0),
     0,
   );
   const npcShieldRatio =
     npcMaxShields > 0
-      ? Math.max(0, Math.min(1, getTotalShieldStrength(encounter.npc.ship) / npcMaxShields))
+      ? Math.max(0, Math.min(1, safeShieldStrength(encounter.npc.ship) / npcMaxShields))
       : 0;
 
   const narrativeLines = buildNarrativeText(

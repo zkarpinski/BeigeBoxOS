@@ -131,7 +131,7 @@ Small icons drawn at position (143, 13) to identify the opponent type:
 
 1. ~~**Damage direction**: Change from vertical (top-to-bottom) to horizontal (left-to-right)~~ **FIXED**
 2. ~~**Ship colors**: Change from faction-based to ship-type-specific colors~~ **FIXED**
-3. **Interior pixels**: SVGs only have outlines; originals had multi-color filled bitmaps — approximated via morphological close filter (best possible without redrawing each sprite pixel-by-pixel)
+3. ~~**Interior pixels**: SVGs only have outlines; originals had multi-color filled bitmaps~~ **FIXED** — generated multi-color sprites with flood-filled interiors and 4-zone gradient coloring
 4. ~~**Shield rendering**: Original had separate shielded bitmaps; we have no shield visual~~ **FIXED** — 3-region compositing with gold outline for shielded portion
 5. **Damaged bitmap**: Original had a separate damaged bitmap variant; we recolor red — close approximation, would need per-pixel redraw for exact match
 
@@ -174,6 +174,21 @@ Small icons drawn at position (143, 13) to identify the opponent type:
 - Added `shieldRatio` prop to `ColoredShip` (calculated from `getTotalShieldStrength() / maxShields`)
 - Shield portion sweeps right-to-left as shields deplete, matching original `startshield` calculation
 - File: `src/components/views/EncounterModal.tsx` — `ShipFilterDefs`, `ColoredShip`, shield ratio calc
+
+### Fix 4: Multi-color interior pixels (replaces morphological close filter)
+
+- **Before**: SVG sprites contained only black outline pixels (`<g fill="#000000">`). A morphological close SVG filter approximated interior fill at render time with a single flat color.
+- **After**: Interior pixels generated programmatically via flood-fill and baked into `ShipSprites.tsx` with 4 color zones per ship:
+  - **Accent** (cockpit/front-center): lightest, brightest shade
+  - **Highlight** (top third): lighter shade
+  - **Body** (middle third): main ship color
+  - **Shadow** (bottom third): darker shade
+- Each SVG now has multiple `<g>` groups (body, highlight, shadow, accent fills behind, black outline on top)
+- Removed per-ship-type morphological close filters from `ShipFilterDefs` — normal rendering uses baked-in colors directly with no filter
+- Simplified to just 2 filters: `ship-damage` (red SourceAlpha recolor) and `ship-shield` (gold drop-shadow glow)
+- `ShipInformationView` also benefits — ships now render in color instead of black outlines
+- Generation script: `scripts/generate-colored-sprites.js`
+- File: `src/assets/ships/ShipSprites.tsx`, `src/components/views/EncounterModal.tsx`
 
 ## Reference Images
 

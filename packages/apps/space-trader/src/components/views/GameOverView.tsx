@@ -1,187 +1,196 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSpaceTraderGame } from '../../logic/useSpaceTraderGame';
-import { DifficultyLevel, ShipTypes } from '../../logic/DataTypes';
-import { calculateNetWorth } from '../../logic/store/bankSlice';
 
-// OG rating titles based on score thresholds
-const RATINGS = [
-  { min: 0, title: 'Beginner' },
-  { min: 20, title: 'Trainee' },
-  { min: 50, title: 'Amateur' },
-  { min: 100, title: 'Competent' },
-  { min: 180, title: 'Dangerous' },
-  { min: 280, title: 'Deadly' },
-  { min: 400, title: 'Elite' },
-  { min: 600, title: 'Master' },
-  { min: 900, title: 'Ultimate' },
-];
-
-function getRating(score: number): string {
-  let title = RATINGS[0].title;
-  for (const r of RATINGS) {
-    if (score >= r.min) title = r.title;
-  }
-  return title;
-}
-
+/**
+ * Game Over screen matching the original PalmOS Space Trader.
+ * Defeat: "YOU ARE DESTROYED" over a starfield with OK button.
+ * Victory: "CONGRATULATIONS" over a starfield with OK button.
+ */
 export const GameOverView: React.FC = () => {
-  const state = useSpaceTraderGame();
-  const {
-    restartGame,
-    nameCommander,
-    days,
-    credits,
-    difficulty,
-    killsPirate,
-    killsPolice,
-    reputationScore,
-    policeRecordScore,
-    moonBought,
-  } = state;
-
-  const netWorth = calculateNetWorth(state);
+  const { restartGame, moonBought } = useSpaceTraderGame();
   const isVictory = moonBought;
 
-  // OG score formula: net worth scaled by difficulty, penalized by days, bonus for kills/quests
-  const diffMultiplier = (difficulty + 1) * 0.5;
-  const worthScore = Math.floor(netWorth / 500) * diffMultiplier;
-  const killScore = (killsPirate * 2 + killsPolice) * diffMultiplier;
-  const dayPenalty = Math.floor(days * 0.5);
-  const repBonus = Math.max(0, reputationScore) * 2;
-  const victoryBonus = isVictory ? 500 * (difficulty + 1) : 0;
-  const totalScore = Math.max(
-    0,
-    Math.floor(worthScore + killScore - dayPenalty + repBonus + victoryBonus),
-  );
-  const rating = getRating(totalScore);
-
-  const row = (label: string, value: string | number) => (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginBottom: '3px',
-        fontSize: '13px',
-      }}
-    >
-      <span>{label}</span>
-      <span>{value}</span>
-    </div>
-  );
+  // Generate random stars once
+  const stars = useMemo(() => {
+    const result: { x: number; y: number; size: number; bright: boolean }[] = [];
+    // Seeded pseudo-random for consistent look
+    let seed = 42;
+    const rand = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
+    for (let i = 0; i < 120; i++) {
+      result.push({
+        x: rand() * 100,
+        y: rand() * 100,
+        size: rand() < 0.15 ? 2 : 1,
+        bright: rand() < 0.3,
+      });
+    }
+    return result;
+  }, []);
 
   return (
     <div
-      className="palm-window"
       style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 200,
         background: '#000',
-        color: '#fff',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
+        border: '2px solid #888',
       }}
     >
-      <div
-        className="palm-header"
-        style={{
-          width: '100%',
-          background: isVictory ? '#006600' : '#cc0000',
-          textAlign: 'center',
-          padding: '4px',
-          fontWeight: 'bold',
-        }}
-      >
-        {isVictory ? 'VICTORY!' : 'GAME OVER'}
-      </div>
-
-      <div className="palm-content" style={{ padding: '12px', flex: 1 }}>
-        <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+      {/* Starfield background */}
+      <div style={{ position: 'absolute', inset: 0 }}>
+        {stars.map((s, i) => (
           <div
+            key={i}
             style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: isVictory ? '#0f0' : '#f00',
-              marginBottom: '4px',
+              position: 'absolute',
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              width: `${s.size}px`,
+              height: `${s.size}px`,
+              background: s.bright ? '#fff' : '#888',
+              borderRadius: s.size > 1 ? '50%' : undefined,
             }}
-          >
-            {isVictory ? 'Congratulations!' : 'DEFEAT'}
-          </div>
-          <div style={{ fontSize: '13px', color: '#ccc' }}>
-            {isVictory
-              ? `Commander ${nameCommander} has retired to the moon!`
-              : `Commander ${nameCommander} is lost in the void.`}
-          </div>
-        </div>
-
+          />
+        ))}
+        {/* Planet/moon in upper left */}
         <div
           style={{
-            border: '1px solid #555',
-            padding: '8px',
-            marginBottom: '10px',
-            background: '#111',
+            position: 'absolute',
+            left: '8%',
+            top: '18%',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 40% 35%, #ddcc44, #aa8800, #664400)',
+          }}
+        />
+        {/* Asteroid/debris */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '45%',
+            top: '55%',
+            width: '40px',
+            height: '36px',
+            borderRadius: '40% 50% 45% 55%',
+            background: 'radial-gradient(ellipse at 40% 40%, #777, #444, #222)',
+            transform: 'rotate(-15deg)',
+          }}
+        />
+        {/* Small debris pieces */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '55%',
+            top: '28%',
+            width: '12px',
+            height: '10px',
+            background: '#555',
+            clipPath: 'polygon(50% 0%, 100% 40%, 80% 100%, 20% 100%, 0% 40%)',
+            transform: 'rotate(20deg)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: '72%',
+            top: '42%',
+            width: '8px',
+            height: '7px',
+            background: '#666',
+            clipPath: 'polygon(50% 0%, 100% 50%, 70% 100%, 0% 80%)',
+            transform: 'rotate(-30deg)',
+          }}
+        />
+        {/* Colored indicator dots on asteroid (like lights on a station) */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 'calc(45% + 10px)',
+            top: 'calc(55% + 10px)',
+            width: '2px',
+            height: '2px',
+            background: '#ff0000',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: 'calc(45% + 22px)',
+            top: 'calc(55% + 8px)',
+            width: '2px',
+            height: '2px',
+            background: '#00ff00',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: 'calc(45% + 16px)',
+            top: 'calc(55% + 24px)',
+            width: '2px',
+            height: '2px',
+            background: '#0044ff',
+          }}
+        />
+      </div>
+
+      {/* Title text */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          padding: '8px 6px',
+          fontFamily: 'monospace',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          color: '#cc0000',
+          letterSpacing: '2px',
+          textShadow: '1px 1px 0 #440000',
+        }}
+      >
+        {isVictory ? 'CONGRATULATIONS' : 'YOU ARE DESTROYED'}
+      </div>
+
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* OK button — bottom right, matching original */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: '8px 12px',
+        }}
+      >
+        <button
+          onClick={restartGame}
+          style={{
+            fontFamily: 'monospace',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#cc0000',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '4px 8px',
+            letterSpacing: '1px',
           }}
         >
-          <div
-            style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              marginBottom: '6px',
-              borderBottom: '1px solid #444',
-              paddingBottom: '4px',
-            }}
-          >
-            Final Score
-          </div>
-          {row('Difficulty:', DifficultyLevel[difficulty])}
-          {row('Days:', days)}
-          {row('Net Worth:', `${netWorth} cr.`)}
-          {row('Ship:', ShipTypes[state.ship.type].name)}
-          {row('Pirate Kills:', killsPirate)}
-          {row('Police Kills:', killsPolice)}
-          {row('Reputation:', reputationScore)}
-          {row('Police Record:', policeRecordScore)}
-
-          <div
-            style={{
-              borderTop: '1px solid #444',
-              marginTop: '6px',
-              paddingTop: '6px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontWeight: 'bold',
-              fontSize: '14px',
-            }}
-          >
-            <span>Score:</span>
-            <span>{totalScore}</span>
-          </div>
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: '4px',
-              fontSize: '16px',
-              color: '#ff0',
-              fontWeight: 'bold',
-            }}
-          >
-            {rating}
-          </div>
-        </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <button
-            className="palm-btn-large"
-            style={{
-              background: '#fff',
-              color: '#000',
-              padding: '8px 24px',
-              fontSize: '14px',
-              cursor: 'pointer',
-            }}
-            onClick={restartGame}
-          >
-            New Game
-          </button>
-        </div>
+          OK
+        </button>
       </div>
     </div>
   );

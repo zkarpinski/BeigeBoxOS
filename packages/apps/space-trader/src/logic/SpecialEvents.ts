@@ -172,7 +172,7 @@ export const SpecialEvents: Record<number, SpecialEventDef> = {
     id: MEDICINEDELIVERY,
     title: 'Medicine Delivery',
     description:
-      'Thank you for delivering the medicine to Japori! As a reward, an alien fast-learning machine increases all your skills by 2 points.',
+      'Thank you for delivering the medicine to Japori! As a reward, an alien fast-learning machine increases all your skills by 1 point.',
     price: 0,
     justAMessage: true,
   },

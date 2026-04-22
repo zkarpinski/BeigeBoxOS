@@ -302,12 +302,9 @@ export function getTotalShieldStrength(ship: PlayerShip): number {
  */
 export function getStrengthPolice(system: SolarSystem, policeRecordScore: number): number {
   const pol = PoliticalSystems[system.politics];
-  if (policeRecordScore < PSYCHOPATHSCORE) {
-    return 3 * pol.strengthPolice;
-  } else if (policeRecordScore < VILLAINSCORE) {
-    return 2 * pol.strengthPolice;
-  }
-  return pol.strengthPolice;
+  // OG: StrengthPolice + (CleanScore - RecordScore)/10
+  // CleanScore is 0 in our implementation.
+  return Math.max(0, pol.strengthPolice - Math.floor(policeRecordScore / 10));
 }
 
 /**

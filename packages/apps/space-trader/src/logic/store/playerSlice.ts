@@ -193,13 +193,13 @@ export const createPlayerSlice: StateCreator<SpaceTraderState, [], [], PlayerSli
     let refund = 0;
     if (slot === 'weapon') {
       if (ship.weapon[index] < 0) return;
-      refund = Math.floor(Weapons[ship.weapon[index]].price / 2);
+      refund = Math.floor((Weapons[ship.weapon[index]].price * 2) / 3);
       const newSlot = [...ship.weapon];
       newSlot[index] = -1;
       set({ credits: state.credits + refund, ship: { ...ship, weapon: newSlot } });
     } else if (slot === 'shield') {
       if (ship.shield[index] < 0) return;
-      refund = Math.floor(Shields[ship.shield[index]].price / 2);
+      refund = Math.floor((Shields[ship.shield[index]].price * 2) / 3);
       const newShields = [...ship.shield];
       newShields[index] = -1;
       const newShieldStrength = [...ship.shieldStrength];
@@ -210,7 +210,7 @@ export const createPlayerSlice: StateCreator<SpaceTraderState, [], [], PlayerSli
       });
     } else if (slot === 'gadget') {
       if (ship.gadget[index] < 0) return;
-      refund = Math.floor(Gadgets[ship.gadget[index]].price / 2);
+      refund = Math.floor((Gadgets[ship.gadget[index]].price * 2) / 3);
       const newSlot = [...ship.gadget];
       newSlot[index] = -1;
       set({ credits: state.credits + refund, ship: { ...ship, gadget: newSlot } });

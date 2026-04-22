@@ -84,7 +84,7 @@ describe('playerSlice', () => {
         credits: 1000,
         ship: makePlayerShip({ weapon: [0, -1, -1] }),
       });
-      const refund = Math.floor(Weapons[0].price / 2);
+      const refund = Math.floor((Weapons[0].price * 2) / 3);
       store.getState().sellEquipment('weapon', 0);
 
       expect(store.getState().credits).toBe(1000 + refund);

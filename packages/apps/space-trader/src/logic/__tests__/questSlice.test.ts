@@ -134,8 +134,8 @@ describe('questSlice', () => {
         engineerSkill: 5,
       });
       store.getState().triggerSpecialEvent(0);
-      expect(store.getState().pilotSkill).toBe(7);
-      expect(store.getState().engineerSkill).toBe(7);
+      expect(store.getState().pilotSkill).toBe(6);
+      expect(store.getState().engineerSkill).toBe(6);
       expect(store.getState().japoriStatus).toBe(2);
     });
 

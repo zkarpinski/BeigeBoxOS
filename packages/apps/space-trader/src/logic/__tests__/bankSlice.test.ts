@@ -17,6 +17,8 @@ function createTestStore(overrides: any = {}) {
           weapon: [-1, -1, -1],
           shield: [-1, -1, -1],
           gadget: [-1, -1, -1],
+          hull: ShipTypes[1].hullStrength,
+          fuel: ShipTypes[1].fuelTanks,
         },
         ...overrides,
       }) as any,
@@ -35,13 +37,28 @@ describe('bankSlice', () => {
         weapon: [-1, -1, -1],
         shield: [-1, -1, -1],
         gadget: [-1, -1, -1],
+        hull: ShipTypes[1].hullStrength,
+        fuel: ShipTypes[1].fuelTanks,
       },
     };
 
-    it('includes credits and ship base value', () => {
-      const worth = calculateNetWorth(baseState);
-      const expectedShipValue = Math.floor((ShipTypes[1].price * 3) / 4);
-      expect(worth).toBe(1000 + expectedShipValue);
+    it('includes credits and ship trade-in value (accounting for status)', () => {
+      const state = {
+        ...baseState,
+        ship: {
+          ...baseState.ship,
+          hull: 50,
+          fuel: 5,
+        },
+      };
+
+      const shipType = ShipTypes[1];
+      let expectedShipValue = Math.floor((shipType.price * 3) / 4);
+      expectedShipValue -= (shipType.hullStrength - 50) * shipType.repairCosts;
+      expectedShipValue -= (shipType.fuelTanks - 5) * shipType.costOfFuel;
+
+      const worth = calculateNetWorth(state as any);
+      expect(worth).toBe(1000 + Math.max(0, expectedShipValue));
     });
 
     it('subtracts debt', () => {
@@ -66,23 +83,20 @@ describe('bankSlice', () => {
   });
 
   describe('borrowCredits', () => {
-    it('allows borrowing up to max loan limit', () => {
-      const store = createTestStore({ credits: 0, debt: 0, traderSkill: 10, policeRecordScore: 0 });
-      // Max loan = 25000 if record >= 0.
+    it('calculates max loan based on net worth (10% rounded to 500)', () => {
+      // Gnat worth is ~7500. Credits 10000. Total worth ~17500.
+      // 10% is 1750. Rounded to 500 is 1500.
+      const store = createTestStore({ credits: 10000, debt: 0, policeRecordScore: 0 });
       store.getState().borrowCredits(5000);
-      expect(store.getState().credits).toBe(5000);
-      expect(store.getState().debt).toBe(5000);
+
+      // Worth = 10000 + 7500 = 17500. Limit = 1500.
+      expect(store.getState().debt).toBe(1500);
     });
 
-    it('prevents borrowing more than once if at limit', () => {
-      const store = createTestStore({
-        credits: 25000,
-        debt: 25000,
-        traderSkill: 10,
-        policeRecordScore: 0,
-      });
+    it('limits dubious record to 500 credits', () => {
+      const store = createTestStore({ credits: 10000, debt: 0, policeRecordScore: -1 });
       store.getState().borrowCredits(1000);
-      expect(store.getState().debt).toBe(25000);
+      expect(store.getState().debt).toBe(500);
     });
   });
 

@@ -112,20 +112,35 @@ export async function onRequestGet(context) {
     );
   }
   try {
-    const [boardRes, metricsRes] = await Promise.all([
+    const [beginnerRes, intermediateRes, expertRes, metricsRes] = await Promise.all([
       supabase
         .from('minesweeper_leaderboard')
-        .select('difficulty, player_name, time_seconds')
-        .order('time_seconds', { ascending: true }),
+        .select('player_name, time_seconds')
+        .eq('difficulty', 'beginner')
+        .order('time_seconds', { ascending: true })
+        .limit(TOP_N),
+      supabase
+        .from('minesweeper_leaderboard')
+        .select('player_name, time_seconds')
+        .eq('difficulty', 'intermediate')
+        .order('time_seconds', { ascending: true })
+        .limit(TOP_N),
+      supabase
+        .from('minesweeper_leaderboard')
+        .select('player_name, time_seconds')
+        .eq('difficulty', 'expert')
+        .order('time_seconds', { ascending: true })
+        .limit(TOP_N),
       supabase.from('minesweeper_metrics').select('difficulty, attempts, completed, won'),
     ]);
-    if (boardRes.error) throw boardRes.error;
-    const rows = boardRes.data ?? [];
-    const byDiff = (d) =>
-      rows
-        .filter((r) => r.difficulty === d)
-        .slice(0, TOP_N)
-        .map((r) => ({ name: r.player_name, time: r.time_seconds }));
+
+    if (beginnerRes.error) throw beginnerRes.error;
+    if (intermediateRes.error) throw intermediateRes.error;
+    if (expertRes.error) throw expertRes.error;
+
+    const mapRows = (rows) =>
+      (rows ?? []).map((r) => ({ name: r.player_name, time: r.time_seconds }));
+
     const metricsRows = metricsRes.error ? [] : (metricsRes.data ?? []);
     const metricsByDiff = (d) =>
       metricsRows.find((r) => r.difficulty === d) || { attempts: 0, completed: 0, won: 0 };
@@ -136,9 +151,9 @@ export async function onRequestGet(context) {
     };
     return jsonResponse({
       data: {
-        beginner: byDiff('beginner'),
-        intermediate: byDiff('intermediate'),
-        expert: byDiff('expert'),
+        beginner: mapRows(beginnerRes.data),
+        intermediate: mapRows(intermediateRes.data),
+        expert: mapRows(expertRes.data),
       },
       metrics,
     });

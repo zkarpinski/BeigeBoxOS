@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { usePalmSounds } from '../hooks/usePalmSounds';
 import {
   Phone,
@@ -50,16 +50,102 @@ interface PalmLauncherProps {
 
 export function PalmLauncher({ onAppOpen }: PalmLauncherProps) {
   const { playClick } = usePalmSounds();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScroll, setCanScroll] = useState(false);
 
   const handleAppClick = (id: string) => {
     playClick();
     onAppOpen(id);
   };
 
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const maxScroll = scrollHeight - clientHeight;
+    setCanScroll(maxScroll > 0);
+    if (maxScroll <= 0) {
+      setScrollProgress(0);
+      return;
+    }
+    setScrollProgress(scrollTop / maxScroll);
+  };
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, []);
+
+  const scrollByAmount = (amount: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ top: amount, behavior: 'instant' });
+      playClick();
+    }
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!scrollRef.current || !trackRef.current || !canScroll) return;
+    // Attempt to prevent normal browser drag behaviors
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const maxThumbTop = trackRect.height * 0.5;
+
+    const setScrollFromY = (clientY: number) => {
+      const y = clientY - trackRect.top;
+      // center the 50%-height thumb on the pointer
+      let thumbTop = y - trackRect.height * 0.25;
+      if (thumbTop < 0) thumbTop = 0;
+      if (thumbTop > maxThumbTop) thumbTop = maxThumbTop;
+
+      const newScrollProgress = thumbTop / maxThumbTop;
+      const { scrollHeight, clientHeight } = scrollRef.current!;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll > 0) {
+        scrollRef.current!.scrollTop = newScrollProgress * maxScroll;
+      }
+    };
+
+    setScrollFromY(e.clientY);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      setScrollFromY(moveEvent.clientY);
+    };
+
+    const handlePointerUp = (upEvent: PointerEvent) => {
+      (upEvent.target as HTMLElement).releasePointerCapture?.(upEvent.pointerId);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+  };
+
   return (
     <div style={{ display: 'flex', height: '100%', width: '100%', background: 'white' }}>
+      <style>{`
+        .palm-launcher-grid::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+
       {/* App grid */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 2px 4px 6px' }}>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="palm-launcher-grid"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '4px 2px 4px 6px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
         <div
           style={{
             display: 'grid',
@@ -127,19 +213,24 @@ export function PalmLauncher({ onAppOpen }: PalmLauncherProps) {
         }}
       >
         <button
+          onClick={() => scrollByAmount(-60)}
           style={{
             background: 'none',
             border: 'none',
             padding: '2px 0',
-            cursor: 'pointer',
+            cursor: canScroll ? 'pointer' : 'default',
             lineHeight: 0,
+            opacity: canScroll ? 1 : 0.5,
           }}
+          disabled={!canScroll}
         >
           <svg width="9" height="7" viewBox="0 0 9 7">
             <polygon points="4.5,0.5 8.5,6.5 0.5,6.5" fill="#333" />
           </svg>
         </button>
         <div
+          ref={trackRef}
+          onPointerDown={handlePointerDown}
           style={{
             flex: 1,
             width: '9px',
@@ -148,12 +239,15 @@ export function PalmLauncher({ onAppOpen }: PalmLauncherProps) {
             position: 'relative',
             margin: '2px 0',
             border: '1px solid #bbb',
+            visibility: canScroll ? 'visible' : 'hidden',
+            touchAction: 'none',
+            cursor: 'ns-resize',
           }}
         >
           <div
             style={{
               position: 'absolute',
-              top: '0',
+              top: `${scrollProgress * 50}%`,
               left: '0',
               right: '0',
               height: '50%',
@@ -163,13 +257,16 @@ export function PalmLauncher({ onAppOpen }: PalmLauncherProps) {
           />
         </div>
         <button
+          onClick={() => scrollByAmount(60)}
           style={{
             background: 'none',
             border: 'none',
             padding: '2px 0',
-            cursor: 'pointer',
+            cursor: canScroll ? 'pointer' : 'default',
             lineHeight: 0,
+            opacity: canScroll ? 1 : 0.5,
           }}
+          disabled={!canScroll}
         >
           <svg width="9" height="7" viewBox="0 0 9 7">
             <polygon points="4.5,6.5 8.5,0.5 0.5,0.5" fill="#333" />

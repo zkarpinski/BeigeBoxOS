@@ -82,13 +82,43 @@ describe('playerSlice', () => {
     it('sells equipment for half price', () => {
       const store = createTestStore({
         credits: 1000,
-        ship: makePlayerShip({ weapon: [0, -1, -1] }),
+        ship: makePlayerShip({ weapon: [0, -1, -1], shield: [0, -1, -1], gadget: [0, -1, -1] }),
       });
-      const refund = Math.floor((Weapons[0].price * 2) / 3);
+      const refundW = Math.floor((Weapons[0].price * 2) / 3);
       store.getState().sellEquipment('weapon', 0);
-
-      expect(store.getState().credits).toBe(1000 + refund);
+      expect(store.getState().credits).toBe(1000 + refundW);
       expect(store.getState().ship.weapon[0]).toBe(-1);
+
+      const refundS = Math.floor((Shields[0].price * 2) / 3);
+      store.getState().sellEquipment('shield', 0);
+      expect(store.getState().credits).toBe(1000 + refundW + refundS);
+      expect(store.getState().ship.shield[0]).toBe(-1);
+
+      const refundG = Math.floor((Gadgets[0].price * 2) / 3);
+      store.getState().sellEquipment('gadget', 0);
+      expect(store.getState().credits).toBe(1000 + refundW + refundS + refundG);
+      expect(store.getState().ship.gadget[0]).toBe(-1);
+    });
+
+    it('handles buyEscapePod', () => {
+      const store = createTestStore({
+        credits: 50000,
+        currentSystem: 0,
+        systems: [{ techLevel: 8 }],
+      });
+      store.getState().buyEscapePod();
+      expect(store.getState().ship.escapePod).toBe(true);
+      expect(store.getState().credits).toBe(50000 - ESCAPE_POD_PRICE);
+    });
+
+    it('denies buyEscapePod if tech level is too low', () => {
+      const store = createTestStore({
+        credits: 50000,
+        currentSystem: 0,
+        systems: [{ techLevel: 1 }],
+      });
+      store.getState().buyEscapePod();
+      expect(store.getState().ship.escapePod).toBe(false);
     });
   });
 
@@ -155,6 +185,48 @@ describe('playerSlice', () => {
       store.getState().dumpCargo(0, 2);
       expect(store.getState().ship.cargo[0]).toBe(3);
       expect(store.getState().credits).toBe(1000 - 20);
+    });
+  });
+
+  describe('maintenance', () => {
+    it('repairs hull', () => {
+      const type = ShipTypes[1];
+      const store = createTestStore({
+        credits: 5000,
+        ship: makePlayerShip({ hull: type.hullStrength - 10 }),
+      });
+      store.getState().repairHull();
+      expect(store.getState().ship.hull).toBe(type.hullStrength);
+    });
+
+    it('buys fuel', () => {
+      const type = ShipTypes[1];
+      const store = createTestStore({
+        credits: 5000,
+        ship: makePlayerShip({ fuel: type.fuelTanks - 5 }),
+      });
+      store.getState().buyFuel(5);
+      expect(store.getState().ship.fuel).toBe(type.fuelTanks);
+    });
+  });
+
+  describe('trade wrappers', () => {
+    it('buys goods', () => {
+      const store = createTestStore({ credits: 5000, currentSystem: 0 });
+      store.getState().buyGood(0, 2);
+      expect(store.getState().ship.cargo[0]).toBe(2);
+      expect(store.getState().systems[0].qty[0]).toBe(8); // Started with 10 from mock
+    });
+
+    it('sells goods', () => {
+      const store = createTestStore({
+        credits: 5000,
+        currentSystem: 0,
+        ship: makePlayerShip({ cargo: [5, 0, 0, 0, 0, 0, 0, 0, 0, 0] }),
+      });
+      store.getState().sellGood(0, 2);
+      expect(store.getState().ship.cargo[0]).toBe(3);
+      expect(store.getState().systems[0].qty[0]).toBe(12); // Started with 10 from mock
     });
   });
 });

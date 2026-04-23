@@ -42,6 +42,9 @@
       "**/*.test.ts",
       "**/*.test.tsx"
     ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/test/setup.js"
+    ],
     "transform": {
       "\\.(ts|tsx)$": [
         "ts-jest",

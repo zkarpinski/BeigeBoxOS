@@ -2,18 +2,16 @@ import { StateCreator } from 'zustand';
 import { ShipTypes, Weapons, Shields, Gadgets } from '../DataTypes';
 import { SpaceTraderState, BankSlice } from './types';
 
-/** OG: Calculate player's net worth (credits + ship value - debt) */
-export function calculateNetWorth(state: {
-  credits: number;
-  debt: number;
-  ship: { type: number; cargo: number[]; weapon: number[]; shield: number[]; gadget: number[] };
-  sellPrices: number[];
-}): number {
+/** OG: Calculate player's net worth (credits + ship trade-in value - debt) */
+export function calculateNetWorth(state: SpaceTraderState): number {
   const shipType = ShipTypes[state.ship.type];
   let worth = state.credits;
 
-  // Ship base value (75% of price, like trade-in)
-  worth += Math.floor((shipType.price * 3) / 4);
+  // Ship trade-in value (75% of price, minus repairs/fuel)
+  let shipValue = Math.floor((shipType.price * 3) / 4);
+  shipValue -= (shipType.hullStrength - state.ship.hull) * shipType.repairCosts;
+  shipValue -= (shipType.fuelTanks - state.ship.fuel) * shipType.costOfFuel;
+  worth += Math.max(0, shipValue);
 
   // Equipment value (2/3 of price)
   for (const w of state.ship.weapon) if (w >= 0) worth += Math.floor((Weapons[w].price * 2) / 3);
@@ -32,7 +30,16 @@ export function calculateNetWorth(state: {
 export const createBankSlice: StateCreator<SpaceTraderState, [], [], BankSlice> = (set, get) => ({
   borrowCredits: (amount) => {
     const state = get();
-    const maxLoan = state.policeRecordScore >= 0 ? 25000 : 5000;
+    // OG: If record is Dubious (< 0), max loan is 500.
+    // If clean, max loan is min(25000, 10% of worth rounded down to nearest 500).
+    let maxLoan = 0;
+    if (state.policeRecordScore < 0) {
+      maxLoan = 500;
+    } else {
+      const worthLimit = Math.floor(calculateNetWorth(state) / 10 / 500) * 500;
+      maxLoan = Math.min(25000, Math.max(1000, worthLimit));
+    }
+
     const canBorrow = Math.max(0, maxLoan - state.debt);
     const toBorrow = Math.min(amount, canBorrow);
     if (toBorrow <= 0) return;

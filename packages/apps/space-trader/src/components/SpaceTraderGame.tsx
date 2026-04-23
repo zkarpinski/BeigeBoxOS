@@ -23,6 +23,8 @@ import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
 import { ViewType } from '../logic/DataTypes';
+import { AppView } from '../logic/store/types';
+import { AiController } from '../logic/ai/AiController';
 
 export interface AppShortcut {
   label: string;
@@ -50,20 +52,36 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
   menuOpen = false,
   onMenuClose,
 }) => {
-  const { nameCommander, isGameOver, tradeMode, setTradeMode, encounter } = useSpaceTraderGame();
-  const [activeView, setActiveView] = useState<ViewType>('newgame');
+  const {
+    nameCommander,
+    isGameOver,
+    tradeMode,
+    setTradeMode,
+    encounter,
+    activeView,
+    setActiveView,
+    isAiEnabled,
+  } = useSpaceTraderGame();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Check if store has hydrated from localStorage
-    const hasGame = !!localStorage.getItem('space-trader-save');
-    if (nameCommander || hasGame) {
+    // Check if store has hydrated from localStorage for initial routing
+    const saved = localStorage.getItem('space-trader-save');
+    let hasValidGame = false;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed?.state?.nameCommander) hasValidGame = true;
+      } catch (e) {}
+    }
+
+    if (nameCommander || hasValidGame) {
       setActiveView('trade');
     } else {
       setActiveView('newgame');
     }
     setHydrated(true);
-  }, [nameCommander]);
+  }, [hydrated]); // Run exactly once to handle hydration routing
 
   useEffect(() => {
     if (!onShortcutsChange) return;
@@ -109,7 +127,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
 
   useEffect(() => {
     if (!onTitleChange) return;
-    const titles: Record<ViewType, string> = {
+    const titles: Record<AppView, string> = {
       trade:
         tradeMode === 'buy' ? 'Buy Cargo' : tradeMode === 'sell' ? 'Sell Cargo' : 'Avg Price List',
       system: 'System Info',
@@ -128,6 +146,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       quests: 'Quests',
       bank: 'Bank',
       news: 'News',
+      gameOver: 'Game Over',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);
@@ -141,6 +160,35 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
         data-space-trader-skin={skin}
         style={{ position: 'relative' }}
       >
+        <style>
+          {`
+            @keyframes stylus-tap {
+              0% { transform: scale(0.5); opacity: 0.8; }
+              100% { transform: scale(2.5); opacity: 0; }
+            }
+            .stylus-tap {
+              position: absolute;
+              width: 30px;
+              height: 30px;
+              background: rgba(255, 255, 255, 0.7);
+              border: 2px solid rgba(0, 255, 0, 0.5);
+              border-radius: 50%;
+              pointer-events: none;
+              animation: stylus-tap 0.5s ease-out forwards;
+              z-index: 10000;
+            }
+            @keyframes ai-pulse {
+              0% { box-shadow: 0 0 0px #0f0; border-color: inherit; }
+              50% { box-shadow: 0 0 15px #0f0; border-color: #0f0; border-width: 2px; }
+              100% { box-shadow: 0 0 0px #0f0; border-color: inherit; }
+            }
+            .ai-highlight {
+              animation: ai-pulse 0.6s ease-in-out;
+              position: relative;
+              z-index: 1000;
+            }
+          `}
+        </style>
         {activeView === 'trade' && <MainTradeView onViewChange={setActiveView} />}
         {activeView === 'system' && <SystemInfoView onViewChange={setActiveView} />}
         {activeView === 'ship' && <ShipInfoView onViewChange={setActiveView} />}
@@ -161,6 +209,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
 
         {isGameOver && <GameOverView />}
         <EncounterModal />
+        <AiController />
 
         {menuOpen && (
           <SpaceTraderMenu

@@ -29,7 +29,7 @@ const SIZE_LABELS = ['Tiny', 'Small', 'Medium', 'Large', 'Huge'];
 
 export const SystemInfoView: React.FC<SystemInfoViewProps> = ({ onViewChange }) => {
   const { TitleBar } = useTitleBar();
-  const { systems, currentSystem } = useSpaceTraderGame();
+  const { systems, currentSystem, isAiEnabled, toggleAi } = useSpaceTraderGame();
   const system = systems[currentSystem];
 
   if (!system) return null;
@@ -82,6 +82,9 @@ export const SystemInfoView: React.FC<SystemInfoViewProps> = ({ onViewChange }) 
           </button>
           <button className="palm-btn" onClick={() => onViewChange('bank')}>
             Bank
+          </button>
+          <button className="palm-btn" onClick={() => toggleAi()}>
+            {isAiEnabled ? 'Stop AI' : 'Start AI'}
           </button>
           <button
             className="palm-btn"

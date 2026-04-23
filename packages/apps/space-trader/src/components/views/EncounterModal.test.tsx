@@ -291,3 +291,122 @@ describe('EncounterModal — combat UI', () => {
     expect(container.firstChild).toBeNull();
   });
 });
+
+describe('EncounterModal — boss encounters', () => {
+  it('renders Space Monster encounter', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...makeStore(1, 1),
+      encounter: { ...makeStore(1, 1).encounter, type: 'MONSTER' },
+    });
+    render(<EncounterModal />);
+    expect(screen.getByText('A massive space monster blocks your path!')).toBeInTheDocument();
+  });
+
+  it('renders Dragonfly encounter', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...makeStore(1, 1),
+      encounter: { ...makeStore(1, 1).encounter, type: 'DRAGONFLY' },
+    });
+    render(<EncounterModal />);
+    expect(screen.getByText('The experimental Dragonfly ship attacks!')).toBeInTheDocument();
+  });
+
+  it('renders Scarab encounter', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...makeStore(1, 1),
+      encounter: { ...makeStore(1, 1).encounter, type: 'SCARAB' },
+    });
+    render(<EncounterModal />);
+    expect(screen.getByText('The stolen Scarab ship engages you!')).toBeInTheDocument();
+  });
+});
+
+describe('EncounterModal — options and layout', () => {
+  it('renders textual layout when optTextualEncounters is true', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...makeStore(1, 3),
+      optTextualEncounters: true,
+    });
+    render(<EncounterModal />);
+    expect(screen.getByText('You')).toBeInTheDocument();
+    expect(screen.getByText('Opponent')).toBeInTheDocument();
+    expect(screen.getAllByText(/Hull at 100%/)).toHaveLength(2);
+    // Sprites should not be rendered
+    expect(screen.queryByRole('img', { name: 'Gnat' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: 'Mosquito' })).not.toBeInTheDocument();
+  });
+
+  it('toggles information panel', () => {
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue(makeStore(1, 1));
+    render(<EncounterModal />);
+
+    // Click the info icon "i"
+    const infoBtn = screen.getByText('i');
+    fireEvent.click(infoBtn);
+
+    expect(screen.getByText(/Fighter:/)).toBeInTheDocument();
+    expect(screen.getByText(/Hull:/)).toBeInTheDocument();
+
+    fireEvent.click(infoBtn);
+    expect(screen.queryByText(/Fighter:/)).not.toBeInTheDocument();
+  });
+});
+
+describe('EncounterModal — auto-advance logic', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('auto-attacks when optContinuousFight is true and last action was attack', () => {
+    const store = makeStore(1, 1);
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...store,
+      optContinuousFight: true,
+    });
+
+    const { rerender } = render(<EncounterModal />);
+
+    // 1. Initial click (manual)
+    fireEvent.click(screen.getByText('Attack'));
+    expect(store.attackInEncounter).toHaveBeenCalledTimes(1);
+
+    // 2. Mock state change (new encounter round) to trigger useEffect
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...store,
+      optContinuousFight: true,
+      encounter: { ...store.encounter, round: 1 },
+    });
+    rerender(<EncounterModal />);
+
+    // 3. Advance timers
+    jest.advanceTimersByTime(600);
+    expect(store.attackInEncounter).toHaveBeenCalledTimes(2);
+  });
+
+  it('auto-clears when optAttackFleeing is true and NPC fled while player was attacking', () => {
+    const store = makeStore(1, 1);
+    const { rerender } = render(<EncounterModal />);
+
+    // 1. Initial state: player is attacking
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...store,
+      optAttackFleeing: true,
+    });
+    rerender(<EncounterModal />);
+    fireEvent.click(screen.getByText('Attack'));
+
+    // 2. NPC flees (encounter resolves, playerWon=false, was attacking)
+    (useSpaceTraderGame as unknown as jest.Mock).mockReturnValue({
+      ...store,
+      optAttackFleeing: true,
+      encounter: { ...store.encounter, resolved: true, playerWon: false },
+    });
+    rerender(<EncounterModal />);
+
+    jest.advanceTimersByTime(400);
+    expect(store.clearEncounter).toHaveBeenCalled();
+  });
+});

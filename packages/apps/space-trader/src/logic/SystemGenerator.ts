@@ -57,9 +57,9 @@ import {
 
 // Distances based on spacetrader.h
 const GALAXYWIDTH = 150;
-const GALAXYHEIGHT = 110;
-const CLOSEDISTANCE = 13;
-const MINDISTANCE = 6;
+const GALAXYHEIGHT = 100;
+const CLOSEDISTANCE = 20;
+const MINDISTANCE = 7;
 
 // Math Helpers
 const getRandom = (max: number) => Math.floor(Math.random() * max);

@@ -302,12 +302,9 @@ export function getTotalShieldStrength(ship: PlayerShip): number {
  */
 export function getStrengthPolice(system: SolarSystem, policeRecordScore: number): number {
   const pol = PoliticalSystems[system.politics];
-  if (policeRecordScore < PSYCHOPATHSCORE) {
-    return 3 * pol.strengthPolice;
-  } else if (policeRecordScore < VILLAINSCORE) {
-    return 2 * pol.strengthPolice;
-  }
-  return pol.strengthPolice;
+  // OG: StrengthPolice + (CleanScore - RecordScore)/10
+  // CleanScore is 0 in our implementation.
+  return Math.max(0, pol.strengthPolice - Math.floor(policeRecordScore / 10));
 }
 
 /**
@@ -356,10 +353,10 @@ export function executeAttack(
   difficulty: number,
   isCommanderUnderAttack: boolean,
 ): boolean {
-  // Accuracy Roll
+  // Accuracy Roll — matches original Space Trader formula (Spronck)
   const defenderShipType = ShipTypes[defender.type];
   const hitChance = getRandom(attackerFighterSkill + defenderShipType.size);
-  const evadeChance = (flees ? 2 : 1) * getRandom(5 + Math.floor(defenderPilotSkill / 2));
+  const evadeChance = (flees ? 2 : 1) * (1 + getRandom(5 + Math.floor(defenderPilotSkill / 2)));
 
   if (hitChance < evadeChance) {
     return false; // Miss

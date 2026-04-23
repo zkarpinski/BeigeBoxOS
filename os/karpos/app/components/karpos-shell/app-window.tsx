@@ -46,13 +46,15 @@ export function AppWindow({
     const show = appState.visible && !appState.minimized;
     el.style.display = show ? 'flex' : 'none';
     el.classList.toggle('app-window-hidden', !show);
-  }, [appState?.visible, appState?.minimized]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState?.visible, appState?.minimized, windowRef]);
 
   useEffect(() => {
     const el = windowRef.current;
     if (!el || !appState) return;
     el.style.zIndex = String(appState.zIndex);
-  }, [appState?.zIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState?.zIndex, windowRef]);
 
   const boundsAppliedRef = useRef(false);
   useEffect(() => {
@@ -66,7 +68,8 @@ export function AppWindow({
       el.style.width = b.width + 'px';
       el.style.height = b.height + 'px';
     }
-  }, [appState?.bounds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState?.bounds, windowRef]);
 
   useEffect(() => {
     const el = windowRef.current;
@@ -128,7 +131,7 @@ export function AppWindow({
       if (btnMax && maximizedClass) btnMax.removeEventListener('click', onMax);
       btnClose?.removeEventListener('click', onClose_);
     };
-  }, [appId, maximizedClass, onClose, hideApp]);
+  }, [appId, maximizedClass, onClose, hideApp, windowRef]);
 
   const show = (appState?.visible ?? false) && !(appState?.minimized ?? false);
   const zIndex = appState?.zIndex ?? 10;

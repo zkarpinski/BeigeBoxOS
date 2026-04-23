@@ -1,4 +1,6 @@
-import { PlayerShip, SolarSystem, ActiveEncounter } from '../DataTypes';
+import { PlayerShip, SolarSystem, ActiveEncounter, ViewType } from '../DataTypes';
+
+export type AppView = ViewType | 'gameOver';
 
 export interface PlayerSlice {
   credits: number;
@@ -62,11 +64,15 @@ export interface EncounterSlice {
 export interface GameSlice {
   difficulty: number;
   tradeMode: 'buy' | 'sell' | 'price-list';
+  activeView: AppView;
   viewingShipId: number | null;
   selectedMapSystemId: number | null;
+  isAiEnabled: boolean;
   setTradeMode: (mode: 'buy' | 'sell' | 'price-list') => void;
+  setActiveView: (view: AppView) => void;
   setViewingShipId: (id: number | null) => void;
   setSelectedMapSystem: (id: number | null) => void;
+  toggleAi: () => void;
   restartGame: () => void;
 }
 

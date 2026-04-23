@@ -27,13 +27,25 @@ describe('System Generator', () => {
     expect(systems[119].nameIndex).toBe(119);
   });
 
-  it('ensures systems are spaced out slightly (no identical coords)', () => {
+  it('ensures systems are within the 150x100 grid', () => {
     const { systems } = generateGalaxy();
-    const coords = new Set();
     systems.forEach((s) => {
-      const key = `${s.x},${s.y}`;
-      expect(coords.has(key)).toBe(false);
-      coords.add(key);
+      expect(s.x).toBeLessThan(150);
+      expect(s.y).toBeLessThan(100);
     });
+  });
+
+  it('ensures systems are spaced by at least MINDISTANCE (7)', () => {
+    const { systems } = generateGalaxy();
+    for (let i = 0; i < systems.length; i++) {
+      for (let j = i + 1; j < systems.length; j++) {
+        const dist = Math.sqrt(
+          Math.pow(systems[i].x - systems[j].x, 2) + Math.pow(systems[i].y - systems[j].y, 2),
+        );
+        // We use Math.floor because SystemGenerator uses sqrDistance check which is precision-dependent
+        // but realDistance should be >= 7.
+        expect(dist).toBeGreaterThanOrEqual(7);
+      }
+    }
   });
 });

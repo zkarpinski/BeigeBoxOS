@@ -58,10 +58,18 @@ describe('Encounter Logic', () => {
       expect(policeCount).toBeGreaterThan(0);
     });
 
-    it('increases police strength for criminals', () => {
+    it('increases police strength for criminals using linear formula', () => {
+      // Technocracy (ID 15) strengthPolice is 6
       const normalStrength = getStrengthPolice(mockSystem, 0);
+      expect(normalStrength).toBe(6);
+
       const criminalStrength = getStrengthPolice(mockSystem, -50);
-      expect(criminalStrength).toBeGreaterThan(normalStrength);
+      // 6 - floor(-50/10) = 6 - (-5) = 11
+      expect(criminalStrength).toBe(11);
+
+      const psychopathStrength = getStrengthPolice(mockSystem, -100);
+      // 6 - floor(-100/10) = 6 - (-10) = 16
+      expect(psychopathStrength).toBe(16);
     });
 
     it('never generates PIRATE if system is already raided', () => {

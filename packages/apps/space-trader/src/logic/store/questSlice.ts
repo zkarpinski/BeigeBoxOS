@@ -158,10 +158,10 @@ export const createQuestSlice: StateCreator<SpaceTraderState, [], [], QuestSlice
           systems: newSystems,
           japoriStatus: 2,
           antidoteOnBoard: false,
-          pilotSkill: Math.min(10, state.pilotSkill + 2),
-          fighterSkill: Math.min(10, state.fighterSkill + 2),
-          traderSkill: Math.min(10, state.traderSkill + 2),
-          engineerSkill: Math.min(10, state.engineerSkill + 2),
+          pilotSkill: Math.min(10, state.pilotSkill + 1),
+          fighterSkill: Math.min(10, state.fighterSkill + 1),
+          traderSkill: Math.min(10, state.traderSkill + 1),
+          engineerSkill: Math.min(10, state.engineerSkill + 1),
         });
         return;
       }

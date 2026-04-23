@@ -15,7 +15,7 @@ export const InformationButton: React.FC<InformationButtonProps> = ({ onClick, s
         width: '16px',
         height: '16px',
         background: '#fff',
-        color: '#330099',
+        color: '#1a1a8c',
         borderRadius: '50%',
         display: 'flex',
         alignItems: 'center',

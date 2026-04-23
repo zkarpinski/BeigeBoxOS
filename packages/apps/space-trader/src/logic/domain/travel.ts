@@ -117,7 +117,7 @@ export function processWarp(
         round: 0,
         resolved: false,
         playerWon: false,
-        clickNumber: click,
+        clickNumber: CLICKS - click + 1,
         destinationSystemIdx: targetSystemId,
         encounterAction: action,
       });
@@ -138,7 +138,7 @@ export function processWarp(
         round: 0,
         resolved: false,
         playerWon: false,
-        clickNumber: CLICKS,
+        clickNumber: 1,
         destinationSystemIdx: targetSystemId,
         encounterAction: 'ATTACK',
       });
@@ -153,7 +153,7 @@ export function processWarp(
         round: 0,
         resolved: false,
         playerWon: false,
-        clickNumber: CLICKS,
+        clickNumber: 1,
         destinationSystemIdx: targetSystemId,
         encounterAction: 'ATTACK',
       });
@@ -171,7 +171,7 @@ export function processWarp(
           round: 0,
           resolved: false,
           playerWon: false,
-          clickNumber: CLICKS,
+          clickNumber: 1,
           destinationSystemIdx: targetSystemId,
           encounterAction: 'ATTACK',
         });

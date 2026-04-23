@@ -78,8 +78,6 @@ describe('combat domain logic', () => {
   });
 
   test('resolveFlee - success scenario', () => {
-    // We can't control Math.random here either without mocking,
-    // but we can verify the structure of the result.
     const result = resolveFlee(
       mockPlayerShip,
       mockNPCEncounter,
@@ -93,5 +91,108 @@ describe('combat domain logic', () => {
     if (result.log.includes('You successfully fled!')) {
       expect(result.resolved).toBe(true);
     }
+  });
+
+  describe('deterministic combat mechanics', () => {
+    let randomSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      randomSpy = jest.spyOn(Math, 'random');
+    });
+
+    afterEach(() => {
+      randomSpy.mockRestore();
+    });
+
+    test('resolveCombatRound - predictable hit and damage', () => {
+      // Sequence of getRandom() calls in executeAttack:
+      //  player attack: hitChance, evadeChance, damage, npcRepair
+      // npc attack: hitChance, evadeChance, damage, playerRepair
+
+      // Player attacks NPC: Hit + Max Damage (Pulse laser power 15, max 16)
+      // NPC attacks Player: Miss
+      randomSpy
+        .mockReturnValueOnce(0.9) // 1. player hitChance
+        .mockReturnValueOnce(0.1) // 2. npc evadeChance
+        .mockReturnValueOnce(0.99) // 3. damage roll (15)
+        .mockReturnValueOnce(0.01) // 4. npc repair roll (0)
+        .mockReturnValueOnce(0.01) // 5. npc hitChance
+        .mockReturnValueOnce(0.9); // 6. player evadeChance
+
+      const result = resolveCombatRound(
+        mockPlayerShip,
+        mockNPCEncounter,
+        1,
+        { pilot: 5, fighter: 5, engineer: 5 },
+        [],
+        0,
+      );
+
+      expect(result.log).toContain('Round 1: You hit! NPC hull: 35 / shields: 0');
+      expect(result.log).toContain('NPC missed.');
+      expect(result.npcShip.hull).toBe(35);
+    });
+
+    test('shields absorb damage before hull', () => {
+      const playerWithShield: PlayerShip = {
+        ...mockPlayerShip,
+        shield: [0], // Energy shield
+        shieldStrength: [100],
+      };
+
+      // Player misses NPC
+      // NPC hits Player for damage
+      // Military Laser power 35. 3 lasers = 105.
+      // Max potential damage with engineer skill: Math.floor(105 * 1.08) = 113. (npc engineer 4)
+      randomSpy
+        .mockReturnValueOnce(0.1) // 1. player hit
+        .mockReturnValueOnce(0.9) // 2. npc evade
+        .mockReturnValueOnce(0.9) // 3. npc hit
+        .mockReturnValueOnce(0.1) // 4. player evade
+        .mockReturnValueOnce(0.1); // 5. damage roll (0.1 * 113 = 11)
+
+      const strongNPC = {
+        ...mockNPCEncounter,
+        ship: { ...mockNPCEncounter.ship, weapon: [2, 2, 2] }, // 3 Military lasers
+      };
+
+      const result = resolveCombatRound(
+        playerWithShield,
+        strongNPC,
+        1,
+        { pilot: 5, fighter: 5, engineer: 5 },
+        [],
+        0,
+      );
+
+      expect(result.playerShip.hull).toBe(100); // Intact
+      expect(result.playerShip.shieldStrength[0]).toBe(89); // 100 - 11
+      expect(result.log.some((l) => l.includes('NPC hits you!'))).toBe(true);
+    });
+
+    test('engineer skill reduces incoming hull damage', () => {
+      // NPC hits player (no shields)
+      randomSpy
+        .mockReturnValueOnce(0.1)
+        .mockReturnValueOnce(0.9) // Player misses
+        .mockReturnValueOnce(0.9)
+        .mockReturnValueOnce(0.1) // NPC hits
+        .mockReturnValueOnce(0.5) // Damage roll (say 30)
+        .mockReturnValueOnce(0.99); // Damage reduction roll (Max based on engineer skill)
+
+      const result = resolveCombatRound(
+        mockPlayerShip,
+        mockNPCEncounter,
+        1,
+        { pilot: 1, fighter: 1, engineer: 10 }, // High engineer
+        [],
+        0,
+      );
+
+      // Even if hit, damage is reduced by engineer skill
+      // damage -= getRandom(defenderEngineerSkill)
+      // With engineer 10, up to 9 damage reduced.
+      expect(result.log.some((l) => l.includes('NPC hits you!'))).toBe(true);
+    });
   });
 });

@@ -23,6 +23,7 @@ import { TitleBarProvider, TitleBarProps } from './TitleBarContext';
 import { PalmHeader } from './PalmHeader';
 import { SpaceTraderMenu } from './SpaceTraderMenu';
 import { ViewType } from '../logic/DataTypes';
+import { AppView } from '../logic/store/types';
 import { AiController } from '../logic/ai/AiController';
 
 export interface AppShortcut {
@@ -126,7 +127,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
 
   useEffect(() => {
     if (!onTitleChange) return;
-    const titles: Record<ViewType, string> = {
+    const titles: Record<AppView, string> = {
       trade:
         tradeMode === 'buy' ? 'Buy Cargo' : tradeMode === 'sell' ? 'Sell Cargo' : 'Avg Price List',
       system: 'System Info',
@@ -145,6 +146,7 @@ export const SpaceTraderGame: React.FC<SpaceTraderGameProps> = ({
       quests: 'Quests',
       bank: 'Bank',
       news: 'News',
+      gameOver: 'Game Over',
     };
     onTitleChange(titles[activeView] ?? 'Space Trader');
   }, [activeView, tradeMode, onTitleChange]);

@@ -309,7 +309,7 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
       document.removeEventListener('click', onClick);
       document.removeEventListener('touchstart', onTouchStart);
     };
-  }, []);
+  }, [renamingId]);
 
   useEffect(() => {
     const onEscape = (e: KeyboardEvent) => {

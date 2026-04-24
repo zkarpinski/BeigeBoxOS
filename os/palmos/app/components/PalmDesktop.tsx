@@ -41,13 +41,20 @@ export function PalmDesktop() {
   const [launcherCategory, setLauncherCategory] = useState<LauncherCategory>('All');
 
   // Battery: persisted to localStorage, decays 1% every 3 minutes
-  const [batteryLevel, setBatteryLevel] = useState<number>(() => {
-    if (typeof window === 'undefined') return 75;
-    return Number(localStorage.getItem('palmos-battery') ?? 75);
-  });
+  const [batteryLevel, setBatteryLevel] = useState<number>(75);
+  const [hasHydrated, setHasHydrated] = useState(false);
+
   useEffect(() => {
-    localStorage.setItem('palmos-battery', String(batteryLevel));
-  }, [batteryLevel]);
+    const saved = localStorage.getItem('palmos-battery');
+    if (saved) setBatteryLevel(Number(saved));
+    setHasHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      localStorage.setItem('palmos-battery', String(batteryLevel));
+    }
+  }, [batteryLevel, hasHydrated]);
   useEffect(() => {
     const id = setInterval(
       () => {

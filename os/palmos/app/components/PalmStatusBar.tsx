@@ -29,7 +29,7 @@ export function PalmStatusBar({
   onLauncherCategoryChange,
   batteryLevel = 75,
 }: PalmStatusBarProps = {}) {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
   const [catOpen, setCatOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
 
@@ -43,11 +43,14 @@ export function PalmStatusBar({
   }, [catOpen]);
 
   useEffect(() => {
+    setTime(new Date());
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const timeStr = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+  const timeStr = time
+    ? time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase()
+    : '--:--';
 
   // App mode: title pill left + white space + bordered shortcut boxes right
   if (appTitle) {

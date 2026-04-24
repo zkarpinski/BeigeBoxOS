@@ -7,7 +7,24 @@ export function sanitizeHTML(html: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  const dangerousTags = ['script', 'object', 'embed', 'iframe', 'base', 'link', 'meta'];
+  const dangerousTags = [
+    'script',
+    'object',
+    'embed',
+    'iframe',
+    'base',
+    'link',
+    'meta',
+    'applet',
+    'svg',
+    'math',
+    'form',
+    'style',
+    'canvas',
+    'video',
+    'audio',
+    'details',
+  ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
   });
@@ -21,6 +38,15 @@ export function sanitizeHTML(html: string): string {
       } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
         const value = attrs[i].value.toLowerCase().replace(/\s/g, '');
         if (value.startsWith('javascript:')) {
+          el.removeAttribute(attrs[i].name);
+        }
+      } else if (attrName === 'style') {
+        const value = attrs[i].value.toLowerCase();
+        if (
+          value.includes('expression') ||
+          value.includes('javascript:') ||
+          value.includes('-moz-binding')
+        ) {
           el.removeAttribute(attrs[i].name);
         }
       }

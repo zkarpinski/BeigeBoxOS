@@ -26,9 +26,11 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math, style, etc.', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">' +
+        '<svg><circle cx="50" cy="50" r="40" /></svg><math><mi>x</mi></math><style>body { color: red; }</style>' +
+        '<form action="/test"><input name="q"></form><applet code="X.class"></applet><canvas></canvas><video></video><audio></audio><details></details>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -36,6 +38,15 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<base');
       expect(out).not.toContain('<link');
       expect(out).not.toContain('<meta');
+      expect(out).not.toContain('<svg');
+      expect(out).not.toContain('<math');
+      expect(out).not.toContain('<style');
+      expect(out).not.toContain('<form');
+      expect(out).not.toContain('<applet');
+      expect(out).not.toContain('<canvas');
+      expect(out).not.toContain('<video');
+      expect(out).not.toContain('<audio');
+      expect(out).not.toContain('<details');
     });
 
     test('strips onclick and other event handlers', () => {
@@ -64,6 +75,24 @@ describe('sanitizer', () => {
       const out = sanitizeHTML(html);
       expect(out).toContain('href="http://example.com"');
       expect(out).toContain('href="https://safe.com"');
+    });
+
+    test('strips malicious style attributes', () => {
+      const html =
+        '<div style="color: blue; background-image: url(javascript:alert(1))">1</div>' +
+        '<div style="width: expression(alert(1))">2</div>' +
+        '<div style="-moz-binding: url(xss.xml#xss)">3</div>';
+      const out = sanitizeHTML(html);
+      expect(out).not.toContain('style');
+      expect(out).toContain('<div>1</div>');
+      expect(out).toContain('<div>2</div>');
+      expect(out).toContain('<div>3</div>');
+    });
+
+    test('allows safe style attributes', () => {
+      const html = '<div style="color: blue; font-weight: bold;">Safe</div>';
+      const out = sanitizeHTML(html);
+      expect(out).toContain('style="color: blue; font-weight: bold;"');
     });
 
     test('returns body innerHTML only (no full document)', () => {

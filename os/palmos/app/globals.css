@@ -1,8 +1,21 @@
 :root {
-  --palm-bg: #8c927b;
-  --palm-text: #2a2d24;
+  --palm-bg: #ffffff;
+  --palm-text: #2c2c2c;
   --palm-border: #4a4d41;
-  --palm-dark: #2a2d24;
+  --palm-dark: #2c2c2c;
+}
+
+@keyframes palm-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.palm-app-fade {
+  animation: palm-fade-in 150ms ease-out both;
 }
 
 body {
@@ -10,8 +23,25 @@ body {
   padding: 0;
   background-color: #222;
   color: var(--palm-text);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--font-palm), 'Courier New', monospace;
   overflow: hidden;
+}
+
+/* Apply Palm font + no smoothing inside the screen */
+.palm-screen,
+.palm-screen * {
+  font-family: var(--font-palm), sans-serif;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Space Trader has its own font metrics (sans-serif 11px) — restore them so
+   layouts don't overflow. Two-class specificity beats the one-class rule above. */
+.palm-screen .space-trader-app,
+.palm-screen .space-trader-app * {
+  font-family: sans-serif;
 }
 
 * {
@@ -452,8 +482,9 @@ input::placeholder {
   width: 264px;
   height: 264px;
   overflow: hidden;
-  background: white;
+  background: var(--palm-bg);
   position: relative;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 .palm-silk-area {
@@ -624,4 +655,27 @@ input::placeholder {
 }
 .m505-battery {
   background: linear-gradient(to bottom, #74ff74, #008000); /* Green battery per m505 usually */
+}
+
+/* Stylus tap animation */
+@keyframes stylus-tap {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+.stylus-tap {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(0, 255, 0, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: stylus-tap 0.5s ease-out forwards;
+  z-index: 10000;
 }

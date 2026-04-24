@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 import { usePalmSounds } from '../hooks/usePalmSounds';
 
@@ -11,11 +11,16 @@ interface TodoItem {
   priority: number;
 }
 
-export function PalmTodoApp() {
+interface PalmTodoAppProps {
+  onRegisterScroll?: (fn: ((dir: 'up' | 'down') => void) | null) => void;
+}
+
+export function PalmTodoApp({ onRegisterScroll }: PalmTodoAppProps) {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const { playClick, playSuccess, playError } = usePalmSounds();
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('palmos-todos');
@@ -31,6 +36,13 @@ export function PalmTodoApp() {
   useEffect(() => {
     localStorage.setItem('palmos-todos', JSON.stringify(todos));
   }, [todos]);
+
+  useEffect(() => {
+    onRegisterScroll?.((dir) => {
+      listRef.current?.scrollBy({ top: dir === 'up' ? -40 : 40, behavior: 'instant' });
+    });
+    return () => onRegisterScroll?.(null);
+  }, [onRegisterScroll]);
 
   const addTodo = () => {
     if (!inputValue.trim()) {
@@ -61,7 +73,7 @@ export function PalmTodoApp() {
 
   return (
     <div className="flex h-full w-full flex-col p-2 text-[#2a2d24]">
-      <div className="flex-1 overflow-y-auto">
+      <div ref={listRef} className="flex-1 overflow-y-auto">
         {todos.map((todo) => (
           <div
             key={todo.id}

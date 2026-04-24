@@ -356,7 +356,7 @@ export function executeAttack(
   // Accuracy Roll — matches original Space Trader formula (Spronck)
   const defenderShipType = ShipTypes[defender.type];
   const hitChance = getRandom(attackerFighterSkill + defenderShipType.size);
-  const evadeChance = (flees ? 2 : 1) * (1 + getRandom(5 + Math.floor(defenderPilotSkill / 2)));
+  const evadeChance = (flees ? 2 : 1) * getRandom(5 + Math.floor(defenderPilotSkill / 2));
 
   if (hitChance < evadeChance) {
     return false; // Miss

@@ -35,22 +35,6 @@ function b64UrlDecode(str) {
   return bytes;
 }
 
-async function hmacSha256(secretKey, data) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secretKey),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const sig = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    typeof data === 'string' ? new TextEncoder().encode(data) : data,
-  );
-  return new Uint8Array(sig);
-}
-
 function parseToken(token) {
   const parts = token.split('.');
   if (parts.length !== 2) return null;
@@ -77,15 +61,20 @@ function parseToken(token) {
 }
 
 async function verifySignature(secret, payloadB64, sigB64) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify'],
-  );
-  const actualSig = b64UrlDecode(sigB64);
-  return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  try {
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+    const actualSig = b64UrlDecode(sigB64);
+    return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  } catch (e) {
+    console.error('Signature verification error', e);
+    return false;
+  }
 }
 
 export async function onRequestPost(context) {

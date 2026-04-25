@@ -74,7 +74,7 @@ function getWindowsUpdatePage(): string {
     '<p id="install-pct">0%</p></div>' +
     '<div class="phase" id="phase3"><h2>Installation Complete</h2>' +
     '<div class="notice">Updates installed. <b>Restart required.</b></div>' +
-    '<button class="btn" onclick="alert(\'Windows 98 is shutting down...\\n\\nIt is now safe to turn off your computer.\')">Restart Now</button></div>' +
+    '<button class="btn" onclick="alert(\'Windows XP is shutting down...\\n\\nIt is now safe to turn off your computer.\')">Restart Now</button></div>' +
     '</div></div>' +
     '<script>(function(){var phases=["phase0","phase1","phase2","phase3"];' +
     'function show(n){phases.forEach(function(id,i){var el=document.getElementById(id);if(el)el.className="phase"+(i===n?" active":"");});}' +
@@ -103,6 +103,7 @@ export function Ie6Window() {
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
   const [iframeSrcdoc, setIframeSrcdoc] = useState<string | null>(null);
   const [urlBarValue, setUrlBarValue] = useState('http://www.msn.com/');
+  const [reloadKey, setReloadKey] = useState(0);
   const [statusText, setStatusText] = useState('Done');
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -158,6 +159,20 @@ export function Ie6Window() {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, [helpMenuOpen]);
+
+  function navigate(rawUrl: string) {
+    let url = rawUrl.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) {
+      url = /^www\./i.test(url) ? 'https://' + url : 'https://www.' + url;
+    }
+    setIframeSrcdoc(null);
+    setIframeSrc(url);
+    setUrlBarValue(url);
+    setStatusText('Opening page ' + url + '...');
+    hasLoadedRef.current = true;
+    setTimeout(() => setStatusText('Done'), 2000);
+  }
 
   function handleFavoriteClick(fav: (typeof FAVORITES)[0]) {
     setIframeSrcdoc(null);
@@ -255,11 +270,22 @@ export function Ie6Window() {
             <span className="ie5-btn-icon">✖</span>
             <span className="ie5-btn-label">Stop</span>
           </button>
-          <button className="ie5-btn disabled" title="Refresh">
+          <button className="ie5-btn" title="Refresh" onClick={() => setReloadKey((k) => k + 1)}>
             <span className="ie5-btn-icon">🔄</span>
             <span className="ie5-btn-label">Refresh</span>
           </button>
-          <button className="ie5-btn disabled" title="Home">
+          <button
+            className="ie5-btn"
+            title="Home"
+            onClick={() => {
+              setIframeSrcdoc(null);
+              setIframeSrc(DEFAULT_URL);
+              setUrlBarValue('http://www.msn.com/');
+              setStatusText('Opening page http://www.msn.com/...');
+              hasLoadedRef.current = true;
+              setTimeout(() => setStatusText('Done'), 2000);
+            }}
+          >
             <span className="ie5-btn-icon">🏠</span>
             <span className="ie5-btn-label">Home</span>
           </button>
@@ -308,12 +334,20 @@ export function Ie6Window() {
               type="text"
               className="ie5-url-input"
               value={urlBarValue}
-              readOnly
-              onChange={() => {}}
+              onChange={(e) => setUrlBarValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') navigate(urlBarValue);
+              }}
             />
           </div>
         </div>
-        <div className="ie5-address-go disabled">Go</div>
+        <div
+          className="ie5-address-go"
+          onClick={() => navigate(urlBarValue)}
+          style={{ cursor: 'pointer' }}
+        >
+          Go
+        </div>
         <div className="ie5-address-links disabled">
           Links <span>»</span>
         </div>
@@ -363,7 +397,7 @@ export function Ie6Window() {
           ) : (
             <iframe
               id="ie5-iframe"
-              key={iframeSrc ?? 'blank'}
+              key={`${iframeSrc ?? 'blank'}-${reloadKey}`}
               src={iframeSrc ?? 'about:blank'}
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
               title="Internet Explorer content"

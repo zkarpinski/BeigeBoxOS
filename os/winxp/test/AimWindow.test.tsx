@@ -5,14 +5,25 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AimWindow, aimAppConfig } from './AimWindow';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { AimWindow, aimAppConfig } from '../app/components/apps/aim/AimWindow';
+import { WindowManagerProvider, OsShellProvider } from '@retro-web/core/context';
+import { TitleBar } from '../app/components/winxp/TitleBar';
+import { AppWindow } from '../app/components/winxp/AppWindow';
+
+// Mock OsShellProvider to use WinXP components
+const mockOsShell = {
+  AppWindow,
+  TitleBar,
+  MenuBar: () => <div data-testid="mock-menubar" />,
+};
 
 function renderAim() {
   return render(
-    <WindowManagerProvider registry={[aimAppConfig]}>
-      <AimWindow />
-    </WindowManagerProvider>,
+    <OsShellProvider value={mockOsShell}>
+      <WindowManagerProvider registry={[aimAppConfig]} initialOpenAppId="aim">
+        <AimWindow />
+      </WindowManagerProvider>
+    </OsShellProvider>,
   );
 }
 

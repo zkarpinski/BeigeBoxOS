@@ -582,7 +582,7 @@ export function LimeWireWindow() {
               </div>
             </section>
             <section className="limewire-filter-section">
-              <div className="lw-filter-header">Album</div>
+              <div className="lw-filter-header">Genre</div>
               <div className="lw-filter-scroll">
                 {CATALOG_ALBUMS.map((g) => (
                   <button

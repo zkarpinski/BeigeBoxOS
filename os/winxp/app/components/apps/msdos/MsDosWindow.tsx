@@ -106,14 +106,19 @@ export function MsDosWindow() {
       case 'help':
         newLines.push(
           'For more information on a specific command, type HELP command-name',
+          '  CD       Displays the name of or changes the current directory.',
           '  CLS      Clears the screen.',
+          '  COLOR    Sets the default console foreground and background colors.',
           '  DATE     Displays or sets the date.',
           '  DIR      Displays a list of files and subdirectories.',
           '  ECHO     Displays messages.',
+          '  EXIT     Quits the CMD.EXE program (command interpreter).',
           '  HELP     Provides Help information for Windows commands.',
+          '  IPCONFIG Displays all current TCP/IP network configuration values.',
+          '  PING     Sends ICMP ECHO_REQUEST to network hosts.',
+          '  START    Starts a separate window to run a specified program.',
           '  TIME     Displays or sets the system time.',
           '  VER      Displays the Windows version.',
-          '  EXIT     Quits the CMD.EXE program (command interpreter).',
         );
         break;
       case 'cd':
@@ -131,9 +136,80 @@ export function MsDosWindow() {
             }
             return prev;
           });
+          newLines.push('');
+        } else {
+          newLines.push(workingDir);
         }
+        break;
+      case 'ipconfig':
+        newLines.push(
+          '',
+          'Windows IP Configuration',
+          '',
+          'Ethernet adapter Local Area Connection:',
+          '',
+          '   Connection-specific DNS Suffix  . :',
+          '   IP Address. . . . . . . . . . . : 192.168.1.100',
+          '   Subnet Mask . . . . . . . . . . : 255.255.255.0',
+          '   Default Gateway . . . . . . . . : 192.168.1.1',
+          '',
+        );
+        break;
+      case 'ping': {
+        const host = parts[1] || 'localhost';
+        newLines.push(
+          '',
+          `Pinging ${host} with 32 bytes of data:`,
+          '',
+          `Reply from 192.168.1.1: bytes=32 time=14ms TTL=64`,
+          `Reply from 192.168.1.1: bytes=32 time=12ms TTL=64`,
+          `Reply from 192.168.1.1: bytes=32 time=11ms TTL=64`,
+          `Reply from 192.168.1.1: bytes=32 time=13ms TTL=64`,
+          '',
+          `Ping statistics for ${host}:`,
+          `    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),`,
+          `Approximate round trip times in milli-seconds:`,
+          `    Minimum = 11ms, Maximum = 14ms, Average = 12ms`,
+          '',
+        );
+        break;
+      }
+      case 'color':
         newLines.push('');
         break;
+      case 'start': {
+        const appName = parts
+          .slice(1)
+          .join(' ')
+          .toLowerCase()
+          .replace(/\.exe$/, '');
+        const APP_MAP: Record<string, string> = {
+          notepad: 'notepad',
+          calc: 'calculator',
+          calculator: 'calculator',
+          mspaint: 'paint',
+          paint: 'paint',
+          winamp: 'winamp',
+          limewire: 'limewire',
+          aim: 'aim',
+          iexplore: 'ie6',
+          ie: 'ie6',
+          winmine: 'minesweeper',
+          minesweeper: 'minesweeper',
+          control: 'controlpanel',
+          taskmgr: 'taskmanager',
+          itunes: 'itunes',
+          explorer: 'mycomputer',
+        };
+        const appId = APP_MAP[appName];
+        if (appId && ctx) {
+          ctx.showApp(appId);
+          newLines.push('');
+        } else {
+          newLines.push(`Unable to find application: ${parts.slice(1).join(' ')}`);
+        }
+        break;
+      }
       case 'exit':
         ctx?.hideApp('msdos');
         setLines((prev) => [...prev, ...newLines]);

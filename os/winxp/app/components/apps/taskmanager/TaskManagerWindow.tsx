@@ -199,16 +199,26 @@ export function TaskManagerWindow({ registry }: { registry: AppConfig[] }) {
     const proc = allProcesses.find((p) => p.pid === selectedPid);
     if (!proc) return;
     if (proc.appId) {
-      if (
-        confirm(
-          `WARNING: Terminating a process can cause undesired results including loss of data and system instability.\n\nAre you sure you want to terminate the process "${proc.name}"?`,
-        )
-      ) {
-        ctx.hideApp(proc.appId);
-        setSelectedPid(null);
-      }
+      void ctx
+        .openDialog({
+          type: 'warning',
+          title: 'Windows Task Manager',
+          message: `WARNING: Terminating a process can cause undesired results including loss of data and system instability.\n\nAre you sure you want to terminate the process "${proc.name}"?`,
+          buttons: ['Yes', 'No'],
+        })
+        .then((btn) => {
+          if (btn === 'Yes') {
+            ctx.hideApp(proc.appId!);
+            setSelectedPid(null);
+          }
+        });
     } else {
-      alert(`Unable to terminate process "${proc.name}".\n\nAccess is denied.`);
+      void ctx.openDialog({
+        type: 'error',
+        title: 'Windows Task Manager',
+        message: `Unable to terminate process "${proc.name}".\n\nAccess is denied.`,
+        buttons: ['OK'],
+      });
     }
   };
 
@@ -319,7 +329,7 @@ export function TaskManagerWindow({ registry }: { registry: AppConfig[] }) {
             </div>
             <div className="tm-proc-footer">
               <label className="tm-checkbox">
-                <input type="checkbox" defaultChecked readOnly /> Show processes from all users
+                <input type="checkbox" defaultChecked disabled /> Show processes from all users
               </label>
               <button className="tm-btn" onClick={handleEndProcess} disabled={selectedPid === null}>
                 End Process

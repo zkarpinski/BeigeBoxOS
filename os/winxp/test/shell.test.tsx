@@ -158,7 +158,7 @@ describe('StartMenuTree', () => {
     await user.click(shutdownBtn);
     const overlay = document.querySelector('.shutdown-screen');
     expect(overlay).toBeInTheDocument();
-    expect(overlay).toHaveTextContent(/Click any where to return/i);
+    expect(overlay).toHaveTextContent(/Click anywhere to return/i);
   });
 });
 

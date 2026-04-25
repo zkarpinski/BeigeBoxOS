@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { AppConfig } from '../../types/app-config';
+import { useWindowManager } from '@retro-web/core/context';
 import { StartMenuTree } from './StartMenuTree';
 import { StartButton } from './taskbar/StartButton';
 import { TaskbarTasks } from './taskbar/TaskbarTasks';
@@ -10,6 +11,7 @@ import { SystemTray } from './taskbar/SystemTray';
 export function Taskbar({ registry }: { registry: AppConfig[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [volumeOpen, setVolumeOpen] = useState(false);
+  const { showApp, minimizeApp, apps } = useWindowManager();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -25,7 +27,12 @@ export function Taskbar({ registry }: { registry: AppConfig[] }) {
     return () => document.removeEventListener('click', handler);
   }, [menuOpen]);
 
-  // Quick Launch: IE6 (or IE5), Show Desktop placeholder
+  const handleShowDesktop = () => {
+    const visibleApps = Object.entries(apps).filter(([, s]) => s.visible && !s.minimized);
+    visibleApps.forEach(([id]) => minimizeApp(id));
+  };
+
+  // Quick Launch: IE6 (or IE5), Show Desktop
   const ie = registry.find((a) => a.id === 'ie6' || a.id === 'ie5');
 
   return (
@@ -35,16 +42,7 @@ export function Taskbar({ registry }: { registry: AppConfig[] }) {
         {/* Quick Launch */}
         <div className="quick-launch">
           {ie && (
-            <div
-              className="quick-launch-btn"
-              title={ie.label}
-              onClick={() => {
-                const { showApp } =
-                  (window as unknown as { WindowsXP?: { showApp: (id: string) => void } })
-                    .WindowsXP ?? {};
-                showApp?.(ie.id);
-              }}
-            >
+            <div className="quick-launch-btn" title={ie.label} onClick={() => showApp(ie.id)}>
               <img
                 src={ie.icon}
                 alt={ie.label}
@@ -54,7 +52,12 @@ export function Taskbar({ registry }: { registry: AppConfig[] }) {
               />
             </div>
           )}
-          <div className="quick-launch-btn" title="Show Desktop" style={{ fontSize: 13 }}>
+          <div
+            className="quick-launch-btn"
+            title="Show Desktop"
+            style={{ fontSize: 13 }}
+            onClick={handleShowDesktop}
+          >
             🖥
           </div>
         </div>

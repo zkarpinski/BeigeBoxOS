@@ -12,7 +12,7 @@ export { NOTEPAD_PENDING_KEY };
 export const WORD_PENDING_KEY = 'word-pending-document';
 
 /** Bump when default tree layout changes so users get the new structure without stale merges. */
-const STORAGE_KEY = 'winxp-filesystem-v2';
+const STORAGE_KEY = 'winxp-filesystem-v3';
 
 /** Logon name shown in Documents and Settings (Windows XP profile). */
 export const USER_PROFILE_NAME = 'zKarpinski';
@@ -103,23 +103,15 @@ function buildDefaultTree(): FsTree {
     },
     [DESKTOP_PATH]: {
       type: 'folder',
-      children: ['TODO.txt', 'My Resume.doc'],
+      children: ['TODO.txt'],
     },
     [`${DESKTOP_PATH}\\TODO.txt`]: {
       type: 'file',
       content: DEFAULT_TODO_CONTENT,
     },
-    [`${DESKTOP_PATH}\\My Resume.doc`]: {
-      type: 'file',
-      contentKey: 'resume',
-    },
     [MY_DOCUMENTS_PATH]: {
       type: 'folder',
-      children: ['My Resume.doc'],
-    },
-    [`${MY_DOCUMENTS_PATH}\\My Resume.doc`]: {
-      type: 'file',
-      contentKey: 'resume',
+      children: [],
     },
     'C:\\Windows': {
       type: 'folder',

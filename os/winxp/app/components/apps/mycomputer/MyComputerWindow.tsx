@@ -112,7 +112,12 @@ export function MyComputerWindow() {
     if (entry.type === 'folder') {
       if (entry.path === 'A:\\' || entry.path === 'D:\\') {
         const drive = entry.path[0];
-        window.alert(`There is no disk in drive ${drive}.\\n\\nInsert a disk, and then try again.`);
+        void ctx?.openDialog({
+          type: 'error',
+          title: 'My Computer',
+          message: `There is no disk in drive ${drive}.\n\nInsert a disk, and then try again.`,
+          buttons: ['OK'],
+        });
         return;
       }
       navigateToPath(entry.path);

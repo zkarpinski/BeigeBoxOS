@@ -2,6 +2,21 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('PalmOS Desktop', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock date to 2004-09-23
+    await page.addInitScript(() => {
+      const MockDate = class extends Date {
+        constructor(...args) {
+          if (args.length === 0) {
+            super('2004-09-23T12:00:00');
+          } else {
+            super(...args);
+          }
+        }
+      };
+      // @ts-ignore
+      window.Date = MockDate;
+    });
+
     // Navigate to the base URL (which should be running PalmOS)
     await page.goto('/');
     // Clear localStorage to ensure a fresh start for every test

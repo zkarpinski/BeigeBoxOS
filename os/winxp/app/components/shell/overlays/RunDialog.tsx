@@ -4,9 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '@retro-web/core/context';
 
 const APP_COMMANDS: Record<string, string> = {
-  winword: 'word',
-  'winword.exe': 'word',
-  word: 'word',
   notepad: 'notepad',
   'notepad.exe': 'notepad',
   calc: 'calculator',
@@ -21,21 +18,12 @@ const APP_COMMANDS: Record<string, string> = {
   'limewire.exe': 'limewire',
   aim: 'aim',
   'aim.exe': 'aim',
-  navigator: 'navigator',
-  netscape: 'navigator',
-  'netscape.exe': 'navigator',
-  iexplore: 'ie5',
-  'iexplore.exe': 'ie5',
-  ie5: 'ie5',
+  iexplore: 'ie6',
+  'iexplore.exe': 'ie6',
+  ie6: 'ie6',
   winmine: 'minesweeper',
   'winmine.exe': 'minesweeper',
   minesweeper: 'minesweeper',
-  vb6: 'vb6',
-  'vb6.exe': 'vb6',
-  thps2: 'thps2',
-  'thps.exe': 'thps2',
-  defrag: 'defrag',
-  'defrag.exe': 'defrag',
   control: 'controlpanel',
   'control.exe': 'controlpanel',
   controlpanel: 'controlpanel',
@@ -76,7 +64,7 @@ export function RunDialog({ open, onClose }: { open: boolean; onClose: () => voi
     if (/^https?:\/\//i.test(raw) || /^www\./i.test(raw)) {
       onClose();
       const url = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
-      showApp('navigator');
+      showApp('ie6');
       window.dispatchEvent(new CustomEvent('winxp:navigate', { detail: { url } }));
       return;
     }

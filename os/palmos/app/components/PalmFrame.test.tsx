@@ -104,7 +104,7 @@ describe('PalmFrame Component', () => {
     expect(onAppButtonClick).toHaveBeenCalledWith('todo');
 
     fireEvent.click(screen.getByTitle('Note Pad'));
-    expect(onAppButtonClick).toHaveBeenCalledWith('memo');
+    expect(onAppButtonClick).toHaveBeenCalledWith('notepad');
 
     expect(mockSounds.playClick).toHaveBeenCalledTimes(4);
   });

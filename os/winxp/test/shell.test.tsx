@@ -1,15 +1,15 @@
 /**
- * Unit tests for shell components: BootScreen, Taskbar, DesktopIcons, StartMenuTree, ShellOverlays.
+ * Unit tests for WinXP shell components: BootScreen, Taskbar, DesktopIcons, StartMenuTree, ShellOverlays.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BootScreen } from './BootScreen';
-import { Taskbar } from './Taskbar';
-import { DesktopIcons } from './DesktopIcons';
-import { ShellOverlays } from './ShellOverlays';
+import { BootScreen } from '../app/components/shell/BootScreen';
+import { Taskbar } from '../app/components/shell/Taskbar';
+import { DesktopIcons } from '../app/components/shell/DesktopIcons';
+import { ShellOverlays } from '../app/components/shell/ShellOverlays';
 import { WindowManagerProvider } from '@retro-web/core/context';
-import type { AppConfig } from '../../types/app-config';
+import type { AppConfig } from '../app/types/app-config';
 
 const mockAppWithDesktop: AppConfig = {
   id: 'notepad',
@@ -52,7 +52,6 @@ describe('BootScreen', () => {
     const bootScreen = document.getElementById('boot-screen');
     expect(bootScreen).toBeInTheDocument();
     expect(bootScreen?.querySelector('.boot-splash')).toBeInTheDocument();
-    expect(bootScreen?.querySelector('#boot-bar-fill')).toBeInTheDocument();
     expect(document.getElementById('boot-sound')).toBeInTheDocument();
   });
 
@@ -85,12 +84,12 @@ describe('Taskbar', () => {
     renderShell();
     const startBtn = document.getElementById('start-button');
     expect(startBtn).toBeInTheDocument();
-    const startMenu = document.getElementById('start-menu');
-    expect(startMenu).toHaveClass('hidden');
+    // Start menu is not in DOM when closed in XP implementation
+    expect(document.getElementById('xp-start-menu')).not.toBeInTheDocument();
     await user.click(startBtn!);
-    expect(startMenu).not.toHaveClass('hidden');
+    expect(document.getElementById('xp-start-menu')).toBeInTheDocument();
     await user.click(startBtn!);
-    expect(startMenu).toHaveClass('hidden');
+    expect(document.getElementById('xp-start-menu')).not.toBeInTheDocument();
   });
 
   test('volume tray icon and popup exist', () => {
@@ -121,69 +120,45 @@ describe('DesktopIcons', () => {
 });
 
 describe('StartMenuTree', () => {
-  test('start menu has Windows 98 title when open', async () => {
+  test('start menu has username when open', async () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    const startMenu = document.getElementById('start-menu');
-    expect(startMenu?.querySelector('.start-menu-title')).toHaveTextContent(/Windows/);
-    expect(startMenu?.querySelector('.start-menu-title')).toHaveTextContent(/98/);
+    const startMenu = document.getElementById('xp-start-menu');
+    expect(startMenu?.querySelector('.xp-sm-username')).toHaveTextContent(/User/);
   });
 
-  test('start menu has Windows Update item', async () => {
+  test('start menu has All Programs, My Documents, Control Panel, Run, Turn Off Computer', async () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    expect(document.getElementById('start-windows-update')).toBeInTheDocument();
-    expect(screen.getByText('Windows Update')).toBeInTheDocument();
-  });
-
-  test('start menu has Programs, Documents, Settings, Find, Help, Run, Shut Down', async () => {
-    const user = userEvent.setup();
-    renderShell();
-    await user.click(document.getElementById('start-button')!);
-    expect(screen.getByText('Programs')).toBeInTheDocument();
-    expect(screen.getByText('Documents')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Find')).toBeInTheDocument();
-    expect(screen.getByText('Help')).toBeInTheDocument();
-    expect(screen.getByText(/Run/)).toBeInTheDocument();
-    expect(screen.getByText(/Shut Down/)).toBeInTheDocument();
+    expect(screen.getByText('All Programs')).toBeInTheDocument();
+    expect(screen.getByText('My Documents')).toBeInTheDocument();
+    expect(screen.getByText('Control Panel')).toBeInTheDocument();
+    expect(screen.getByText('Run...')).toBeInTheDocument();
+    expect(screen.getByText('Turn Off Computer')).toBeInTheDocument();
   });
 
   test('clicking Run opens run dialog', async () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    const runItem = document.getElementById('start-run');
+    const runItem = document.getElementById('xp-right-run');
     expect(runItem).toBeInTheDocument();
     await user.click(runItem!);
     expect(document.getElementById('run-dialog')).toBeInTheDocument();
     expect(screen.getByLabelText(/open/i)).toBeInTheDocument();
   });
 
-  test('Shut Down menu item exists and opens shutdown overlay when clicked', async () => {
+  test('Turn Off Computer opens shutdown overlay when clicked', async () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    const startMenu = document.getElementById('start-menu');
-    const shutdownItem =
-      startMenu?.querySelector('[id="start-shutdown"]') ?? screen.getByText('Shut Down...');
-    expect(shutdownItem).toBeInTheDocument();
-    await user.click(shutdownItem as HTMLElement);
+    const shutdownBtn = screen.getByText('Turn Off Computer');
+    await user.click(shutdownBtn);
     const overlay = document.querySelector('.shutdown-screen');
     expect(overlay).toBeInTheDocument();
-    expect(overlay).toHaveTextContent(/safe to turn off/i);
-  });
-
-  test('Programs submenu has Accessories with registry apps', async () => {
-    const user = userEvent.setup();
-    renderShell();
-    await user.click(document.getElementById('start-button')!);
-    expect(screen.getByText('Accessories')).toBeInTheDocument();
-    const notepadItem = document.getElementById('start-menu-notepad');
-    expect(notepadItem).toBeInTheDocument();
-    expect(notepadItem).toHaveTextContent('Notepad');
+    expect(overlay).toHaveTextContent(/Click anywhere to return/i);
   });
 });
 
@@ -192,7 +167,7 @@ describe('ShellOverlays', () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
+    await user.click(document.getElementById('xp-right-run')!);
     expect(screen.getByRole('button', { name: /ok/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
@@ -201,10 +176,10 @@ describe('ShellOverlays', () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
+    await user.click(document.getElementById('xp-right-run')!);
     expect(document.getElementById('run-dialog')).toBeInTheDocument();
-    const closeBtn = document.querySelector('#run-dialog .run-titlebtn');
-    await user.click(closeBtn as HTMLElement);
+    const closeBtn = document.getElementById('run-close-btn');
+    await user.click(closeBtn!);
     expect(document.getElementById('run-dialog')).not.toBeInTheDocument();
   });
 
@@ -212,8 +187,8 @@ describe('ShellOverlays', () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
-    expect(screen.getByText(/type the name of a program/i)).toBeInTheDocument();
+    await user.click(document.getElementById('xp-right-run')!);
+    expect(screen.getByText(/Type the name of a program/i)).toBeInTheDocument();
   });
 });
 

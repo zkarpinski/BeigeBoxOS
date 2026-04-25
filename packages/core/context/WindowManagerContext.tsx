@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
   useCallback,
 } from 'react';
@@ -97,6 +98,31 @@ export const Z_FOCUSED = 11;
 
 // ── localStorage helpers (key is per-OS via WindowManagerProvider) ─────────────
 
+/** Persisted visible/minimized state for each app. */
+type PersistedWindowState = Record<string, { visible: boolean; minimized: boolean }>;
+
+function loadWindowState(key: string): PersistedWindowState {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return {};
+    return JSON.parse(raw) as PersistedWindowState;
+  } catch {
+    return {};
+  }
+}
+
+function saveWindowState(key: string, apps: Record<string, AppState>): void {
+  try {
+    const state: PersistedWindowState = {};
+    for (const [id, app] of Object.entries(apps)) {
+      state[id] = { visible: app.visible, minimized: app.minimized };
+    }
+    localStorage.setItem(key, JSON.stringify(state));
+  } catch {
+    /* quota exceeded or private browsing — ignore */
+  }
+}
+
 /** Previous key before renaming Win97 → Win98; migrated once when reading win98-window-bounds. */
 const LEGACY_WIN98_BOUNDS_KEY = 'win97-window-bounds';
 
@@ -138,7 +164,8 @@ type AppAction =
   | { type: 'HIDE'; id: string }
   | { type: 'FOCUS'; id: string }
   | { type: 'MINIMIZE'; id: string }
-  | { type: 'SET_BOUNDS'; id: string; bounds: Bounds };
+  | { type: 'SET_BOUNDS'; id: string; bounds: Bounds }
+  | { type: 'RESTORE_STATE'; state: PersistedWindowState };
 
 function appsReducer(state: AppsMap, action: AppAction): AppsMap {
   switch (action.type) {
@@ -189,6 +216,23 @@ function appsReducer(state: AppsMap, action: AppAction): AppsMap {
       if (!state[action.id]) return state;
       return { ...state, [action.id]: { ...state[action.id], bounds: action.bounds } };
     }
+    case 'RESTORE_STATE': {
+      const next: AppsMap = {};
+      for (const [id, app] of Object.entries(state)) {
+        const saved = action.state[id];
+        if (saved === undefined) {
+          next[id] = app;
+        } else {
+          next[id] = {
+            ...app,
+            visible: saved.visible,
+            minimized: saved.minimized,
+            zIndex: saved.visible && !saved.minimized ? Z_FOCUSED : Z_BASE,
+          };
+        }
+      }
+      return next;
+    }
     default:
       return state;
   }
@@ -208,6 +252,17 @@ export function WindowManagerProvider({
    * Set false for shells that should boot with a clear desktop (e.g. KarpOS); `initialOpenAppId` still opens that app.
    */
   applyOpenByDefault = true,
+  /**
+   * localStorage key for persisting each app's open/minimized state across refreshes.
+   * When provided, state is always saved. Pass `restoreState={false}` to skip loading
+   * (e.g. after a reboot or first visit).
+   */
+  stateStorageKey,
+  /**
+   * Whether to restore previously-saved window state on mount.
+   * Defaults to true — OSes with a boot screen should pass false on fresh boots.
+   */
+  restoreState = true,
   children,
 }: {
   registry: AppConfig[];
@@ -216,6 +271,8 @@ export function WindowManagerProvider({
   boundsStorageKey?: string;
   defaultDialogTitle?: string;
   applyOpenByDefault?: boolean;
+  stateStorageKey?: string;
+  restoreState?: boolean;
   children: React.ReactNode;
 }) {
   // Initial state: no bounds (SSR-safe). Bounds are loaded client-side in useEffect below.
@@ -230,6 +287,8 @@ export function WindowManagerProvider({
   }
 
   const [apps, dispatch] = useReducer(appsReducer, initialApps);
+  // True once the restore effect has run — prevents saving defaults before restore completes.
+  const restoreCompleted = useRef(false);
   const [dialogState, setDialogState] = useState<DialogState | null>(null);
   const [bsodState, setBsodState] = useState<BsodState | FatalErrorState | null>(null);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
@@ -247,6 +306,28 @@ export function WindowManagerProvider({
       });
     }
   }, [registry, openingFromUrl, applyOpenByDefault]);
+
+  // Restore persisted window state on mount (client-only).
+  // Runs before the bounds effect so bounds are applied on top of restored state.
+  useEffect(() => {
+    if (!stateStorageKey || !restoreState) {
+      restoreCompleted.current = true;
+      return;
+    }
+    const persisted = loadWindowState(stateStorageKey);
+    if (Object.keys(persisted).length > 0) {
+      dispatch({ type: 'RESTORE_STATE', state: persisted });
+    }
+    restoreCompleted.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Mount only
+
+  // Save window state whenever apps change, but only after restore has completed
+  // (prevents overwriting saved state with registry defaults on first render).
+  useEffect(() => {
+    if (!stateStorageKey || !restoreCompleted.current) return;
+    saveWindowState(stateStorageKey, apps);
+  }, [apps, stateStorageKey]);
 
   // Load persisted bounds from localStorage after mount (client-only, avoids SSR mismatch)
   useEffect(() => {

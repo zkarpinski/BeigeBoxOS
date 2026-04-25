@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { AppConfig } from '../../types/app-config';
 import { useWindowManager } from '@retro-web/core/context';
 
@@ -33,7 +33,18 @@ export function StartMenuTree({
   menuOpen: boolean;
   setMenuOpen: (open: boolean) => void;
 }) {
+  const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const { showApp, setRunDialogOpen, setShutdownOpen } = useWindowManager();
+
+  React.useEffect(() => {
+    if (!menuOpen) {
+      setOpenSubmenus([]);
+    }
+  }, [menuOpen]);
+
+  const addSubmenu = (path: string) => {
+    setOpenSubmenus((prev) => (prev.includes(path) ? prev : [...prev, path]));
+  };
 
   const openApp = (id: string) => {
     if (id === 'word') {
@@ -45,25 +56,39 @@ export function StartMenuTree({
     }
     showApp(id);
     setMenuOpen(false);
+    setOpenSubmenus([]);
   };
 
   const handleClick = (e: React.MouseEvent) => {
     const item = (e.target as HTMLElement).closest('.start-menu-item') as HTMLElement | null;
-    if (!item || !item.id) return;
+    if (!item) return;
+
+    // Check for submenu toggle
+    const label = item.querySelector('.sm-label')?.textContent?.trim();
+    if (item.classList.contains('has-submenu') && label) {
+      // Logic for mobile/click
+      addSubmenu(label);
+      return;
+    }
+
+    if (!item.id) return;
 
     if (item.id === 'start-run') {
       setMenuOpen(false);
       setRunDialogOpen(true);
+      setOpenSubmenus([]);
       return;
     }
     if (item.id === 'start-windows-update') {
       setMenuOpen(false);
       (window as unknown as { WindowsUpdate97?: { open: () => void } }).WindowsUpdate97?.open();
+      setOpenSubmenus([]);
       return;
     }
     if (item.id === 'start-shutdown') {
       setMenuOpen(false);
       setShutdownOpen(true);
+      setOpenSubmenus([]);
       return;
     }
     // Registry app items
@@ -91,13 +116,17 @@ export function StartMenuTree({
         <div className="start-menu-divider" />
 
         {/* Programs */}
-        <div className="start-menu-item has-submenu">
+        <div
+          className={`start-menu-item has-submenu${openSubmenus.includes('Programs') ? ' sm-open' : ''}`}
+        >
           <img src="shell/icons/directory.png" className="sm-icon" alt="" />
           <span className="sm-label">Programs</span>
           <span className="sm-arrow">▶</span>
           <div className="submenu">
             {/* Accessories */}
-            <div className="start-menu-item has-submenu">
+            <div
+              className={`start-menu-item has-submenu${openSubmenus.includes('Accessories') ? ' sm-open' : ''}`}
+            >
               <img src="shell/icons/directory.png" className="sm-icon" alt="" />
               <span className="sm-label">Accessories</span>
               <span className="sm-arrow">▶</span>
@@ -109,7 +138,9 @@ export function StartMenuTree({
             </div>
 
             {/* Entertainment */}
-            <div className="start-menu-item has-submenu">
+            <div
+              className={`start-menu-item has-submenu${openSubmenus.includes('Entertainment') ? ' sm-open' : ''}`}
+            >
               <img src="shell/icons/directory.png" className="sm-icon" alt="" />
               <span className="sm-label">Entertainment</span>
               <span className="sm-arrow">▶</span>
@@ -121,7 +152,9 @@ export function StartMenuTree({
             </div>
 
             {/* Games */}
-            <div className="start-menu-item has-submenu">
+            <div
+              className={`start-menu-item has-submenu${openSubmenus.includes('Games') ? ' sm-open' : ''}`}
+            >
               <img src="shell/icons/directory.png" className="sm-icon" alt="" />
               <span className="sm-label">Games</span>
               <span className="sm-arrow">▶</span>
@@ -133,7 +166,9 @@ export function StartMenuTree({
             </div>
 
             {/* Internet */}
-            <div className="start-menu-item has-submenu">
+            <div
+              className={`start-menu-item has-submenu${openSubmenus.includes('Internet') ? ' sm-open' : ''}`}
+            >
               <img src="shell/icons/ie.png" className="sm-icon" alt="" />
               <span className="sm-label">Internet</span>
               <span className="sm-arrow">▶</span>
@@ -145,7 +180,9 @@ export function StartMenuTree({
             </div>
 
             {/* System Tools */}
-            <div className="start-menu-item has-submenu">
+            <div
+              className={`start-menu-item has-submenu${openSubmenus.includes('System Tools') ? ' sm-open' : ''}`}
+            >
               <img src="shell/icons/system_tools.png" className="sm-icon" alt="" />
               <span className="sm-label">System Tools</span>
               <span className="sm-arrow">▶</span>
@@ -173,7 +210,9 @@ export function StartMenuTree({
         </div>
 
         {/* Settings */}
-        <div className="start-menu-item has-submenu">
+        <div
+          className={`start-menu-item has-submenu${openSubmenus.includes('Settings') ? ' sm-open' : ''}`}
+        >
           <img src="apps/controlpanel/controlpanel-icon.png" className="sm-icon" alt="" />
           <span className="sm-label">Settings</span>
           <span className="sm-arrow">▶</span>

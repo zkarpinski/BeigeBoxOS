@@ -12,12 +12,22 @@ function localDateTimeString(d: Date): string {
 }
 
 export function TaskbarClock() {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  if (!now) {
+    return (
+      <time id="clock" className="taskbar-clock">
+        <span className="taskbar-clock__hm">--:--</span>
+        <span className="taskbar-clock__ampm">--</span>
+      </time>
+    );
+  }
 
   const h = now.getHours();
   const m = pad2(now.getMinutes());

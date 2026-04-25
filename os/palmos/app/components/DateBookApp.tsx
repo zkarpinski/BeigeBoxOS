@@ -230,6 +230,20 @@ export function DateBookApp() {
         </div>
         <div className="flex gap-1">
           <button
+            onClick={() => {}}
+            className="px-2 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white"
+            style={{ cursor: 'pointer' }}
+          >
+            Details
+          </button>
+          <button
+            onClick={() => {}}
+            className="px-2 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white"
+            style={{ cursor: 'pointer' }}
+          >
+            Go To
+          </button>
+          <button
             onClick={() =>
               openSlot(HOURS.findIndex((_, i) => !dayEvents.find((e) => e.hourIndex === i)))
             }

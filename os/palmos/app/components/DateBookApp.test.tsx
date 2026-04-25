@@ -4,6 +4,14 @@ import '@testing-library/jest-dom';
 import { DateBookApp } from './DateBookApp';
 
 describe('DateBookApp Component', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2004-09-23T12:00:00Z'));
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   it('renders the date and day picker', () => {
     render(<DateBookApp />);
     expect(screen.getByText('Sep 23, 04')).toBeInTheDocument();

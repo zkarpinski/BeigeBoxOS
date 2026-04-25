@@ -11,7 +11,7 @@ export function BootScreen() {
           </div>
         </div>
       </div>
-      <audio id="boot-sound" src="shell/sounds/startup.mp3" preload="auto" />
+      <audio id="boot-sound" src="shell/sounds/startup.mp3" preload="none" />
     </>
   );
 }

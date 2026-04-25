@@ -22,6 +22,16 @@
   resize: both;
   overflow: hidden;
 }
+
+@media (max-width: 600px) {
+  .notepad-window:not(.maximized) {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100dvh - 28px) !important;
+    min-width: 0 !important;
+  }
+}
 .notepad-window.maximized {
   top: 0;
   left: 0;

@@ -176,163 +176,193 @@ export function Vb6Window() {
           </ToolbarButton>
         </Toolbar>
       </ToolbarRow>
-      <div className="vb6-main">
-        {/* Project panel */}
-        <div className="vb6-panel vb6-project-panel">
-          <div className="vb6-panel-title">Project - Project1</div>
-          <div className="vb6-project-tree">
-            <div className="vb6-tree-node">
-              <div className="vb6-tree-item vb6-tree-folder open">
-                <span className="vb6-tree-toggle">−</span>
-                <span className="vb6-tree-icon">📁</span>
-                <span>Project1 (Project1.vbp)</span>
-              </div>
-              <div className="vb6-tree-children">
-                <div className="vb6-tree-node">
-                  <div className="vb6-tree-item vb6-tree-folder open">
-                    <span className="vb6-tree-toggle">−</span>
-                    <span className="vb6-tree-icon">📄</span>
-                    <span>Forms</span>
-                  </div>
-                  <div className="vb6-tree-children">
-                    <div className="vb6-tree-item">
-                      <span className="vb6-tree-pad" />
-                      <span className="vb6-tree-icon">📋</span>
-                      <span>Form1 (Form1.frm)</span>
+      <div className="vb6-layout-container">
+        <div className="vb6-toolbox">
+          <div className="vb6-toolbox-title">Controls</div>
+          <div className="vb6-toolbox-grid">
+            {[
+              { id: 'pointer', label: 'Pointer', icon: '↖' },
+              { id: 'label', label: 'Label', icon: 'A' },
+              { id: 'textbox', label: 'TextBox', icon: 'ab|' },
+              { id: 'frame', label: 'Frame', icon: '🔳' },
+              { id: 'button', label: 'CommandButton', icon: '🔘' },
+              { id: 'checkbox', label: 'CheckBox', icon: '☑' },
+              { id: 'radio', label: 'OptionButton', icon: '⚪' },
+              { id: 'combo', label: 'ComboBox', icon: '⏬' },
+              { id: 'list', label: 'ListBox', icon: '📜' },
+              { id: 'hscroll', label: 'HScrollBar', icon: '↔' },
+              { id: 'vscroll', label: 'VScrollBar', icon: '↕' },
+              { id: 'timer', label: 'Timer', icon: '⏲' },
+            ].map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`vb6-tool-btn${t.id === 'pointer' ? ' active' : ''}`}
+                title={t.label}
+              >
+                <span className="vb6-tool-icon">{t.icon}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="vb6-main">
+          {/* Project panel */}
+          <div className="vb6-panel vb6-project-panel">
+            <div className="vb6-panel-title">Project - Project1</div>
+            <div className="vb6-project-tree">
+              <div className="vb6-tree-node">
+                <div className="vb6-tree-item vb6-tree-folder open">
+                  <span className="vb6-tree-toggle">−</span>
+                  <span className="vb6-tree-icon">📁</span>
+                  <span>Project1 (Project1.vbp)</span>
+                </div>
+                <div className="vb6-tree-children">
+                  <div className="vb6-tree-node">
+                    <div className="vb6-tree-item vb6-tree-folder open">
+                      <span className="vb6-tree-toggle">−</span>
+                      <span className="vb6-tree-icon">📄</span>
+                      <span>Forms</span>
+                    </div>
+                    <div className="vb6-tree-children">
+                      <div className="vb6-tree-item">
+                        <span className="vb6-tree-pad" />
+                        <span className="vb6-tree-icon">📋</span>
+                        <span>Form1 (Form1.frm)</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="vb6-tree-item vb6-tree-folder">
-                  <span className="vb6-tree-toggle">+</span>
-                  <span className="vb6-tree-icon">📄</span>
-                  <span>Modules</span>
-                </div>
-                <div className="vb6-tree-item vb6-tree-folder">
-                  <span className="vb6-tree-toggle">+</span>
-                  <span className="vb6-tree-icon">📄</span>
-                  <span>Class Modules</span>
+                  <div className="vb6-tree-item vb6-tree-folder">
+                    <span className="vb6-tree-toggle">+</span>
+                    <span className="vb6-tree-icon">📄</span>
+                    <span>Modules</span>
+                  </div>
+                  <div className="vb6-tree-item vb6-tree-folder">
+                    <span className="vb6-tree-toggle">+</span>
+                    <span className="vb6-tree-icon">📄</span>
+                    <span>Class Modules</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Form/code panel */}
-        <div className="vb6-panel vb6-form-panel" ref={formPanelRef}>
-          <div className="vb6-panel-title">Project1 - Form1 (Form)</div>
-          <div className="vb6-form-design">
-            {/* Code window */}
-            <div className="vb6-mdi-window vb6-code-window">
-              <div className="vb6-mdi-title">
-                <span className="vb6-mdi-title-text">Project1 - Form1 (Code)</span>
-                <div className="vb6-mdi-controls">
-                  <button type="button" className="win-btn title-btn">
-                    _
-                  </button>
-                  <button type="button" className="win-btn title-btn">
-                    ❐
-                  </button>
-                  <button type="button" className="win-btn title-btn">
-                    X
-                  </button>
+          {/* Form/code panel */}
+          <div className="vb6-panel vb6-form-panel" ref={formPanelRef}>
+            <div className="vb6-panel-title">Project1 - Form1 (Form)</div>
+            <div className="vb6-form-design">
+              {/* Code window */}
+              <div className="vb6-mdi-window vb6-code-window">
+                <div className="vb6-mdi-title">
+                  <span className="vb6-mdi-title-text">Project1 - Form1 (Code)</span>
+                  <div className="vb6-mdi-controls">
+                    <button type="button" className="win-btn title-btn">
+                      _
+                    </button>
+                    <button type="button" className="win-btn title-btn">
+                      ❐
+                    </button>
+                    <button type="button" className="win-btn title-btn">
+                      X
+                    </button>
+                  </div>
+                </div>
+                <div className="vb6-code-top">
+                  <select className="vb6-code-select">
+                    <option>Command1</option>
+                    <option>Form</option>
+                  </select>
+                  <select className="vb6-code-select">
+                    <option>Click</option>
+                    <option>Load</option>
+                  </select>
+                </div>
+                <textarea
+                  className="vb6-code-area"
+                  readOnly
+                  spellCheck={false}
+                  defaultValue={`Private Sub Command1_Click()\n    Label1.Caption = "hello world"\nEnd Sub`}
+                />
+              </div>
+
+              {/* Form window */}
+              <div className="vb6-mdi-window vb6-form-window">
+                <div className="vb6-mdi-title">
+                  <span className="vb6-mdi-title-text">Project1 - Form1 (Form)</span>
+                  <div className="vb6-mdi-controls">
+                    <button type="button" className="win-btn title-btn">
+                      _
+                    </button>
+                    <button type="button" className="win-btn title-btn">
+                      ❐
+                    </button>
+                    <button type="button" className="win-btn title-btn">
+                      X
+                    </button>
+                  </div>
+                </div>
+                <div className="vb6-form-surface">
+                  <div className="vb6-form-grid">
+                    <div className="vb6-designer-label">Label1</div>
+                    <button className="win-btn vb6-designer-btn">
+                      Command1
+                      <div className="vb6-resize-handle nw" />
+                      <div className="vb6-resize-handle n" />
+                      <div className="vb6-resize-handle ne" />
+                      <div className="vb6-resize-handle e" />
+                      <div className="vb6-resize-handle se" />
+                      <div className="vb6-resize-handle s" />
+                      <div className="vb6-resize-handle sw" />
+                      <div className="vb6-resize-handle w" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="vb6-code-top">
-                <select className="vb6-code-select">
-                  <option>Command1</option>
-                  <option>Form</option>
-                </select>
-                <select className="vb6-code-select">
-                  <option>Click</option>
-                  <option>Load</option>
-                </select>
-              </div>
-              <textarea
-                className="vb6-code-area"
-                readOnly
-                spellCheck={false}
-                defaultValue={`Private Sub Command1_Click()\n    Label1.Caption = "hello world"\nEnd Sub`}
-              />
-            </div>
 
-            {/* Form window */}
-            <div className="vb6-mdi-window vb6-form-window">
-              <div className="vb6-mdi-title">
-                <span className="vb6-mdi-title-text">Project1 - Form1 (Form)</span>
-                <div className="vb6-mdi-controls">
-                  <button type="button" className="win-btn title-btn">
-                    _
-                  </button>
-                  <button type="button" className="win-btn title-btn">
-                    ❐
-                  </button>
-                  <button type="button" className="win-btn title-btn">
-                    X
-                  </button>
+              {/* Run window */}
+              <div className={`vb6-mdi-window vb6-run-window${running ? '' : ' hidden'}`}>
+                <div className="vb6-mdi-title">
+                  <span className="vb6-mdi-title-text">Form1</span>
+                  <div className="vb6-mdi-controls">
+                    <button type="button" className="win-btn title-btn">
+                      _
+                    </button>
+                    <button type="button" className="win-btn title-btn">
+                      ❐
+                    </button>
+                    <button type="button" className="win-btn title-btn" onClick={stop}>
+                      X
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="vb6-form-surface">
-                <div className="vb6-form-grid">
-                  <div className="vb6-designer-label">Label1</div>
-                  <button className="win-btn vb6-designer-btn">
+                <div className="vb6-run-surface">
+                  <div className="vb6-designer-label">{runLabel}</div>
+                  <button
+                    className="win-btn vb6-designer-btn"
+                    onClick={() => setRunLabel('hello world')}
+                  >
                     Command1
-                    <div className="vb6-resize-handle nw" />
-                    <div className="vb6-resize-handle n" />
-                    <div className="vb6-resize-handle ne" />
-                    <div className="vb6-resize-handle e" />
-                    <div className="vb6-resize-handle se" />
-                    <div className="vb6-resize-handle s" />
-                    <div className="vb6-resize-handle sw" />
-                    <div className="vb6-resize-handle w" />
                   </button>
                 </div>
-              </div>
-            </div>
-
-            {/* Run window */}
-            <div className={`vb6-mdi-window vb6-run-window${running ? '' : ' hidden'}`}>
-              <div className="vb6-mdi-title">
-                <span className="vb6-mdi-title-text">Form1</span>
-                <div className="vb6-mdi-controls">
-                  <button type="button" className="win-btn title-btn">
-                    _
-                  </button>
-                  <button type="button" className="win-btn title-btn">
-                    ❐
-                  </button>
-                  <button type="button" className="win-btn title-btn" onClick={stop}>
-                    X
-                  </button>
-                </div>
-              </div>
-              <div className="vb6-run-surface">
-                <div className="vb6-designer-label">{runLabel}</div>
-                <button
-                  className="win-btn vb6-designer-btn"
-                  onClick={() => setRunLabel('hello world')}
-                >
-                  Command1
-                </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Properties panel */}
-        <div className="vb6-panel vb6-props-panel">
-          <div className="vb6-panel-title">Properties - Form1</div>
-          <div className="vb6-props-list">
-            <div className="vb6-props-row">
-              <span className="vb6-props-name">(Name)</span>
-              <span className="vb6-props-value">Form1</span>
-            </div>
-            <div className="vb6-props-row">
-              <span className="vb6-props-name">Caption</span>
-              <span className="vb6-props-value">Form1</span>
-            </div>
-            <div className="vb6-props-row">
-              <span className="vb6-props-name">BackColor</span>
-              <span className="vb6-props-value">&amp;H8000000F&amp;</span>
+          {/* Properties panel */}
+          <div className="vb6-panel vb6-props-panel">
+            <div className="vb6-panel-title">Properties - Form1</div>
+            <div className="vb6-props-list">
+              <div className="vb6-props-row">
+                <span className="vb6-props-name">(Name)</span>
+                <span className="vb6-props-value">Form1</span>
+              </div>
+              <div className="vb6-props-row">
+                <span className="vb6-props-name">Caption</span>
+                <span className="vb6-props-value">Form1</span>
+              </div>
+              <div className="vb6-props-row">
+                <span className="vb6-props-name">BackColor</span>
+                <span className="vb6-props-value">&amp;H8000000F&amp;</span>
+              </div>
             </div>
           </div>
         </div>

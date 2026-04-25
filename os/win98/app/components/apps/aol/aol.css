@@ -10,6 +10,20 @@
   flex-direction: column;
 }
 
+@media (max-width: 600px) {
+  .aol-signon-dialog {
+    width: 95vw !important;
+    left: 2.5vw !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+  .aol-channels-window {
+    width: 95vw !important;
+    left: 2.5vw !important;
+    top: 10px !important;
+  }
+}
+
 /* Title bar icon (top left) */
 #aol-window .aol-title-icon {
   width: 16px;

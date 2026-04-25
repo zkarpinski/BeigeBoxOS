@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
 import { OsShellProvider } from '@retro-web/core/context';
 import { AppWindow, TitleBar, MenuBar } from '../winxp';
@@ -42,6 +42,8 @@ function DesktopDestroyerContainer() {
   return <DesktopDestroyer skin="winxp" />;
 }
 
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+
 export function Desktop({ openAppId }: DesktopProps) {
   const urlAppId = useMemo(() => {
     if (typeof window === 'undefined') return null;
@@ -56,6 +58,22 @@ export function Desktop({ openAppId }: DesktopProps) {
 
   const resolvedOpenAppId = (openAppId && openAppId.trim()) || urlAppId || null;
   const skipBoot = typeof resolvedOpenAppId === 'string' && resolvedOpenAppId.length > 0;
+
+  // Computed synchronously: restore persisted window state only when the boot screen
+  // would also be skipped (recent visit, no shutdown). Mirrors boot-check.js logic.
+  const [restoreState] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (skipBoot) return true;
+    try {
+      if (localStorage.getItem('winxp-shutdown')) return false;
+      const booted = localStorage.getItem('winxp-booted');
+      if (!booted) return false;
+      const ts = parseInt(booted, 10);
+      return !isNaN(ts) && Date.now() - ts < TWO_DAYS_MS;
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     initFileSystem(appRegistry);
@@ -191,6 +209,8 @@ export function Desktop({ openAppId }: DesktopProps) {
       registry={appRegistry}
       initialOpenAppId={resolvedOpenAppId}
       boundsStorageKey="winxp-window-bounds"
+      stateStorageKey="winxp-window-state"
+      restoreState={restoreState}
     >
       <WindowsXPGlobalShim registry={appRegistry} />
       <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>

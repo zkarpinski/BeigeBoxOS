@@ -6,8 +6,17 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { WinampWindow, winampAppConfig } from './WinampWindow';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { WinampWindow, winampAppConfig } from '../app/components/apps/winamp/WinampWindow';
+import { WindowManagerProvider, OsShellProvider } from '@retro-web/core/context';
+import { TitleBar } from '../app/components/winxp/TitleBar';
+import { AppWindow } from '../app/components/winxp/AppWindow';
+
+// Mock OsShellProvider to use WinXP components
+const mockOsShell = {
+  AppWindow,
+  TitleBar,
+  MenuBar: () => <div data-testid="mock-menubar" />,
+};
 
 // jsdom doesn't implement HTMLMediaElement or canvas 2d context — stub them out
 beforeAll(() => {
@@ -35,9 +44,11 @@ afterEach(() => {
 function renderWinamp() {
   const config = { ...winampAppConfig, openByDefault: true };
   return render(
-    <WindowManagerProvider registry={[config]}>
-      <WinampWindow />
-    </WindowManagerProvider>,
+    <OsShellProvider value={mockOsShell}>
+      <WindowManagerProvider registry={[config]} initialOpenAppId="winamp">
+        <WinampWindow />
+      </WindowManagerProvider>
+    </OsShellProvider>,
   );
 }
 

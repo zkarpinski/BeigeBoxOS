@@ -29,12 +29,10 @@ const PROGRAM_FILES_BASE = 'C:\\Program Files';
 /** Extension → app id for opening files. */
 export const EXTENSION_TO_APP: Record<string, string> = {
   txt: 'notepad',
-  doc: 'word',
 };
 
 const DEFAULT_ICON_BY_EXT: Record<string, string> = {
   txt: 'shell/icons/notepad_file.png',
-  doc: 'apps/word/word-icon.png',
 };
 
 export type FolderNode = { type: 'folder'; children: string[] };
@@ -44,7 +42,7 @@ export type FsNode = FolderNode | FileNode | AppNode;
 
 export type FsTree = Record<string, FsNode>;
 
-function normalizePath(p: string): string {
+export function normalizePath(p: string): string {
   const s = p.replace(/\//g, '\\').trim();
   if (!s) return s;
   const parts = s.split('\\').filter(Boolean);
@@ -57,7 +55,7 @@ function normalizePath(p: string): string {
   return parts.join('\\');
 }
 
-function joinPath(parent: string, name: string): string {
+export function joinPath(parent: string, name: string): string {
   const p = normalizePath(parent);
   if (!p) return name;
   return p + '\\' + name;
@@ -285,12 +283,6 @@ export function openFileByPath(path: string, showApp: (appId: string) => void): 
         sessionStorage.setItem(
           NOTEPAD_PENDING_KEY,
           JSON.stringify({ filename: name, content: node.content ?? '', path: path }),
-        );
-        break;
-      case 'word':
-        sessionStorage.setItem(
-          WORD_PENDING_KEY,
-          JSON.stringify({ documentKey: node.contentKey ?? 'resume' }),
         );
         break;
       default:

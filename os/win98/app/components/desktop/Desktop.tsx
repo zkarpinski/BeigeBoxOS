@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { WordWindow } from '../apps/word';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
 import { OsShellProvider } from '@retro-web/core/context';
@@ -58,6 +58,21 @@ export function Desktop({ openAppId }: DesktopProps) {
 
   const resolvedOpenAppId = (openAppId && openAppId.trim()) || urlAppId || null;
   const skipBoot = typeof resolvedOpenAppId === 'string' && resolvedOpenAppId.length > 0;
+
+  // Mirrors the Win98 boot-skip logic (30-day threshold, word97-booted key).
+  const [restoreState] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (skipBoot) return true;
+    try {
+      const booted = localStorage.getItem('word97-booted');
+      if (!booted) return false;
+      const ts = parseInt(booted, 10);
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+      return !isNaN(ts) && Date.now() - ts < THIRTY_DAYS_MS;
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     initFileSystem(appRegistry);
@@ -183,6 +198,8 @@ export function Desktop({ openAppId }: DesktopProps) {
       registry={appRegistry}
       initialOpenAppId={resolvedOpenAppId}
       boundsStorageKey="win98-window-bounds"
+      stateStorageKey="win98-window-state"
+      restoreState={restoreState}
     >
       <Windows98GlobalShim registry={appRegistry} />
       <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>

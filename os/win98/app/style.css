@@ -115,6 +115,19 @@ html {
   max-width: 100vw;
 }
 
+/* Mobile: all app windows go full-screen on small viewports.
+ * App-specific CSS only needs to override things beyond this base (e.g. dialogs, panels). */
+@media (max-width: 600px) {
+  .app-window:not(.maximized) {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100dvh - 28px) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+}
+
 /* Shell: hide app window/taskbar button when closed */
 .app-window-hidden {
   display: none !important;

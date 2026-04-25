@@ -370,6 +370,39 @@ html {
   );
 }
 
+/* ── Inactive window — Luna steel-blue gradient (matches real XP) ─────────── */
+.app-window-inactive .winxp-title-bar {
+  background: linear-gradient(
+    to bottom,
+    #c8d8f0 0%,
+    #a8c0e0 12%,
+    #90aecc 40%,
+    #7898b8 80%,
+    #6080a8 100%
+  );
+  box-shadow: none;
+  border-bottom-color: #6080a8;
+}
+
+.app-window-inactive .winxp-title-bar .title-text {
+  color: #d8e8f8;
+}
+
+.app-window-inactive .winxp-title-bar .xp-btn-min,
+.app-window-inactive .winxp-title-bar .xp-btn-max {
+  background: linear-gradient(to bottom, #c0d0e8 0%, #9ab0cc 50%, #7898b4 100%);
+  border-color: #6080a0;
+}
+
+.app-window-inactive .winxp-title-bar .xp-btn-close {
+  background: linear-gradient(to bottom, #e0b0bc 0%, #c48898 50%, #a87088 100%);
+  border-color: #886070;
+}
+
+.app-window-inactive {
+  border-color: #7898b8;
+}
+
 /* Minimize animation */
 .win-minimizing {
   transform: scale(0.8);

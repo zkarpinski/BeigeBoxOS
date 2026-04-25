@@ -379,8 +379,14 @@ export function AppWindow({
   // ── Initial render ────────────────────────────────────────────────────────
   const show = (appState?.visible ?? false) && !(appState?.minimized ?? false);
   const zIndex = appState?.zIndex ?? 10;
+  const maxZIndex = Object.values(apps)
+    .filter((a) => a?.visible && !a?.minimized)
+    .reduce((max, a) => Math.max(max, a?.zIndex ?? 0), 0);
+  const isActive = zIndex >= maxZIndex;
   const baseClass = className
     .replace(/\bapp-window-hidden\b/g, '')
+    .replace(/\bapp-window-active\b/g, '')
+    .replace(/\bapp-window-inactive\b/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim();
 
@@ -388,7 +394,7 @@ export function AppWindow({
     <div
       ref={windowRef}
       id={id}
-      className={`${baseClass}${show ? '' : ' app-window-hidden'}`}
+      className={`${baseClass}${show ? '' : ' app-window-hidden'} ${isActive ? 'app-window-active' : 'app-window-inactive'}`}
       style={{ display: show ? 'flex' : 'none', zIndex }}
     >
       {titleBar}

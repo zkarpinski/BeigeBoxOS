@@ -12,10 +12,9 @@ export function StartButton({ active, onClick }: { active: boolean; onClick: () 
     >
       <img
         src="shell/icons/start-button.png"
-        alt=""
-        style={{ height: 18, display: 'block', imageRendering: 'pixelated' }}
+        alt="start"
+        style={{ height: 22, display: 'block', imageRendering: 'pixelated' }}
       />
-      <span>start</span>
     </button>
   );
 }

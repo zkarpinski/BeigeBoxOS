@@ -24,7 +24,7 @@ export function ShutdownOverlay({ open, onClose }: { open: boolean; onClose: () 
     <div id="shutdown-overlay" className="shutdown-overlay" onClick={handleReturn}>
       <div className="shutdown-screen">
         <p className="shutdown-message">It is now safe to turn off your computer.</p>
-        <p className="shutdown-hint">Click any where to return</p>
+        <p className="shutdown-hint">Click anywhere to return</p>
       </div>
     </div>
   );

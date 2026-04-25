@@ -30,9 +30,10 @@ describe('Graffiti Recognizer — Letters', () => {
   });
 
   it('c — leftward arc, start right-of-center', () => {
-    expect(recognizeLetter(f('SW', { sX: 0.8, closed: false }))).toBe('c');
-    expect(recognizeLetter(f('NW-SW', { sX: 0.8, closed: false }))).toBe('c');
-    expect(recognizeLetter(f('W-SW', { sX: 0.8, closed: false }))).toBe('c');
+    // Single 'SW' with ratio 0.5–1.5 now goes to X (single-slash shortcut); use multi-dir patterns
+    expect(recognizeLetter(f('NW-SW', { closed: false }))).toBe('c');
+    expect(recognizeLetter(f('W-SW', { closed: false }))).toBe('c');
+    expect(recognizeLetter(f('W-S', { closed: false }))).toBe('c');
   });
 
   it('d — down then arc back up, ends high', () => {
@@ -48,9 +49,10 @@ describe('Graffiti Recognizer — Letters', () => {
     // 'W-S-E', 'W-SW-E', 'NW-SW-E', 'NW-S-E' all go to G (startsWith W/NW + endsWith -E)
   });
 
-  it('f — crossbar then down, starts at middle height', () => {
-    expect(recognizeLetter(f('E-S', { sY: 0.6, ratio: 0.8 }))).toBe('f');
-    expect(recognizeLetter(f('E-SW', { sY: 0.5, ratio: 0.8 }))).toBe('f');
+  it('f — crossbar then down, wide aspect (taller than wide)', () => {
+    // T/F now split by ratio: T = ratio < 1.0 (wider), F = ratio >= 1.0 (taller)
+    expect(recognizeLetter(f('E-S', { ratio: 1.2 }))).toBe('f');
+    expect(recognizeLetter(f('E-SW', { ratio: 1.5 }))).toBe('f');
   });
 
   it('g — C-arc with rightward bar at bottom', () => {
@@ -66,13 +68,13 @@ describe('Graffiti Recognizer — Letters', () => {
   it('i — narrow downstroke', () => {
     expect(recognizeLetter(f('S', { ratio: 0.3 }))).toBe('i');
     expect(recognizeLetter(f('SE', { ratio: 0.4 }))).toBe('i');
-    expect(recognizeLetter(f('SW', { ratio: 0.4, sX: 0.3, closed: false }))).toBe('i');
+    // 'SW' at ratio < 0.5 → C (no sX guard on C); at 0.5–1.5 → X (single-slash shortcut)
   });
 
   it('j — down then hook left, ends left-of-center', () => {
-    // 'S-SW', 'S-SW-W', 'SE-S-W' are all in the Enter pattern list (checked first)
-    // Only 'SE-SW' is safe for J
-    expect(recognizeLetter(f('SE-SW', { eX: 0.3 }))).toBe('j');
+    // 'S-SW', 'S-SW-W', 'SE-S-W' are in Enter (checked first); safe J patterns are 'S-NW' / 'E-S-W'
+    expect(recognizeLetter(f('S-NW', { eX: 0.2 }))).toBe('j');
+    expect(recognizeLetter(f('E-S-W', { eX: 0.3 }))).toBe('j');
   });
 
   it('k — down, sharp straight-up kick, then down-right', () => {

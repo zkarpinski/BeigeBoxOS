@@ -30,12 +30,6 @@ function getSupabase(env) {
 }
 
 // --- Game token verification (Web Crypto, no Node) ---
-function b64UrlEncode(bytes) {
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 function b64UrlDecode(str) {
   str = str.replace(/-/g, '+').replace(/_/g, '/');
   const pad = str.length % 4;
@@ -44,22 +38,6 @@ function b64UrlDecode(str) {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;
-}
-
-async function hmacSha256(secretKey, data) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secretKey),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const sig = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    typeof data === 'string' ? new TextEncoder().encode(data) : data,
-  );
-  return new Uint8Array(sig);
 }
 
 function verifyGameToken(secret, token) {
@@ -89,15 +67,20 @@ function verifyGameToken(secret, token) {
 }
 
 async function verifyGameTokenSignature(secret, payloadB64, sigB64) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify'],
-  );
-  const actualSig = b64UrlDecode(sigB64);
-  return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  try {
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+    const actualSig = b64UrlDecode(sigB64);
+    return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  } catch (e) {
+    console.error('Signature verification error', e);
+    return false;
+  }
 }
 
 const CONFIG_HINT =

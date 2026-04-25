@@ -146,14 +146,14 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
           const nextX = (ant.x + Math.cos(newAngle) * 2 + animCanvas.width) % animCanvas.width;
           const nextY = (ant.y + Math.sin(newAngle) * 2 + animCanvas.height) % animCanvas.height;
 
+          // Render ant on animation canvas
           ctx.fillStyle = '#000';
           ctx.fillRect(nextX, nextY, 2, 2);
 
+          // Ant "eats" the screen - draw permanent black on damage canvas
           if (damageCtx) {
-            if (Math.random() > 0.7) {
-              damageCtx.fillStyle = '#000';
-              damageCtx.fillRect(nextX - 1, nextY - 1, 3, 3);
-            }
+            damageCtx.fillStyle = '#000';
+            damageCtx.fillRect(nextX, nextY, 2, 2);
           }
           return { x: nextX, y: nextY, angle: newAngle };
         });
@@ -162,7 +162,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         particlesRef.current = particlesRef.current.filter((p) => {
           p.x += p.vx;
           p.y += p.vy;
-          p.life -= 0.02;
+          p.life -= 0.03; // Faster dissipation
 
           if (p.life > 0) {
             const alpha = p.life;
@@ -171,11 +171,11 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
             ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
             ctx.fill();
 
-            // Burn the screen
-            if (damageCtx && p.life > 0.4) {
-              damageCtx.fillStyle = `rgba(0, 0, 0, ${0.1 * p.life})`;
+            // Burn the screen - persistent soot
+            if (damageCtx && p.life > 0.6) {
+              damageCtx.fillStyle = `rgba(0, 0, 0, ${0.05 * p.life})`;
               damageCtx.beginPath();
-              damageCtx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
+              damageCtx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
               damageCtx.fill();
             }
             return true;
@@ -219,31 +219,33 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
     const ctx = canvas?.getContext('2d');
     if (!ctx) return;
 
+    // Check if we hit an ant with ANY tool (except pointer/repair/ants spawn)
+    const HIT_RADIUS = 20;
+    const hitAnts = antsRef.current.filter((ant) => {
+      const dist = Math.sqrt((ant.x - x) ** 2 + (ant.y - y) ** 2);
+      return dist < HIT_RADIUS;
+    });
+
+    if (hitAnts.length > 0 && activeTool !== 'ants' && activeTool !== 'repair') {
+      hitAnts.forEach((ant) => drawBlood(ctx, ant.x, ant.y));
+      antsRef.current = antsRef.current.filter((ant) => !hitAnts.includes(ant));
+      if (activeTool === 'hammer') playSound('hammer');
+    }
+
     if (activeTool === 'hammer') {
       drawCracks(ctx, x, y);
-      playSound('hammer');
-
-      const HIT_RADIUS = 25;
-      const hitAnts = antsRef.current.filter((ant) => {
-        const dist = Math.sqrt((ant.x - x) ** 2 + (ant.y - y) ** 2);
-        return dist < HIT_RADIUS;
-      });
-
-      if (hitAnts.length > 0) {
-        hitAnts.forEach((ant) => drawBlood(ctx, ant.x, ant.y));
-        antsRef.current = antsRef.current.filter((ant) => !hitAnts.includes(ant));
-      }
+      if (hitAnts.length === 0) playSound('hammer');
     } else if (activeTool === 'flamethrower') {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         particlesRef.current.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * 4,
-          vy: (Math.random() - 0.5) * 4 - 2,
+          vx: (Math.random() - 0.5) * 5,
+          vy: (Math.random() - 0.5) * 5 - 2,
           life: 1.0,
-          size: Math.random() * 15 + 5,
+          size: Math.random() * 20 + 8,
           r: 255,
-          g: Math.floor(Math.random() * 150),
+          g: Math.floor(Math.random() * 180),
           b: 0,
         });
       }
@@ -253,10 +255,10 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
     } else if (activeTool === 'repair') {
       ctx.clearRect(x - 25, y - 25, 50, 50);
     } else if (activeTool === 'ants') {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 8; i++) {
         antsRef.current.push({
-          x: x + (Math.random() - 0.5) * 20,
-          y: y + (Math.random() - 0.5) * 20,
+          x: x + (Math.random() - 0.5) * 25,
+          y: y + (Math.random() - 0.5) * 25,
           angle: Math.random() * Math.PI * 2,
         });
       }
@@ -268,17 +270,22 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     const ctx = audioContextRef.current;
+    if (ctx.state === 'suspended') ctx.resume();
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'brown' as any; // Brown noise is better for fire
-    if ((osc.type as any) === 'brown') {
-      // Just use noise
-    } else {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(40, ctx.currentTime);
-    }
-    gain.gain.setValueAtTime(0.05, ctx.currentTime);
-    osc.connect(gain);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(45, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.5);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(400, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
     fireSoundRef.current = { osc, gain };
@@ -286,67 +293,66 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
 
   const stopFireSound = () => {
     if (fireSoundRef.current) {
-      fireSoundRef.current.osc.stop();
+      const { osc, gain } = fireSoundRef.current;
+      const now = audioContextRef.current?.currentTime || 0;
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      setTimeout(() => {
+        try {
+          osc.stop();
+        } catch {}
+      }, 150);
       fireSoundRef.current = null;
     }
   };
 
   const drawCracks = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
     ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       ctx.beginPath();
       ctx.moveTo(x, y);
       let curX = x;
       let curY = y;
-      for (let j = 0; j < 10; j++) {
-        curX += (Math.random() - 0.5) * 20;
-        curY += (Math.random() - 0.5) * 20;
+      for (let j = 0; j < 12; j++) {
+        curX += (Math.random() - 0.5) * 25;
+        curY += (Math.random() - 0.5) * 25;
         ctx.lineTo(curX, curY);
       }
       ctx.stroke();
     }
   };
 
-  const drawFire = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 30);
-    gradient.addColorStop(0, 'rgba(255, 100, 0, 0.8)');
-    gradient.addColorStop(0.5, 'rgba(255, 50, 0, 0.4)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, 30, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Add some "soot"
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath();
-    ctx.arc(x, y, 15, 0, Math.PI * 2);
-    ctx.fill();
-  };
-
   const drawPaint = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
     ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
     ctx.beginPath();
-    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.arc(x, y, 12, 0, Math.PI * 2);
     ctx.fill();
   };
 
   const drawBlood = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    ctx.fillStyle = 'rgba(180, 0, 0, 0.9)';
-    for (let i = 0; i < 8; i++) {
-      const rx = x + (Math.random() - 0.5) * 12;
-      const ry = y + (Math.random() - 0.5) * 12;
-      const size = Math.random() * 2.5 + 0.5;
+    ctx.fillStyle = 'rgba(200, 0, 0, 0.95)';
+    // Small splatters
+    for (let i = 0; i < 12; i++) {
+      const rx = x + (Math.random() - 0.5) * 15;
+      const ry = y + (Math.random() - 0.5) * 15;
+      const size = Math.random() * 3 + 0.5;
       ctx.beginPath();
       ctx.arc(rx, ry, size, 0, Math.PI * 2);
       ctx.fill();
     }
-    // Center splatter
+    // Main splatter
     ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
+
+    // Drip
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + 10 + Math.random() * 10);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(200, 0, 0, 0.9)';
+    ctx.stroke();
   };
 
   const handleClear = () => {
@@ -356,6 +362,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
       ctx.clearRect(0, 0, canvas!.width, canvas!.height);
     }
     antsRef.current = [];
+    particlesRef.current = [];
     playSound('clear');
   };
 

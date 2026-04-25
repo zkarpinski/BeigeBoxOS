@@ -17,6 +17,12 @@
   color: #000;
 }
 
+@media (max-width: 600px) {
+  .avg-left-panel {
+    display: none; /* Hide left panel on mobile to focus on scan buttons */
+  }
+}
+
 /* ── Menu Bar Override ── */
 .avg-window .menu-bar {
   background: #c0c0c0;

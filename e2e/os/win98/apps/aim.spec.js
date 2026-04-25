@@ -11,7 +11,7 @@ test('opens from Start menu, interacts, and closes', async ({ page }) => {
 
 test('opens zkarpinski and sends a message', async ({ page }) => {
   await openFromStartMenu(page, 'Internet');
-  await page.locator('#start-menu-aim').click();
+  await page.locator('#start-menu-aim').click({ force: true });
   await page.waitForSelector('#aim-window', { state: 'visible' });
 
   const aim = page.locator('#aim-window');

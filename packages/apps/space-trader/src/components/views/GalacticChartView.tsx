@@ -147,6 +147,7 @@ export const GalacticChartView: React.FC<GalacticChartViewProps> = ({ onViewChan
                 <g
                   key={idx}
                   className="map-dot"
+                  data-in-range={inRange}
                   onClick={() => handleMapClick(idx)}
                   style={{ cursor: 'pointer' }}
                 >

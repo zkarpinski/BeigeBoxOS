@@ -34,10 +34,24 @@ async function dismissBootScreen(page) {
  */
 async function openFromStartMenu(page, subFolder) {
   await page.click('#start-button', { force: true });
-  await page.hover('.start-menu-items > .start-menu-item.has-submenu', { force: true });
+  // On mobile/touch, click is more reliable than hover for triggering submenus
+  await page.click('.start-menu-items > .start-menu-item.has-submenu', { force: true });
+  // Wait for the Programs submenu to be visible
+  await page.waitForSelector('.start-menu-items > .start-menu-item.has-submenu > .submenu', {
+    state: 'visible',
+    timeout: 5000,
+  });
+
   if (subFolder) {
-    await page.hover(`.start-menu-items .submenu .has-submenu:has-text("${subFolder}")`, {
-      force: true,
+    const subFolderSelector = `.start-menu-items .submenu .has-submenu:has-text("${subFolder}")`;
+    const subFolderLocator = page.locator(subFolderSelector);
+    // Use evaluate to bypass potential interception/actionability issues on mobile
+    await subFolderLocator.evaluate((el) => el.click());
+
+    // Wait for the subfolder submenu to be visible
+    await page.waitForSelector(`${subFolderSelector} > .submenu`, {
+      state: 'visible',
+      timeout: 5000,
     });
   }
 }

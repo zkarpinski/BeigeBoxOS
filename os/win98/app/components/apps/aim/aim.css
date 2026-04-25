@@ -661,3 +661,24 @@
 .aim-buddy-item.flash {
   animation: aim-flash 0.3s ease 3;
 }
+
+/* ── Mobile Overrides ── */
+@media (max-width: 600px) {
+  .aim-window {
+    border: none; /* global .app-window rule handles sizing */
+  }
+  .aim-chat-window {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100dvh - 30px) !important;
+    border: none !important;
+  }
+  .aim-away-dialog {
+    width: 90vw !important;
+  }
+  .aim-profile-dialog {
+    left: 5vw !important;
+    width: 90vw !important;
+  }
+}

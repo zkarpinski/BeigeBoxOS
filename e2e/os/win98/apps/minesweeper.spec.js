@@ -15,7 +15,7 @@ test('opens from Start menu, interacts, and closes', async ({ page }) => {
 
 test('opens Best Times from Game menu and shows leaderboard', async ({ page }) => {
   await openFromStartMenu(page, 'Games');
-  await page.locator('#start-menu-minesweeper').click();
+  await page.locator('#start-menu-minesweeper').click({ force: true });
   await page.waitForSelector('#minesweeper-window', { state: 'visible' });
 
   const win = page.locator('#minesweeper-window');

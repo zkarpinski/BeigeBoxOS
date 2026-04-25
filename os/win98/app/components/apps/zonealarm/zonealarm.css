@@ -15,6 +15,23 @@
   box-shadow: 1px 1px 0 var(--win-black);
 }
 
+@media (max-width: 600px) {
+  .za-nav {
+    width: 60px; /* Slimmer nav on mobile */
+  }
+  .za-nav-btn {
+    font-size: 8px;
+    padding: 6px 2px;
+  }
+  .za-header {
+    padding: 2px 4px;
+    min-height: 44px;
+  }
+  .za-traffic {
+    display: none; /* Hide traffic bars on mobile to save space */
+  }
+}
+
 /* ── Header banner ── */
 .za-header {
   background: linear-gradient(to bottom, #f8cb00 0%, #e8a800 100%);

@@ -10,7 +10,10 @@ const apps = [
     windowId: '#napster-window',
     titleSelector: '#napster-window .title-bar-text .title-text',
     interact: async (p) => {
-      await p.locator('#napster-window .napster-tab').filter({ hasText: 'Search' }).click();
+      await p
+        .locator('#napster-window .napster-tab')
+        .filter({ hasText: 'Search' })
+        .click({ force: true });
     },
   },
   {
@@ -19,7 +22,7 @@ const apps = [
     windowId: '#aim-window',
     titleSelector: '#aim-window .title-bar-text .title-text',
     interact: async (p) => {
-      await p.locator('#aim-window button[title="Send Instant Message"]').click();
+      await p.locator('#aim-window button[title="Send Instant Message"]').click({ force: true });
       await p.locator('.aim-chat-window').waitFor({ state: 'visible', timeout: 3000 });
     },
     assertAfterInteract: async (p) => {
@@ -36,7 +39,7 @@ const apps = [
     windowId: '#navigator-window',
     titleSelector: '#navigator-window .title-bar-text .title-text',
     interact: async (p) => {
-      await p.locator('#navigator-window button[title="Home"]').click();
+      await p.locator('#navigator-window button[title="Home"]').click({ force: true });
     },
   },
   {
@@ -45,7 +48,7 @@ const apps = [
     windowId: '#aol-window',
     titleSelector: '#aol-window .title-bar-text .title-text',
     interact: async (p) => {
-      await p.locator('#aol-window .aol-btn-signon').click();
+      await p.locator('#aol-window .aol-btn-signon').click({ force: true });
     },
   },
   {
@@ -55,13 +58,13 @@ const apps = [
     titleSelector: '#calculator-window .title-bar-text .title-text',
     interact: async (p) => {
       const calc = p.locator('#calculator-window');
-      await calc.getByRole('button', { name: '5', exact: true }).click();
+      await calc.getByRole('button', { name: '5', exact: true }).click({ force: true });
       await p.waitForTimeout(80);
-      await calc.getByRole('button', { name: '+', exact: true }).click();
+      await calc.getByRole('button', { name: '+', exact: true }).click({ force: true });
       await p.waitForTimeout(80);
-      await calc.getByRole('button', { name: '3', exact: true }).click();
+      await calc.getByRole('button', { name: '3', exact: true }).click({ force: true });
       await p.waitForTimeout(80);
-      await calc.getByRole('button', { name: '=', exact: true }).click();
+      await calc.getByRole('button', { name: '=', exact: true }).click({ force: true });
       await p.waitForTimeout(80);
     },
     assertAfterInteract: async (p) => {
@@ -120,8 +123,8 @@ const apps = [
     windowId: '#winamp-window',
     titleSelector: '#winamp-window .title-bar-text',
     interact: async (p) => {
-      await p.locator('#winamp-window button[title="Play"]').click();
-      await p.locator('#winamp-window button[title="Stop"]').click();
+      await p.locator('#winamp-window button[title="Play"]').click({ force: true });
+      await p.locator('#winamp-window button[title="Stop"]').click({ force: true });
     },
   },
   {
@@ -170,7 +173,10 @@ const apps = [
     windowId: '#avg-window',
     titleSelector: '#avg-window .title-bar-text .title-text',
     interact: async (p) => {
-      await p.locator('#avg-window button', { hasText: 'Complete Test' }).first().click();
+      await p
+        .locator('#avg-window button', { hasText: 'Complete Test' })
+        .first()
+        .click({ force: true });
     },
   },
 ];

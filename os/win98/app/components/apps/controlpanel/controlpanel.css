@@ -207,6 +207,7 @@
   position: fixed;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
   width: 420px;
   background: var(--win-bg);
   border-top: 2px solid var(--win-white);
@@ -221,6 +222,14 @@
   flex-direction: column;
   font-family: 'Microsoft Sans Serif', Arial, sans-serif;
   font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  #display-properties-dialog {
+    width: 95vw !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
 }
 #display-properties-dialog[hidden] {
   display: none;

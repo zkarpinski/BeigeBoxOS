@@ -21,6 +21,7 @@ export const GameModal: React.FC<GameModalProps> = ({
 
   return (
     <div
+      className="palm-modal-overlay"
       style={{
         position: 'absolute',
         top: 0,

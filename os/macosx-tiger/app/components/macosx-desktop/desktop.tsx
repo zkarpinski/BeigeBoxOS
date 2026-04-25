@@ -46,6 +46,7 @@ export function MacDesktop() {
       registry={appRegistry}
       initialOpenAppId={urlAppId}
       boundsStorageKey="macosx-tiger-window-bounds"
+      stateStorageKey="macosx-tiger-window-state"
       applyOpenByDefault={false}
     >
       <MacGlobalShim registry={appRegistry} />

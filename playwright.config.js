@@ -37,14 +37,22 @@ module.exports = defineConfig({
       testMatch: ['**/os/palmos/**/*.spec.js'],
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: process.env.PALMOS_URL || 'http://localhost:3000',
+        baseURL: process.env.PALMOS_URL || 'http://localhost:3001',
       },
     },
   ],
-  webServer: {
-    command: 'pnpm dev:win98',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  webServer: [
+    {
+      command: 'pnpm dev:win98',
+      url: 'http://localhost:3000',
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+    {
+      command: 'PORT=3001 pnpm dev:palmos',
+      url: 'http://localhost:3001',
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+  ],
 });

@@ -57,6 +57,7 @@ export function KarpDesktop() {
       registry={appRegistry}
       initialOpenAppId={urlAppId}
       boundsStorageKey="karpos-window-bounds"
+      stateStorageKey="karpos-window-state"
       applyOpenByDefault={false}
     >
       <ToastProvider>

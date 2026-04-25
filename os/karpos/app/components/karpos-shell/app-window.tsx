@@ -135,7 +135,7 @@ export function AppWindow({
 
   const show = (appState?.visible ?? false) && !(appState?.minimized ?? false);
   const zIndex = appState?.zIndex ?? 10;
-  const baseClass = className
+  const baseClass = (className || '')
     .replace(/\bapp-window-hidden\b/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim();

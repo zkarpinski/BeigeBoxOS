@@ -5,14 +5,18 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CalculatorWindow, calculatorAppConfig } from './CalculatorWindow';
-import { WindowManagerProvider } from '@retro-web/core/context';
+import { CalculatorWindow, calculatorAppConfig } from '../app/components/apps/calculator';
+import { WindowManagerProvider, OsShellProvider } from '@retro-web/core/context';
+import { AppWindow, TitleBar, MenuBar } from '../app/components/winxp';
+import { writeFile } from '../app/fileSystem';
 
 function renderCalculator() {
   const config = { ...calculatorAppConfig, openByDefault: true };
   return render(
     <WindowManagerProvider registry={[config]}>
-      <CalculatorWindow />
+      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+        <CalculatorWindow />
+      </OsShellProvider>
     </WindowManagerProvider>,
   );
 }

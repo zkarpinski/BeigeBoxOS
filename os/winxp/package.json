@@ -38,6 +38,9 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/test/__mocks__/styleMock.js"
+    },
     "testMatch": [
       "**/test/**/*.test.ts",
       "**/test/**/*.test.tsx"

@@ -44,7 +44,7 @@ export type FsNode = FolderNode | FileNode | AppNode;
 
 export type FsTree = Record<string, FsNode>;
 
-function normalizePath(p: string): string {
+export function normalizePath(p: string): string {
   const s = p.replace(/\//g, '\\').trim();
   if (!s) return s;
   const parts = s.split('\\').filter(Boolean);
@@ -57,7 +57,7 @@ function normalizePath(p: string): string {
   return parts.join('\\');
 }
 
-function joinPath(parent: string, name: string): string {
+export function joinPath(parent: string, name: string): string {
   const p = normalizePath(parent);
   if (!p) return name;
   return p + '\\' + name;

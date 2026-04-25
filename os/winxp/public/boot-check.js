@@ -88,10 +88,29 @@
       ].join('|'),
       'i',
     );
-    var isBot = BOT.test(navigator.userAgent);
-    var s = localStorage.getItem('word97-booted');
 
-    if (isBot || (s && Date.now() - parseInt(s, 10) < 2592000000)) {
+    var TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+    var isBot = BOT.test(navigator.userAgent);
+
+    // Suppress boot if: bot crawl, OR (recent visit AND no pending shutdown).
+    // Must match the logic in Desktop.tsx exactly.
+    var suppressBoot = false;
+    if (isBot) {
+      suppressBoot = true;
+    } else {
+      var shutdownFlag = localStorage.getItem('winxp-shutdown');
+      if (!shutdownFlag) {
+        var stored = localStorage.getItem('winxp-booted');
+        if (stored) {
+          var ts = parseInt(stored, 10);
+          if (!isNaN(ts) && Date.now() - ts < TWO_DAYS_MS) {
+            suppressBoot = true;
+          }
+        }
+      }
+    }
+
+    if (suppressBoot) {
       var css = '#boot-screen{display:none!important}';
       if (isBot) {
         css +=

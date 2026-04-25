@@ -13,12 +13,9 @@ export function ShutdownOverlay({ open, onClose }: { open: boolean; onClose: () 
 
   const handleReturn = () => {
     try {
-      localStorage.removeItem('word97-state');
+      localStorage.setItem('winxp-shutdown', '1');
     } catch (_) {}
-    try {
-      localStorage.removeItem('word97-booted');
-    } catch (_) {}
-    onClose();
+    window.location.href = 'https://zkarpinski.com';
   };
 
   if (!open) return null;
@@ -27,7 +24,7 @@ export function ShutdownOverlay({ open, onClose }: { open: boolean; onClose: () 
     <div id="shutdown-overlay" className="shutdown-overlay" onClick={handleReturn}>
       <div className="shutdown-screen">
         <p className="shutdown-message">It is now safe to turn off your computer.</p>
-        <p className="shutdown-hint">Click anywhere to return</p>
+        <p className="shutdown-hint">Click any where to return</p>
       </div>
     </div>
   );

@@ -152,6 +152,7 @@ export function PalmStatusBar({
       </div>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div
+          data-testid="battery-indicator"
           style={{
             position: 'relative',
             width: '28px',

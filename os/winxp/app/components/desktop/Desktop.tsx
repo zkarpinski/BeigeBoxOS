@@ -113,6 +113,8 @@ export function Desktop({ openAppId }: DesktopProps) {
 
     // Boot screen logic
     const BOOT_KEY = 'winxp-booted';
+    const SHUTDOWN_KEY = 'winxp-shutdown';
+    const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
     const bootScreen = document.getElementById('boot-screen');
     const sound = document.getElementById('boot-sound') as HTMLAudioElement | null;
     const prompt = document.getElementById('boot-click-prompt');
@@ -122,27 +124,37 @@ export function Desktop({ openAppId }: DesktopProps) {
     if (skipBoot) {
       try {
         localStorage.setItem(BOOT_KEY, String(Date.now()));
+        localStorage.removeItem(SHUTDOWN_KEY);
       } catch {
         /* ignore */
       }
     }
 
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    // Skip boot if: visited recently (< 2 days) AND no shutdown flag.
+    // Show boot if: first visit, stale visit (>= 2 days), or explicit shutdown.
+    let skipBootScreen = false;
     try {
-      const stored = localStorage.getItem(BOOT_KEY);
-      if (stored) {
-        const ts = parseInt(stored, 10);
-        if (!isNaN(ts) && Date.now() - ts < THIRTY_DAYS_MS) {
-          bootScreen.style.display = 'none';
-          (window as unknown as { _onDesktopReady: (instant: boolean) => void })._onDesktopReady(
-            true,
-          );
-          return;
+      const shutdownFlag = localStorage.getItem(SHUTDOWN_KEY);
+      if (shutdownFlag) {
+        // Explicit shutdown — show boot and clear the flag so next refresh is instant.
+        localStorage.removeItem(SHUTDOWN_KEY);
+      } else {
+        const stored = localStorage.getItem(BOOT_KEY);
+        if (stored) {
+          const ts = parseInt(stored, 10);
+          if (!isNaN(ts) && Date.now() - ts < TWO_DAYS_MS) {
+            skipBootScreen = true;
+          }
         }
-        localStorage.removeItem(BOOT_KEY);
       }
     } catch {
       /* ignore */
+    }
+
+    if (skipBootScreen) {
+      bootScreen.style.display = 'none';
+      (window as unknown as { _onDesktopReady: (instant: boolean) => void })._onDesktopReady(true);
+      return;
     }
 
     let dismissed = false;

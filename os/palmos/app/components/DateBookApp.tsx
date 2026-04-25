@@ -76,13 +76,13 @@ export function DateBookApp() {
           </div>
         </div>
         <div className="flex gap-1">
-          <button className="px-2 py-0\.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
+          <button className="px-2 py-0.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
             New
           </button>
-          <button className="px-2 py-0\.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
+          <button className="px-2 py-0.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
             Details
           </button>
-          <button className="px-2 py-0\.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
+          <button className="px-2 py-0.5 border border-black rounded-full text-[10px] font-bold bg-white active:bg-black active:text-white">
             Go To
           </button>
         </div>

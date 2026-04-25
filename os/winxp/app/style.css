@@ -18,7 +18,7 @@
   --title-font-size: 11px;
   --title-font-weight: bold;
   --title-color: #ffffff;
-  --title-bar-height: 30px;
+  --title-bar-height: 26px;
   --start-btn-bg: #3c8c3c;
   --start-btn-hover: #4cac4c;
 }
@@ -53,20 +53,20 @@ html {
 .title-bar.winxp-title-bar {
   /*
    * Authentic Luna Blue gradient — pixel-sampled from real XP at 96 DPI.
-   * The top 3–4 px are a brighter “rim”, then it drops into the rich cobalt
-   * body and darkens steadily toward the bottom edge.
+   * Key: very bright near-white rim at top 1-2px, then RAPID drop to cobalt
+   * blue body. This contrast creates the characteristic “plastic” XP look.
    */
   background: linear-gradient(
     to bottom,
-    #5a94d8 0%,
-    #4284d0 4%,
-    #2870cc 18%,
-    #1e64c8 40%,
-    #1858c0 65%,
-    #1248b4 85%,
-    #0c3ca8 100%
+    #b4d4f8 0%,
+    #68a8e8 4%,
+    #3888d8 10%,
+    #2070cc 25%,
+    #1c64c8 50%,
+    #1454bc 75%,
+    #0c44b0 100%
   );
-  border-radius: 6px 6px 0 0;
+  border-radius: 5px 5px 0 0;
   height: var(--title-bar-height);
   min-height: var(--title-bar-height);
   display: flex;
@@ -78,12 +78,12 @@ html {
   font-size: 11px;
   font-weight: bold;
   cursor: move;
-  /* Inner white rim along top + left edge (XP “plastic” look) */
+  /* Strong white rim at very top — creates the XP “glass” highlight */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 1px 0 0 rgba(255, 255, 255, 0.15);
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 1px 0 0 rgba(255, 255, 255, 0.25);
   border: none;
-  border-bottom: 1px solid #0a246a;
+  border-bottom: 1px solid #082060;
 }
 
 .title-bar.winxp-title-bar .title-bar-text {
@@ -164,12 +164,12 @@ html {
 
 /*
  * XP Luna window control buttons.
- * Min/Max: 22×21 px blue gel. Close: 24×21 px red gel (slightly wider in real XP).
- * Each has a top-highlight inner glow and a dark bottom shadow — the "gel pill" look.
+ * Min/Max: 22×18px blue gel. Close: 24×18px red gel (slightly wider in real XP).
+ * Each has a bright top inner-glow that creates the "gel pill" look.
  */
 .title-bar.winxp-title-bar .title-btn {
-  height: 21px;
-  min-height: 21px;
+  height: 18px;
+  min-height: 18px;
   padding: 0;
   margin: 0;
   cursor: default;
@@ -177,18 +177,18 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 3px;
+  border-radius: 2px;
   border: 1px solid transparent;
-  /* Top inner-glow highlight */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  /* Bright top highlight — the "gel pill" look */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .title-bar.winxp-title-bar .xp-btn-min,
 .title-bar.winxp-title-bar .xp-btn-max {
   width: 22px;
   min-width: 22px;
-  background: linear-gradient(to bottom, #78b4f4 0%, #4a96ec 20%, #2878e0 55%, #1460d0 100%);
-  border-color: #0a3aa0;
+  background: linear-gradient(to bottom, #80bcfc 0%, #4898f0 20%, #2878e4 55%, #1460d4 100%);
+  border-color: #083898;
   color: #ffffff;
 }
 
@@ -196,24 +196,24 @@ html {
   /* Close is ~2px wider than min/max in real XP */
   width: 24px;
   min-width: 24px;
-  background: linear-gradient(to bottom, #f48090 0%, #e84050 20%, #d41830 55%, #b00818 100%);
-  border-color: #880010;
+  background: linear-gradient(to bottom, #f88898 0%, #e84050 20%, #d01828 55%, #a80818 100%);
+  border-color: #780010;
   color: #ffffff;
 }
 
 .title-bar.winxp-title-bar .xp-btn-min:hover,
 .title-bar.winxp-title-bar .xp-btn-max:hover {
-  background: linear-gradient(to bottom, #90c8ff 0%, #60a8f8 20%, #3888f0 55%, #1c6ee0 100%);
+  background: linear-gradient(to bottom, #98ccff 0%, #60a8ff 20%, #3888f4 55%, #1c6ee4 100%);
 }
 
 .title-bar.winxp-title-bar .xp-btn-close:hover {
-  background: linear-gradient(to bottom, #ff9090 0%, #ff5060 20%, #e42840 55%, #c00820 100%);
+  background: linear-gradient(to bottom, #ff9898 0%, #ff5060 20%, #e42840 55%, #c01828 100%);
 }
 
 .title-bar.winxp-title-bar .xp-btn-min:active,
 .title-bar.winxp-title-bar .xp-btn-max:active,
 .title-bar.winxp-title-bar .xp-btn-close:active {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
 }
 
 /* Button icons ─────────────────────────────────────────────────────────────── */
@@ -224,7 +224,7 @@ html {
   width: 8px;
   height: 2px;
   background: #ffffff;
-  margin-top: 6px;
+  margin-top: 4px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -243,7 +243,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   line-height: 1;
   color: #ffffff;
@@ -255,12 +255,12 @@ html {
   display: flex;
   flex-direction: column;
   background-color: var(--win-bg);
-  /* 3px outer frame: dark navy on top/sides, matching Luna border color */
-  border: 3px solid #0a3898;
-  border-radius: 6px 6px 0 0;
+  /* 3px outer frame: dark navy, matching Luna border color */
+  border: 3px solid #0a2870;
+  border-radius: 5px 5px 0 0;
   box-shadow:
-    1px 1px 0 rgba(255, 255, 255, 0.15) inset,
-    3px 3px 10px rgba(0, 0, 0, 0.4);
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    4px 4px 14px rgba(0, 0, 0, 0.5);
   min-width: 200px;
   min-height: 100px;
 }
@@ -400,7 +400,7 @@ html {
 }
 
 .app-window-inactive {
-  border-color: #7898b8;
+  border-color: #6880a8;
 }
 
 /* Minimize animation */

@@ -6,7 +6,9 @@ import { DateBookApp } from './DateBookApp';
 describe('DateBookApp Component', () => {
   it('renders the date and day picker', () => {
     render(<DateBookApp />);
-    expect(screen.getByText('Sep 23, 04')).toBeInTheDocument();
+    // Initial date is today, but we can check if it renders some date label format
+    // formatPalmDate(new Date())
+    expect(screen.getByText(/^[A-Z][a-z]{2} \d{1,2}, \d{2}$/)).toBeInTheDocument();
     expect(screen.getAllByText('S')[0]).toBeInTheDocument();
   });
 
@@ -20,7 +22,6 @@ describe('DateBookApp Component', () => {
   it('renders the core footer buttons', () => {
     render(<DateBookApp />);
     expect(screen.getByRole('button', { name: 'New' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Go To' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Today' })).toBeInTheDocument();
   });
 });

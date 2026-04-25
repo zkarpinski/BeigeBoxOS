@@ -277,6 +277,17 @@ html {
   border-radius: 0;
 }
 
+@media (max-width: 600px) {
+  .app-window:not(.maximized) {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100dvh - 40px) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+}
+
 /* WinXP-style resize: thin edges + corners (like real OS), pointer hit layer above content */
 .win-resize-frame {
   position: absolute;

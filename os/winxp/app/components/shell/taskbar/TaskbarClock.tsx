@@ -11,13 +11,13 @@ function formatTime(date: Date): string {
 }
 
 export function TaskbarClock() {
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
-    setTime(formatTime(new Date()));
-    const id = setInterval(() => setTime(formatTime(new Date())), 10000);
+    setTime(new Date());
+    const id = setInterval(() => setTime(new Date()), 10000);
     return () => clearInterval(id);
   }, []);
 
-  return <span id="clock">{time}</span>;
+  return <span id="clock">{time ? formatTime(time) : '--:-- --'}</span>;
 }

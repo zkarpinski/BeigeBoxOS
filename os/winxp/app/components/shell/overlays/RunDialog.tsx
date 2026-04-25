@@ -64,7 +64,7 @@ export function RunDialog({ open, onClose }: { open: boolean; onClose: () => voi
     if (/^https?:\/\//i.test(raw) || /^www\./i.test(raw)) {
       onClose();
       const url = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
-      showApp('navigator');
+      showApp('ie6');
       window.dispatchEvent(new CustomEvent('winxp:navigate', { detail: { url } }));
       return;
     }

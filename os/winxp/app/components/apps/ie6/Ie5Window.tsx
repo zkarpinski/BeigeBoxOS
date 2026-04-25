@@ -135,6 +135,22 @@ export function Ie6Window() {
     };
   }, [ctx]);
 
+  // Handle navigate events from Run dialog
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const url = (e as CustomEvent<{ url: string }>).detail?.url;
+      if (!url) return;
+      ctx?.showApp('ie6');
+      setIframeSrcdoc(null);
+      setIframeSrc(url);
+      setUrlBarValue(url);
+      setStatusText(`Opening page ${url}...`);
+      hasLoadedRef.current = true;
+    };
+    window.addEventListener('winxp:navigate', handler);
+    return () => window.removeEventListener('winxp:navigate', handler);
+  }, [ctx]);
+
   // Close help menu on outside click
   useEffect(() => {
     if (!helpMenuOpen) return;

@@ -183,6 +183,7 @@ export function PalmStatusBar({
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {/* Fixed-width wrapper so the nub doesn't affect centering */}
         <div
+          data-testid="battery-indicator"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

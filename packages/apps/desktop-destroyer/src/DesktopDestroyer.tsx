@@ -24,7 +24,10 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
 
   // Ants state managed in a ref for performance
   const antsRef = useRef<Ant[]>([]);
+  const particlesRef = useRef<any[]>([]);
+  const isMouseDownRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const fireSoundRef = useRef<any>(null);
 
   const tools: Tool[] = ['pointer', 'hammer', 'ants', 'flamethrower', 'paint', 'repair'];
 
@@ -135,16 +138,49 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
     const update = () => {
       if (ctx && animCanvas) {
         ctx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+        const damageCtx = canvasRef.current?.getContext('2d');
 
+        // Update Ants
         antsRef.current = antsRef.current.map((ant) => {
           const newAngle = ant.angle + (Math.random() - 0.5) * 0.5;
           const nextX = (ant.x + Math.cos(newAngle) * 2 + animCanvas.width) % animCanvas.width;
           const nextY = (ant.y + Math.sin(newAngle) * 2 + animCanvas.height) % animCanvas.height;
 
-          ctx.fillStyle = 'black';
+          ctx.fillStyle = '#000';
           ctx.fillRect(nextX, nextY, 2, 2);
 
+          if (damageCtx) {
+            if (Math.random() > 0.7) {
+              damageCtx.fillStyle = '#000';
+              damageCtx.fillRect(nextX - 1, nextY - 1, 3, 3);
+            }
+          }
           return { x: nextX, y: nextY, angle: newAngle };
+        });
+
+        // Update Fire Particles
+        particlesRef.current = particlesRef.current.filter((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.02;
+
+          if (p.life > 0) {
+            const alpha = p.life;
+            ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Burn the screen
+            if (damageCtx && p.life > 0.4) {
+              damageCtx.fillStyle = `rgba(0, 0, 0, ${0.1 * p.life})`;
+              damageCtx.beginPath();
+              damageCtx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
+              damageCtx.fill();
+            }
+            return true;
+          }
+          return false;
         });
       }
       animationFrame = requestAnimationFrame(update);
@@ -155,28 +191,103 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    isMouseDownRef.current = true;
     if (activeTool === 'pointer') return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!ctx) return;
 
     const x = e.clientX;
     const y = e.clientY;
 
+    if (activeTool === 'flamethrower') {
+      startFireSound();
+    }
+
+    handleAction(x, y);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isMouseDownRef.current || activeTool === 'pointer') return;
+    handleAction(e.clientX, e.clientY);
+  };
+
+  const handleMouseUp = () => {
+    isMouseDownRef.current = false;
+    stopFireSound();
+  };
+
+  const handleAction = (x: number, y: number) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx) return;
+
     if (activeTool === 'hammer') {
       drawCracks(ctx, x, y);
       playSound('hammer');
+
+      const HIT_RADIUS = 25;
+      const hitAnts = antsRef.current.filter((ant) => {
+        const dist = Math.sqrt((ant.x - x) ** 2 + (ant.y - y) ** 2);
+        return dist < HIT_RADIUS;
+      });
+
+      if (hitAnts.length > 0) {
+        hitAnts.forEach((ant) => drawBlood(ctx, ant.x, ant.y));
+        antsRef.current = antsRef.current.filter((ant) => !hitAnts.includes(ant));
+      }
     } else if (activeTool === 'flamethrower') {
-      drawFire(ctx, x, y);
-      playSound('fire');
+      for (let i = 0; i < 5; i++) {
+        particlesRef.current.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4 - 2,
+          life: 1.0,
+          size: Math.random() * 15 + 5,
+          r: 255,
+          g: Math.floor(Math.random() * 150),
+          b: 0,
+        });
+      }
     } else if (activeTool === 'paint') {
       drawPaint(ctx, x, y);
       playSound('paint');
     } else if (activeTool === 'repair') {
       ctx.clearRect(x - 25, y - 25, 50, 50);
     } else if (activeTool === 'ants') {
-      antsRef.current.push({ x, y, angle: Math.random() * Math.PI * 2 });
+      for (let i = 0; i < 10; i++) {
+        antsRef.current.push({
+          x: x + (Math.random() - 0.5) * 20,
+          y: y + (Math.random() - 0.5) * 20,
+          angle: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+  };
+
+  const startFireSound = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    const ctx = audioContextRef.current;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'brown' as any; // Brown noise is better for fire
+    if ((osc.type as any) === 'brown') {
+      // Just use noise
+    } else {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(40, ctx.currentTime);
+    }
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    fireSoundRef.current = { osc, gain };
+  };
+
+  const stopFireSound = () => {
+    if (fireSoundRef.current) {
+      fireSoundRef.current.osc.stop();
+      fireSoundRef.current = null;
     }
   };
 
@@ -222,6 +333,22 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
     ctx.fill();
   };
 
+  const drawBlood = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+    ctx.fillStyle = 'rgba(180, 0, 0, 0.9)';
+    for (let i = 0; i < 8; i++) {
+      const rx = x + (Math.random() - 0.5) * 12;
+      const ry = y + (Math.random() - 0.5) * 12;
+      const size = Math.random() * 2.5 + 0.5;
+      ctx.beginPath();
+      ctx.arc(rx, ry, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Center splatter
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
   const handleClear = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -246,6 +373,9 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         cursor: getCursor(activeTool),
       }}
       onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
     >
       <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, display: 'block' }} />
       <canvas

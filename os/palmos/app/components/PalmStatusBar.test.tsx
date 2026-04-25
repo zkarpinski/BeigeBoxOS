@@ -18,11 +18,7 @@ describe('PalmStatusBar Component', () => {
   });
 
   it('contains a battery indicator', () => {
-    const { container } = render(<PalmStatusBar />);
-    // The battery container has a specific width/height in styles
-    const batteryContainer = container.querySelector(
-      'div[style*="width: 28px"][style*="height: 10px"]',
-    );
-    expect(batteryContainer).toBeInTheDocument();
+    render(<PalmStatusBar />);
+    expect(screen.getByTestId('battery-indicator')).toBeInTheDocument();
   });
 });

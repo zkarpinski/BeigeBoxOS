@@ -519,7 +519,7 @@ export interface Weapon {
   chance: number;
 }
 export const Weapons: Weapon[] = [
-  { id: 0, name: 'Pulse laser', power: 15, price: 2000, techLevel: 5, chance: 50 },
+  { id: 0, name: 'Pulse laser', power: 15, price: 2000, techLevel: 1, chance: 50 },
   { id: 1, name: 'Beam laser', power: 25, price: 12500, techLevel: 6, chance: 35 },
   { id: 2, name: 'Military laser', power: 35, price: 35000, techLevel: 7, chance: 15 },
 ];

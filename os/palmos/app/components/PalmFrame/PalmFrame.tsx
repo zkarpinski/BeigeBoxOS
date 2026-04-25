@@ -12,6 +12,7 @@ import {
   NoteHWIcon,
 } from './HardwareButton';
 import { ScrollRocker } from './ScrollRocker';
+import { GraffitiArea } from '../GraffitiArea';
 
 const SCREEN_PX = 264;
 
@@ -23,6 +24,7 @@ interface PalmFrameProps {
   onCalcClick?: () => void;
   onAppButtonClick?: (app: string) => void;
   onScroll?: (direction: 'up' | 'down') => void;
+  onGraffitiTap?: () => void;
 }
 
 export function PalmFrame({
@@ -33,6 +35,7 @@ export function PalmFrame({
   onCalcClick,
   onAppButtonClick,
   onScroll,
+  onGraffitiTap,
 }: PalmFrameProps) {
   const { playClick } = usePalmSounds();
   const [mobileScale, setMobileScale] = useState(1);
@@ -159,9 +162,7 @@ export function PalmFrame({
             </SilkButton>
           </div>
           <div className="palm-graffiti-container">
-            <div className="palm-graffiti-input">abc</div>
-            <div className="palm-graffiti-divider" />
-            <div className="palm-graffiti-input">123</div>
+            <GraffitiArea onKeyboardTap={onGraffitiTap} />
           </div>
           <div
             style={{
@@ -198,7 +199,7 @@ export function PalmFrame({
           <HardwareButton onClick={clickApp('todo')} title="To Do List" isMobile={isMobile}>
             <TodoHWIcon />
           </HardwareButton>
-          <HardwareButton onClick={clickApp('memo')} title="Note Pad" isMobile={isMobile}>
+          <HardwareButton onClick={clickApp('notepad')} title="Note Pad" isMobile={isMobile}>
             <NoteHWIcon />
           </HardwareButton>
         </div>

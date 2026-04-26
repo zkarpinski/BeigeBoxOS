@@ -2,7 +2,7 @@
 .calculator-menu-bar {
   display: flex;
   padding: 2px 0 2px 2px;
-  border-bottom: 1px solid #808080;
+  border-bottom: 1px solid var(--win-dark, #808080);
 }
 
 .calculator-menu-item {
@@ -11,8 +11,8 @@
 }
 
 .calculator-menu-item:hover {
-  background-color: #000080;
-  color: white;
+  background-color: var(--title-active, #000080);
+  color: var(--win-white, #ffffff);
 }
 
 .calculator-body {
@@ -24,16 +24,16 @@
 }
 
 .calculator-body:focus {
-  outline: 1px dotted var(--win-black);
+  outline: 1px dotted var(--win-black, #000000);
   outline-offset: 2px;
 }
 
 .calculator-display-container {
-  background-color: #ffffff;
-  border-top: 2px solid #808080;
-  border-left: 2px solid #808080;
-  border-right: 2px solid #ffffff;
-  border-bottom: 2px solid #ffffff;
+  background-color: var(--win-white, #ffffff);
+  border-top: 2px solid var(--win-dark, #808080);
+  border-left: 2px solid var(--win-dark, #808080);
+  border-right: 2px solid var(--win-white, #ffffff);
+  border-bottom: 2px solid var(--win-white, #ffffff);
   height: 24px;
   margin-bottom: 6px;
   display: flex;
@@ -65,11 +65,11 @@
 .calculator-btn {
   flex: 1;
   height: 24px;
-  background-color: #c0c0c0;
-  border-top: 1px solid #ffffff;
-  border-left: 1px solid #ffffff;
-  border-right: 1px solid #808080;
-  border-bottom: 1px solid #808080;
+  background-color: var(--win-bg, #c0c0c0);
+  border-top: 1px solid var(--win-white, #ffffff);
+  border-left: 1px solid var(--win-white, #ffffff);
+  border-right: 1px solid var(--win-dark, #808080);
+  border-bottom: 1px solid var(--win-dark, #808080);
   font-family: 'MS Sans Serif', Tahoma, sans-serif;
   font-size: 11px;
   cursor: default;
@@ -80,10 +80,10 @@
 
 .calculator-btn:active,
 .calculator-btn.calc-btn-keyboard-pressed {
-  border-top: 1px solid #808080;
-  border-left: 1px solid #808080;
-  border-right: 1px solid #ffffff;
-  border-bottom: 1px solid #ffffff;
+  border-top: 1px solid var(--win-dark, #808080);
+  border-left: 1px solid var(--win-dark, #808080);
+  border-right: 1px solid var(--win-white, #ffffff);
+  border-bottom: 1px solid var(--win-white, #ffffff);
   padding-top: 2px;
   padding-left: 1px;
 }
@@ -106,10 +106,10 @@
 .calc-memory-indicator {
   width: 32px;
   height: 24px;
-  border-top: 1px solid #808080;
-  border-left: 1px solid #808080;
-  border-right: 1px solid #ffffff;
-  border-bottom: 1px solid #ffffff;
+  border-top: 1px solid var(--win-dark, #808080);
+  border-left: 1px solid var(--win-dark, #808080);
+  border-right: 1px solid var(--win-white, #ffffff);
+  border-bottom: 1px solid var(--win-white, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;

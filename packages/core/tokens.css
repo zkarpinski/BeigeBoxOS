@@ -1,0 +1,48 @@
+/**
+ * @retro-web/core — CSS Token Contract
+ *
+ * Every OS that wants to render shared app components (Calculator, Paint,
+ * Notepad, etc.) MUST define all tokens below in its own style.css :root block.
+ * Fallback values mirror the Win98 palette so components degrade gracefully
+ * if an OS hasn't set a token yet.
+ *
+ * Usage in shared components:
+ *   background: var(--win-bg);          ← main surface color
+ *   border-color: var(--win-dark);      ← shadow/inset border
+ *   background: var(--title-active);    ← highlighted / hovered item
+ *
+ * DO NOT import this file in OS style.css — it's documentation only.
+ * Copy the tokens block into each OS's style.css :root.
+ */
+
+/* ── Surfaces ────────────────────────────────────────────────────────────── */
+/* --win-bg          Window, toolbar, button, panel background   Win98: #c0c0c0 */
+/* --win-light       Slightly lighter surface (e.g. ruler)       Win98: #dfdfdf */
+/* --win-white       Canvas, text inputs, pure white areas       Win98: #ffffff */
+/* --win-dark        Inset/shadow borders, depressed states      Win98: #808080 */
+/* --win-black       Pure black text, focus outlines             Win98: #000000 */
+
+/* ── Title bar ───────────────────────────────────────────────────────────── */
+/* --title-active    Active title bar & menu-item hover bg       Win98: #0000a0 */
+/* --title-color     Text on active title bar                    Win98: #ffffff  */
+
+/* ── Desktop ─────────────────────────────────────────────────────────────── */
+/* --desktop-bg      Desktop wallpaper / fallback fill           Win98: #008080 */
+
+/* ── Taskbar ─────────────────────────────────────────────────────────────── */
+/* --taskbar-bg      Bottom taskbar background                   Win98: #c0c0c0 */
+
+/* ── Copy-paste block for new OSes ──────────────────────────────────────── */
+/*
+:root {
+  --win-bg:        #c0c0c0;
+  --win-light:     #dfdfdf;
+  --win-white:     #ffffff;
+  --win-dark:      #808080;
+  --win-black:     #000000;
+  --title-active:  #0000a0;
+  --title-color:   #ffffff;
+  --desktop-bg:    #008080;
+  --taskbar-bg:    #c0c0c0;
+}
+*/

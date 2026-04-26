@@ -5,3 +5,4 @@ export * from './hooks/index';
 export * from './apps/index';
 export * from './music/index';
 export * from './utils/index';
+export * from './fs/index';

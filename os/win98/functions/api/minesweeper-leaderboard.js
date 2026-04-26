@@ -89,15 +89,19 @@ function verifyGameToken(secret, token) {
 }
 
 async function verifyGameTokenSignature(secret, payloadB64, sigB64) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify'],
-  );
-  const actualSig = b64UrlDecode(sigB64);
-  return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  try {
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    );
+    const actualSig = b64UrlDecode(sigB64);
+    return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
+  } catch {
+    return false;
+  }
 }
 
 const CONFIG_HINT =
@@ -188,43 +192,45 @@ export async function onRequestPost(context) {
     );
   }
   const signingSecret = context.env.LEADERBOARD_SIGNING_SECRET;
-  if (signingSecret) {
-    const token = body.game_token;
-    if (!token || typeof token !== 'string') {
-      return jsonResponse(
-        { error: 'Missing game token. Start a game and try again.', rank: 0 },
-        400,
-      );
-    }
-    const verified = verifyGameToken(signingSecret, token);
-    if (!verified) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
-    const ok = await verifyGameTokenSignature(signingSecret, verified.payloadB64, verified.sigB64);
-    if (!ok) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
-    if (verified.payload.d !== difficulty) {
-      return jsonResponse({ error: 'Token difficulty does not match submission', rank: 0 }, 400);
-    }
-    const now = Date.now();
-    const ageMs = now - verified.payload.iat;
-    if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
-      return jsonResponse({ error: 'Game token expired or invalid', rank: 0 }, 400);
-    }
-    const elapsedSec = ageMs / 1000;
-    if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
-      return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
-    }
-    const { error: usedError } = await supabase
-      .from('minesweeper_used_tokens')
-      .insert({ game_id: verified.payload.g });
-    if (usedError) {
-      const isDuplicate = usedError.code === '23505';
-      return jsonResponse(
-        {
-          error: isDuplicate ? 'This game was already submitted.' : 'Failed to record game.',
-          rank: 0,
-        },
-        400,
-      );
-    }
+  if (!signingSecret) {
+    return jsonResponse(
+      { error: 'Leaderboard not configured (missing signing secret)', rank: 0 },
+      503,
+    );
+  }
+
+  const token = body.game_token;
+  if (!token || typeof token !== 'string') {
+    return jsonResponse({ error: 'Missing game token. Start a game and try again.', rank: 0 }, 400);
+  }
+  const verified = verifyGameToken(signingSecret, token);
+  if (!verified) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  const ok = await verifyGameTokenSignature(signingSecret, verified.payloadB64, verified.sigB64);
+  if (!ok) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  if (verified.payload.d !== difficulty) {
+    return jsonResponse({ error: 'Token difficulty does not match submission', rank: 0 }, 400);
+  }
+  const now = Date.now();
+  const ageMs = now - verified.payload.iat;
+  if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
+    return jsonResponse({ error: 'Game token expired or invalid', rank: 0 }, 400);
+  }
+  const elapsedSec = ageMs / 1000;
+  if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
+    return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
+  }
+  const { error: usedError } = await supabase
+    .from('minesweeper_used_tokens')
+    .insert({ game_id: verified.payload.g });
+  if (usedError) {
+    const isDuplicate = usedError.code === '23505';
+    return jsonResponse(
+      {
+        error: isDuplicate ? 'This game was already submitted.' : 'Failed to record game.',
+        rank: 0,
+      },
+      400,
+    );
   }
   const name =
     typeof body.player_name === 'string'

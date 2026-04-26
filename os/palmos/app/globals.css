@@ -18,6 +18,22 @@
   animation: palm-fade-in 150ms ease-out both;
 }
 
+@keyframes graffiti-hint-fade {
+  0% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.graffiti-hint-fade {
+  animation: graffiti-hint-fade 1.2s ease-out both;
+}
+
 body {
   margin: 0;
   padding: 0;

@@ -10,7 +10,15 @@ const mockOsShell = {
   AppWindow,
   TitleBar,
   MenuBar: () => <div data-testid="mock-menubar" />,
+  writeFile: jest.fn(),
+  osMode: 'multi-window' as const,
 };
+
+import { initFileSystem } from '../app/fileSystem';
+
+beforeAll(() => {
+  initFileSystem([]);
+});
 
 describe('MyComputerWindow', () => {
   const renderMyComputer = () => {

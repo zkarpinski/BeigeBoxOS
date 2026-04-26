@@ -7,7 +7,7 @@
 import React from 'react';
 import type { AppConfig } from '@retro-web/core';
 import { CalculatorContent } from '@retro-web/core/apps/calculator';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useOptionalWindowManager, useOsShell } from '@retro-web/core/context';
 
 export const CALCULATOR_ICON_SRC = 'apps/calculator/calculator-icon.png';
 
@@ -27,9 +27,15 @@ export type CalculatorWindowProps = {
 };
 
 export function CalculatorWindow({ skin = 'win98' }: CalculatorWindowProps) {
-  const { apps } = useWindowManager();
-  const { AppWindow, TitleBar } = useOsShell();
-  const isVisible = apps.calculator?.visible && !apps.calculator?.minimized;
+  const osShell = useOsShell();
+  const { AppWindow, TitleBar, osMode, currentApp } = osShell;
+  const wm = useOptionalWindowManager();
+
+  // Fallback for single-app mode where WindowManagerContext is not present
+  const isVisible =
+    osMode === 'single-app'
+      ? currentApp === 'calculator'
+      : !!(wm?.apps.calculator?.visible && !wm?.apps.calculator?.minimized);
 
   return (
     <AppWindow

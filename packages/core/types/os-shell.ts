@@ -61,6 +61,14 @@ export interface MenuBarProps {
 
 /** What each OS passes so shared apps render with native window shell + FS integration. */
 export interface OsShellValue {
+  osMode?: 'multi-window' | 'single-app';
+  /** If single-app, the currently active app ID */
+  currentApp?: string;
+  /** If single-app, opens the app */
+  openApp?: (id: string) => void;
+  /** If single-app, returns to home screen */
+  goHome?: () => void;
+
   AppWindow: React.ComponentType<AppWindowProps>;
   TitleBar: React.ComponentType<TitleBarProps>;
   /** OS-themed menu bar (dropdowns). Each desktop passes its native implementation. */

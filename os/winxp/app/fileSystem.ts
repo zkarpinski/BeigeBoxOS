@@ -38,7 +38,11 @@ const fs = createFileSystem({
   storageKey: STORAGE_KEY,
   changeEvent: 'winxp-fs-change',
   pathStyle: 'windows',
-  volumes: [{ name: 'Local Disk (C:)', rootKey: 'C:' }],
+  volumes: [
+    { name: '3½ Floppy (A:)', rootKey: 'A:', placeholder: true },
+    { name: 'Local Disk (C:)', rootKey: 'C:' },
+    { name: 'CD-ROM Drive (D:)', rootKey: 'D:', placeholder: true },
+  ],
   defaultIconByExt: {
     txt: 'shell/icons/notepad_file.png',
   },

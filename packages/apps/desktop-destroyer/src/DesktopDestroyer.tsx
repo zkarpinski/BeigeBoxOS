@@ -467,7 +467,9 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         />
       </div>
 
-      <style jsx global>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .desktop-destroyer-overlay.skin-karpos .desktop-destroyer-toolbar button {
           border: 2px solid #000;
           background: #fff;
@@ -488,7 +490,9 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
           background: #ccc;
           box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

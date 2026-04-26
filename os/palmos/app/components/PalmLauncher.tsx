@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { usePalmSounds } from '../hooks/usePalmSounds';
 import {
   Phone,
@@ -84,17 +84,20 @@ export function PalmLauncher({ onAppOpen, onRegisterScroll, category = 'All' }: 
     return () => window.removeEventListener('resize', handleScroll);
   }, []);
 
+  const scrollByAmount = useCallback(
+    (amount: number) => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollBy({ top: amount, behavior: 'instant' });
+        playClick();
+      }
+    },
+    [playClick],
+  );
+
   useEffect(() => {
     onRegisterScroll?.((dir) => scrollByAmount(dir === 'up' ? -60 : 60));
     return () => onRegisterScroll?.(null);
-  }, [onRegisterScroll]);
-
-  const scrollByAmount = (amount: number) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ top: amount, behavior: 'instant' });
-      playClick();
-    }
-  };
+  }, [onRegisterScroll, scrollByAmount]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!scrollRef.current || !trackRef.current || !canScroll) return;

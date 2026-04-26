@@ -112,6 +112,16 @@ export function recognizeLetter(f: StrokeFeatures): string | null {
   // ── Tiny dot → period ───────────────────────────────────────
   if (len < 12 && bboxW < 10 && bboxH < 10) return '.';
 
+  // ── Comma: short downward hook curving left at the bottom ───
+  if (
+    is(seq, 'S-SW', 'SE-SW', 'S-W', 'SE-S-SW', 'SE-W') &&
+    len < 50 &&
+    bboxH < 35 &&
+    !has(seq, 'N') &&
+    eX < 0.6
+  )
+    return ',';
+
   // ── Shortcuts ───────────────────────────────────────────────
   // Space: rightward swipe (wide)
   if (ratio > 1.8 && is(seq, 'E', 'NE', 'SE', 'NE-E', 'E-NE', 'SE-E', 'E-SE')) return ' ';

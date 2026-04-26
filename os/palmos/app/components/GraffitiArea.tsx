@@ -3,6 +3,7 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { recognize } from '../utils/graffitiRecognizer';
 import type { Point } from '../utils/graffitiRecognizer';
+import { usePalmSounds } from '../hooks/usePalmSounds';
 
 interface GraffitiAreaProps {
   /** Called when the user taps without drawing (opens system keyboard) */
@@ -55,8 +56,10 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
   const pts = useRef<Point[]>([]);
   const strokeSide = useRef<'letter' | 'number'>('letter');
   const strokeStart = useRef(0);
-  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const canvasTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [hint, setHint] = useState<string | null>(null);
+  const { playClick } = usePalmSounds();
 
   // Size canvas to its container whenever the container resizes
   useEffect(() => {
@@ -84,11 +87,12 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
   }, []);
 
   const scheduleClean = useCallback(() => {
-    if (fadeTimer.current) clearTimeout(fadeTimer.current);
-    fadeTimer.current = setTimeout(() => {
-      clearCanvas();
-      setHint(null);
-    }, 650);
+    if (canvasTimer.current) clearTimeout(canvasTimer.current);
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+    // Clear canvas quickly (300ms) so it doesn't linger during recognition
+    canvasTimer.current = setTimeout(() => clearCanvas(), 300);
+    // Keep hint visible longer so user can confirm what was recognized
+    hintTimer.current = setTimeout(() => setHint(null), 1200);
   }, [clearCanvas]);
 
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>): Point => {
@@ -102,7 +106,7 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.lineTo(to.x, to.y);
-    ctx.strokeStyle = 'rgba(0, 0, 100, 0.75)';
+    ctx.strokeStyle = 'rgba(50, 80, 200, 0.4)';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -112,7 +116,8 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    if (canvasTimer.current) clearTimeout(canvasTimer.current);
+    if (hintTimer.current) clearTimeout(hintTimer.current);
     clearCanvas();
     setHint(null);
 
@@ -155,11 +160,12 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
     const result = recognize(points, strokeSide.current);
     if (result !== null) {
       dispatchChar(result);
-      // Show a brief visual hint of the recognized character
+      playClick();
       if (result === ' ') setHint('⎵');
       else if (result === '\b') setHint('⌫');
       else if (result === '\n') setHint('↵');
       else if (result === '.') setHint('·');
+      else if (result === ',') setHint(',');
       else setHint(result.toUpperCase());
     } else {
       setHint('?');
@@ -176,39 +182,48 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          display: 'flex',
-          alignItems: 'center',
           pointerEvents: 'none',
           zIndex: 0,
         }}
       >
+        {/* Center divider */}
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: 'absolute',
+            left: '50%',
+            top: '10%',
+            width: '1px',
+            height: '80%',
+            background: '#555',
+            opacity: 0.3,
+          }}
+        />
+        {/* Bottom-left label */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '3px',
+            left: '6px',
             color: '#aaa',
-            fontSize: '18px',
+            fontSize: '9px',
             fontFamily: 'serif',
             fontStyle: 'italic',
-            opacity: 0.4,
+            opacity: 0.5,
           }}
         >
           abc
         </div>
-        <div style={{ width: '1px', height: '60%', background: '#555', opacity: 0.4 }} />
+        {/* Bottom-right label */}
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: 'absolute',
+            bottom: '3px',
+            right: '6px',
             color: '#aaa',
-            fontSize: '18px',
+            fontSize: '9px',
             fontFamily: 'serif',
             fontStyle: 'italic',
-            opacity: 0.4,
+            opacity: 0.5,
           }}
         >
           123
@@ -218,6 +233,8 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
       {/* Recognized character hint */}
       {hint && (
         <div
+          key={hint + Date.now()}
+          className="graffiti-hint-fade"
           style={{
             position: 'absolute',
             inset: 0,
@@ -230,12 +247,11 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
         >
           <span
             style={{
-              fontSize: '26px',
+              fontSize: '48px',
               fontWeight: 'bold',
               color: '#3050cc',
-              opacity: 0.85,
               fontFamily: 'var(--font-palm), monospace',
-              textShadow: '0 0 6px rgba(0,0,180,0.3)',
+              textShadow: '0 0 8px rgba(0,0,180,0.4)',
             }}
           >
             {hint}

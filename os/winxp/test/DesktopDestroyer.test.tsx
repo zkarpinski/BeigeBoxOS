@@ -28,14 +28,27 @@ beforeAll(() => {
 describe('DesktopDestroyer (WinXP)', () => {
   test('renders desktop destroyer with winxp skin', () => {
     render(
-      <WindowManagerProvider
-        registry={[
-          { id: 'desktop-destroyer', label: 'Desktop Destroyer', icon: '', desktop: true },
-        ]}
-        initialOpenAppId="desktop-destroyer"
+      <OsShellProvider
+        value={{
+          osMode: 'multi-window',
+          currentApp: 'desktop-destroyer',
+          openApp: () => {},
+          goHome: () => {},
+          AppWindow: ({ children }) => <div>{children}</div>,
+          TitleBar: () => null,
+          MenuBar: () => null,
+          writeFile: () => {},
+        }}
       >
-        <DesktopDestroyer skin="winxp" />
-      </WindowManagerProvider>,
+        <WindowManagerProvider
+          registry={[
+            { id: 'desktop-destroyer', label: 'Desktop Destroyer', icon: '', desktop: true },
+          ]}
+          initialOpenAppId="desktop-destroyer"
+        >
+          <DesktopDestroyer skin="winxp" />
+        </WindowManagerProvider>
+      </OsShellProvider>,
     );
     // Desktop destroyer doesn't have a window, it's a full-screen overlay
     expect(document.querySelector('.desktop-destroyer-overlay')).toBeInTheDocument();

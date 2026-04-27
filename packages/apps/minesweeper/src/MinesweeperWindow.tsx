@@ -7,7 +7,8 @@
  */
 import React from 'react';
 import type { AppConfig } from '@retro-web/core';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useOsShell } from '@retro-web/core/context';
+import { useCloseApp } from '@retro-web/core';
 import { useMinesweeperGame } from './useMinesweeperGame';
 import { MinesweeperMenuBar } from './components/MinesweeperMenuBar';
 import { MinesweeperGameBody } from './components/MinesweeperGameBody';
@@ -34,8 +35,8 @@ export type MinesweeperWindowProps = {
 };
 
 export function MinesweeperWindow({ skin = 'win98' }: MinesweeperWindowProps) {
-  const ctx = useWindowManager();
   const { AppWindow, TitleBar } = useOsShell();
+  const closeApp = useCloseApp('minesweeper');
   const g = useMinesweeperGame();
 
   return (
@@ -66,7 +67,7 @@ export function MinesweeperWindow({ skin = 'win98' }: MinesweeperWindowProps) {
           onNewGame={() => g.initGame()}
           onChangeDiff={g.changeDiff}
           onToggleMarks={() => g.setUseMarks((m) => !m)}
-          onExit={() => ctx?.hideApp('minesweeper')}
+          onExit={closeApp}
           onOpenLeaderboard={(data, metrics) => {
             g.setLeaderboardData(data);
             g.setLeaderboardMetrics(metrics);

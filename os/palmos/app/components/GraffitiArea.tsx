@@ -59,6 +59,7 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
   const canvasTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [hint, setHint] = useState<string | null>(null);
+  const [hintKey, setHintKey] = useState<string>('');
   const { playClick } = usePalmSounds();
 
   // Size canvas to its container whenever the container resizes
@@ -167,8 +168,10 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
       else if (result === '.') setHint('·');
       else if (result === ',') setHint(',');
       else setHint(result.toUpperCase());
+      setHintKey(String(Date.now()));
     } else {
       setHint('?');
+      setHintKey(String(Date.now()));
     }
 
     scheduleClean();
@@ -233,7 +236,7 @@ export function GraffitiArea({ onKeyboardTap }: GraffitiAreaProps) {
       {/* Recognized character hint */}
       {hint && (
         <div
-          key={hint + Date.now()}
+          key={hintKey}
           className="graffiti-hint-fade"
           style={{
             position: 'absolute',

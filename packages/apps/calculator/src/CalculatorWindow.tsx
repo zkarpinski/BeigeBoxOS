@@ -7,7 +7,8 @@
 import React from 'react';
 import type { AppConfig } from '@retro-web/core';
 import { CalculatorContent } from '@retro-web/core/apps/calculator';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useOsShell } from '@retro-web/core/context';
+import { useAppVisibility } from '@retro-web/core';
 
 export const CALCULATOR_ICON_SRC = 'apps/calculator/calculator-icon.png';
 
@@ -27,9 +28,8 @@ export type CalculatorWindowProps = {
 };
 
 export function CalculatorWindow({ skin = 'win98' }: CalculatorWindowProps) {
-  const { apps } = useWindowManager();
   const { AppWindow, TitleBar } = useOsShell();
-  const isVisible = apps.calculator?.visible && !apps.calculator?.minimized;
+  const isVisible = useAppVisibility('calculator');
 
   return (
     <AppWindow

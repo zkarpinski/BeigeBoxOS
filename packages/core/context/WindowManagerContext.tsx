@@ -85,8 +85,12 @@ interface WindowManagerContextValue {
 
 const WindowManagerContext = createContext<WindowManagerContextValue | null>(null);
 
+export function useOptionalWindowManager(): WindowManagerContextValue | null {
+  return useContext(WindowManagerContext);
+}
+
 export function useWindowManager(): WindowManagerContextValue {
-  const ctx = useContext(WindowManagerContext);
+  const ctx = useOptionalWindowManager();
   if (!ctx) throw new Error('useWindowManager must be used inside WindowManagerProvider');
   return ctx;
 }

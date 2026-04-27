@@ -1,0 +1,234 @@
+:root {
+  --winmo-bg: #f0f0f0;
+  --winmo-text: #000000;
+  --winmo-blue: #0055cc;
+  --winmo-blue-light: #6699ff;
+  --winmo-border: #808080;
+  --pocketpc-blue: #3a6ea5;
+  --pocketpc-blue-dark: #244976;
+  --pocketpc-blue-light: #6ba5d6;
+  --pocketpc-gradient: linear-gradient(
+    to bottom,
+    #6ba5d6 0%,
+    #3a6ea5 15%,
+    #3a6ea5 85%,
+    #244976 100%
+  );
+  --winmo-today-bg: #e7eff7;
+  --winmo-today-border: #9fbade;
+}
+
+@keyframes winmo-dropdown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.winmo-app-fade {
+  animation: winmo-fade-in 200ms ease-out both;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1a1a1a;
+  color: var(--winmo-text);
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Layout Utilities */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
+.h-full {
+  height: 100%;
+}
+.w-full {
+  width: 100%;
+}
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Dell Axim X3i 3D Frame */
+.winmo-page-wrapper {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #1e1e1e 0%, #0a0a0a 100%);
+  padding: 20px;
+}
+
+.axim-3d-root {
+  /* drop-shadow on the 3D canvas layer */
+  filter: drop-shadow(0 28px 55px rgba(0, 0, 0, 0.85)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
+}
+
+/* Screen content inherits h-full / flex layout from WinMobile UI classes */
+.winmo-screen,
+.winmo-screen * {
+  font-family: 'Tahoma', 'Arial', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* WinMo UI Elements */
+.winmo-navbar {
+  height: 26px;
+  background: var(--pocketpc-gradient);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-bottom: 1px solid #1a3a5a;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.winmo-start-btn {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
+  cursor: pointer;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.winmo-start-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.winmo-commandbar {
+  height: 26px;
+  background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+  border-top: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #333;
+}
+
+.winmo-content {
+  flex: 1;
+  background: #fff;
+  position: relative;
+}
+
+.winmo-start-menu {
+  position: absolute;
+  top: 26px;
+  left: 0;
+  width: 170px;
+  background: #fff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: winmo-dropdown 0.15s ease-out;
+}
+
+.winmo-start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #000;
+  cursor: pointer;
+}
+
+.winmo-start-menu-item:hover {
+  background: #3a6ea5;
+  color: #fff;
+}
+
+/* Today Screen */
+.winmo-today {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--winmo-today-bg);
+  position: relative;
+}
+
+.winmo-today::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 40px;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.winmo-today-header {
+  padding: 12px 12px 12px 50px;
+  background: #fff;
+  border-bottom: 1px solid var(--winmo-today-border);
+}
+
+.winmo-today-date {
+  font-size: 13px;
+  font-weight: bold;
+  color: #003399;
+}
+
+.winmo-today-item {
+  padding: 10px 12px 10px 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px dotted var(--winmo-today-border);
+  font-size: 11px;
+  color: #000;
+  cursor: pointer;
+}
+
+.winmo-today-item:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.winmo-today-icon {
+  position: absolute;
+  left: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MousePointer2, Hammer, Bug, Flame, Palette, Eraser, Trash2, X } from 'lucide-react';
-import { useWindowManager } from '@retro-web/core/context';
+import { useCloseApp } from '@retro-web/core';
 
 type Tool = 'pointer' | 'hammer' | 'ants' | 'flamethrower' | 'paint' | 'repair';
 
@@ -20,7 +20,7 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
   const [activeTool, setActiveTool] = useState<Tool>('hammer');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationCanvasRef = useRef<HTMLCanvasElement>(null);
-  const { hideApp } = useWindowManager();
+  const hideApp = useCloseApp('desktop-destroyer');
 
   // Ants state managed in a ref for performance
   const antsRef = useRef<Ant[]>([]);
@@ -460,14 +460,16 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
         />
         <ToolbarButton
           active={false}
-          onClick={() => hideApp('desktop-destroyer')}
+          onClick={hideApp}
           icon={<X size={20} />}
           title="Close"
           skin={skin}
         />
       </div>
 
-      <style jsx global>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .desktop-destroyer-overlay.skin-karpos .desktop-destroyer-toolbar button {
           border: 2px solid #000;
           background: #fff;
@@ -488,7 +490,9 @@ export function DesktopDestroyer({ skin = 'winxp' }: DesktopDestroyerProps) {
           background: #ccc;
           box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

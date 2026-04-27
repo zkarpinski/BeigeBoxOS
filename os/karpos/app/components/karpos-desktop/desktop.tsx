@@ -62,7 +62,9 @@ export function KarpDesktop() {
     >
       <ToastProvider>
         <KarpGlobalShim registry={appRegistry} />
-        <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+        <OsShellProvider
+          value={{ osMode: 'multi-window', AppWindow, TitleBar, MenuBar, writeFile }}
+        >
           <div className="seo-intro" aria-hidden="true">
             <h1>KarpOS — Zachary Karpinski</h1>
             <p>

@@ -3,6 +3,23 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { WinMobileDesktop } from '../app/components/WinMobileDesktop';
 import '@testing-library/jest-dom';
 
+// Mock Three.js WebGLRenderer which fails in JSDOM
+jest.mock('three', () => {
+  const THREE = jest.requireActual('three');
+  return {
+    ...THREE,
+    WebGLRenderer: jest.fn().mockImplementation(() => ({
+      setSize: jest.fn(),
+      setPixelRatio: jest.fn(),
+      setClearColor: jest.fn(),
+      render: jest.fn(),
+      dispose: jest.fn(),
+      shadowMap: { enabled: false },
+      domElement: document.createElement('canvas'),
+    })),
+  };
+});
+
 describe('WinMobileDesktop', () => {
   test('renders the Today screen by default', () => {
     render(<WinMobileDesktop />);
@@ -41,7 +58,7 @@ describe('WinMobileDesktop', () => {
     fireEvent.click(screen.getByText('Calculator'));
 
     // Press hardware home button
-    const homeBtn = screen.getByTitle('Home');
+    const homeBtn = screen.getByLabelText(/Home/i);
     fireEvent.click(homeBtn);
 
     expect(screen.getByText('Today')).toBeInTheDocument();

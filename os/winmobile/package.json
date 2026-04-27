@@ -13,14 +13,15 @@
     "@retro-web/app-calculator": "workspace:*",
     "@retro-web/app-space-trader": "workspace:*",
     "@retro-web/core": "workspace:*",
+    "lucide-react": "^0.453.0",
     "next": "^15.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "lucide-react": "^0.453.0"
+    "three": "^0.184.0"
   },
   "devDependencies": {
-    "@retro-web/config": "workspace:*",
     "@playwright/test": "^1.58.2",
+    "@retro-web/config": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -28,6 +29,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.184.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.0",
     "eslint-config-prettier": "^10.1.8",

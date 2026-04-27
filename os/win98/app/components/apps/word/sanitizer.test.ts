@@ -26,9 +26,11 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math, form, etc.', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">' +
+        '<svg><circle cx="50" cy="50" r="40"></circle></svg><math>1+1</math><form><input><button>x</button></form>' +
+        '<style>body { color: red; }</style><template>x</template><frame src="x"><frameset></frameset><applet></applet>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -36,6 +38,16 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<base');
       expect(out).not.toContain('<link');
       expect(out).not.toContain('<meta');
+      expect(out).not.toContain('<svg');
+      expect(out).not.toContain('<math');
+      expect(out).not.toContain('<form');
+      expect(out).not.toContain('<input');
+      expect(out).not.toContain('<button');
+      expect(out).not.toContain('<style');
+      expect(out).not.toContain('<template');
+      expect(out).not.toContain('<frame');
+      expect(out).not.toContain('<frameset');
+      expect(out).not.toContain('<applet');
     });
 
     test('strips onclick and other event handlers', () => {
@@ -64,6 +76,18 @@ describe('sanitizer', () => {
       const out = sanitizeHTML(html);
       expect(out).toContain('href="http://example.com"');
       expect(out).toContain('href="https://safe.com"');
+    });
+
+    test('sanitizes dangerous style attributes', () => {
+      const html =
+        '<div style="color: red; background-image: url(javascript:alert(1))">1</div>' +
+        '<div style="width: expression(alert(1))">2</div>' +
+        '<div style="list-style-image: url(\'http://example.com\')">3</div>';
+      const out = sanitizeHTML(html);
+      expect(out).not.toContain('url(javascript:alert(1))');
+      expect(out).not.toContain('expression(alert(1))');
+      expect(out).toContain('style="list-style-image: url(\'http://example.com\')"');
+      expect(out).toContain('>3</div>');
     });
 
     test('returns body innerHTML only (no full document)', () => {

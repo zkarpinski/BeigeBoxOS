@@ -202,7 +202,7 @@ export function Desktop({ openAppId }: DesktopProps) {
       restoreState={restoreState}
     >
       <Windows98GlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+      <OsShellProvider value={{ osMode: 'multi-window', AppWindow, TitleBar, MenuBar, writeFile }}>
         {/* SEO content (visually hidden, crawlable) */}
         <div className="seo-intro" aria-hidden="true">
           <h1>Windows 98 in the Browser</h1>

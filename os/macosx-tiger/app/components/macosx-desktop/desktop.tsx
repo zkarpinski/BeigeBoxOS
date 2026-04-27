@@ -50,7 +50,7 @@ export function MacDesktop() {
       applyOpenByDefault={false}
     >
       <MacGlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+      <OsShellProvider value={{ osMode: 'multi-window', AppWindow, TitleBar, MenuBar, writeFile }}>
         {/* SEO content */}
         <div className="seo-intro" aria-hidden="true">
           <h1>Mac OS X 10.4 Tiger in the Browser</h1>

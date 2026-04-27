@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useOsShell, useWindowManager } from '@retro-web/core/context';
+import { useOsShell } from '@retro-web/core/context';
 import { SpaceTraderGame } from './SpaceTraderGame';
 
 interface SpaceTraderWindowProps {
@@ -8,9 +8,7 @@ interface SpaceTraderWindowProps {
 
 export function SpaceTraderWindow({ skin = 'karpos' }: SpaceTraderWindowProps) {
   const { AppWindow, TitleBar } = useOsShell();
-  const { apps } = useWindowManager();
   const appId = 'space-trader';
-  const myState = apps[appId];
 
   const onClose = () => {
     // If the game needs a save confirmation, it could be here

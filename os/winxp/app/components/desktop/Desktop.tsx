@@ -213,7 +213,7 @@ export function Desktop({ openAppId }: DesktopProps) {
       restoreState={restoreState}
     >
       <WindowsXPGlobalShim registry={appRegistry} />
-      <OsShellProvider value={{ AppWindow, TitleBar, MenuBar, writeFile }}>
+      <OsShellProvider value={{ osMode: 'multi-window', AppWindow, TitleBar, MenuBar, writeFile }}>
         {/* SEO content (visually hidden, crawlable) */}
         <div className="seo-intro" aria-hidden="true">
           <h1>Windows XP in the Browser</h1>

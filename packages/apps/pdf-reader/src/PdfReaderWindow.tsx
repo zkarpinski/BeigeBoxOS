@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
-import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { useOsShell } from '@retro-web/core/context';
+import { useAppVisibility } from '@retro-web/core';
 import { PDF_READER_PENDING_KEY } from '@retro-web/core/apps/pdf-reader/constants';
 
 export const PDF_READER_ICON_SRC = 'shell/icons/adobe-pdf-modern-icon.png';
@@ -17,17 +18,16 @@ export const pdfReaderAppConfig: AppConfig = {
 };
 
 export function PdfReaderWindow() {
-  const ctx = useWindowManager();
   const { AppWindow, TitleBar } = useOsShell();
+  const isVisible = useAppVisibility('pdf-reader');
   const [title, setTitle] = useState('PDF Reader');
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const prevShowWindowRef = useRef(false);
 
-  const pdfApp = ctx.apps['pdf-reader'];
-  const showWindow = !!(pdfApp?.visible && !pdfApp?.minimized);
+  const showWindow = isVisible;
 
   useEffect(() => {
-    if (!pdfApp?.visible) return;
+    if (!isVisible) return;
     try {
       const raw = sessionStorage.getItem(PDF_READER_PENDING_KEY);
       if (!raw) return;
@@ -41,7 +41,7 @@ export function PdfReaderWindow() {
     } catch (_) {
       /* ignore */
     }
-  }, [pdfApp?.visible]);
+  }, [isVisible]);
 
   /** Default to maximized whenever the window becomes shown (incl. restore from minimize). */
   useEffect(() => {

@@ -7,7 +7,23 @@ export function sanitizeHTML(html: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  const dangerousTags = ['script', 'object', 'embed', 'iframe', 'base', 'link', 'meta'];
+  const dangerousTags = [
+    'script',
+    'object',
+    'embed',
+    'iframe',
+    'base',
+    'link',
+    'meta',
+    'svg',
+    'math',
+    'form',
+    'style',
+    'template',
+    'frame',
+    'frameset',
+    'applet',
+  ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
   });
@@ -20,10 +36,24 @@ export function sanitizeHTML(html: string): string {
         el.removeAttribute(attrs[i].name);
       } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
         const value = attrs[i].value.toLowerCase().replace(/\s/g, '');
-        if (value.startsWith('javascript:')) {
+        if (value.startsWith('javascript:') || value.startsWith('data:')) {
+          el.removeAttribute(attrs[i].name);
+        }
+      } else if (attrName === 'style') {
+        const value = attrs[i].value.toLowerCase();
+        if (value.includes('javascript:') || value.includes('expression(')) {
           el.removeAttribute(attrs[i].name);
         }
       }
+    }
+
+    // Security enhancement: Prevent window-opener hijacking for external links
+    if (
+      el.tagName.toLowerCase() === 'a' &&
+      el.getAttribute('target') === '_blank' &&
+      !el.getAttribute('rel')?.includes('noreferrer')
+    ) {
+      el.setAttribute('rel', 'noopener noreferrer');
     }
   });
 

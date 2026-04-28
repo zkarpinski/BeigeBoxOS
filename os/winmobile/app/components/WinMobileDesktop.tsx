@@ -16,7 +16,8 @@ type AppId =
   | 'notes'
   | 'settings'
   | 'file-explorer'
-  | 'ie';
+  | 'ie'
+  | 'programs';
 
 // ---- Mock data ----
 const MOCK_CONTACTS = [
@@ -111,7 +112,6 @@ function formatDateLong(d: Date) {
 export function WinMobileDesktop() {
   const [currentApp, setCurrentApp] = useState<AppId>('today');
   const [startMenuOpen, setStartMenuOpen] = useState(false);
-  const [programsOpen, setProgramsOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const [tasks, setTasks] = useState(INITIAL_TASKS);
   const [emails, setEmails] = useState(MOCK_EMAILS);
@@ -125,13 +125,11 @@ export function WinMobileDesktop() {
   const openApp = useCallback((id: string) => {
     setCurrentApp(id as AppId);
     setStartMenuOpen(false);
-    setProgramsOpen(false);
   }, []);
 
   const goHome = useCallback(() => {
     setCurrentApp('today');
     setStartMenuOpen(false);
-    setProgramsOpen(false);
   }, []);
 
   const toggleTask = (id: number) =>
@@ -154,6 +152,7 @@ export function WinMobileDesktop() {
     settings: 'Done',
     'file-explorer': ' ',
     ie: 'Go',
+    programs: ' ',
   };
 
   return (
@@ -164,10 +163,7 @@ export function WinMobileDesktop() {
           <NavBar
             currentApp={currentApp}
             time={formatTime(now)}
-            onStartClick={() => {
-              setStartMenuOpen((s) => !s);
-              setProgramsOpen(false);
-            }}
+            onStartClick={() => setStartMenuOpen((s) => !s)}
           />
 
           {/* Content area */}
@@ -189,6 +185,7 @@ export function WinMobileDesktop() {
             {currentApp === 'settings' && <SettingsApp />}
             {currentApp === 'file-explorer' && <FileExplorerApp />}
             {currentApp === 'ie' && <IEApp />}
+            {currentApp === 'programs' && <ProgramsApp onOpenApp={openApp} />}
           </div>
 
           {/* Command Bar */}
@@ -200,15 +197,7 @@ export function WinMobileDesktop() {
 
           {/* Start Menu */}
           {startMenuOpen && (
-            <StartMenu
-              programsOpen={programsOpen}
-              onTogglePrograms={() => setProgramsOpen((p) => !p)}
-              onOpenApp={openApp}
-              onClose={() => {
-                setStartMenuOpen(false);
-                setProgramsOpen(false);
-              }}
-            />
+            <StartMenu onOpenApp={openApp} onClose={() => setStartMenuOpen(false)} />
           )}
         </div>
       </WinMobileFrame>
@@ -237,6 +226,7 @@ function NavBar({
     settings: 'Settings',
     'file-explorer': 'File Explorer',
     ie: 'Internet Explorer',
+    programs: 'Programs',
   };
 
   return (
@@ -339,88 +329,224 @@ function BatteryIcon({ pct }: { pct: number }) {
 }
 
 // ---- Start Menu ----
+// ---- Windows flag logo ----
+function WinFlag() {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 1.5,
+        width: 20,
+        height: 20,
+        flexShrink: 0,
+      }}
+    >
+      <div style={{ background: '#ff3300' }} />
+      <div style={{ background: '#33aa00' }} />
+      <div style={{ background: '#3366ff' }} />
+      <div style={{ background: '#ffaa00' }} />
+    </div>
+  );
+}
+
 function StartMenu({
-  programsOpen,
-  onTogglePrograms,
   onOpenApp,
   onClose,
 }: {
-  programsOpen: boolean;
-  onTogglePrograms: () => void;
   onOpenApp: (id: string) => void;
   onClose: () => void;
 }) {
-  const mainApps = [
+  const mainItems = [
     { id: 'today', name: 'Today', icon: '🏠' },
-    { id: 'calculator', name: 'Calculator', icon: '🧮' },
     { id: 'calendar', name: 'Calendar', icon: '📅' },
     { id: 'contacts', name: 'Contacts', icon: '👤' },
     { id: 'inbox', name: 'Inbox', icon: '✉️' },
-    { id: 'tasks', name: 'Tasks', icon: '☑' },
-  ];
-  const programs = [
-    { id: 'notes', name: 'Notes', icon: '📝' },
-    { id: 'file-explorer', name: 'File Explorer', icon: '📁' },
     { id: 'ie', name: 'Internet Explorer', icon: '🌐' },
+    { id: 'notes', name: 'Notes', icon: '📝' },
+    { id: 'tasks', name: 'Tasks', icon: '✅' },
+    { id: 'calculator', name: 'Calculator', icon: '🧮' },
   ];
+
+  const row: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '5px 10px',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+    cursor: 'pointer',
+    userSelect: 'none',
+  };
 
   return (
     <>
       <div
         data-testid="start-backdrop"
         onClick={onClose}
+        style={{ position: 'absolute', inset: 0, zIndex: 999 }}
+      />
+      <div
         style={{
           position: 'absolute',
           top: 0,
-          right: 0,
-          bottom: 0,
           left: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.05)',
-          zIndex: 999,
+          width: 162,
+          bottom: 0,
+          background: '#3a7cc8',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          boxShadow: '3px 0 10px rgba(0,0,0,0.45)',
         }}
-      />
-      <div className="winmo-start-menu">
-        {mainApps.map((app) => (
-          <div key={app.id} className="winmo-start-menu-item" onClick={() => onOpenApp(app.id)}>
-            <span>{app.icon}</span>
-            <span>{app.name}</span>
-          </div>
-        ))}
-        <div style={{ borderTop: '1px solid #ccc', margin: '2px 0' }} />
+      >
+        {/* Header */}
         <div
-          className="winmo-start-menu-item"
-          onClick={onTogglePrograms}
-          style={{ justifyContent: 'space-between' }}
+          style={{
+            background: '#1a4c96',
+            padding: '5px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            borderBottom: '1px solid rgba(255,255,255,0.15)',
+          }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span>📂</span>
-            <span>Programs</span>
+          <WinFlag />
+          <span style={{ color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 0.3 }}>
+            Start
           </span>
-          <span style={{ fontSize: 9 }}>{programsOpen ? '▼' : '▶'}</span>
         </div>
-        {programsOpen &&
-          programs.map((app) => (
-            <div
-              key={app.id}
-              className="winmo-start-menu-item"
-              style={{ paddingLeft: 28 }}
-              onClick={() => onOpenApp(app.id)}
-            >
-              <span>{app.icon}</span>
-              <span>{app.name}</span>
+
+        {/* Recent apps row */}
+        <div
+          style={{
+            background: '#2460a8',
+            padding: '3px 8px',
+            display: 'flex',
+            gap: 5,
+            alignItems: 'center',
+            borderBottom: '1px solid rgba(0,0,0,0.2)',
+          }}
+        >
+          {['🌐', '📅', '✉️', '📝', '🧮'].map((icon, i) => (
+            <span key={i} style={{ fontSize: 16, cursor: 'pointer', lineHeight: 1 }}>
+              {icon}
+            </span>
+          ))}
+        </div>
+
+        {/* Scrollable list */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          {mainItems.map((item) => (
+            <div key={item.id} style={row} onClick={() => onOpenApp(item.id)}>
+              <span style={{ fontSize: 14, width: 20, textAlign: 'center', lineHeight: 1 }}>
+                {item.icon}
+              </span>
+              <span>{item.name}</span>
             </div>
           ))}
-        <div className="winmo-start-menu-item" onClick={() => onOpenApp('settings')}>
-          <span>⚙</span>
-          <span>Settings</span>
-        </div>
-        <div style={{ borderTop: '1px solid #ccc', margin: '2px 0' }} />
-        <div className="winmo-start-menu-item" style={{ fontSize: 11, color: '#666' }}>
-          <span>❓</span>
-          <span>Help</span>
+
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.22)', margin: '2px 0' }} />
+
+          {/* Programs — opens full Programs screen */}
+          <div
+            style={{ ...row, justifyContent: 'space-between' }}
+            onClick={() => onOpenApp('programs')}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, width: 20, textAlign: 'center' }}>📂</span>
+              <span>Programs</span>
+            </span>
+            <span style={{ fontSize: 8, marginRight: 2 }}>▶</span>
+          </div>
+
+          {/* Settings */}
+          <div style={row} onClick={() => onOpenApp('settings')}>
+            <span style={{ fontSize: 14, width: 20, textAlign: 'center' }}>📂</span>
+            <span>Settings</span>
+          </div>
+
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.22)', margin: '2px 0' }} />
+
+          <div style={row} onClick={onClose}>
+            <span style={{ fontSize: 14, width: 20, textAlign: 'center' }}>🔍</span>
+            <span>Find</span>
+          </div>
+          <div style={row} onClick={onClose}>
+            <span style={{ fontSize: 14, width: 20, textAlign: 'center' }}>❓</span>
+            <span>Help</span>
+          </div>
         </div>
       </div>
     </>
+  );
+}
+
+// ---- Programs App ----
+function ProgramsApp({ onOpenApp }: { onOpenApp: (id: string) => void }) {
+  const apps = [
+    { id: 'calculator', name: 'Calculator', icon: '🧮', color: '#c8e0f8' },
+    { id: 'file-explorer', name: 'File Explorer', icon: '📁', color: '#fde8a0' },
+    { id: 'notes', name: 'Notes', icon: '📝', color: '#fffacd' },
+    { id: null, name: 'Games', icon: '🎮', color: '#d0f0d0' },
+    { id: null, name: 'MSN Messenger', icon: '💬', color: '#cce8ff' },
+    { id: null, name: 'Pictures', icon: '🖼️', color: '#ffd8e8' },
+    { id: null, name: 'Pocket Excel', icon: '📊', color: '#d8f0d0' },
+    { id: null, name: 'Pocket Word', icon: '📄', color: '#d0d8ff' },
+    { id: null, name: 'Microsoft Reader', icon: '📖', color: '#ffe0c0' },
+    { id: null, name: 'Pocket MSN', icon: '🦋', color: '#e8d8ff' },
+    { id: null, name: 'Windows Media', icon: '▶️', color: '#c8f0e0' },
+    { id: null, name: 'Data Backup', icon: '💾', color: '#e0e0e0' },
+  ];
+
+  return (
+    <div style={{ height: '100%', overflowY: 'auto', background: '#daeef8', padding: '6px 4px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+        {apps.map((app, i) => (
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '8px 4px',
+              cursor: app.id ? 'pointer' : 'default',
+            }}
+            onClick={() => app.id && onOpenApp(app.id)}
+          >
+            <div
+              style={{
+                width: 46,
+                height: 46,
+                background: app.color,
+                border: '1px solid rgba(0,0,0,0.15)',
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 28,
+              }}
+            >
+              {app.icon}
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                textAlign: 'center',
+                marginTop: 3,
+                color: '#000',
+                lineHeight: 1.2,
+                maxWidth: 72,
+              }}
+            >
+              {app.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

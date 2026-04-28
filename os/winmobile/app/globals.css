@@ -149,32 +149,8 @@ body {
   position: relative;
 }
 
-.winmo-start-menu {
-  position: absolute;
-  top: 26px;
-  left: 0;
-  width: 170px;
-  background: #fff;
-  border-right: 1px solid #808080;
-  border-bottom: 1px solid #808080;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  animation: winmo-dropdown 0.15s ease-out;
-}
-
-.winmo-start-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  font-size: 12px;
-  color: #000;
-  cursor: pointer;
-}
-
 .winmo-start-menu-item:hover {
-  background: #3a6ea5;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* Today Screen */

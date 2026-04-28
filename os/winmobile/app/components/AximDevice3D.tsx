@@ -200,7 +200,7 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 0.25;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
@@ -223,9 +223,9 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     }
 
     // ---- Materials — MeshPhysicalMaterial for key surfaces ----
-    // Cool neutral gray — matches real Dell Axim X3i silver finish
+    // Cool neutral gray — Dell Axim X3i silver (darker so it doesn't blow out under lighting)
     const chassisMat = new THREE.MeshPhysicalMaterial({
-      color: 0xd2d2d2,
+      color: 0xa0a0a0,
       roughness: 0.4,
       metalness: 0.55,
       clearcoat: 0.07,
@@ -233,34 +233,34 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
       side: THREE.DoubleSide,
     });
     const chassisDarkMat = new THREE.MeshPhysicalMaterial({
-      color: 0xbebebe,
+      color: 0x909090,
       roughness: 0.46,
       metalness: 0.48,
       clearcoat: 0.04,
       clearcoatRoughness: 0.36,
       side: THREE.DoubleSide,
     });
-    // Bezel — slightly darker cool gray
+    // Bezel — slightly darker
     const bezelMat = new THREE.MeshPhysicalMaterial({
-      color: 0xc8c8c8,
+      color: 0x989898,
       roughness: 0.54,
       metalness: 0.32,
       clearcoat: 0.0,
     });
     const buttonMat = new THREE.MeshPhysicalMaterial({
-      color: 0xc0c0c0,
+      color: 0x929292,
       roughness: 0.5,
       metalness: 0.35,
       clearcoat: 0.0,
     });
     const dpadMat = new THREE.MeshPhysicalMaterial({
-      color: 0xb8b8b8,
+      color: 0x8a8a8a,
       roughness: 0.52,
       metalness: 0.33,
       clearcoat: 0.0,
     });
     const dpadCenterMat = new THREE.MeshPhysicalMaterial({
-      color: 0xcecece,
+      color: 0x9e9e9e,
       roughness: 0.44,
       metalness: 0.4,
       clearcoat: 0.0,
@@ -520,7 +520,7 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     const batX = -0.06;
     const batY = -0.02;
     const batCoverMat = new THREE.MeshStandardMaterial({
-      color: 0xcecece,
+      color: 0x9c9c9c,
       roughness: 0.38,
       metalness: 0.48,
     });
@@ -528,7 +528,7 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
 
     // Battery release tabs (tapered oval domes at top & bottom of cover)
     const tabMat = new THREE.MeshStandardMaterial({
-      color: 0xd4d4d4,
+      color: 0xa4a4a4,
       roughness: 0.3,
       metalness: 0.5,
     });
@@ -712,32 +712,29 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     );
 
     // ---- Lighting ----
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    // Low ambient so shadows remain visible; directionals provide shape definition
+    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.45);
+    const key = new THREE.DirectionalLight(0xffffff, 0.75);
     key.position.set(3, 4.5, 6);
     key.castShadow = true;
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0x9090bb, 0.32);
+    const fill = new THREE.DirectionalLight(0x9090bb, 0.18);
     fill.position.set(-4, 1.5, 3);
     scene.add(fill);
 
-    const rim = new THREE.DirectionalLight(0xfff0e8, 0.42);
+    const rim = new THREE.DirectionalLight(0xfff0e8, 0.14);
     rim.position.set(0.5, -3, -2);
     scene.add(rim);
 
-    const backKey = new THREE.DirectionalLight(0xffffff, 0.9);
+    const backKey = new THREE.DirectionalLight(0xffffff, 0.28);
     backKey.position.set(-1, 2, -6);
     scene.add(backKey);
 
-    const top = new THREE.DirectionalLight(0xffffff, 0.55);
+    const top = new THREE.DirectionalLight(0xffffff, 0.16);
     top.position.set(0, 6, 3);
     scene.add(top);
-
-    const botKey = new THREE.DirectionalLight(0xffffff, 0.7);
-    botKey.position.set(0, -6, 3);
-    scene.add(botKey);
 
     // Initial render — straight on (rotation 0, 0)
     renderAndProject(0, 0);

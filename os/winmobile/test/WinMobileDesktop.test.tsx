@@ -24,7 +24,8 @@ describe('WinMobileDesktop', () => {
   test('renders the Today screen by default', () => {
     render(<WinMobileDesktop />);
     expect(screen.getByText('Today')).toBeInTheDocument();
-    expect(screen.getByText(/Sunday, April 26, 2026/i)).toBeInTheDocument();
+    // Date is dynamic — verify a long-form date string is present
+    expect(screen.getByText(/\w+day, \w+ \d+, \d{4}/i)).toBeInTheDocument();
   });
 
   test('can open and close the Start menu', () => {
@@ -35,7 +36,7 @@ describe('WinMobileDesktop', () => {
     expect(screen.getByText('Calculator')).toBeInTheDocument();
 
     // Clicking the backdrop closes it
-    const backdrop = document.querySelector('.bg-black\\/5');
+    const backdrop = document.querySelector('[data-testid="start-backdrop"]');
     if (backdrop) fireEvent.click(backdrop);
 
     expect(screen.queryByText('Calculator')).not.toBeInTheDocument();

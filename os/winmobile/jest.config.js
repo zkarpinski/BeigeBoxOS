@@ -10,8 +10,9 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
-    // Handle module aliases (this will be automatically configured for you soon)
     '^@/(.*)$': '<rootDir>/app/$1',
+    // Stub three.js JSM examples (ESM-only, can't be parsed by Jest/CommonJS)
+    '^three/examples/jsm/(.*)$': '<rootDir>/__mocks__/threeJsmStub.js',
   },
 };
 

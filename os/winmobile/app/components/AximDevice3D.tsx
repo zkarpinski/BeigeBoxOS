@@ -1,35 +1,44 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 // ---------- Scene constants ----------
 const CANVAS_W = 400;
 const CANVAS_H = 730;
 
-const BODY_W = 1.26;
-const BODY_H = 2.08;
-const BODY_D = 0.28;
+const BODY_W = 1.32;
+const BODY_H = 2.02;
+const BODY_D = 0.17;
 
 // Screen face dimensions & position in scene-local coords
-const SCREEN_W = 0.87;
-const SCREEN_H = 1.06;
-const SCREEN_Y = 0.23;
-const SCREEN_Z = BODY_D / 2 + 0.013;
+const SCREEN_W = 0.92;
+const SCREEN_H = 1.22;
+const SCREEN_Y = 0.22;
+const SCREEN_Z = BODY_D / 2 + 0.015;
 
 // Controls area
-const CTRL_Y = -BODY_H / 2 + 0.185;
+const CTRL_Y = -BODY_H / 2 + 0.22;
 
-// Camera & scene rotation
-const CAM_X = 0.75;
-const CAM_Y = 0.18;
+// Camera — centered for a straight-on default view
+const CAM_X = 0;
+const CAM_Y = 0;
 const CAM_Z = 5.5;
-const ROT_Y = -0.22; // negative = slight right-side reveal
-const ROT_X = 0.06; // slight downward tilt
 
 // Screen content design size
 const CONTENT_W = 240;
 const CONTENT_H = 320;
+
+// App button positions (module-scope so renderAndProject can reference them)
+const APP_BTN_POSITIONS: [number, number][] = [
+  [-0.52, CTRL_Y],
+  [-0.3, CTRL_Y],
+  [0.3, CTRL_Y],
+  [0.52, CTRL_Y],
+];
+
+// No rotation limits — full 360° in any direction
 
 // ---------- 3×3 flat row-major matrix math for CSS homography ----------
 
@@ -63,10 +72,6 @@ function mulv3(m: number[], v: number[]): number[] {
   ];
 }
 
-/**
- * Returns 3×3 homography (flat row-major) from {e1→p1, e2→p2, e3→p3, [1,1,1]→p4}.
- * Used to build the source-rect → dest-quad transform.
- */
 function basisToPoints(
   x1: number,
   y1: number,
@@ -77,18 +82,11 @@ function basisToPoints(
   x4: number,
   y4: number,
 ): number[] {
-  // m has p1,p2,p3 as columns (row-major representation)
   const m = [x1, x2, x3, y1, y2, y3, 1, 1, 1];
   const v = mulv3(adj3(m), [x4, y4, 1]);
-  // H = m * diag(v)
   return mul3(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]);
 }
 
-/**
- * CSS matrix3d string for a projective transform that maps a srcW×srcH rectangle
- * (top-left at origin) to an arbitrary quadrilateral (tl, tr, br, bl).
- * Apply with `transform-origin: 0 0`.
- */
 function homographyCSS(
   tl: [number, number],
   tr: [number, number],
@@ -102,7 +100,6 @@ function homographyCSS(
   const T = mul3(d, adj3(s));
   const n = T[8];
   const h = T.map((v) => v / n);
-  // CSS matrix3d (column-major, 4×4 with Z pass-through)
   return `matrix3d(${h[0]},${h[3]},0,${h[6]},${h[1]},${h[4]},0,${h[7]},0,0,1,0,${h[2]},${h[5]},0,${h[8]})`;
 }
 
@@ -115,6 +112,8 @@ interface OverlayState {
   screenQuad: Quad;
   dpadCenter: Point2;
   appBtns: Point2[];
+  /** True when the screen face normal points toward the camera (front-facing). */
+  screenFacing: boolean;
 }
 
 export interface AximDevice3DProps {
@@ -127,8 +126,65 @@ export interface AximDevice3DProps {
 
 export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [overlay, setOverlay] = useState<OverlayState | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
+  // Current rotation stored in a ref (avoids stale closures in event handlers)
+  const rotRef = useRef({ x: 0, y: 0 });
+  // Drag start state
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    startRotX: number;
+    startRotY: number;
+  } | null>(null);
+
+  const [overlay, setOverlay] = useState<OverlayState | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Re-render the scene at the given rotation and recalculate the 2D overlay coords.
+  const renderAndProject = useCallback((rotX: number, rotY: number) => {
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+    if (!renderer || !scene || !camera) return;
+
+    scene.rotation.x = rotX;
+    scene.rotation.y = rotY;
+    renderer.render(scene, camera);
+
+    const euler = new THREE.Euler(rotX, rotY, 0);
+    const rotMat = new THREE.Matrix4().makeRotationFromEuler(euler);
+
+    // camera is guaranteed non-null here (guarded above); captured for TS narrowing
+    const cam = camera;
+    function project(v3: THREE.Vector3): Point2 {
+      const world = v3.clone().applyMatrix4(rotMat);
+      world.project(cam);
+      return [((world.x + 1) / 2) * CANVAS_W, ((-world.y + 1) / 2) * CANVAS_H];
+    }
+
+    const screenQuad: Quad = [
+      project(new THREE.Vector3(-SCREEN_W / 2, SCREEN_Y + SCREEN_H / 2, SCREEN_Z)), // TL
+      project(new THREE.Vector3(SCREEN_W / 2, SCREEN_Y + SCREEN_H / 2, SCREEN_Z)), // TR
+      project(new THREE.Vector3(SCREEN_W / 2, SCREEN_Y - SCREEN_H / 2, SCREEN_Z)), // BR
+      project(new THREE.Vector3(-SCREEN_W / 2, SCREEN_Y - SCREEN_H / 2, SCREEN_Z)), // BL
+    ];
+
+    const dpadCenter = project(new THREE.Vector3(0, CTRL_Y, BODY_D / 2 + 0.03));
+    const appBtns = APP_BTN_POSITIONS.map(([bx, by]) =>
+      project(new THREE.Vector3(bx, by, BODY_D / 2 + 0.024)),
+    );
+
+    // Screen normal (0,0,1) rotated by scene rotation — z-component tells us if it faces camera.
+    // cos(rotX)*cos(rotY) > 0 means the front face is toward the camera.
+    const screenFacing = Math.cos(rotX) * Math.cos(rotY) > 0;
+
+    setOverlay({ screenQuad, dpadCenter, appBtns, screenFacing });
+  }, []);
+
+  // ---- Build Three.js scene once ----
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -136,7 +192,6 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     const W = CANVAS_W;
     const H = CANVAS_H;
 
-    // ---- Renderer ----
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setSize(W, H);
     renderer.setPixelRatio(
@@ -144,67 +199,97 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // ---- Scene ----
     const scene = new THREE.Scene();
-    scene.rotation.y = ROT_Y;
-    scene.rotation.x = ROT_X;
-
-    // ---- Camera ----
     const camera = new THREE.PerspectiveCamera(28, W / H, 0.1, 50);
     camera.position.set(CAM_X, CAM_Y, CAM_Z);
     camera.lookAt(0, 0, 0);
 
-    // ---- Materials ----
-    const chassisMat = new THREE.MeshStandardMaterial({
-      color: 0xd6d6d6,
-      roughness: 0.18,
-      metalness: 0.72,
+    rendererRef.current = renderer;
+    sceneRef.current = scene;
+    cameraRef.current = camera;
+
+    // Environment map — gives physical materials (clearcoat, metalness) realistic reflections.
+    // Guarded: PMREMGenerator requires getRenderTarget which may not exist in test environments.
+    let envTexture: THREE.Texture | null = null;
+    if (typeof renderer.getRenderTarget === 'function') {
+      const pmremGenerator = new THREE.PMREMGenerator(renderer);
+      envTexture = pmremGenerator.fromScene(new RoomEnvironment()).texture;
+      scene.environment = envTexture;
+      pmremGenerator.dispose();
+    }
+
+    // ---- Materials — MeshPhysicalMaterial for key surfaces ----
+    // Cool neutral gray — matches real Dell Axim X3i silver finish
+    const chassisMat = new THREE.MeshPhysicalMaterial({
+      color: 0xd2d2d2,
+      roughness: 0.4,
+      metalness: 0.55,
+      clearcoat: 0.07,
+      clearcoatRoughness: 0.3,
+      side: THREE.DoubleSide,
     });
-    const chassisDarkMat = new THREE.MeshStandardMaterial({
+    const chassisDarkMat = new THREE.MeshPhysicalMaterial({
+      color: 0xbebebe,
+      roughness: 0.46,
+      metalness: 0.48,
+      clearcoat: 0.04,
+      clearcoatRoughness: 0.36,
+      side: THREE.DoubleSide,
+    });
+    // Bezel — slightly darker cool gray
+    const bezelMat = new THREE.MeshPhysicalMaterial({
+      color: 0xc8c8c8,
+      roughness: 0.54,
+      metalness: 0.32,
+      clearcoat: 0.0,
+    });
+    const buttonMat = new THREE.MeshPhysicalMaterial({
+      color: 0xc0c0c0,
+      roughness: 0.5,
+      metalness: 0.35,
+      clearcoat: 0.0,
+    });
+    const dpadMat = new THREE.MeshPhysicalMaterial({
       color: 0xb8b8b8,
-      roughness: 0.25,
-      metalness: 0.7,
+      roughness: 0.52,
+      metalness: 0.33,
+      clearcoat: 0.0,
     });
-    const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0x141414,
-      roughness: 0.65,
-      metalness: 0.08,
+    const dpadCenterMat = new THREE.MeshPhysicalMaterial({
+      color: 0xcecece,
+      roughness: 0.44,
+      metalness: 0.4,
+      clearcoat: 0.0,
     });
-    const buttonMat = new THREE.MeshStandardMaterial({
-      color: 0x888888,
-      roughness: 0.32,
-      metalness: 0.58,
+    const lensMat = new THREE.MeshPhysicalMaterial({
+      color: 0x040406,
+      roughness: 0.02,
+      metalness: 0.0,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.02,
     });
-    const dpadMat = new THREE.MeshStandardMaterial({
-      color: 0x6a6a6a,
-      roughness: 0.38,
-      metalness: 0.52,
-    });
-    const dpadCenterMat = new THREE.MeshStandardMaterial({
-      color: 0xb2b2b2,
-      roughness: 0.22,
-      metalness: 0.62,
-    });
-    const lensMat = new THREE.MeshStandardMaterial({
-      color: 0x060608,
-      roughness: 0.04,
-      metalness: 0.92,
-    });
-    const lensRingMat = new THREE.MeshStandardMaterial({
-      color: 0x424242,
-      roughness: 0.18,
-      metalness: 0.85,
+    const lensRingMat = new THREE.MeshPhysicalMaterial({
+      color: 0x3e3e3e,
+      roughness: 0.15,
+      metalness: 0.88,
+      clearcoat: 0.3,
+      clearcoatRoughness: 0.1,
     });
     const speakerMat = new THREE.MeshStandardMaterial({
-      color: 0x1e1e1e,
-      roughness: 0.88,
-      metalness: 0.05,
+      color: 0x1a1a1a,
+      roughness: 0.9,
+      metalness: 0.04,
     });
-    const dellBadgeMat = new THREE.MeshStandardMaterial({
-      color: 0xbababa,
-      roughness: 0.28,
-      metalness: 0.75,
+    const dellBadgeMat = new THREE.MeshPhysicalMaterial({
+      color: 0xb8b8b8,
+      roughness: 0.22,
+      metalness: 0.78,
+      clearcoat: 0.4,
+      clearcoatRoughness: 0.1,
     });
 
     // ---- Helper ----
@@ -226,38 +311,43 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     }
 
     // ---- Device body ----
-    add(new THREE.BoxGeometry(BODY_W, BODY_H, BODY_D), chassisMat);
+    const bodyShape = new THREE.Shape();
+    const rw = BODY_W / 2;
+    const rh = BODY_H / 2;
+    const br = 0.24; // Bottom corner radius
+    const tr = 0.06; // Top corner radius
 
-    // Subtle darker side panels (left & right sides)
-    add(
-      new THREE.BoxGeometry(0.03, BODY_H - 0.1, BODY_D),
-      chassisDarkMat,
-      -BODY_W / 2 + 0.015,
-      0,
-      0,
-    );
-    add(
-      new THREE.BoxGeometry(0.03, BODY_H - 0.1, BODY_D),
-      chassisDarkMat,
-      BODY_W / 2 - 0.015,
-      0,
-      0,
-    );
+    bodyShape.moveTo(rw - tr, rh);
+    bodyShape.lineTo(-rw + tr, rh);
+    bodyShape.absarc(-rw + tr, rh - tr, tr, Math.PI / 2, Math.PI, false);
+    bodyShape.lineTo(-rw, -rh + br);
+    bodyShape.absarc(-rw + br, -rh + br, br, Math.PI, Math.PI * 1.5, false);
+    bodyShape.lineTo(rw - br, -rh);
+    bodyShape.absarc(rw - br, -rh + br, br, Math.PI * 1.5, Math.PI * 2, false);
+    bodyShape.lineTo(rw, rh - tr);
+    bodyShape.absarc(rw - tr, rh - tr, tr, 0, Math.PI / 2, false);
+
+    const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, {
+      depth: BODY_D,
+      bevelEnabled: true,
+      bevelThickness: 0.009,
+      bevelSize: 0.011,
+      bevelSegments: 10,
+    });
+    bodyGeo.center();
+    add(bodyGeo, chassisMat);
 
     // ---- Front face overlays ----
     const frontZ = BODY_D / 2 + 0.005;
 
-    // Top section bezel (above screen)
     const topSecH = BODY_H / 2 - (SCREEN_Y + SCREEN_H / 2) - 0.01;
     const topSecY = SCREEN_Y + SCREEN_H / 2 + topSecH / 2 + 0.01;
     add(new THREE.BoxGeometry(BODY_W - 0.06, topSecH, 0.018), bezelMat, 0, topSecY, frontZ);
 
-    // Bottom section bezel (below screen / controls area)
     const botSecH = BODY_H / 2 + (SCREEN_Y - SCREEN_H / 2) - 0.01;
     const botSecY = SCREEN_Y - SCREEN_H / 2 - botSecH / 2 - 0.01;
     add(new THREE.BoxGeometry(BODY_W - 0.06, botSecH, 0.018), bezelMat, 0, botSecY, frontZ);
 
-    // Left / right narrow side bezels flanking the screen
     const sbH = SCREEN_H + 0.05;
     const sbW = (BODY_W - 0.06 - SCREEN_W) / 2;
     add(
@@ -269,132 +359,356 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     );
     add(new THREE.BoxGeometry(sbW, sbH, 0.018), bezelMat, SCREEN_W / 2 + sbW / 2, SCREEN_Y, frontZ);
 
-    // NOTE: no mesh for the screen face itself — DOM content shows through alpha canvas
-
-    // ---- Camera lens (top-left area) ----
-    const LX = -0.34;
-    const LY = BODY_H / 2 - 0.115;
-    const LZ = BODY_D / 2 + 0.012;
-    add(new THREE.CylinderGeometry(0.054, 0.054, 0.02, 32), lensRingMat, LX, LY, LZ, Math.PI / 2);
+    // Screen glass — MeshPhysicalMaterial clearcoat simulates the display cover glass.
+    // The DOM overlay (z-index > canvas) renders the OS UI on top of this mesh.
     add(
-      new THREE.CylinderGeometry(0.037, 0.037, 0.026, 32),
-      lensMat,
-      LX,
-      LY,
-      LZ + 0.006,
+      new THREE.BoxGeometry(SCREEN_W, SCREEN_H, 0.004),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x050505,
+        roughness: 0.03,
+        metalness: 0.0,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.02,
+      }),
+      0,
+      SCREEN_Y,
+      SCREEN_Z + 0.001,
+    );
+
+    // ---- Speaker slit & notification LED (top bezel) ----
+    const spkY = rh - 0.07;
+    // Thin horizontal speaker slit
+    for (let i = 0; i < 3; i++) {
+      add(new THREE.BoxGeometry(0.24, 0.007, 0.008), speakerMat, 0, spkY - i * 0.014, frontZ);
+    }
+    // Notification LED (small green dot, top-left of bezel)
+    add(
+      new THREE.CylinderGeometry(0.013, 0.013, 0.01, 12),
+      new THREE.MeshStandardMaterial({ color: 0x22ff44, emissive: 0x116600 }),
+      -0.34,
+      spkY - 0.02,
+      frontZ,
       Math.PI / 2,
     );
 
-    // ---- Speaker grille (top-right, parallel slots) ----
-    for (let i = 0; i < 5; i++) {
-      add(
-        new THREE.BoxGeometry(0.22, 0.011, 0.008),
-        speakerMat,
-        0.18,
-        BODY_H / 2 - 0.09 - i * 0.024,
-        BODY_D / 2 + 0.008,
+    // ---- DELL badge (round, top bezel) ----
+    add(
+      new THREE.CylinderGeometry(0.055, 0.055, 0.01, 32),
+      dellBadgeMat,
+      0,
+      rh - 0.18,
+      frontZ,
+      Math.PI / 2,
+    );
+    // Inner ring detail
+    add(
+      new THREE.CylinderGeometry(0.04, 0.04, 0.012, 32),
+      new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.8 }),
+      0,
+      rh - 0.18,
+      frontZ + 0.001,
+      Math.PI / 2,
+    );
+
+    // ---- Nav control — horizontal oval (matches real Axim 5-way nav shape) ----
+    // Outer base pill (slightly wider than the cap)
+    {
+      const navBase = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.016, 32), dpadMat);
+      navBase.rotation.x = Math.PI / 2;
+      navBase.scale.x = 2.6;
+      navBase.position.set(0, CTRL_Y, frontZ + 0.008);
+      navBase.castShadow = true;
+      scene.add(navBase);
+      // Raised center cap
+      const navCap = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.044, 0.044, 0.02, 32),
+        dpadCenterMat,
       );
+      navCap.rotation.x = Math.PI / 2;
+      navCap.scale.x = 2.4;
+      navCap.position.set(0, CTRL_Y, frontZ + 0.014);
+      navCap.castShadow = true;
+      scene.add(navCap);
     }
 
-    // ---- DELL badge (raised rectangle, top-right area) ----
-    add(
-      new THREE.BoxGeometry(0.24, 0.055, 0.006),
-      dellBadgeMat,
-      0.27,
-      BODY_H / 2 - 0.14,
-      BODY_D / 2 + 0.009,
-    );
-
-    // ---- Bottom controls ----
-    // D-pad circle
-    add(
-      new THREE.CylinderGeometry(0.19, 0.19, 0.022, 32),
-      dpadMat,
-      0,
-      CTRL_Y,
-      BODY_D / 2 + 0.016,
-      Math.PI / 2,
-    );
-    // D-pad cross — horizontal arm
-    add(
-      new THREE.BoxGeometry(0.38, 0.075, 0.026),
-      new THREE.MeshStandardMaterial({ color: 0x5c5c5c, roughness: 0.38, metalness: 0.52 }),
-      0,
-      CTRL_Y,
-      BODY_D / 2 + 0.023,
-    );
-    // D-pad cross — vertical arm
-    add(
-      new THREE.BoxGeometry(0.075, 0.38, 0.026),
-      new THREE.MeshStandardMaterial({ color: 0x5c5c5c, roughness: 0.38, metalness: 0.52 }),
-      0,
-      CTRL_Y,
-      BODY_D / 2 + 0.023,
-    );
-    // D-pad center button
-    add(
-      new THREE.CylinderGeometry(0.066, 0.066, 0.034, 32),
-      dpadCenterMat,
-      0,
-      CTRL_Y,
-      BODY_D / 2 + 0.027,
-      Math.PI / 2,
-    );
-
-    // App buttons (2 left, 2 right of D-pad)
-    const APP_BTN_POSITIONS: [number, number][] = [
-      [-0.37, CTRL_Y + 0.055],
-      [-0.37, CTRL_Y - 0.1],
-      [0.37, CTRL_Y + 0.055],
-      [0.37, CTRL_Y - 0.1],
-    ];
+    // ---- Application shortcut buttons — horizontal row, champagne, no dark housing ----
     APP_BTN_POSITIONS.forEach(([bx, by]) => {
-      add(new THREE.BoxGeometry(0.1, 0.058, 0.022), buttonMat, bx, by, BODY_D / 2 + 0.013);
+      // Rounded-square cap button, proud of bezel
+      add(new THREE.BoxGeometry(0.1, 0.08, 0.02), buttonMat, bx, by, frontZ + 0.01);
     });
 
     // ---- Side details ----
-    // Left side — volume rocker
+    // Left side: voice record button (small protrusion, champagne)
+    add(new THREE.BoxGeometry(0.026, 0.08, 0.05), buttonMat, -rw - 0.013, 0.28, 0);
+    // Right side: stylus channel groove (thin strip indicating stylus slot)
     add(
-      new THREE.BoxGeometry(0.032, 0.2, BODY_D - 0.06),
-      new THREE.MeshStandardMaterial({ color: 0xb0b0b0, roughness: 0.22, metalness: 0.78 }),
-      -BODY_W / 2 - 0.016,
-      0.28,
-      0,
-    );
-    add(
-      new THREE.BoxGeometry(0.042, 0.065, BODY_D * 0.55),
-      new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.28, metalness: 0.72 }),
-      -BODY_W / 2 - 0.018,
-      0.28,
-      0,
+      new THREE.BoxGeometry(0.018, 0.32, 0.01),
+      new THREE.MeshStandardMaterial({ color: 0x909090, roughness: 0.45 }),
+      frontZ - 0.005,
     );
 
-    // Right side — stylus slot ridge
+    // ---- AXIM branding (bottom bezel) ----
     add(
-      new THREE.BoxGeometry(0.025, 0.35, 0.018),
-      new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.45 }),
-      BODY_W / 2 + 0.012,
-      -0.05,
-      BODY_D / 2 - 0.01,
+      new THREE.BoxGeometry(0.16, 0.04, 0.008),
+      new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8 }),
+      0,
+      -0.58,
+      frontZ,
     );
 
-    // ---- Top details ----
-    // Power button
+    // ---- Top edge ----
+    // Power button (top-right)
     add(
-      new THREE.BoxGeometry(0.12, 0.038, 0.014),
-      new THREE.MeshStandardMaterial({ color: 0x646464, roughness: 0.28, metalness: 0.72 }),
-      0.24,
-      BODY_H / 2 + 0.019,
-      0.04,
-    );
-    // IR port
-    add(
-      new THREE.CylinderGeometry(0.016, 0.016, 0.013, 12),
-      new THREE.MeshStandardMaterial({ color: 0x160800, roughness: 0.28 }),
-      -0.38,
-      BODY_H / 2 + 0.012,
+      new THREE.BoxGeometry(0.11, 0.034, 0.014),
+      new THREE.MeshStandardMaterial({ color: 0x606060, roughness: 0.28, metalness: 0.72 }),
+      0.25,
+      rh + 0.017,
       0.02,
+    );
+    // IR port (top-left, dark lens)
+    add(
+      new THREE.CylinderGeometry(0.015, 0.015, 0.012, 12),
+      new THREE.MeshStandardMaterial({ color: 0x160800, roughness: 0.3 }),
+      -0.36,
+      rh + 0.012,
+      0.01,
       Math.PI / 2,
+    );
+
+    // ---- Back face details ----
+    const backSZ = -(BODY_D / 2 + 0.005);
+
+    // Corner screws (×4)
+    const screwRingMat = new THREE.MeshStandardMaterial({
+      color: 0x505050,
+      roughness: 0.3,
+      metalness: 0.8,
+    });
+    const screwCoreMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1a1a,
+      roughness: 0.5,
+      metalness: 0.5,
+    });
+    const cornerScrews: [number, number][] = [
+      [-BODY_W / 2 + 0.1, BODY_H / 2 - 0.1],
+      [BODY_W / 2 - 0.1, BODY_H / 2 - 0.1],
+      [-BODY_W / 2 + 0.1, -BODY_H / 2 + 0.1],
+      [BODY_W / 2 - 0.1, -BODY_H / 2 + 0.1],
+    ];
+    cornerScrews.forEach(([sx, sy]) => {
+      add(
+        new THREE.CylinderGeometry(0.044, 0.044, 0.016, 16),
+        screwRingMat,
+        sx,
+        sy,
+        backSZ - 0.008,
+        Math.PI / 2,
+      );
+      add(
+        new THREE.CylinderGeometry(0.025, 0.025, 0.022, 12),
+        screwCoreMat,
+        sx,
+        sy,
+        backSZ - 0.009,
+        Math.PI / 2,
+      );
+    });
+
+    // Battery cover (large panel covering most of the back)
+    const batW = 0.88;
+    const batH = 1.44;
+    const batX = -0.06;
+    const batY = -0.02;
+    const batCoverMat = new THREE.MeshStandardMaterial({
+      color: 0xcecece,
+      roughness: 0.38,
+      metalness: 0.48,
+    });
+    add(new THREE.BoxGeometry(batW, batH, 0.014), batCoverMat, batX, batY, backSZ - 0.006);
+
+    // Battery release tabs (tapered oval domes at top & bottom of cover)
+    const tabMat = new THREE.MeshStandardMaterial({
+      color: 0xd4d4d4,
+      roughness: 0.3,
+      metalness: 0.5,
+    });
+    add(
+      new THREE.CylinderGeometry(0.046, 0.06, 0.018, 20),
+      tabMat,
+      batX,
+      batY + batH / 2 + 0.016,
+      backSZ - 0.012,
+      Math.PI / 2,
+    );
+    add(
+      new THREE.CylinderGeometry(0.046, 0.06, 0.018, 20),
+      tabMat,
+      batX,
+      batY - batH / 2 - 0.016,
+      backSZ - 0.012,
+      Math.PI / 2,
+    );
+
+    // "Designed for Windows Mobile" badge (dark rectangle near top-center of back)
+    const badgeW = 0.38;
+    const badgeH = 0.11;
+    const badgeX = 0.08;
+    const badgeY = BODY_H / 2 - 0.22;
+    add(
+      new THREE.BoxGeometry(badgeW, badgeH, 0.007),
+      new THREE.MeshStandardMaterial({ color: 0x0d0d0d, roughness: 0.6, metalness: 0.1 }),
+      badgeX,
+      badgeY,
+      backSZ - 0.006,
+    );
+
+    // Windows logo — 4 colored panes
+    const pSz = 0.026;
+    const pOff = 0.016;
+    const logoX = badgeX - badgeW / 2 + 0.054;
+    const logoY = badgeY;
+    const logoPanes: Array<{ col: number; ox: number; oy: number }> = [
+      { col: 0xf25022, ox: -pOff, oy: pOff },
+      { col: 0x7fba00, ox: pOff, oy: pOff },
+      { col: 0x00a4ef, ox: -pOff, oy: -pOff },
+      { col: 0xffb900, ox: pOff, oy: -pOff },
+    ];
+    logoPanes.forEach(({ col, ox, oy }) => {
+      add(
+        new THREE.BoxGeometry(pSz, pSz, 0.008),
+        new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.1 }),
+        logoX + ox,
+        logoY + oy,
+        backSZ - 0.007,
+      );
+    });
+
+    // Back face DELL logo (circular recess)
+    add(
+      new THREE.CylinderGeometry(0.14, 0.14, 0.01, 32),
+      dellBadgeMat,
+      0,
+      0.45,
+      backSZ - 0.005,
+      Math.PI / 2,
+    );
+
+    // Speaker grille — 6x6 dot grid (bottom-left of back)
+    const spkX0 = -rw + 0.18;
+    const spkY0 = -rh + 0.22;
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 6; col++) {
+        add(
+          new THREE.CylinderGeometry(0.01, 0.01, 0.01, 8),
+          speakerMat,
+          spkX0 + col * 0.035,
+          spkY0 + row * 0.035,
+          backSZ - 0.006,
+          Math.PI / 2,
+        );
+      }
+    }
+
+    // Lock slider slot (right-side of back, lower area)
+    add(
+      new THREE.BoxGeometry(0.034, 0.055, 0.014),
+      new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.8, metalness: 0.2 }),
+      BODY_W / 2 - 0.22,
+      -0.12,
+      backSZ - 0.007,
+    );
+
+    // Strap pin slots (side cutouts, upper area — left & right)
+    const pinMat = new THREE.MeshStandardMaterial({
+      color: 0x0a0a0a,
+      roughness: 0.7,
+      metalness: 0.2,
+    });
+    add(
+      new THREE.BoxGeometry(0.032, 0.065, BODY_D * 0.52),
+      pinMat,
+      -BODY_W / 2,
+      BODY_H / 2 - 0.31,
+      0,
+    );
+    add(
+      new THREE.BoxGeometry(0.032, 0.065, BODY_D * 0.52),
+      pinMat,
+      BODY_W / 2,
+      BODY_H / 2 - 0.31,
+      0,
+    );
+
+    // ---- Bottom edge — sync/dock connector ----
+    const botFaceY = -(BODY_H / 2);
+
+    // Dark plastic base strip covering most of the bottom face
+    add(
+      new THREE.BoxGeometry(BODY_W - 0.1, 0.02, BODY_D - 0.04),
+      new THREE.MeshStandardMaterial({ color: 0x181818, roughness: 0.88, metalness: 0.04 }),
+      0,
+      botFaceY - 0.01,
+      0,
+    );
+
+    // Sync/dock connector cavity (deep dark recess)
+    const syncW = 0.54;
+    const syncD = BODY_D * 0.75; // proportion of body depth
+    add(
+      new THREE.BoxGeometry(syncW, 0.03, syncD),
+      new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.95, metalness: 0.05 }),
+      -0.02,
+      botFaceY - 0.015,
+      0,
+    );
+
+    // Connector plastic body (silver/grey insert inside the cavity)
+    const connW = syncW - 0.06;
+    const connD = syncD - 0.04;
+    add(
+      new THREE.BoxGeometry(connW, 0.016, connD),
+      new THREE.MeshStandardMaterial({ color: 0xb4b4b4, roughness: 0.3, metalness: 0.55 }),
+      -0.02,
+      botFaceY - 0.009,
+      0,
+    );
+
+    // Connector pin contacts (gold, two rows front & back)
+    const pinMat3 = new THREE.MeshStandardMaterial({
+      color: 0xc8a820,
+      roughness: 0.15,
+      metalness: 0.95,
+    });
+    const nPins = 13;
+    const pinAreaW = connW - 0.04;
+    const pinStep = pinAreaW / (nPins - 1);
+    const pinFrontZ = -(connD / 2 - 0.022);
+    const pinBackZ = connD / 2 - 0.022;
+    for (let i = 0; i < nPins; i++) {
+      const px = -0.02 - pinAreaW / 2 + i * pinStep;
+      add(new THREE.BoxGeometry(0.011, 0.007, 0.018), pinMat3, px, botFaceY - 0.008, pinFrontZ);
+      add(new THREE.BoxGeometry(0.011, 0.007, 0.018), pinMat3, px, botFaceY - 0.008, pinBackZ);
+    }
+
+    // Connector retaining clips (small dark L-brackets at front & back of cavity)
+    const clipMat = new THREE.MeshStandardMaterial({
+      color: 0x404040,
+      roughness: 0.35,
+      metalness: 0.75,
+    });
+    add(
+      new THREE.BoxGeometry(syncW - 0.02, 0.01, 0.018),
+      clipMat,
+      -0.02,
+      botFaceY - 0.006,
+      -(syncD / 2 - 0.009),
+    );
+    add(
+      new THREE.BoxGeometry(syncW - 0.02, 0.01, 0.018),
+      clipMat,
+      -0.02,
+      botFaceY - 0.006,
+      syncD / 2 - 0.009,
     );
 
     // ---- Lighting ----
@@ -413,45 +727,76 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     rim.position.set(0.5, -3, -2);
     scene.add(rim);
 
+    const backKey = new THREE.DirectionalLight(0xffffff, 0.9);
+    backKey.position.set(-1, 2, -6);
+    scene.add(backKey);
+
     const top = new THREE.DirectionalLight(0xffffff, 0.55);
     top.position.set(0, 6, 3);
     scene.add(top);
 
-    // ---- Render once ----
-    renderer.render(scene, camera);
+    const botKey = new THREE.DirectionalLight(0xffffff, 0.7);
+    botKey.position.set(0, -6, 3);
+    scene.add(botKey);
 
-    // ---- Project 3D points → 2D CSS coords ----
-    const euler = new THREE.Euler(ROT_X, ROT_Y, 0);
-    const rotMat = new THREE.Matrix4().makeRotationFromEuler(euler);
-
-    function project(v3: THREE.Vector3): Point2 {
-      const world = v3.clone().applyMatrix4(rotMat);
-      world.project(camera);
-      return [((world.x + 1) / 2) * W, ((-world.y + 1) / 2) * H];
-    }
-
-    // Screen quad
-    const screenQuad: Quad = [
-      project(new THREE.Vector3(-SCREEN_W / 2, SCREEN_Y + SCREEN_H / 2, SCREEN_Z)), // TL
-      project(new THREE.Vector3(SCREEN_W / 2, SCREEN_Y + SCREEN_H / 2, SCREEN_Z)), // TR
-      project(new THREE.Vector3(SCREEN_W / 2, SCREEN_Y - SCREEN_H / 2, SCREEN_Z)), // BR
-      project(new THREE.Vector3(-SCREEN_W / 2, SCREEN_Y - SCREEN_H / 2, SCREEN_Z)), // BL
-    ];
-
-    // D-pad center
-    const dpadCenter = project(new THREE.Vector3(0, CTRL_Y, BODY_D / 2 + 0.03));
-
-    // App button centers
-    const appBtns = APP_BTN_POSITIONS.map(([bx, by]) =>
-      project(new THREE.Vector3(bx, by, BODY_D / 2 + 0.024)),
-    );
-
-    setOverlay({ screenQuad, dpadCenter, appBtns });
+    // Initial render — straight on (rotation 0, 0)
+    renderAndProject(0, 0);
 
     return () => {
       renderer.dispose();
+      envTexture?.dispose();
+      rendererRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
     };
+  }, [renderAndProject]);
+
+  // ---- Global mouse drag handlers ----
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!dragRef.current) return;
+      const dx = e.clientX - dragRef.current.startX;
+      const dy = e.clientY - dragRef.current.startY;
+
+      const newRotY = dragRef.current.startRotY + dx * 0.007;
+      const newRotX = dragRef.current.startRotX + dy * 0.005;
+
+      rotRef.current = { x: newRotX, y: newRotY };
+      renderAndProject(newRotX, newRotY);
+    };
+
+    const onMouseUp = () => {
+      if (dragRef.current) {
+        dragRef.current = null;
+        setIsDragging(false);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [renderAndProject]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // If we're clicking the OS content or the Home button, don't start dragging the device
+    const target = e.target as HTMLElement;
+    if (target.closest('.axim-screen-container') || target.tagName === 'BUTTON') {
+      return;
+    }
+
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startRotX: rotRef.current.x,
+      startRotY: rotRef.current.y,
+    };
+    setIsDragging(true);
   }, []);
+
+  const screenFacing = overlay?.screenFacing ?? false;
 
   // ---- Screen overlay (perspective-correct) ----
   const screenStyle: React.CSSProperties = {
@@ -461,47 +806,58 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
     width: CONTENT_W,
     height: CONTENT_H,
     transformOrigin: '0 0',
-    transform: overlay
-      ? homographyCSS(
-          overlay.screenQuad[0],
-          overlay.screenQuad[1],
-          overlay.screenQuad[2],
-          overlay.screenQuad[3],
-          CONTENT_W,
-          CONTENT_H,
-        )
-      : 'translateX(-9999px)',
+    transform:
+      overlay && screenFacing
+        ? homographyCSS(
+            overlay.screenQuad[0],
+            overlay.screenQuad[1],
+            overlay.screenQuad[2],
+            overlay.screenQuad[3],
+            CONTENT_W,
+            CONTENT_H,
+          )
+        : 'translateX(-9999px)',
     overflow: 'hidden',
-    pointerEvents: 'auto',
-    zIndex: 1,
+    // Disable pointer events while rotating so the drag isn't interrupted
+    pointerEvents: isDragging ? 'none' : 'auto',
+    zIndex: 3,
   };
 
-  // ---- D-pad home button overlay ----
-  const dpadBtnStyle: React.CSSProperties | null = overlay
-    ? {
-        position: 'absolute',
-        left: overlay.dpadCenter[0] - 22,
-        top: overlay.dpadCenter[1] - 22,
-        width: 44,
-        height: 44,
-        borderRadius: '50%',
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        zIndex: 3,
-        outline: 'none',
-      }
-    : null;
+  // ---- D-pad home button overlay — only shown when front face is toward camera ----
+  const dpadBtnStyle: React.CSSProperties | null =
+    overlay && screenFacing
+      ? {
+          position: 'absolute',
+          left: overlay.dpadCenter[0] - 22,
+          top: overlay.dpadCenter[1] - 22,
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          background: 'transparent',
+          border: 'none',
+          cursor: isDragging ? 'grabbing' : 'pointer',
+          zIndex: 4,
+          outline: 'none',
+        }
+      : null;
 
   return (
     <div
       className="axim-3d-root"
-      style={{ position: 'relative', width: CANVAS_W, height: CANVAS_H }}
+      style={{
+        position: 'relative',
+        width: CANVAS_W,
+        height: CANVAS_H,
+        cursor: isDragging ? 'grabbing' : 'grab',
+      }}
+      onMouseDown={handleMouseDown}
     >
-      {/* Screen content — below canvas so device bezel renders over edges */}
-      <div style={screenStyle}>{children}</div>
+      {/* OS content — above canvas so it shows over the 3D screen face mesh */}
+      <div className="axim-screen-container" style={screenStyle}>
+        {children}
+      </div>
 
-      {/* Three.js device model — transparent canvas on top */}
+      {/* Three.js device model — transparent canvas */}
       <canvas
         ref={canvasRef}
         width={CANVAS_W}

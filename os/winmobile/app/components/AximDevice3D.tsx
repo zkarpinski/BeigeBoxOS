@@ -500,31 +500,177 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
       frontZ + 0.022,
     );
 
-    // ---- Nav control — horizontal oval (matches real Axim 5-way nav shape) ----
-    // Outer base pill (slightly wider than the cap)
+    // ---- Recessed button ring material (dark groove) ----
+    const recessMat = new THREE.MeshPhysicalMaterial({
+      color: 0x484848,
+      roughness: 0.6,
+      metalness: 0.35,
+      clearcoat: 0.0,
+    });
+
+    // ---- Nav oval — outer housing → recessed ring → raised cap ----
     {
-      const navBase = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.016, 32), dpadMat);
-      navBase.rotation.x = Math.PI / 2;
-      navBase.scale.x = 2.6;
-      navBase.position.set(0, CTRL_Y, frontZ + 0.008);
-      navBase.castShadow = true;
-      scene.add(navBase);
-      // Raised center cap
+      // Outer housing oval (chassis color, proud of bezel)
+      const navHousing = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.072, 0.072, 0.014, 32),
+        chassisMat,
+      );
+      navHousing.rotation.x = Math.PI / 2;
+      navHousing.scale.x = 2.5;
+      navHousing.position.set(0, CTRL_Y, frontZ + 0.007);
+      navHousing.castShadow = true;
+      scene.add(navHousing);
+      // Dark recessed groove disc
+      const navRecess = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.06, 0.012, 32),
+        recessMat,
+      );
+      navRecess.rotation.x = Math.PI / 2;
+      navRecess.scale.x = 2.2;
+      navRecess.position.set(0, CTRL_Y, frontZ + 0.002);
+      navRecess.castShadow = true;
+      scene.add(navRecess);
+      // Raised inner cap
       const navCap = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.044, 0.044, 0.02, 32),
+        new THREE.CylinderGeometry(0.048, 0.048, 0.022, 32),
         dpadCenterMat,
       );
       navCap.rotation.x = Math.PI / 2;
-      navCap.scale.x = 2.4;
-      navCap.position.set(0, CTRL_Y, frontZ + 0.014);
+      navCap.scale.x = 1.9;
+      navCap.position.set(0, CTRL_Y, frontZ + 0.017);
       navCap.castShadow = true;
       scene.add(navCap);
+      // Small indicator dot (top)
+      add(
+        new THREE.CylinderGeometry(0.008, 0.008, 0.006, 12),
+        recessMat,
+        0,
+        CTRL_Y + 0.048,
+        frontZ + 0.02,
+        Math.PI / 2,
+      );
     }
 
-    // ---- Application shortcut buttons — horizontal row, champagne, no dark housing ----
-    APP_BTN_POSITIONS.forEach(([bx, by]) => {
-      // Rounded-square cap button, proud of bezel
-      add(new THREE.BoxGeometry(0.1, 0.08, 0.02), buttonMat, bx, by, frontZ + 0.01);
+    // ---- App buttons — circular housing → dark recessed ring → raised cap + icon ----
+    // Icon draw functions (canvas 64×64)
+    type DrawFn = (ctx: CanvasRenderingContext2D) => void;
+    const iconDrawers: DrawFn[] = [
+      // Calendar
+      (ctx) => {
+        ctx.strokeStyle = '#505050';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(8, 12, 48, 44);
+        ctx.beginPath();
+        ctx.moveTo(8, 26);
+        ctx.lineTo(56, 26);
+        ctx.stroke();
+        for (let c = 1; c < 3; c++) {
+          const x = 8 + c * 16;
+          ctx.beginPath();
+          ctx.moveTo(x, 26);
+          ctx.lineTo(x, 56);
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.moveTo(8, 41);
+        ctx.lineTo(56, 41);
+        ctx.stroke();
+        ctx.fillStyle = '#505050';
+        ctx.fillRect(18, 6, 5, 10);
+        ctx.fillRect(41, 6, 5, 10);
+      },
+      // Contacts (person)
+      (ctx) => {
+        ctx.strokeStyle = '#505050';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(32, 22, 12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(32, 56, 20, Math.PI, 0);
+        ctx.stroke();
+      },
+      // Inbox (envelope)
+      (ctx) => {
+        ctx.strokeStyle = '#505050';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(6, 14, 52, 36);
+        ctx.beginPath();
+        ctx.moveTo(6, 14);
+        ctx.lineTo(32, 36);
+        ctx.lineTo(58, 14);
+        ctx.stroke();
+      },
+      // Home
+      (ctx) => {
+        ctx.strokeStyle = '#505050';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(8, 34);
+        ctx.lineTo(32, 10);
+        ctx.lineTo(56, 34);
+        ctx.stroke();
+        ctx.strokeRect(14, 32, 36, 24);
+        ctx.strokeRect(24, 42, 16, 14);
+      },
+    ];
+
+    function makeIconTexture(drawFn: DrawFn): THREE.CanvasTexture | null {
+      if (typeof document === 'undefined') return null;
+      const c = document.createElement('canvas');
+      c.width = 64;
+      c.height = 64;
+      const ctx = c.getContext('2d');
+      if (!ctx) return null;
+      ctx.clearRect(0, 0, 64, 64);
+      drawFn(ctx);
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    APP_BTN_POSITIONS.forEach(([bx, by], i) => {
+      // Outer housing disc (chassis color, raised ring)
+      add(
+        new THREE.CylinderGeometry(0.082, 0.082, 0.012, 32),
+        chassisMat,
+        bx,
+        by,
+        frontZ + 0.006,
+        Math.PI / 2,
+      );
+      // Dark recessed inner disc
+      add(
+        new THREE.CylinderGeometry(0.066, 0.066, 0.01, 32),
+        recessMat,
+        bx,
+        by,
+        frontZ + 0.001,
+        Math.PI / 2,
+      );
+      // Raised circular cap
+      add(
+        new THREE.CylinderGeometry(0.052, 0.052, 0.018, 32),
+        buttonMat,
+        bx,
+        by,
+        frontZ + 0.014,
+        Math.PI / 2,
+      );
+      // Icon decal on cap face
+      const iconTex = makeIconTexture(iconDrawers[i % iconDrawers.length]);
+      if (iconTex) {
+        const iconMat = new THREE.MeshBasicMaterial({
+          map: iconTex,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false,
+        });
+        const iconMesh = new THREE.Mesh(new THREE.CircleGeometry(0.042, 32), iconMat);
+        iconMesh.position.set(bx, by, frontZ + 0.026);
+        iconMesh.renderOrder = 2;
+        scene.add(iconMesh);
+      }
     });
 
     // ---- Side details ----

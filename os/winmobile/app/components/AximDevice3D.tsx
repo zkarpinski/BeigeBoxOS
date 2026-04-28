@@ -391,23 +391,113 @@ export function AximDevice3D({ children, onHomeBtn }: AximDevice3DProps) {
       Math.PI / 2,
     );
 
-    // ---- DELL badge (round, top bezel) ----
+    // ---- Top-bezel branding: DELL (left) · gold circle (center) · AXIM (right) ----
+    // Gold power / IR indicator circle
     add(
-      new THREE.CylinderGeometry(0.055, 0.055, 0.01, 32),
-      dellBadgeMat,
-      0,
-      rh - 0.18,
+      new THREE.CylinderGeometry(0.052, 0.052, 0.014, 32),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xb89030,
+        roughness: 0.25,
+        metalness: 0.85,
+        clearcoat: 0.5,
+      }),
+      0.06,
+      rh - 0.1,
       frontZ,
       Math.PI / 2,
     );
-    // Inner ring detail
+    // Dark lens inside
     add(
-      new THREE.CylinderGeometry(0.04, 0.04, 0.012, 32),
-      new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.8 }),
-      0,
-      rh - 0.18,
+      new THREE.CylinderGeometry(0.032, 0.032, 0.018, 32),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x080808,
+        roughness: 0.05,
+        metalness: 0.0,
+        clearcoat: 1.0,
+      }),
+      0.06,
+      rh - 0.1,
       frontZ + 0.001,
       Math.PI / 2,
+    );
+
+    // Canvas text helper — creates a transparent plane with rendered text
+    function addTextPlane(
+      text: string,
+      font: string,
+      color: string,
+      cw: number,
+      ch: number,
+      planeW: number,
+      planeH: number,
+      px: number,
+      py: number,
+      pz: number,
+    ) {
+      if (typeof document === 'undefined') return;
+      const canvas = document.createElement('canvas');
+      canvas.width = cw;
+      canvas.height = ch;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.fillStyle = color;
+      ctx.font = font;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, cw / 2, ch / 2);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+      mesh.position.set(px, py, pz);
+      mesh.renderOrder = 2;
+      scene.add(mesh);
+    }
+
+    // "DELL" — bold italic silver, left of circle
+    addTextPlane(
+      'DELL',
+      'bold italic 48px Arial',
+      '#b4b4b4',
+      200,
+      72,
+      0.3,
+      0.09,
+      -0.27,
+      rh - 0.11,
+      frontZ + 0.022,
+    );
+    // "AXIM" — smaller regular, right of circle
+    addTextPlane(
+      'AXIM',
+      'bold 28px Arial',
+      '#a0a0a0',
+      140,
+      48,
+      0.18,
+      0.065,
+      0.27,
+      rh - 0.11,
+      frontZ + 0.022,
+    );
+    // "Pocket PC" — centered below screen
+    addTextPlane(
+      'Pocket PC',
+      '22px Arial',
+      '#888888',
+      220,
+      44,
+      0.38,
+      0.065,
+      0,
+      CTRL_Y + 0.14,
+      frontZ + 0.022,
     );
 
     // ---- Nav control — horizontal oval (matches real Axim 5-way nav shape) ----

@@ -341,7 +341,7 @@ export function Ie5Window() {
               id="ie5-iframe"
               key="srcdoc"
               srcDoc={iframeSrcdoc}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           ) : (
@@ -349,7 +349,7 @@ export function Ie5Window() {
               id="ie5-iframe"
               key={iframeSrc ?? 'blank'}
               src={iframeSrc ?? 'about:blank'}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           )}

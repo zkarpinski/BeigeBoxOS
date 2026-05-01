@@ -783,7 +783,7 @@ export function NavigatorWindow() {
           id="nav-iframe"
           ref={iframeRef}
           srcDoc={srcdoc}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+          sandbox="allow-scripts allow-forms allow-popups allow-modals"
           title="Netscape Navigator content"
           onLoad={handleIframeLoad}
         />

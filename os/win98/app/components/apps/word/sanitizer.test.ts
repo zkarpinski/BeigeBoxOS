@@ -26,9 +26,9 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><circle/></svg><math><mi>x</mi></math>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -36,6 +36,8 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<base');
       expect(out).not.toContain('<link');
       expect(out).not.toContain('<meta');
+      expect(out).not.toContain('<svg');
+      expect(out).not.toContain('<math');
     });
 
     test('strips onclick and other event handlers', () => {
@@ -57,6 +59,22 @@ describe('sanitizer', () => {
       const html = '<img src="javascript:void(0)">';
       const out = sanitizeHTML(html);
       expect(out).not.toMatch(/src="javascript:/i);
+    });
+
+    test('strips data: URLs from href and src', () => {
+      const html = '<a href="data:text/html,<html>">x</a><img src="data:image/png,base64...">';
+      const out = sanitizeHTML(html);
+      expect(out).not.toContain('href="data:');
+      expect(out).not.toContain('src="data:');
+    });
+
+    test('sanitizes style attributes', () => {
+      const safe = '<div style="color:red">x</div>';
+      const bad1 = '<div style="background:url(javascript:alert(1))">x</div>';
+      const bad2 = '<div style="width:expression(alert(1))">x</div>';
+      expect(sanitizeHTML(safe)).toContain('style="color:red"');
+      expect(sanitizeHTML(bad1)).not.toContain('style=');
+      expect(sanitizeHTML(bad2)).not.toContain('style=');
     });
 
     test('allows http and https URLs', () => {

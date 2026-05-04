@@ -76,6 +76,15 @@ function getHomePage(): string {
       '" alt="GitHub"><div class="link-card-text"><h3>GitHub</h3><p>View my GitHub profile</p></div></div>',
     '</div></div>',
     '<div class="footer">Netscape Communications Corporation &copy; 1997 &nbsp;|&nbsp; All Rights Reserved</div>',
+    '<script>',
+    'document.querySelectorAll("[data-url]").forEach(function(card) {',
+    '  card.addEventListener("click", function() {',
+    '    window.parent.postMessage({ type: "nav-navigate", url: card.dataset.url }, "' +
+      window.location.origin +
+      '");',
+    '  });',
+    '});',
+    '</script>',
     '</body></html>',
   ].join('');
 }
@@ -240,6 +249,9 @@ export function NavigatorWindow() {
   // Message listener for nav-navigate from home page iframes
   useEffect(() => {
     function onMessage(e: MessageEvent) {
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      // When allow-same-origin is omitted, origin is "null" for srcdoc/data URLs
+      if (e.origin !== 'null') return;
       if (e.data?.type === 'nav-navigate') navigate(e.data.url);
     }
     window.addEventListener('message', onMessage);
@@ -783,7 +795,7 @@ export function NavigatorWindow() {
           id="nav-iframe"
           ref={iframeRef}
           srcDoc={srcdoc}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+          sandbox="allow-scripts allow-forms allow-popups allow-modals"
           title="Netscape Navigator content"
           onLoad={handleIframeLoad}
         />

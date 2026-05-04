@@ -26,9 +26,9 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh">';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -36,6 +36,8 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<base');
       expect(out).not.toContain('<link');
       expect(out).not.toContain('<meta');
+      expect(out).not.toContain('<svg');
+      expect(out).not.toContain('<math');
     });
 
     test('strips onclick and other event handlers', () => {
@@ -46,17 +48,29 @@ describe('sanitizer', () => {
       expect(out).toContain('Click');
     });
 
-    test('strips javascript: URLs from href', () => {
-      const html = '<a href="javascript:alert(1)">x</a>';
+    test('strips javascript: and data: URLs from sensitive attributes', () => {
+      const html =
+        '<a href="javascript:alert(1)">x</a>' +
+        '<a href="data:text/html,<html>">y</a>' +
+        '<img src="javascript:void(0)">' +
+        '<img src="data:image/svg+xml,<svg onload=alert(1)>">' +
+        '<form action="javascript:alert(1)">' +
+        '<button formaction="javascript:alert(1)">';
       const out = sanitizeHTML(html);
-      expect(out).not.toMatch(/href="javascript:/i);
-      expect(out).toContain('<a');
+      expect(out).not.toContain('javascript:');
+      expect(out).not.toContain('data:');
     });
 
-    test('strips javascript: URLs from src', () => {
-      const html = '<img src="javascript:void(0)">';
+    test('sanitizes style attribute', () => {
+      const html =
+        '<div style="color: red">safe</div>' +
+        '<div style="background-image: url(javascript:alert(1))">x</div>' +
+        '<div style="width: expression(alert(1))">y</div>' +
+        '<div style="background: url(\'data:image/svg+xml,...\')">z</div>';
       const out = sanitizeHTML(html);
-      expect(out).not.toMatch(/src="javascript:/i);
+      expect(out).not.toContain('url(');
+      expect(out).not.toContain('expression(');
+      expect(out).toContain('color: red');
     });
 
     test('allows http and https URLs', () => {

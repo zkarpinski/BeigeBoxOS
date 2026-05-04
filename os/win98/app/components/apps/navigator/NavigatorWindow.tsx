@@ -76,6 +76,14 @@ function getHomePage(): string {
       '" alt="GitHub"><div class="link-card-text"><h3>GitHub</h3><p>View my GitHub profile</p></div></div>',
     '</div></div>',
     '<div class="footer">Netscape Communications Corporation &copy; 1997 &nbsp;|&nbsp; All Rights Reserved</div>',
+    '<script>',
+    "document.addEventListener('click', function(e) {",
+    "  var card = e.target.closest('[data-url]');",
+    '  if (card) {',
+    "    window.parent.postMessage({ type: 'nav-navigate', url: card.getAttribute('data-url') }, '*');",
+    '  }',
+    '});',
+    '</script>',
     '</body></html>',
   ].join('');
 }
@@ -240,7 +248,12 @@ export function NavigatorWindow() {
   // Message listener for nav-navigate from home page iframes
   useEffect(() => {
     function onMessage(e: MessageEvent) {
-      if (e.data?.type === 'nav-navigate') navigate(e.data.url);
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      // When allow-same-origin is removed from a sandboxed srcdoc iframe, its origin is 'null'
+      if (e.origin !== 'null') return;
+      if (e.data?.type === 'nav-navigate' && typeof e.data.url === 'string') {
+        navigate(e.data.url);
+      }
     }
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
@@ -277,18 +290,6 @@ export function NavigatorWindow() {
       setCanGoBack(histPos.current > 0);
       setCanGoForward(histPos.current < historyArr.current.length - 1);
       navigate(historyArr.current[histPos.current], false);
-    }
-  }
-
-  function handleIframeLoad() {
-    try {
-      const doc = iframeRef.current?.contentDocument;
-      if (!doc) return;
-      doc.querySelectorAll('[data-url]').forEach((card) => {
-        card.addEventListener('click', () => navigate((card as HTMLElement).dataset.url || ''));
-      });
-    } catch {
-      /* cross-origin */
     }
   }
 
@@ -783,9 +784,8 @@ export function NavigatorWindow() {
           id="nav-iframe"
           ref={iframeRef}
           srcDoc={srcdoc}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+          sandbox="allow-scripts allow-forms allow-popups allow-modals"
           title="Netscape Navigator content"
-          onLoad={handleIframeLoad}
         />
       </div>
 

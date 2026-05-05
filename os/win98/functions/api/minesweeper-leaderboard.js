@@ -37,13 +37,17 @@ function b64UrlEncode(bytes) {
 }
 
 function b64UrlDecode(str) {
-  str = str.replace(/-/g, '+').replace(/_/g, '/');
-  const pad = str.length % 4;
-  if (pad) str += '===='.slice(0, 4 - pad);
-  const binary = atob(str);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
+  try {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = str.length % 4;
+    if (pad) str += '===='.slice(0, 4 - pad);
+    const binary = atob(str);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  } catch {
+    return null;
+  }
 }
 
 async function hmacSha256(secretKey, data) {
@@ -68,7 +72,9 @@ function verifyGameToken(secret, token) {
   const [payloadB64, sigB64] = parts;
   let payloadJson;
   try {
-    payloadJson = new TextDecoder().decode(b64UrlDecode(payloadB64));
+    const decoded = b64UrlDecode(payloadB64);
+    if (!decoded) return null;
+    payloadJson = new TextDecoder().decode(decoded);
   } catch {
     return null;
   }
@@ -97,6 +103,7 @@ async function verifyGameTokenSignature(secret, payloadB64, sigB64) {
     ['verify'],
   );
   const actualSig = b64UrlDecode(sigB64);
+  if (!actualSig) return false;
   return await crypto.subtle.verify('HMAC', key, actualSig, new TextEncoder().encode(payloadB64));
 }
 

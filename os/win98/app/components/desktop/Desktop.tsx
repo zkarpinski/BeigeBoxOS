@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { WordWindow } from '../apps/word';
 import { NotepadWindow } from '@retro-web/core/apps/notepad';
 import { OsShellProvider } from '@retro-web/core/context';
@@ -31,6 +31,7 @@ import { BootScreen } from '../shell/BootScreen';
 import { DesktopIcons } from '../shell/DesktopIcons';
 import { Taskbar } from '../shell/Taskbar';
 import { ShellOverlays } from '../shell/ShellOverlays';
+import { ScreensaverOverlay } from '../shell/screensaver/ScreensaverOverlay';
 import { appRegistry } from '../../registry';
 import { WindowManagerProvider } from '@retro-web/core/context';
 import { initFileSystem } from '../../fileSystem';
@@ -44,7 +45,63 @@ export interface DesktopProps {
   openAppId?: string;
 }
 
+function readSsMs(): number {
+  try {
+    const ss = localStorage.getItem('win98-screensaver') ?? 'underwater';
+    if (ss === 'none') return 0;
+    const wait = parseInt(localStorage.getItem('win98-screensaver-wait') ?? '2', 10) || 2;
+    return wait * 60 * 1000;
+  } catch {
+    return 2 * 60 * 1000;
+  }
+}
+
 export function Desktop({ openAppId }: DesktopProps) {
+  const [screensaverActive, setScreensaverActive] = useState(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Idle detection — restarts whenever screensaver is dismissed or settings change
+  useEffect(() => {
+    if (screensaverActive) return;
+
+    const ms = readSsMs();
+    if (!ms) return; // screensaver disabled
+
+    function resetIdle() {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(() => setScreensaverActive(true), ms);
+    }
+
+    resetIdle();
+    const events: (keyof WindowEventMap)[] = [
+      'mousemove',
+      'mousedown',
+      'keydown',
+      'touchstart',
+      'scroll',
+    ];
+    events.forEach((e) => window.addEventListener(e, resetIdle, { passive: true }));
+
+    // Preview trigger from Display Properties
+    function onPreview() {
+      setScreensaverActive(true);
+    }
+    window.addEventListener('screensaver-preview', onPreview);
+    // Re-read settings when they change
+    function onSettingsChanged() {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      resetIdle();
+    }
+    window.addEventListener('screensaver-settings-changed', onSettingsChanged);
+
+    return () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      events.forEach((e) => window.removeEventListener(e, resetIdle));
+      window.removeEventListener('screensaver-preview', onPreview);
+      window.removeEventListener('screensaver-settings-changed', onSettingsChanged);
+    };
+  }, [screensaverActive]);
+
   const urlAppId = useMemo(() => {
     if (typeof window === 'undefined') return null;
     try {
@@ -245,6 +302,9 @@ export function Desktop({ openAppId }: DesktopProps) {
         <DesktopIcons registry={appRegistry} />
         <Taskbar registry={appRegistry} />
         <ShellOverlays />
+
+        {/* Screensaver */}
+        {screensaverActive && <ScreensaverOverlay onDismiss={() => setScreensaverActive(false)} />}
       </OsShellProvider>
     </WindowManagerProvider>
   );

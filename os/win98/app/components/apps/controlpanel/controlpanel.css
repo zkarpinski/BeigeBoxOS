@@ -555,6 +555,155 @@
 }
 
 /* ══════════════════════════════════════════
+   Screen Saver tab (dp-ss-*)
+   ══════════════════════════════════════════ */
+.dp-ss-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+/* Win98-style group box */
+.dp-group {
+  position: relative;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow:
+    1px 1px 0 var(--win-white),
+    -1px -1px 0 var(--win-dark);
+  padding: 12px 8px 8px;
+  margin-top: 4px;
+}
+
+.dp-group-label {
+  position: absolute;
+  top: -7px;
+  left: 8px;
+  background: var(--win-bg);
+  padding: 0 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.dp-ss-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.dp-ss-select {
+  flex: 1;
+  height: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  padding: 0 2px;
+}
+
+.dp-ss-password-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  font-size: 11px;
+}
+
+.dp-ss-check-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  cursor: default;
+  user-select: none;
+}
+
+.dp-ss-wait-label {
+  font-size: 11px;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.dp-ss-spinner {
+  display: inline-flex;
+  align-items: stretch;
+  margin-left: 4px;
+  height: 20px;
+}
+
+.dp-ss-spinner-input {
+  width: 30px;
+  font-size: 11px;
+  font-family: inherit;
+  text-align: right;
+  background: #fff;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: none;
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  padding: 0 2px;
+}
+
+.dp-ss-spinner-btns {
+  display: flex;
+  flex-direction: column;
+  width: 14px;
+}
+
+.dp-ss-spin-btn {
+  flex: 1;
+  padding: 0;
+  font-size: 6px;
+  line-height: 1;
+  font-family: inherit;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-white);
+  border-left: 1px solid var(--win-white);
+  border-right: 1px solid var(--win-black);
+  border-bottom: 1px solid var(--win-black);
+  box-shadow:
+    inset 1px 1px var(--win-light),
+    inset -1px -1px var(--win-dark);
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dp-ss-spin-btn:active {
+  border-top: 1px solid var(--win-black);
+  border-left: 1px solid var(--win-black);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+}
+
+.dp-ss-energy-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.dp-ss-energy-logo {
+  flex-shrink: 0;
+}
+
+.dp-ss-energy-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--win-dark);
+}
+
+/* ══════════════════════════════════════════
    Shared: new applet dialogs
    ══════════════════════════════════════════ */
 #datetime-dialog,

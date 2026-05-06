@@ -6,3 +6,4 @@ export * from './apps/index';
 export * from './music/index';
 export * from './utils/index';
 export * from './fs/index';
+export * from './screensavers/index';

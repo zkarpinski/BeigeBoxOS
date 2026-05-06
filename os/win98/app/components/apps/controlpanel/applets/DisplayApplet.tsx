@@ -2,8 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useDraggable, centerDialog } from './shared';
-import { UnderwaterScreensaver } from '../../../shell/screensaver/UnderwaterScreensaver';
-import { SpaceScreensaver } from '../../../shell/screensaver/SpaceScreensaver';
+import { MazeScreensaver, SpaceScreensaver, UnderwaterScreensaver } from '@retro-web/core';
 
 const DISPLAY_ICON = 'apps/controlpanel/display.png';
 
@@ -16,6 +15,7 @@ const SCREENSAVERS = [
   { id: 'none', label: '(None)' },
   { id: 'space', label: 'Space' },
   { id: 'underwater', label: 'Underwater' },
+  { id: 'maze', label: '3D Maze' },
 ];
 
 const SS_KEY = 'win98-screensaver';
@@ -138,6 +138,12 @@ export function DisplayApplet({
       return (
         <div style={{ width: '100%', height: '100%' }}>
           <SpaceScreensaver />
+        </div>
+      );
+    if (pendingSs === 'maze')
+      return (
+        <div style={{ width: '100%', height: '100%' }}>
+          <MazeScreensaver />
         </div>
       );
     return (

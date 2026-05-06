@@ -52,7 +52,7 @@ function loadSprite(url: string): Promise<HTMLCanvasElement | null> {
       resolve(c);
     };
     img.onerror = () => resolve(null);
-    img.src = url;
+    img.src = url.startsWith('/') ? url : `/${url}`;
   });
 }
 

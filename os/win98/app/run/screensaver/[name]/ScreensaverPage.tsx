@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react';
 import { UnderwaterScreensaver } from '../../../components/shell/screensaver/UnderwaterScreensaver';
+import { SpaceScreensaver } from '../../../components/shell/screensaver/SpaceScreensaver';
 
-export function ScreensaverPage() {
+export function ScreensaverPage({ name }: { name: string }) {
   // Dismiss to home on any input
   useEffect(() => {
     const events: (keyof WindowEventMap)[] = ['mousedown', 'keydown', 'touchstart'];
@@ -17,7 +18,7 @@ export function ScreensaverPage() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, cursor: 'none', background: '#000' }}>
-      <UnderwaterScreensaver />
+      {name === 'space' ? <SpaceScreensaver /> : <UnderwaterScreensaver />}
     </div>
   );
 }

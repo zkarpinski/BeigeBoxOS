@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDraggable, centerDialog } from './shared';
 import { UnderwaterScreensaver } from '../../../shell/screensaver/UnderwaterScreensaver';
+import { SpaceScreensaver } from '../../../shell/screensaver/SpaceScreensaver';
 
 const DISPLAY_ICON = 'apps/controlpanel/display.png';
 
@@ -13,6 +14,7 @@ const WALLPAPERS = [
 
 const SCREENSAVERS = [
   { id: 'none', label: '(None)' },
+  { id: 'space', label: 'Space' },
   { id: 'underwater', label: 'Underwater' },
 ];
 
@@ -97,7 +99,7 @@ export function DisplayApplet({
     setSsApplyEnabled(false);
   }
   function handlePreview() {
-    window.dispatchEvent(new CustomEvent('screensaver-preview'));
+    window.dispatchEvent(new CustomEvent('screensaver-preview', { detail: { name: pendingSs } }));
   }
 
   function handleOk() {
@@ -132,6 +134,12 @@ export function DisplayApplet({
     }
     // Screen saver tab
     if (pendingSs === 'none') return null;
+    if (pendingSs === 'space')
+      return (
+        <div style={{ width: '100%', height: '100%' }}>
+          <SpaceScreensaver />
+        </div>
+      );
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <UnderwaterScreensaver />
@@ -175,12 +183,6 @@ export function DisplayApplet({
         </button>
         <button className="dp-tab disabled" disabled>
           Appearance
-        </button>
-        <button className="dp-tab disabled" disabled>
-          Effects
-        </button>
-        <button className="dp-tab disabled" disabled>
-          Web
         </button>
         <button className="dp-tab disabled" disabled>
           Settings
@@ -346,19 +348,22 @@ export function DisplayApplet({
                   </svg>
                 </div>
                 <div className="dp-ss-energy-checks">
-                  <label className="dp-ss-check-label">
-                    <input type="checkbox" disabled style={{ marginRight: 4 }} />
-                    Low-power standby
-                  </label>
-                  <span style={{ color: 'var(--win-dark)', marginLeft: 8 }}>1</span>
-                  <span style={{ color: 'var(--win-dark)', marginLeft: 4 }}>minutes</span>
-                  <br />
-                  <label className="dp-ss-check-label" style={{ marginTop: 4 }}>
-                    <input type="checkbox" disabled style={{ marginRight: 4 }} />
-                    Shut off monitor
-                  </label>
-                  <span style={{ color: 'var(--win-dark)', marginLeft: 8 }}>1</span>
-                  <span style={{ color: 'var(--win-dark)', marginLeft: 4 }}>minutes</span>
+                  <div className="dp-ss-energy-check-row">
+                    <label className="dp-ss-check-label">
+                      <input type="checkbox" disabled style={{ marginRight: 4 }} />
+                      Low-power standby
+                    </label>
+                    <span className="dp-ss-energy-spin">1</span>
+                    <span className="dp-ss-energy-unit">minutes</span>
+                  </div>
+                  <div className="dp-ss-energy-check-row">
+                    <label className="dp-ss-check-label">
+                      <input type="checkbox" disabled style={{ marginRight: 4 }} />
+                      Shut off monitor
+                    </label>
+                    <span className="dp-ss-energy-spin">1</span>
+                    <span className="dp-ss-energy-unit">minutes</span>
+                  </div>
                 </div>
               </div>
             </div>

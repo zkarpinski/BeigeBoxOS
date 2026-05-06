@@ -65,14 +65,17 @@ describe('NavigatorWindow', () => {
 
     // Use a matcher that ignores the <u> tags
     const helpMenu = screen.getByText((content, element) => {
-      return element?.classList.contains('nav-menu-item') && element.textContent === 'Help';
+      return (
+        (element?.classList.contains('nav-menu-item') && element.textContent === 'Help') ?? false
+      );
     });
     fireEvent.click(helpMenu);
 
     const aboutItem = screen.getByText((content, element) => {
       return (
-        element?.classList.contains('nav-menu-dropdown-item') &&
-        element.textContent?.includes('About Netscape')
+        (element?.classList.contains('nav-menu-dropdown-item') &&
+          element.textContent?.includes('About Netscape')) ??
+        false
       );
     });
     fireEvent.click(aboutItem);

@@ -3,18 +3,18 @@ import { notFound } from 'next/navigation';
 import { ScreensaverPage } from './ScreensaverPage';
 
 export const metadata: Metadata = {
-  title: 'Underwater Screensaver | Windows 98',
+  title: 'Screensaver | Windows 98',
   robots: { index: false, follow: false },
 };
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ name: 'underwater' }];
+  return [{ name: 'underwater' }, { name: 'space' }];
 }
 
 export default async function Page({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
-  if (name !== 'underwater') notFound();
-  return <ScreensaverPage />;
+  if (name !== 'underwater' && name !== 'space') notFound();
+  return <ScreensaverPage name={name} />;
 }

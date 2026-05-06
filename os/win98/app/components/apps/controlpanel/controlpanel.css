@@ -703,6 +703,35 @@
   color: var(--win-dark);
 }
 
+.dp-ss-energy-check-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dp-ss-energy-spin {
+  width: 24px;
+  text-align: right;
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-white);
+  border-bottom: 1px solid var(--win-white);
+  box-shadow: inset 1px 1px var(--win-black);
+  background: var(--win-bg);
+  padding: 0 2px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.dp-ss-energy-unit {
+  white-space: nowrap;
+  opacity: 0.6;
+}
+
 /* ══════════════════════════════════════════
    Shared: new applet dialogs
    ══════════════════════════════════════════ */

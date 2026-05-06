@@ -69,7 +69,7 @@ describe('Vb6Window', () => {
     // Check for Form1 in the run window specifically
     const runWindow = screen
       .getByText((content, element) => {
-        return element?.classList.contains('vb6-mdi-title-text') && content === 'Form1';
+        return (element?.classList.contains('vb6-mdi-title-text') && content === 'Form1') ?? false;
       })
       .closest('.vb6-run-window');
 

@@ -56,8 +56,17 @@ function readSsMs(): number {
   }
 }
 
+function readSsName(): string {
+  try {
+    return localStorage.getItem('win98-screensaver') ?? 'underwater';
+  } catch {
+    return 'underwater';
+  }
+}
+
 export function Desktop({ openAppId }: DesktopProps) {
   const [screensaverActive, setScreensaverActive] = useState(false);
+  const [screensaverName, setScreensaverName] = useState<string>('underwater');
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Idle detection — restarts whenever screensaver is dismissed or settings change
@@ -69,7 +78,10 @@ export function Desktop({ openAppId }: DesktopProps) {
 
     function resetIdle() {
       if (idleTimer.current) clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(() => setScreensaverActive(true), ms);
+      idleTimer.current = setTimeout(() => {
+        setScreensaverName(readSsName());
+        setScreensaverActive(true);
+      }, ms);
     }
 
     resetIdle();
@@ -83,12 +95,15 @@ export function Desktop({ openAppId }: DesktopProps) {
     events.forEach((e) => window.addEventListener(e, resetIdle, { passive: true }));
 
     // Preview trigger from Display Properties
-    function onPreview() {
+    function onPreview(e: Event) {
+      const name = (e as CustomEvent<{ name: string }>).detail?.name ?? readSsName();
+      setScreensaverName(name);
       setScreensaverActive(true);
     }
     window.addEventListener('screensaver-preview', onPreview);
     // Re-read settings when they change
     function onSettingsChanged() {
+      setScreensaverName(readSsName());
       if (idleTimer.current) clearTimeout(idleTimer.current);
       resetIdle();
     }
@@ -304,7 +319,12 @@ export function Desktop({ openAppId }: DesktopProps) {
         <ShellOverlays />
 
         {/* Screensaver */}
-        {screensaverActive && <ScreensaverOverlay onDismiss={() => setScreensaverActive(false)} />}
+        {screensaverActive && (
+          <ScreensaverOverlay
+            name={screensaverName}
+            onDismiss={() => setScreensaverActive(false)}
+          />
+        )}
       </OsShellProvider>
     </WindowManagerProvider>
   );

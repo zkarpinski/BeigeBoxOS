@@ -2,8 +2,14 @@
 
 import { useEffect } from 'react';
 import { UnderwaterScreensaver } from './UnderwaterScreensaver';
+import { SpaceScreensaver } from './SpaceScreensaver';
 
-export function ScreensaverOverlay({ onDismiss }: { onDismiss: () => void }) {
+function ActiveScreensaver({ name }: { name: string }) {
+  if (name === 'space') return <SpaceScreensaver />;
+  return <UnderwaterScreensaver />;
+}
+
+export function ScreensaverOverlay({ name, onDismiss }: { name: string; onDismiss: () => void }) {
   useEffect(() => {
     const events: (keyof WindowEventMap)[] = ['mousemove', 'mousedown', 'keydown', 'touchstart'];
     const handler = () => onDismiss();
@@ -21,7 +27,7 @@ export function ScreensaverOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <div className="screensaver-overlay">
-      <UnderwaterScreensaver />
+      <ActiveScreensaver name={name} />
     </div>
   );
 }

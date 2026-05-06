@@ -336,12 +336,18 @@ export function Ie5Window() {
           </div>
         )}
         <div className="ie5-content">
+          {/*
+              SECURITY: 'allow-same-origin' is intentionally omitted from the sandbox attribute.
+              This ensures that even with 'allow-scripts' enabled, content within the iframe
+              cannot access the parent window's DOM, cookies, or local storage, preventing
+              potential XSS-based privilege escalation.
+          */}
           {iframeSrcdoc !== null ? (
             <iframe
               id="ie5-iframe"
               key="srcdoc"
               srcDoc={iframeSrcdoc}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           ) : (
@@ -349,7 +355,7 @@ export function Ie5Window() {
               id="ie5-iframe"
               key={iframeSrc ?? 'blank'}
               src={iframeSrc ?? 'about:blank'}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           )}

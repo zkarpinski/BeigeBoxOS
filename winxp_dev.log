@@ -1,0 +1,17 @@
+
+> @retro-web/winxp@0.0.1 dev /app/os/winxp
+> next dev --port 3100
+
+   ▲ Next.js 15.5.13
+   - Local:        http://localhost:3100
+   - Network:      http://192.168.0.2:3100
+
+ ✓ Starting...
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 8.2s (1197 modules)
+ GET / 200 in 10161ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 2.7s (863 modules)
+ GET /shell/icons/adobe-pdf-modern-icon.png 404 in 3104ms
+ GET /shell/icons/adobe-pdf-modern-icon.png 404 in 117ms

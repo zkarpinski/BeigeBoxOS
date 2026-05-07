@@ -341,7 +341,12 @@ export function Ie5Window() {
               id="ie5-iframe"
               key="srcdoc"
               srcDoc={iframeSrcdoc}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              /*
+                 Security: Removed 'allow-same-origin' to ensure that content (especially srcdoc)
+                 is treated as a unique origin. This prevents scripts in the iframe from
+                 accessing the host's DOM, cookies, or localStorage.
+              */
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           ) : (
@@ -349,7 +354,12 @@ export function Ie5Window() {
               id="ie5-iframe"
               key={iframeSrc ?? 'blank'}
               src={iframeSrc ?? 'about:blank'}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              /*
+                 Security: Removed 'allow-same-origin' to ensure that even external content
+                 is treated as a unique origin, mitigating potential cross-origin or
+                 same-origin bypass vulnerabilities.
+              */
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
               title="Internet Explorer content"
             />
           )}

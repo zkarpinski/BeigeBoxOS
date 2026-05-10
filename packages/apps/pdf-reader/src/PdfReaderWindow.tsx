@@ -143,7 +143,17 @@ export function PdfReaderWindow() {
         </div>
         <div className="pdf-reader-body">
           {pdfUrl ? (
-            <iframe title={title} src={pdfUrl} className="pdf-reader-frame" />
+            <iframe
+              title={title}
+              src={pdfUrl}
+              className="pdf-reader-frame"
+              /*
+               * SECURITY: Sandbox the iframe to prevent potentially malicious PDF/content from
+               * accessing the host's DOM, storage, or cookies. allow-same-origin is omitted
+               * to ensure the iframe is treated as a unique origin.
+               */
+              sandbox="allow-scripts allow-forms allow-popups allow-modals"
+            />
           ) : (
             <div className="pdf-reader-fallback">
               <p>No document loaded.</p>

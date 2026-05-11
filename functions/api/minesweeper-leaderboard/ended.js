@@ -29,7 +29,12 @@ function b64UrlDecode(str) {
   str = str.replace(/-/g, '+').replace(/_/g, '/');
   const pad = str.length % 4;
   if (pad) str += '===='.slice(0, 4 - pad);
-  const binary = atob(str);
+  let binary;
+  try {
+    binary = atob(str);
+  } catch {
+    return new Uint8Array(0);
+  }
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;

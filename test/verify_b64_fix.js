@@ -31,6 +31,9 @@ const malformed2 = 'a'; // base64 strings usually must be at least 2 chars if no
 const decodedMalformed2 = b64UrlDecode(malformed2);
 // Node's atob might throw or just return truncated.
 // If it throws, our try/catch handles it.
-console.log('✅ Malformed base64 (invalid length) handled gracefully, returned length:', decodedMalformed2.length);
+console.log(
+  '✅ Malformed base64 (invalid length) handled gracefully, returned length:',
+  decodedMalformed2.length,
+);
 
 console.log('All b64UrlDecode verification tests passed!');

@@ -192,6 +192,9 @@ export async function onRequestPost(context) {
     );
   }
   const signingSecret = context.env.LEADERBOARD_SIGNING_SECRET;
+  if (!signingSecret) {
+    return jsonResponse({ error: 'Game tokens not configured', hint: CONFIG_HINT, rank: 0 }, 503);
+  }
   if (signingSecret) {
     const token = body.game_token;
     if (!token || typeof token !== 'string') {
@@ -214,7 +217,7 @@ export async function onRequestPost(context) {
     }
     const elapsedSec = ageMs / 1000;
     if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
-      return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
+      return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
     }
     const { error: usedError } = await supabase
       .from('minesweeper_used_tokens')

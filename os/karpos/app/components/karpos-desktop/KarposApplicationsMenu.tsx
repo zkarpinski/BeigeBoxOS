@@ -82,7 +82,7 @@ export function KarposApplicationsMenu({
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [menuOpen, openFolder, setMenuOpen]);
+  }, [menuOpen, openFolder]);
 
   const openApp = (id: string) => {
     if (id === 'word') {

@@ -16,6 +16,8 @@ function taskbarReservePx(): number {
 
 /** Pixels from viewport edge that trigger a snap zone. */
 const SNAP_EDGE = 20;
+/** Minimum milliseconds the pointer must dwell in a snap zone before release commits the snap. */
+const SNAP_DWELL_MS = 150;
 
 type SnapZone = 'left' | 'right' | 'maximize';
 
@@ -57,10 +59,16 @@ let _snapPreviewEl: HTMLDivElement | null = null;
 
 function getSnapPreviewEl(): HTMLDivElement {
   if (!_snapPreviewEl) {
-    _snapPreviewEl = document.createElement('div');
-    _snapPreviewEl.className = 'karp-snap-preview';
-    _snapPreviewEl.style.display = 'none';
-    document.body.appendChild(_snapPreviewEl);
+    // Recover existing element in case of HMR/module reload to avoid accumulating DOM nodes.
+    const existing = document.querySelector('.karp-snap-preview') as HTMLDivElement | null;
+    if (existing) {
+      _snapPreviewEl = existing;
+    } else {
+      _snapPreviewEl = document.createElement('div');
+      _snapPreviewEl.className = 'karp-snap-preview';
+      _snapPreviewEl.style.display = 'none';
+      document.body.appendChild(_snapPreviewEl);
+    }
   }
   return _snapPreviewEl;
 }
@@ -157,16 +165,22 @@ export function useWindowBehavior({
       const startLeft = r.left;
       const startTop = r.top;
       let currentSnapZone: SnapZone | null = null;
+      let snapEnteredAt = 0;
 
       const onMove = (x: number, y: number) => {
         const zone = getSnapZone(x, y);
         if (zone) {
+          if (zone !== currentSnapZone) {
+            // Entering a new snap zone — start the dwell timer.
+            snapEnteredAt = Date.now();
+          }
           showSnapPreview(zone);
           currentSnapZone = zone;
           return; // Freeze window position while previewing snap
         }
         hideSnapPreview();
         currentSnapZone = null;
+        snapEnteredAt = 0;
         let newLeft = startLeft + (x - startX);
         let newTop = startTop + (y - startY);
         const r2 = rect();
@@ -183,7 +197,7 @@ export function useWindowBehavior({
         document.removeEventListener('touchend', onTouchEnd, { capture: true });
         document.removeEventListener('touchcancel', onTouchEnd, { capture: true });
         hideSnapPreview();
-        if (currentSnapZone) {
+        if (currentSnapZone && Date.now() - snapEnteredAt >= SNAP_DWELL_MS) {
           const b = getSnapBounds(currentSnapZone);
           el.style.left = b.left + 'px';
           el.style.top = b.top + 'px';

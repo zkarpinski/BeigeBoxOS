@@ -193,8 +193,8 @@ export async function openFileByPath(
         return;
     }
     showApp(appId);
-  } catch {
-    /* ignore */
+  } catch (err) {
+    console.error('[KarpOS] openFileByPath: failed to open', path, err);
   }
 }
 

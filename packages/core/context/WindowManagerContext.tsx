@@ -293,6 +293,9 @@ export function WindowManagerProvider({
   const [apps, dispatch] = useReducer(appsReducer, initialApps);
   // True once the restore effect has run — prevents saving defaults before restore completes.
   const restoreCompleted = useRef(false);
+  // Capture initial prop values so the mount-only restore effect reads them without stale closure.
+  const stateStorageKeyRef = useRef(stateStorageKey);
+  const restoreStateRef = useRef(restoreState);
   const [dialogState, setDialogState] = useState<DialogState | null>(null);
   const [bsodState, setBsodState] = useState<BsodState | FatalErrorState | null>(null);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
@@ -314,17 +317,16 @@ export function WindowManagerProvider({
   // Restore persisted window state on mount (client-only).
   // Runs before the bounds effect so bounds are applied on top of restored state.
   useEffect(() => {
-    if (!stateStorageKey || !restoreState) {
+    if (!stateStorageKeyRef.current || !restoreStateRef.current) {
       restoreCompleted.current = true;
       return;
     }
-    const persisted = loadWindowState(stateStorageKey);
+    const persisted = loadWindowState(stateStorageKeyRef.current);
     if (Object.keys(persisted).length > 0) {
       dispatch({ type: 'RESTORE_STATE', state: persisted });
     }
     restoreCompleted.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Mount only
+  }, []); // Mount only — reads initial prop values via refs above
 
   // Save window state whenever apps change, but only after restore has completed
   // (prevents overwriting saved state with registry defaults on first render).

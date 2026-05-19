@@ -3,7 +3,7 @@
 /**
  * Exposes `window.KarpOS` for helpers — must render inside WindowManagerProvider.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import {
   useWindowManager,
@@ -20,8 +20,6 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
     hideApp,
     focusApp,
     minimizeApp,
-    isAppVisible,
-    isMinimized,
     openDialog,
     openBsod,
     openFatalError,
@@ -29,19 +27,26 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
   } = useWindowManager();
   const { addToast } = useToast();
 
+  // Keep a stable ref to apps so the window.KarpOS object is not rebuilt on every
+  // window interaction — the ref is always current without being a dependency.
+  const appsRef = useRef(apps);
+  appsRef.current = apps;
+
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
     w['KarpOS'] = {
-      apps,
+      get apps() {
+        return appsRef.current;
+      },
       registerApp: () => {},
       showApp,
       hideApp,
       focusApp,
       minimizeApp,
-      isAppVisible,
-      isMinimized,
+      isAppVisible: (id: string) => !!appsRef.current[id]?.visible,
+      isMinimized: (id: string) => !!appsRef.current[id]?.minimized,
       get activeAppId() {
-        const focused = Object.entries(apps).find(
+        const focused = Object.entries(appsRef.current).find(
           ([, s]) => s.visible && !s.minimized && s.zIndex === Z_FOCUSED,
         );
         return focused ? focused[0] : null;
@@ -51,7 +56,8 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
           (a) => `start-menu-${a.id}` === clickedId || `start-${a.id}` === clickedId,
         );
         if (app) {
-          if (isAppVisible(app.id) && !isMinimized(app.id)) focusApp(app.id);
+          const { visible, minimized } = appsRef.current[app.id] ?? {};
+          if (visible && !minimized) focusApp(app.id);
           else showApp(app.id);
           return true;
         }
@@ -73,13 +79,10 @@ export function KarpGlobalShim({ registry }: { registry: AppConfig[] }) {
       notify: (message: string, opts?: ToastOptions) => addToast(message, opts),
     };
   }, [
-    apps,
     showApp,
     hideApp,
     focusApp,
     minimizeApp,
-    isAppVisible,
-    isMinimized,
     openDialog,
     openBsod,
     openFatalError,

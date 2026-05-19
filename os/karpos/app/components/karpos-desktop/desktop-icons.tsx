@@ -252,7 +252,30 @@ type DesktopItem =
   | { type: 'fs'; entry: DirEntry }
   | { type: 'link'; link: KarposDesktopLink };
 
-export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
+class DesktopIconsErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div id="desktop-icons" style={{ padding: 16, color: 'var(--karp-error, #ff4444)' }}>
+          Desktop failed to load. Try refreshing.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function DesktopIconsInner({ registry }: { registry: AppConfig[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -480,5 +503,13 @@ export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export function DesktopIcons({ registry }: { registry: AppConfig[] }) {
+  return (
+    <DesktopIconsErrorBoundary>
+      <DesktopIconsInner registry={registry} />
+    </DesktopIconsErrorBoundary>
   );
 }

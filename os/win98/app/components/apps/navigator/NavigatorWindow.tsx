@@ -28,7 +28,7 @@ function normalizeUrl(raw: string): string {
   return trimmed;
 }
 
-function getHomePage(): string {
+function getHomePage(hostOrigin: string): string {
   const logoUrl = new URL('apps/navigator/navigator-icon.png', document.baseURI).href;
   const linkedinLogoUrl = new URL('apps/navigator/linkedin-logo.png', document.baseURI).href;
   const githubLogoUrl = new URL('apps/navigator/github-logo.png', document.baseURI).href;
@@ -80,7 +80,9 @@ function getHomePage(): string {
     "document.addEventListener('click', function(e) {",
     "  var card = e.target.closest('[data-url]');",
     '  if (card) {',
-    "    window.parent.postMessage({ type: 'nav-navigate', url: card.getAttribute('data-url') }, '*');",
+    "    window.parent.postMessage({ type: 'nav-navigate', url: card.getAttribute('data-url') }, '" +
+      hostOrigin +
+      "');",
     '  }',
     '});',
     '</script>',
@@ -135,7 +137,7 @@ export function NavigatorWindow() {
     const url = normalizeUrl(rawUrl);
 
     if (url === 'about:home') {
-      setSrcdoc(getHomePage());
+      setSrcdoc(getHomePage(window.location.origin));
       setUrlBarValue('about:home');
       setStatusText('Document: Done');
       setIsSecure(false);

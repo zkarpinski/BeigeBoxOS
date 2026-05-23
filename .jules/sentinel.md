@@ -8,3 +8,8 @@
 **Vulnerability:** The `atob()` function throws a `DOMException` on malformed input, which was causing unhandled 500 errors in Cloudflare Pages functions.
 **Learning:** Defensive coding in API handlers must account for common functions that throw (like `atob` or `JSON.parse`) when processing user-controlled input, even if the input is expected to be a valid token.
 **Prevention:** Wrap Base64 decoding logic in `try...catch` blocks and return a safe default (like an empty `Uint8Array`) to allow subsequent validation to fail gracefully.
+
+## 2026-06-20 - [MEDIUM] Exploit calibration via detailed API error messages
+**Vulnerability:** The Minesweeper leaderboard API returned specific error messages for different validation failures (e.g., "Token difficulty does not match", "Token expired", "Game token time verification failed").
+**Learning:** Detailed error messages for cryptographic or time-based validation can help an attacker "calibrate" an exploit by confirming which part of the validation they have successfully bypassed.
+**Prevention:** Use generic error messages (e.g., "Invalid or tampered game token") for all validation failures in sensitive API endpoints to avoid leaking information about the server-side verification logic.

@@ -205,16 +205,16 @@ export async function onRequestPost(context) {
     const ok = await verifyGameTokenSignature(signingSecret, verified.payloadB64, verified.sigB64);
     if (!ok) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
     if (verified.payload.d !== difficulty) {
-      return jsonResponse({ error: 'Token difficulty does not match submission', rank: 0 }, 400);
+      return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
     }
     const now = Date.now();
     const ageMs = now - verified.payload.iat;
     if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
-      return jsonResponse({ error: 'Game token expired or invalid', rank: 0 }, 400);
+      return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
     }
     const elapsedSec = ageMs / 1000;
     if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
-      return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
+      return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
     }
     const { error: usedError } = await supabase
       .from('minesweeper_used_tokens')

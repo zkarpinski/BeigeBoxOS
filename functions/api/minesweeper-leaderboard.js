@@ -105,7 +105,7 @@ async function verifyGameTokenSignature(secret, payloadB64, sigB64) {
 }
 
 const CONFIG_HINT =
-  'Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Cloudflare Pages → Settings → Environment variables (Production).';
+  'Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and LEADERBOARD_SIGNING_SECRET in Cloudflare Pages → Settings → Environment variables (Production).';
 
 export async function onRequestGet(context) {
   const supabase = getSupabase(context.env);
@@ -172,6 +172,10 @@ export async function onRequestPost(context) {
   if (!supabase) {
     return jsonResponse({ error: 'Leaderboard not configured', hint: CONFIG_HINT, rank: 0 }, 503);
   }
+  const signingSecret = context.env.LEADERBOARD_SIGNING_SECRET;
+  if (!signingSecret) {
+    return jsonResponse({ error: 'Game tokens not configured', hint: CONFIG_HINT, rank: 0 }, 503);
+  }
   let body;
   try {
     body = await context.request.json();
@@ -191,44 +195,38 @@ export async function onRequestPost(context) {
       400,
     );
   }
-  const signingSecret = context.env.LEADERBOARD_SIGNING_SECRET;
-  if (signingSecret) {
-    const token = body.game_token;
-    if (!token || typeof token !== 'string') {
-      return jsonResponse(
-        { error: 'Missing game token. Start a game and try again.', rank: 0 },
-        400,
-      );
-    }
-    const verified = verifyGameToken(signingSecret, token);
-    if (!verified) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
-    const ok = await verifyGameTokenSignature(signingSecret, verified.payloadB64, verified.sigB64);
-    if (!ok) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
-    if (verified.payload.d !== difficulty) {
-      return jsonResponse({ error: 'Token difficulty does not match submission', rank: 0 }, 400);
-    }
-    const now = Date.now();
-    const ageMs = now - verified.payload.iat;
-    if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
-      return jsonResponse({ error: 'Game token expired or invalid', rank: 0 }, 400);
-    }
-    const elapsedSec = ageMs / 1000;
-    if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
-      return jsonResponse({ error: 'Game token time verification failed', rank: 0 }, 400);
-    }
-    const { error: usedError } = await supabase
-      .from('minesweeper_used_tokens')
-      .insert({ game_id: verified.payload.g });
-    if (usedError) {
-      const isDuplicate = usedError.code === '23505';
-      return jsonResponse(
-        {
-          error: isDuplicate ? 'This game was already submitted.' : 'Failed to record game.',
-          rank: 0,
-        },
-        400,
-      );
-    }
+  const token = body.game_token;
+  if (!token || typeof token !== 'string') {
+    return jsonResponse({ error: 'Missing game token. Start a game and try again.', rank: 0 }, 400);
+  }
+  const verified = verifyGameToken(signingSecret, token);
+  if (!verified) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  const ok = await verifyGameTokenSignature(signingSecret, verified.payloadB64, verified.sigB64);
+  if (!ok) return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  if (verified.payload.d !== difficulty) {
+    return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  }
+  const now = Date.now();
+  const ageMs = now - verified.payload.iat;
+  if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
+    return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  }
+  const elapsedSec = ageMs / 1000;
+  if (Math.abs(elapsedSec - time) > TIME_TOLERANCE_SEC) {
+    return jsonResponse({ error: 'Invalid or tampered game token', rank: 0 }, 400);
+  }
+  const { error: usedError } = await supabase
+    .from('minesweeper_used_tokens')
+    .insert({ game_id: verified.payload.g });
+  if (usedError) {
+    const isDuplicate = usedError.code === '23505';
+    return jsonResponse(
+      {
+        error: isDuplicate ? 'This game was already submitted.' : 'Failed to record game.',
+        rank: 0,
+      },
+      400,
+    );
   }
   const name =
     typeof body.player_name === 'string'

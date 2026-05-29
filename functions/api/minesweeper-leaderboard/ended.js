@@ -120,11 +120,11 @@ export async function onRequestPost(context) {
   const ok = await verifySignature(secret, parsed.payloadB64, parsed.sigB64);
   if (!ok) return jsonResponse({ error: 'Invalid token', ok: false }, 400);
   if (parsed.payload.d !== difficulty) {
-    return jsonResponse({ error: 'Token difficulty does not match', ok: false }, 400);
+    return jsonResponse({ error: 'Invalid token', ok: false }, 400);
   }
   const ageMs = Date.now() - parsed.payload.iat;
   if (ageMs < 0 || ageMs > TOKEN_MAX_AGE_MS) {
-    return jsonResponse({ error: 'Token expired', ok: false }, 400);
+    return jsonResponse({ error: 'Invalid token', ok: false }, 400);
   }
   const { error: usedError } = await supabase
     .from('minesweeper_used_tokens')

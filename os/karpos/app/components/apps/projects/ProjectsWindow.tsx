@@ -142,7 +142,7 @@ export function ProjectsWindow() {
                 className={styles.projectsRepoLink}
                 href={selectedProject.githubUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 View GitHub Repo
               </a>

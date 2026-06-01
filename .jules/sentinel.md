@@ -13,3 +13,8 @@
 **Vulnerability:** The `NavigatorWindow.tsx` (Win98) used a wildcard `'*'` as the `targetOrigin` in a `postMessage` call from a sandboxed iframe.
 **Learning:** Using `'*'` allows any window that frames the component to intercept the message, which is a risk even for non-sensitive data like navigation URLs.
 **Prevention:** Always specify the exact target origin (e.g., `window.location.origin`) when sending messages via `postMessage` to ensure they are only received by the intended recipient.
+
+## 2026-06-12 - [HIGH] Fail-open leaderboard API
+**Vulnerability:** The Minesweeper Leaderboard API would skip token verification if `LEADERBOARD_SIGNING_SECRET` was missing, essentially "failing open".
+**Learning:** Security-critical features must never treat the absence of a configuration (like a secret) as a signal to skip validation.
+**Prevention:** Always enforce the presence of required security configurations and return a hard error (e.g., 503) if they are missing.

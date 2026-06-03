@@ -13,3 +13,8 @@
 **Vulnerability:** The `NavigatorWindow.tsx` (Win98) used a wildcard `'*'` as the `targetOrigin` in a `postMessage` call from a sandboxed iframe.
 **Learning:** Using `'*'` allows any window that frames the component to intercept the message, which is a risk even for non-sensitive data like navigation URLs.
 **Prevention:** Always specify the exact target origin (e.g., `window.location.origin`) when sending messages via `postMessage` to ensure they are only received by the intended recipient.
+
+## 2026-06-03 - [MEDIUM] Detailed anti-cheat validation errors
+**Vulnerability:** The Minesweeper leaderboard API returned specific error messages for different validation failures (e.g., "Token expired", "Difficulty mismatch", "Time verification failed").
+**Learning:** Overly descriptive error messages in security-critical paths (like anti-cheat or authentication) allow attackers to perform "exploit calibration" by understanding exactly which part of their payload is failing.
+**Prevention:** Always return generic error messages for any validation failure in security-critical logic to deny attackers feedback on the internal state of the verification system.

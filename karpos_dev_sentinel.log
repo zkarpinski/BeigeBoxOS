@@ -1,0 +1,23 @@
+
+> retro-web@0.0.1 dev:karpos /app
+> pnpm --filter @retro-web/karpos dev
+
+
+> @retro-web/karpos@0.0.1 dev /app/os/karpos
+> next dev --turbopack
+
+   ▲ Next.js 15.5.13 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1449ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4.8s
+ GET /?app=projects 200 in 6048ms
+ GET /?app=projects 200 in 254ms

@@ -13,3 +13,8 @@
 **Vulnerability:** The `NavigatorWindow.tsx` (Win98) used a wildcard `'*'` as the `targetOrigin` in a `postMessage` call from a sandboxed iframe.
 **Learning:** Using `'*'` allows any window that frames the component to intercept the message, which is a risk even for non-sensitive data like navigation URLs.
 **Prevention:** Always specify the exact target origin (e.g., `window.location.origin`) when sending messages via `postMessage` to ensure they are only received by the intended recipient.
+
+## 2026-06-10 - [HIGH] Fail-open on missing environment secrets
+**Vulnerability:** Security-critical validation logic in Minesweeper Leaderboard API was skipped if `LEADERBOARD_SIGNING_SECRET` was missing, allowing unvalidated submissions.
+**Learning:** Treating the absence of a secret as a feature toggle to skip security checks creates a "fail-open" state. Critical paths must enforce mandatory configuration.
+**Prevention:** Always implement "fail-secure" logic. If a required security secret is missing, return a hard error (e.g., 503 Service Unavailable) instead of bypassing validation.

@@ -456,7 +456,7 @@ export function NapsterWindow() {
                 window.alert('Select a song first.');
                 return;
               }
-              window.open(spotifyUrl(library[selectedLibIdx]), '_blank');
+              window.open(spotifyUrl(library[selectedLibIdx]), '_blank', 'noopener,noreferrer');
             }}
           >
             ▶ Play on Spotify
@@ -515,7 +515,9 @@ export function NapsterWindow() {
                   key={idx}
                   className={`napster-library-row${selectedLibIdx === idx ? ' selected' : ''}`}
                   onClick={() => setSelectedLibIdx(idx)}
-                  onDoubleClick={() => window.open(spotifyUrl(item), '_blank')}
+                  onDoubleClick={() =>
+                    window.open(spotifyUrl(item), '_blank', 'noopener,noreferrer')
+                  }
                 >
                   <div className="napster-lib-td lcol-filename" title={item.filename}>
                     {item.filename}

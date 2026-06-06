@@ -6,6 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { AppConfig } from '@retro-web/core/types/app-config';
 import { useOsShell } from '@retro-web/core/context';
+import { openSpotifyForTrack } from '@retro-web/core/music';
 
 export const napsterAppConfig: AppConfig = {
   id: 'napster',
@@ -222,15 +223,6 @@ function doSearch(query: string): SearchResult[] {
     [results[j], results[k]] = [results[k], results[j]];
   }
   return results.slice(0, 100);
-}
-
-function spotifyUrl(item: { rawArtist: string; rawTitle: string }): string {
-  const slug = (item.rawArtist + ' ' + item.rawTitle)
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-  return 'https://open.spotify.com/search/' + encodeURIComponent(slug);
 }
 
 export function NapsterWindow() {
@@ -456,7 +448,8 @@ export function NapsterWindow() {
                 window.alert('Select a song first.');
                 return;
               }
-              window.open(spotifyUrl(library[selectedLibIdx]), '_blank');
+              const item = library[selectedLibIdx];
+              openSpotifyForTrack(item.rawArtist, item.rawTitle);
             }}
           >
             ▶ Play on Spotify
@@ -515,7 +508,7 @@ export function NapsterWindow() {
                   key={idx}
                   className={`napster-library-row${selectedLibIdx === idx ? ' selected' : ''}`}
                   onClick={() => setSelectedLibIdx(idx)}
-                  onDoubleClick={() => window.open(spotifyUrl(item), '_blank')}
+                  onDoubleClick={() => openSpotifyForTrack(item.rawArtist, item.rawTitle)}
                 >
                   <div className="napster-lib-td lcol-filename" title={item.filename}>
                     {item.filename}

@@ -64,7 +64,7 @@ describe('ReporterWindow', () => {
     const [url, target] = (window.open as jest.Mock).mock.calls[0];
     expect(url).toContain('mailto:zkarpinski@protonmail.com');
     expect(url).toContain('Something%20is%20wrong');
-    expect(target).toBe('_blank');
+    expect(target).toBe('_self');
   });
 
   test('toggles email field when checkbox is clicked', () => {

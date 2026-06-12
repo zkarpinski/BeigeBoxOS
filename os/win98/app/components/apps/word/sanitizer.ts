@@ -17,6 +17,17 @@ export function sanitizeHTML(html: string): string {
     'meta',
     'svg',
     'math',
+    'form',
+    'input',
+    'button',
+    'select',
+    'textarea',
+    'frame',
+    'frameset',
+    'video',
+    'audio',
+    'canvas',
+    'applet',
   ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
@@ -30,12 +41,19 @@ export function sanitizeHTML(html: string): string {
 
       if (attrName.startsWith('on')) {
         el.removeAttribute(attrs[i].name);
-      } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
+      } else if (
+        ['href', 'src', 'action', 'formaction', 'background', 'xlink:href'].includes(attrName)
+      ) {
         if (value.startsWith('javascript:') || value.startsWith('data:')) {
           el.removeAttribute(attrs[i].name);
         }
       } else if (attrName === 'style') {
-        if (value.includes('url(') || value.includes('expression(')) {
+        if (
+          value.includes('url(') ||
+          value.includes('expression(') ||
+          value.includes('behavior:') ||
+          value.includes('-moz-binding:')
+        ) {
           el.removeAttribute(attrs[i].name);
         }
       }

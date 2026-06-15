@@ -41,7 +41,7 @@ describe('sanitizer', () => {
     });
 
     test('strips onclick and other event handlers', () => {
-      const html = '<button onclick="alert(1)">Click</button><div onload="bad()">x</div>';
+      const html = '<span onclick="alert(1)">Click</span><div onload="bad()">x</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('onclick');
       expect(out).not.toContain('onload');
@@ -54,8 +54,8 @@ describe('sanitizer', () => {
         '<a href="data:text/html,<html>">y</a>' +
         '<img src="javascript:void(0)">' +
         '<img src="data:image/svg+xml,<svg onload=alert(1)>">' +
-        '<form action="javascript:alert(1)">' +
-        '<button formaction="javascript:alert(1)">';
+        '<a background="javascript:alert(1)">z</a>' +
+        '<a xlink:href="javascript:alert(1)">w</a>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('javascript:');
       expect(out).not.toContain('data:');

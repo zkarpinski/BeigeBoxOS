@@ -26,9 +26,10 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math, form, button, etc.', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math>';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math>' +
+        '<form action="bad"><input><button>x</button></form>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -38,10 +39,13 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<meta');
       expect(out).not.toContain('<svg');
       expect(out).not.toContain('<math');
+      expect(out).not.toContain('<form');
+      expect(out).not.toContain('<input');
+      expect(out).not.toContain('<button');
     });
 
     test('strips onclick and other event handlers', () => {
-      const html = '<button onclick="alert(1)">Click</button><div onload="bad()">x</div>';
+      const html = '<div onclick="alert(1)">Click</div><div onload="bad()">x</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('onclick');
       expect(out).not.toContain('onload');
@@ -54,8 +58,8 @@ describe('sanitizer', () => {
         '<a href="data:text/html,<html>">y</a>' +
         '<img src="javascript:void(0)">' +
         '<img src="data:image/svg+xml,<svg onload=alert(1)>">' +
-        '<form action="javascript:alert(1)">' +
-        '<button formaction="javascript:alert(1)">';
+        '<div background="javascript:alert(1)">' +
+        '<a xlink:href="javascript:alert(1)">';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('javascript:');
       expect(out).not.toContain('data:');

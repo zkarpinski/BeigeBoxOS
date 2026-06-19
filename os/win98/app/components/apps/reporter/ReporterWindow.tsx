@@ -47,7 +47,11 @@ export function ReporterWindow() {
       bodyParts.push(`Contact: ${email.trim()}`);
     }
     const body = encodeURIComponent(bodyParts.join('\n'));
-    window.open(`mailto:zkarpinski@protonmail.com?subject=${subject}&body=${body}`, '_blank');
+    window.open(
+      `mailto:zkarpinski@protonmail.com?subject=${subject}&body=${body}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
     hideApp('reporter');
   };
 

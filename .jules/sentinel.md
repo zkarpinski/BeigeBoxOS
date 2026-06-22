@@ -18,3 +18,8 @@
 **Vulnerability:** Security-critical validation logic in Minesweeper Leaderboard API was skipped if `LEADERBOARD_SIGNING_SECRET` was missing, allowing unvalidated submissions.
 **Learning:** Treating the absence of a secret as a feature toggle to skip security checks creates a "fail-open" state. Critical paths must enforce mandatory configuration.
 **Prevention:** Always implement "fail-secure" logic. If a required security secret is missing, return a hard error (e.g., 503 Service Unavailable) instead of bypassing validation.
+
+## 2026-06-15 - [HIGH] Attribute removal bypass in HTML sanitizer
+**Vulnerability:** The HTML sanitizer was removing malicious attributes while iterating over a live NamedNodeMap. Removing an attribute shifts the indices of subsequent attributes, causing some to be skipped and bypass sanitization.
+**Learning:** Mutating a live DOM collection during iteration is a common source of bugs and security bypasses in custom sanitization logic.
+**Prevention:** Always convert live DOM collections to static arrays (e.g., Array.from(el.attributes)) before iterating if the elements/attributes might be removed or modified during the loop.

@@ -13,8 +13,9 @@ describe('sanitizer', () => {
 
     test('preserves safe HTML', () => {
       const html = '<p>Hello</p><a href="https://example.com">link</a>';
-      expect(sanitizeHTML(html)).toContain('<p>Hello</p>');
-      expect(sanitizeHTML(html)).toContain('href="https://example.com"');
+      const out = sanitizeHTML(html);
+      expect(out).toContain('<p>Hello</p>');
+      expect(out).toContain('href="https://example.com"');
     });
 
     test('removes script tags', () => {
@@ -26,39 +27,61 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math', () => {
-      const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math>';
-      const out = sanitizeHTML(html);
-      expect(out).not.toContain('<object');
-      expect(out).not.toContain('<embed');
-      expect(out).not.toContain('<iframe');
-      expect(out).not.toContain('<base');
-      expect(out).not.toContain('<link');
-      expect(out).not.toContain('<meta');
-      expect(out).not.toContain('<svg');
-      expect(out).not.toContain('<math');
+    test('removes dangerous tags', () => {
+      const tags = [
+        'script',
+        'object',
+        'embed',
+        'iframe',
+        'base',
+        'link',
+        'meta',
+        'svg',
+        'math',
+        'form',
+        'input',
+        'button',
+        'select',
+        'textarea',
+        'frame',
+        'frameset',
+        'video',
+        'audio',
+        'canvas',
+        'applet',
+      ];
+      tags.forEach((tag) => {
+        const html = `<p>before</p><${tag}>content</${tag}><p>after</p>`;
+        const out = sanitizeHTML(html);
+        expect(out).not.toContain(`<${tag}`);
+        expect(out).toContain('<p>before</p>');
+        expect(out).toContain('<p>after</p>');
+      });
     });
 
-    test('strips onclick and other event handlers', () => {
-      const html = '<button onclick="alert(1)">Click</button><div onload="bad()">x</div>';
+    test('strips onclick and other event handlers from safe tags', () => {
+      // Changed from <button> to <div> because <button> is now blocked
+      const html = '<div onclick="alert(1)">Click</div><div onload="bad()">x</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('onclick');
       expect(out).not.toContain('onload');
       expect(out).toContain('Click');
     });
 
-    test('strips javascript: and data: URLs from sensitive attributes', () => {
+    test('strips javascript:, data:, and vbscript: URLs from sensitive attributes', () => {
       const html =
         '<a href="javascript:alert(1)">x</a>' +
         '<a href="data:text/html,<html>">y</a>' +
+        '<a href="vbscript:msgbox(1)">v</a>' +
         '<img src="javascript:void(0)">' +
         '<img src="data:image/svg+xml,<svg onload=alert(1)>">' +
-        '<form action="javascript:alert(1)">' +
-        '<button formaction="javascript:alert(1)">';
+        '<div background="javascript:alert(1)">bg</div>' +
+        '<a xlink:href="javascript:alert(1)">xlink</a>';
+
       const out = sanitizeHTML(html);
       expect(out).not.toContain('javascript:');
       expect(out).not.toContain('data:');
+      expect(out).not.toContain('vbscript:');
     });
 
     test('sanitizes style attribute', () => {
@@ -66,10 +89,13 @@ describe('sanitizer', () => {
         '<div style="color: red">safe</div>' +
         '<div style="background-image: url(javascript:alert(1))">x</div>' +
         '<div style="width: expression(alert(1))">y</div>' +
-        '<div style="background: url(\'data:image/svg+xml,...\')">z</div>';
+        '<div style="behavior: url(#default#homepage)">b</div>' +
+        '<div style="-moz-binding: url(x.xml#y)">m</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('url(');
       expect(out).not.toContain('expression(');
+      expect(out).not.toContain('behavior');
+      expect(out).not.toContain('-moz-binding');
       expect(out).toContain('color: red');
     });
 
@@ -86,6 +112,16 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<html>');
       expect(out).not.toContain('<head>');
       expect(out).toContain('<p>Y</p>');
+    });
+
+    test('correctly handles attribute removal with multiple attributes (iteration safety)', () => {
+      // Test that removing one attribute doesn't cause the loop to skip others.
+      const html = '<div onclick="a()" onmouseover="b()" onmouseout="c()">test</div>';
+      const out = sanitizeHTML(html);
+      expect(out).not.toContain('onclick');
+      expect(out).not.toContain('onmouseover');
+      expect(out).not.toContain('onmouseout');
+      expect(out).toContain('test');
     });
   });
 });

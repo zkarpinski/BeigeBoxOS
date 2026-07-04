@@ -17,29 +17,51 @@ export function sanitizeHTML(html: string): string {
     'meta',
     'svg',
     'math',
+    'form',
+    'input',
+    'button',
+    'select',
+    'textarea',
+    'frame',
+    'frameset',
+    'video',
+    'audio',
+    'canvas',
+    'applet',
   ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
   });
 
   doc.querySelectorAll('*').forEach((el) => {
-    const attrs = el.attributes;
-    for (let i = attrs.length - 1; i >= 0; i--) {
-      const attrName = attrs[i].name.toLowerCase();
-      const value = attrs[i].value.toLowerCase().replace(/\s/g, '');
+    // Convert NamedNodeMap to Array to avoid issues with live collections when removing attributes
+    Array.from(el.attributes).forEach((attr) => {
+      const attrName = attr.name.toLowerCase();
+      const value = attr.value.toLowerCase().replace(/\s/g, '');
 
       if (attrName.startsWith('on')) {
-        el.removeAttribute(attrs[i].name);
-      } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
-        if (value.startsWith('javascript:') || value.startsWith('data:')) {
-          el.removeAttribute(attrs[i].name);
+        el.removeAttribute(attr.name);
+      } else if (
+        ['href', 'src', 'action', 'formaction', 'background', 'xlink:href'].includes(attrName)
+      ) {
+        if (
+          value.startsWith('javascript:') ||
+          value.startsWith('data:') ||
+          value.startsWith('vbscript:')
+        ) {
+          el.removeAttribute(attr.name);
         }
       } else if (attrName === 'style') {
-        if (value.includes('url(') || value.includes('expression(')) {
-          el.removeAttribute(attrs[i].name);
+        if (
+          value.includes('url(') ||
+          value.includes('expression(') ||
+          value.includes('behavior:') ||
+          value.includes('-moz-binding:')
+        ) {
+          el.removeAttribute(attr.name);
         }
       }
-    }
+    });
   });
 
   return doc.body ? doc.body.innerHTML : '';

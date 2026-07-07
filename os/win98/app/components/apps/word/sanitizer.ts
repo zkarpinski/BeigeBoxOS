@@ -7,6 +7,7 @@ export function sanitizeHTML(html: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
+  // Blacklist tags that are dangerous or unnecessary for a text editor
   const dangerousTags = [
     'script',
     'object',
@@ -17,26 +18,54 @@ export function sanitizeHTML(html: string): string {
     'meta',
     'svg',
     'math',
+    'form',
+    'input',
+    'button',
+    'select',
+    'textarea',
+    'frame',
+    'frameset',
+    'video',
+    'audio',
+    'canvas',
+    'applet',
   ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
   });
 
   doc.querySelectorAll('*').forEach((el) => {
-    const attrs = el.attributes;
-    for (let i = attrs.length - 1; i >= 0; i--) {
-      const attrName = attrs[i].name.toLowerCase();
-      const value = attrs[i].value.toLowerCase().replace(/\s/g, '');
+    // Convert to array to avoid issues when removing attributes during iteration
+    const attrs = Array.from(el.attributes);
+    for (const attr of attrs) {
+      const attrName = attr.name.toLowerCase();
+      const value = attr.value.toLowerCase().replace(/\s/g, '');
 
+      // Remove event handlers
       if (attrName.startsWith('on')) {
-        el.removeAttribute(attrs[i].name);
-      } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
-        if (value.startsWith('javascript:') || value.startsWith('data:')) {
-          el.removeAttribute(attrs[i].name);
+        el.removeAttribute(attr.name);
+      }
+      // Remove dangerous URI protocols from common attributes
+      else if (
+        ['href', 'src', 'action', 'formaction', 'background', 'xlink:href'].includes(attrName)
+      ) {
+        if (
+          value.startsWith('javascript:') ||
+          value.startsWith('data:') ||
+          value.startsWith('vbscript:')
+        ) {
+          el.removeAttribute(attr.name);
         }
-      } else if (attrName === 'style') {
-        if (value.includes('url(') || value.includes('expression(')) {
-          el.removeAttribute(attrs[i].name);
+      }
+      // Sanitize style attributes
+      else if (attrName === 'style') {
+        if (
+          value.includes('url(') ||
+          value.includes('expression(') ||
+          value.includes('behavior:') ||
+          value.includes('-moz-binding:')
+        ) {
+          el.removeAttribute(attr.name);
         }
       }
     }

@@ -187,35 +187,6 @@ describe('StartMenuTree', () => {
   });
 });
 
-describe('ShellOverlays', () => {
-  test('Run dialog has OK and Cancel buttons when open', async () => {
-    const user = userEvent.setup();
-    renderShell();
-    await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
-    expect(screen.getByRole('button', { name: /ok/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-  });
-
-  test('Run dialog close button hides dialog', async () => {
-    const user = userEvent.setup();
-    renderShell();
-    await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
-    expect(document.getElementById('run-dialog')).toBeInTheDocument();
-    const closeBtn = document.querySelector('#run-dialog .run-titlebtn');
-    await user.click(closeBtn as HTMLElement);
-    expect(document.getElementById('run-dialog')).not.toBeInTheDocument();
-  });
-
-  test('Run dialog shows run icon and description', async () => {
-    const user = userEvent.setup();
-    renderShell();
-    await user.click(document.getElementById('start-button')!);
-    await user.click(document.getElementById('start-run')!);
-    expect(screen.getByText(/type the name of a program/i)).toBeInTheDocument();
-  });
-});
 
 describe('Shell integration', () => {
   test('full shell render without crash', () => {

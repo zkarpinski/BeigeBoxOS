@@ -61,10 +61,11 @@ describe('ReporterWindow', () => {
     fireEvent.click(screen.getByText('Submit Report'));
 
     expect(window.open).toHaveBeenCalledTimes(1);
-    const [url, target] = (window.open as jest.Mock).mock.calls[0];
+    const [url, target, features] = (window.open as jest.Mock).mock.calls[0];
     expect(url).toContain('mailto:zkarpinski@protonmail.com');
     expect(url).toContain('Something%20is%20wrong');
     expect(target).toBe('_blank');
+    expect(features).toBe('noopener,noreferrer');
   });
 
   test('toggles email field when checkbox is clicked', () => {

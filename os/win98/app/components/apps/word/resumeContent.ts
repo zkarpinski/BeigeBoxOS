@@ -4,7 +4,7 @@
 
 export const DEFAULT_RESUME_HTML = [
   '<h1 style="margin-top:0;">Zachary Karpinski</h1>',
-  '<p>Pennsylvania, USA &nbsp;|&nbsp; <a href="mailto:zkarpinski@protonmail.com">zkarpinski@protonmail.com</a> &nbsp;|&nbsp; <a href="https://www.github.com/zKarpinski">www.github.com/zKarpinski</a></p>',
+  '<p>Pennsylvania, USA &nbsp;|&nbsp; <a href="mailto:zkarpinski@protonmail.com">zkarpinski@protonmail.com</a> &nbsp;|&nbsp; <a href="https://www.github.com/zKarpinski" target="_blank" rel="noopener noreferrer">www.github.com/zKarpinski</a></p>',
   '<h2>Professional Summary</h2>',
   '<p>Highly technical Software Engineer with lorem ipsum dolor sit amet experience.</p>',
   '<h2>Work Experience</h2>',

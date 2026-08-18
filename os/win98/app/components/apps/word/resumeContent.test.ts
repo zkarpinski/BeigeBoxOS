@@ -24,6 +24,9 @@ describe('resumeContent', () => {
       expect(DEFAULT_RESUME_HTML).toContain('Skills');
       expect(DEFAULT_RESUME_HTML).toContain('Education');
       expect(DEFAULT_RESUME_HTML).toContain('Certifications');
+      expect(DEFAULT_RESUME_HTML).toContain(
+        '<a href="https://www.github.com/zKarpinski" target="_blank" rel="noopener noreferrer">www.github.com/zKarpinski</a>',
+      );
     });
   });
 

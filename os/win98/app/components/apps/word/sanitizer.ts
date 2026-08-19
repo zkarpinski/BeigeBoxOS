@@ -1,5 +1,5 @@
 /**
- * Simple HTML sanitizer for Word 97 to prevent XSS.
+ * HTML sanitizer for Word 97 to prevent XSS and malicious HTML injection.
  */
 export function sanitizeHTML(html: string): string {
   if (!html) return '';
@@ -17,29 +17,61 @@ export function sanitizeHTML(html: string): string {
     'meta',
     'svg',
     'math',
+    'form',
+    'input',
+    'button',
+    'select',
+    'textarea',
+    'frame',
+    'frameset',
+    'video',
+    'audio',
+    'canvas',
+    'applet',
+    'template',
   ];
   dangerousTags.forEach((tag) => {
     doc.querySelectorAll(tag).forEach((el) => el.remove());
   });
 
+  const urlAttrs = [
+    'href',
+    'src',
+    'action',
+    'formaction',
+    'background',
+    'xlink:href',
+    'lowsrc',
+    'dynsrc',
+  ];
+
   doc.querySelectorAll('*').forEach((el) => {
-    const attrs = el.attributes;
-    for (let i = attrs.length - 1; i >= 0; i--) {
-      const attrName = attrs[i].name.toLowerCase();
-      const value = attrs[i].value.toLowerCase().replace(/\s/g, '');
+    Array.from(el.attributes).forEach((attr) => {
+      const attrName = attr.name.toLowerCase();
+      const value = attr.value.toLowerCase().replace(/[\s\x00-\x20]/g, '');
 
       if (attrName.startsWith('on')) {
-        el.removeAttribute(attrs[i].name);
-      } else if (['href', 'src', 'action', 'formaction'].includes(attrName)) {
-        if (value.startsWith('javascript:') || value.startsWith('data:')) {
-          el.removeAttribute(attrs[i].name);
+        el.removeAttribute(attr.name);
+      } else if (urlAttrs.includes(attrName) || attrName.startsWith('data-')) {
+        if (
+          value.startsWith('javascript:') ||
+          value.startsWith('vbscript:') ||
+          value.startsWith('data:')
+        ) {
+          el.removeAttribute(attr.name);
         }
       } else if (attrName === 'style') {
-        if (value.includes('url(') || value.includes('expression(')) {
-          el.removeAttribute(attrs[i].name);
+        if (
+          value.includes('url(') ||
+          value.includes('expression(') ||
+          value.includes('behavior:') ||
+          value.includes('-moz-binding:') ||
+          value.includes('vbscript:')
+        ) {
+          el.removeAttribute(attr.name);
         }
       }
-    }
+    });
   });
 
   return doc.body ? doc.body.innerHTML : '';

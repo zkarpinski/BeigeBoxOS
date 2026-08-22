@@ -60,4 +60,11 @@ describe('ProjectsWindow', () => {
       'https://github.com/zKarp/T-Driver',
     );
   });
+
+  it('ensures external GitHub link includes target="_blank" and rel="noopener noreferrer"', () => {
+    render(<ProjectsWindow />);
+    const link = screen.getByRole('link', { name: 'View GitHub Repo' });
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });

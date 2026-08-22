@@ -55,10 +55,10 @@ describe('ProjectsWindow', () => {
 
     expect(screen.getByRole('heading', { name: 'T-Driver' })).toBeInTheDocument();
     expect(screen.getByText('2014-2016')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View GitHub Repo' })).toHaveAttribute(
-      'href',
-      'https://github.com/zKarp/T-Driver',
-    );
+    const link = screen.getByRole('link', { name: 'View GitHub Repo' });
+    expect(link).toHaveAttribute('href', 'https://github.com/zKarp/T-Driver');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('ensures external GitHub link includes target="_blank" and rel="noopener noreferrer"', () => {

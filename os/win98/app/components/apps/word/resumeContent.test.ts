@@ -25,6 +25,12 @@ describe('resumeContent', () => {
       expect(DEFAULT_RESUME_HTML).toContain('Education');
       expect(DEFAULT_RESUME_HTML).toContain('Certifications');
     });
+
+    test('ensures external GitHub link includes target="_blank" and rel="noopener noreferrer"', () => {
+      expect(DEFAULT_RESUME_HTML).toContain('href="https://www.github.com/zKarpinski"');
+      expect(DEFAULT_RESUME_HTML).toContain('target="_blank"');
+      expect(DEFAULT_RESUME_HTML).toContain('rel="noopener noreferrer"');
+    });
   });
 
   describe('hasMeaningfulContent', () => {

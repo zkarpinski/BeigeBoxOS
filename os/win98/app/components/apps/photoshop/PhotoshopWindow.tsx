@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { escapeHtml } from '@retro-web/core';
 import type { AppConfig } from '@/app/types/app-config';
 
 export const photoshopAppConfig: AppConfig = {
@@ -116,7 +117,7 @@ function spawnPopup(mode: 'random' | 'cursor', mx: number, my: number) {
   popup.style.cssText = `left:${left}px;top:${top}px;z-index:${9000 + _popupIdx}`;
   popup.innerHTML = `
     <div class="ps5-popup-title">
-      <span>⚠ ${msg.title}</span>
+      <span>⚠ ${escapeHtml(msg.title)}</span>
       <button class="ps5-popup-close" aria-label="Close">✕</button>
     </div>
     <div class="ps5-popup-body">
@@ -176,7 +177,7 @@ export function PhotoshopWindow() {
       setPhase('idle');
       setStatusIdx(0);
     }
-  }, [isVisible]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isVisible]);
 
   // Splash: cycle status text, then kick off virus phase
   useEffect(() => {

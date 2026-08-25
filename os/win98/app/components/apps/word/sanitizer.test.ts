@@ -26,9 +26,9 @@ describe('sanitizer', () => {
       expect(out).toContain('<span>end</span>');
     });
 
-    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math', () => {
+    test('removes dangerous tags: object, embed, iframe, base, link, meta, svg, math, form, input, button, select, textarea, frame, frameset, video, audio, canvas, applet, template', () => {
       const html =
-        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math>';
+        '<object data="x"></object><embed src="y"><iframe src="z"></iframe><base href="/"><link rel="x"><meta http-equiv="refresh"><svg><script>alert(1)</script></svg><math><mi>x</mi></math><form action="x"><input type="text"><button>btn</button><select><option>1</option></select><textarea>txt</textarea></form><frameset><frame src="a"></frameset><video src="v"></video><audio src="a"></audio><canvas></canvas><applet></applet><template></template>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('<object');
       expect(out).not.toContain('<embed');
@@ -38,27 +38,41 @@ describe('sanitizer', () => {
       expect(out).not.toContain('<meta');
       expect(out).not.toContain('<svg');
       expect(out).not.toContain('<math');
+      expect(out).not.toContain('<form');
+      expect(out).not.toContain('<input');
+      expect(out).not.toContain('<button');
+      expect(out).not.toContain('<select');
+      expect(out).not.toContain('<textarea');
+      expect(out).not.toContain('<frame');
+      expect(out).not.toContain('<frameset');
+      expect(out).not.toContain('<video');
+      expect(out).not.toContain('<audio');
+      expect(out).not.toContain('<canvas');
+      expect(out).not.toContain('<applet');
+      expect(out).not.toContain('<template');
     });
 
     test('strips onclick and other event handlers', () => {
-      const html = '<button onclick="alert(1)">Click</button><div onload="bad()">x</div>';
+      const html = '<div onclick="alert(1)">Click</div><div onload="bad()">x</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('onclick');
       expect(out).not.toContain('onload');
       expect(out).toContain('Click');
     });
 
-    test('strips javascript: and data: URLs from sensitive attributes', () => {
+    test('strips javascript:, data:, and vbscript: URLs from sensitive attributes and data- attributes', () => {
       const html =
         '<a href="javascript:alert(1)">x</a>' +
         '<a href="data:text/html,<html>">y</a>' +
+        '<a href="vbscript:msgbox(1)">z</a>' +
         '<img src="javascript:void(0)">' +
         '<img src="data:image/svg+xml,<svg onload=alert(1)>">' +
-        '<form action="javascript:alert(1)">' +
-        '<button formaction="javascript:alert(1)">';
+        '<div background="vbscript:msgbox(1)">b</div>' +
+        '<div data-url="javascript:alert(1)">d</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('javascript:');
       expect(out).not.toContain('data:');
+      expect(out).not.toContain('vbscript:');
     });
 
     test('sanitizes style attribute', () => {
@@ -66,10 +80,16 @@ describe('sanitizer', () => {
         '<div style="color: red">safe</div>' +
         '<div style="background-image: url(javascript:alert(1))">x</div>' +
         '<div style="width: expression(alert(1))">y</div>' +
+        '<div style="behavior: url(xss.htc)">b</div>' +
+        '<div style="-moz-binding: url(xss.xml#xss)">m</div>' +
+        '<div style="background: vbscript:msgbox(1)">v</div>' +
         '<div style="background: url(\'data:image/svg+xml,...\')">z</div>';
       const out = sanitizeHTML(html);
       expect(out).not.toContain('url(');
       expect(out).not.toContain('expression(');
+      expect(out).not.toContain('behavior:');
+      expect(out).not.toContain('-moz-binding:');
+      expect(out).not.toContain('vbscript:');
       expect(out).toContain('color: red');
     });
 

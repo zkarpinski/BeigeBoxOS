@@ -59,4 +59,23 @@ describe('PhotoshopWindow', () => {
     expect(screen.getByText('INSTALLING PHOTOSHOP...')).toBeInTheDocument();
     expect(screen.getByText('💀')).toBeInTheDocument();
   });
+
+  test('escapes HTML in popup titles during virus phase', () => {
+    render(
+      <Win98TestProviders registry={registry} initialOpenAppId="photoshop">
+        <PhotoshopWindow />
+      </Win98TestProviders>,
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    const popups = document.querySelectorAll('[data-ps5-popup]');
+    expect(popups.length).toBeGreaterThan(0);
+    const titleEl = popups[0].querySelector('.ps5-popup-title span');
+    expect(titleEl).not.toBeNull();
+    // Verify title text is properly rendered without unescaped HTML elements
+    expect(titleEl?.innerHTML).toContain('VIRUS ALERT!!!');
+  });
 });

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager, useOsShell } from '@retro-web/core/context';
+import { escapeHtml } from '@retro-web/core/utils';
 import type { AppConfig } from '@/app/types/app-config';
 
 export const photoshopAppConfig: AppConfig = {
@@ -114,9 +115,11 @@ function spawnPopup(mode: 'random' | 'cursor', mx: number, my: number) {
   }
 
   popup.style.cssText = `left:${left}px;top:${top}px;z-index:${9000 + _popupIdx}`;
+  // Sanitize msg.title using escapeHtml to prevent HTML injection / XSS
+  const safeTitle = escapeHtml(msg.title);
   popup.innerHTML = `
     <div class="ps5-popup-title">
-      <span>⚠ ${msg.title}</span>
+      <span>⚠ ${safeTitle}</span>
       <button class="ps5-popup-close" aria-label="Close">✕</button>
     </div>
     <div class="ps5-popup-body">

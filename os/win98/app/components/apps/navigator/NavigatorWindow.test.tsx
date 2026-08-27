@@ -82,4 +82,41 @@ describe('NavigatorWindow', () => {
 
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Netscape Navigator'));
   });
+
+  test('postMessage navigation validates origin', async () => {
+    const { container } = render(
+      <Win98TestProviders registry={registry}>
+        <NavigatorWindow />
+      </Win98TestProviders>,
+    );
+
+    const iframe = container.querySelector('#nav-iframe') as HTMLIFrameElement;
+    expect(iframe).not.toBeNull();
+
+    const input = screen.getByDisplayValue('about:home');
+
+    // 1. Message from unauthorized origin should be ignored
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'https://malicious.com',
+          data: { type: 'nav-navigate', url: 'https://attacker.com' },
+          source: iframe.contentWindow,
+        }),
+      );
+    });
+    expect(input).toHaveValue('about:home');
+
+    // 2. Message from allowed origin 'null' (sandboxed iframe without allow-same-origin)
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'null',
+          data: { type: 'nav-navigate', url: 'https://github.com/zkarpinski' },
+          source: iframe.contentWindow,
+        }),
+      );
+    });
+    expect(input).toHaveValue('https://github.com/zkarpinski');
+  });
 });

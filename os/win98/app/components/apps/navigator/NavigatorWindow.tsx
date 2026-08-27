@@ -250,9 +250,10 @@ export function NavigatorWindow() {
   // Message listener for nav-navigate from home page iframes
   useEffect(() => {
     function onMessage(e: MessageEvent) {
+      // Security: Validate message source and origin to prevent cross-origin message spoofing.
       if (e.source !== iframeRef.current?.contentWindow) return;
-      // When allow-same-origin is removed from a sandboxed srcdoc iframe, its origin is 'null'
-      if (e.origin !== 'null') return;
+      // When allow-same-origin is omitted from a sandboxed srcdoc iframe, its origin is 'null'.
+      if (e.origin !== 'null' && e.origin !== window.location.origin) return;
       if (e.data?.type === 'nav-navigate' && typeof e.data.url === 'string') {
         navigate(e.data.url);
       }

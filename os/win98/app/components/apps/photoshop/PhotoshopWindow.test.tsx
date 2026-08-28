@@ -45,7 +45,7 @@ describe('PhotoshopWindow', () => {
     expect(screen.getByText('Loading plug-ins...')).toBeInTheDocument();
   });
 
-  test('enters virus phase after splash', () => {
+  test('enters virus phase after splash and escapes HTML in popup titles', () => {
     render(
       <Win98TestProviders registry={registry} initialOpenAppId="photoshop">
         <PhotoshopWindow />
@@ -58,5 +58,11 @@ describe('PhotoshopWindow', () => {
 
     expect(screen.getByText('INSTALLING PHOTOSHOP...')).toBeInTheDocument();
     expect(screen.getByText('💀')).toBeInTheDocument();
+
+    const popupTitles = document.querySelectorAll('.ps5-popup-title span');
+    expect(popupTitles.length).toBeGreaterThan(0);
+    popupTitles.forEach((titleEl) => {
+      expect(titleEl.innerHTML).not.toContain('<script>');
+    });
   });
 });

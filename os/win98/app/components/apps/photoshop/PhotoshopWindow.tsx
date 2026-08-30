@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { escapeHtml } from '@retro-web/core';
 import { useWindowManager, useOsShell } from '@retro-web/core/context';
 import type { AppConfig } from '@/app/types/app-config';
 
@@ -116,7 +117,7 @@ function spawnPopup(mode: 'random' | 'cursor', mx: number, my: number) {
   popup.style.cssText = `left:${left}px;top:${top}px;z-index:${9000 + _popupIdx}`;
   popup.innerHTML = `
     <div class="ps5-popup-title">
-      <span>⚠ ${msg.title}</span>
+      <span>⚠ ${escapeHtml(msg.title)}</span>
       <button class="ps5-popup-close" aria-label="Close">✕</button>
     </div>
     <div class="ps5-popup-body">

@@ -59,4 +59,23 @@ describe('PhotoshopWindow', () => {
     expect(screen.getByText('INSTALLING PHOTOSHOP...')).toBeInTheDocument();
     expect(screen.getByText('💀')).toBeInTheDocument();
   });
+
+  test('escapes popup title HTML special characters when virus popups spawn', () => {
+    render(
+      <Win98TestProviders registry={registry} initialOpenAppId="photoshop">
+        <PhotoshopWindow />
+      </Win98TestProviders>,
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    const popups = document.querySelectorAll('.ps5-virus-popup');
+    expect(popups.length).toBeGreaterThan(0);
+    popups.forEach((popup) => {
+      const titleEl = popup.querySelector('.ps5-popup-title span');
+      expect(titleEl?.innerHTML).not.toMatch(/<script/i);
+    });
+  });
 });

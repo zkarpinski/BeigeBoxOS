@@ -532,9 +532,11 @@ export function Itunes8Window() {
                               type="button"
                               className="itunes8-spotify-btn"
                               style={{ marginTop: 8 }}
-                              onClick={() =>
-                                openSpotifyForTrack(g.artist, g.tracks[0]?.title ?? '')
-                              }
+                              onClick={() => {
+                                // openSpotifyForTrack uses window.open with 'noopener,noreferrer' by default
+                                // to prevent reverse tabnabbing vulnerabilities when opening external links.
+                                openSpotifyForTrack(g.artist, g.tracks[0]?.title ?? '');
+                              }}
                             >
                               Open in Spotify
                             </button>

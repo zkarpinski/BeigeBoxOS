@@ -82,4 +82,23 @@ describe('Itunes8Window', () => {
     // Should be playing now (Pause button visible)
     expect(screen.getByLabelText('Pause')).toBeInTheDocument();
   });
+
+  test('spotify button opens search URL with noopener,noreferrer features', () => {
+    const originalOpen = window.open;
+    const mockOpen = jest.fn();
+    window.open = mockOpen;
+
+    renderItunes();
+    const spotifyBtns = screen.getAllByText('Open in Spotify');
+    expect(spotifyBtns.length).toBeGreaterThan(0);
+    fireEvent.click(spotifyBtns[0]);
+
+    expect(mockOpen).toHaveBeenCalledTimes(1);
+    const [url, target, features] = mockOpen.mock.calls[0];
+    expect(url).toMatch(/^https:\/\/open\.spotify\.com\/search\//);
+    expect(target).toBe('_blank');
+    expect(features).toBe('noopener,noreferrer');
+
+    window.open = originalOpen;
+  });
 });

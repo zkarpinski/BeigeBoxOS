@@ -9,6 +9,7 @@
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: frame-ancestors 'self';
 
 # Long-term cache for hashed Next.js static assets (fingerprinted filenames — safe to cache forever)
 /_next/static/*

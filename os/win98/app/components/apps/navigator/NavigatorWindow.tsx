@@ -251,8 +251,8 @@ export function NavigatorWindow() {
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       if (e.source !== iframeRef.current?.contentWindow) return;
-      // When allow-same-origin is removed from a sandboxed srcdoc iframe, its origin is 'null'
-      if (e.origin !== 'null') return;
+      // Allow messages from sandboxed srcdoc iframe ('null') or same-origin window, blocking cross-origin messages
+      if (e.origin !== 'null' && e.origin !== window.location.origin) return;
       if (e.data?.type === 'nav-navigate' && typeof e.data.url === 'string') {
         navigate(e.data.url);
       }

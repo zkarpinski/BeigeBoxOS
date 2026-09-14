@@ -82,4 +82,39 @@ describe('NavigatorWindow', () => {
 
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Netscape Navigator'));
   });
+
+  test('ignores postMessage events from untrusted origins', async () => {
+    render(
+      <Win98TestProviders registry={registry}>
+        <NavigatorWindow />
+      </Win98TestProviders>,
+    );
+
+    const input = screen.getByDisplayValue('about:home');
+
+    await act(async () => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { type: 'nav-navigate', url: 'https://evil.com' },
+          origin: 'https://malicious.com',
+        }),
+      );
+    });
+
+    expect(input).toHaveValue('about:home');
+  });
+
+  test('renders iframe with proper security sandbox restrictions', () => {
+    const { container } = render(
+      <Win98TestProviders registry={registry}>
+        <NavigatorWindow />
+      </Win98TestProviders>,
+    );
+
+    const iframe = container.querySelector('#nav-iframe') as HTMLIFrameElement;
+    expect(iframe).toBeInTheDocument();
+    const sandbox = iframe.getAttribute('sandbox') || '';
+    expect(sandbox).toContain('allow-scripts');
+    expect(sandbox).not.toContain('allow-same-origin');
+  });
 });

@@ -131,23 +131,32 @@ export function PalmDesktop() {
     const results: { app: string; appId: string; text: string }[] = [];
 
     try {
-      const todos: { text: string; completed: boolean }[] = JSON.parse(
-        localStorage.getItem('palmos-todos') ?? '[]',
-      );
-      todos.forEach((t) => {
-        if (t.text.toLowerCase().includes(q))
-          results.push({ app: 'To Do', appId: 'todo', text: t.text });
-      });
+      const rawTodos = JSON.parse(localStorage.getItem('palmos-todos') ?? '[]');
+      if (Array.isArray(rawTodos)) {
+        rawTodos.forEach((t) => {
+          if (t && typeof t.text === 'string' && t.text.toLowerCase().includes(q)) {
+            results.push({ app: 'To Do', appId: 'todo', text: t.text });
+          }
+        });
+      }
     } catch {}
 
     try {
-      const memos: { title: string; body: string }[] = JSON.parse(
-        localStorage.getItem('palmos-memos') ?? '[]',
-      );
-      memos.forEach((m) => {
-        if (m.title.toLowerCase().includes(q) || m.body.toLowerCase().includes(q))
-          results.push({ app: 'Memo', appId: 'memo', text: m.title || m.body.slice(0, 40) });
-      });
+      const rawMemos = JSON.parse(localStorage.getItem('palmos-memos') ?? '[]');
+      if (Array.isArray(rawMemos)) {
+        rawMemos.forEach((m) => {
+          if (!m || typeof m !== 'object') return;
+          const body = typeof m.body === 'string' ? m.body : '';
+          const title = typeof m.title === 'string' ? m.title : body.split('\n')[0]?.trim() || '';
+          if (title.toLowerCase().includes(q) || body.toLowerCase().includes(q)) {
+            results.push({
+              app: 'Memo',
+              appId: 'memo',
+              text: title || body.slice(0, 40) || '(untitled)',
+            });
+          }
+        });
+      }
     } catch {}
 
     return results;

@@ -56,4 +56,25 @@ describe('PalmDesktop Component', () => {
     expect(screen.getByText('Space Trader')).toBeInTheDocument(); // Launcher icon back
     expect(screen.queryByTestId('space-trader')).not.toBeInTheDocument();
   });
+
+  it('handles search in Find overlay safely even with malformed or missing title in memos', () => {
+    localStorage.setItem(
+      'palmos-memos',
+      JSON.stringify([
+        { id: '1', body: 'Meeting notes for Project Alpha' },
+        { id: '2', title: 'Shopping', body: 'Buy milk' },
+        null,
+        'invalid item',
+      ]),
+    );
+    render(<PalmDesktop />);
+
+    const searchBtn = screen.getByTitle('Find');
+    fireEvent.click(searchBtn);
+
+    const findInput = screen.getByRole('textbox');
+    fireEvent.change(findInput, { target: { value: 'Project' } });
+
+    expect(screen.getByText(/Meeting notes for Project Alpha/)).toBeInTheDocument();
+  });
 });

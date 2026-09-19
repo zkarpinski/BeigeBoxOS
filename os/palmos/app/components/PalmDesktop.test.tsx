@@ -17,6 +17,7 @@ const mockSounds = {
 
 describe('PalmDesktop Component', () => {
   beforeEach(() => {
+    localStorage.clear();
     (usePalmSounds as jest.Mock).mockReturnValue(mockSounds);
     jest.clearAllMocks();
   });
@@ -55,5 +56,47 @@ describe('PalmDesktop Component', () => {
 
     expect(screen.getByText('Space Trader')).toBeInTheDocument(); // Launcher icon back
     expect(screen.queryByTestId('space-trader')).not.toBeInTheDocument();
+  });
+
+  it('searches todos and memos via Find overlay safely', () => {
+    localStorage.setItem(
+      'palmos-todos',
+      JSON.stringify([{ text: 'Buy groceries', completed: false }]),
+    );
+    localStorage.setItem(
+      'palmos-memos',
+      JSON.stringify([{ id: '1', body: 'Groceries list:\nMilk\nBread' }]),
+    );
+
+    render(<PalmDesktop />);
+
+    const findBtn = screen.getByTitle('Find');
+    fireEvent.click(findBtn);
+
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'groceries' } });
+
+    expect(screen.getByRole('button', { name: /To Do: Buy groceries/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Memo: Groceries list/ })).toBeInTheDocument();
+  });
+
+  it('handles malformed localStorage data in Find overlay without throwing', () => {
+    localStorage.setItem('palmos-todos', JSON.stringify({ notAnArray: true }));
+    localStorage.setItem(
+      'palmos-memos',
+      JSON.stringify([null, { id: '1' }, { id: '2', body: null }]),
+    );
+
+    render(<PalmDesktop />);
+
+    const findBtn = screen.getByTitle('Find');
+    fireEvent.click(findBtn);
+
+    const input = screen.getByRole('textbox');
+    expect(() => {
+      fireEvent.change(input, { target: { value: 'test' } });
+    }).not.toThrow();
+
+    expect(screen.getByText('No matches found.')).toBeInTheDocument();
   });
 });

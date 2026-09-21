@@ -157,6 +157,20 @@ describe('MinesweeperWindow', () => {
       expect(screen.getByText('120s')).toBeInTheDocument();
     });
 
+    test('sanitizes control characters from player names when adding score', async () => {
+      await addScore('beginner', '\u0000Alice\u0007\u001F', 15);
+      const user = userEvent.setup();
+      renderMinesweeper();
+      const gameMenu = document.querySelector('.minesweeper-menu-item') as HTMLElement;
+      await user.click(getBestTimesMenuItem(gameMenu));
+      await screen.findAllByText('Rank');
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      const rawData = localStorage.getItem(STORAGE_KEY);
+      expect(rawData).not.toContain('\u0000');
+      expect(rawData).not.toContain('\u0007');
+      expect(rawData).not.toContain('\u001F');
+    });
+
     test('leaderboard dialog OK button closes dialog', async () => {
       const user = userEvent.setup();
       renderMinesweeper();

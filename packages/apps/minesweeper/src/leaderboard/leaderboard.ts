@@ -128,7 +128,12 @@ export async function reportGameEnded(
 function addScoreLocal(diff: DifficultyKey, name: string, time: number): number {
   const data = load();
   const list = (data[diff] ?? []).slice();
-  list.push({ name: name.trim() || 'Anonymous', time });
+  const cleanName =
+    name
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+      .trim()
+      .slice(0, 20) || 'Anonymous';
+  list.push({ name: cleanName, time });
   list.sort((a, b) => a.time - b.time);
   data[diff] = list.slice(0, TOP_N);
   save(data);
@@ -158,10 +163,15 @@ export async function addScore(
   time: number,
   gameToken?: string | null,
 ): Promise<number> {
+  const cleanName =
+    name
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+      .trim()
+      .slice(0, 20) || 'Anonymous';
   try {
     const body: Record<string, unknown> = {
       difficulty: diff,
-      player_name: name.trim() || 'Anonymous',
+      player_name: cleanName,
       time_seconds: time,
     };
     if (gameToken) body.game_token = gameToken;

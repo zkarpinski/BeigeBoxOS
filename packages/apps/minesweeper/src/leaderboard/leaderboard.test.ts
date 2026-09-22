@@ -119,6 +119,11 @@ describe('leaderboard', () => {
       expect(getLeaderboard('beginner')[0].name).toBe('Anonymous');
     });
 
+    test('strips control characters from player name', async () => {
+      await addScore('beginner', 'Alice\u0000\u0007\u001b[2J', 15);
+      expect(getLeaderboard('beginner')[0].name).toBe('Alice[2J');
+    });
+
     test('sorts by time ascending and keeps top 10', async () => {
       await addScore('beginner', 'A', 100);
       await addScore('beginner', 'B', 10);

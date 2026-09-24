@@ -125,10 +125,14 @@ export async function reportGameEnded(
   }
 }
 
+function sanitizePlayerName(name: string): string {
+  return name.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+}
+
 function addScoreLocal(diff: DifficultyKey, name: string, time: number): number {
   const data = load();
   const list = (data[diff] ?? []).slice();
-  list.push({ name: name.trim() || 'Anonymous', time });
+  list.push({ name: sanitizePlayerName(name) || 'Anonymous', time });
   list.sort((a, b) => a.time - b.time);
   data[diff] = list.slice(0, TOP_N);
   save(data);
@@ -161,7 +165,7 @@ export async function addScore(
   try {
     const body: Record<string, unknown> = {
       difficulty: diff,
-      player_name: name.trim() || 'Anonymous',
+      player_name: sanitizePlayerName(name) || 'Anonymous',
       time_seconds: time,
     };
     if (gameToken) body.game_token = gameToken;

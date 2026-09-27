@@ -233,10 +233,10 @@ export async function onRequestPost(context) {
       );
     }
   }
+  const rawName = typeof body.player_name === 'string' ? body.player_name : '';
   const name =
-    typeof body.player_name === 'string'
-      ? body.player_name.trim().slice(0, MAX_NAME_LENGTH) || 'Anonymous'
-      : 'Anonymous';
+    rawName.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim().slice(0, MAX_NAME_LENGTH) ||
+    'Anonymous';
   try {
     const { error: insertError } = await supabase.from('minesweeper_leaderboard').insert({
       difficulty,

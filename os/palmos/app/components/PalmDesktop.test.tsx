@@ -56,4 +56,31 @@ describe('PalmDesktop Component', () => {
     expect(screen.getByText('Space Trader')).toBeInTheDocument(); // Launcher icon back
     expect(screen.queryByTestId('space-trader')).not.toBeInTheDocument();
   });
+
+  it('handles search safely with malformed or non-array localStorage data and searches memos without titles', () => {
+    // Populate localStorage with malformed non-array and memo data without explicit title property
+    localStorage.setItem('palmos-todos', JSON.stringify({ invalid: 'not an array' }));
+    localStorage.setItem(
+      'palmos-memos',
+      JSON.stringify([
+        { id: '1', body: 'Secret Meeting\nDiscuss security' },
+        null,
+        { invalid: 123 },
+      ]),
+    );
+
+    render(<PalmDesktop />);
+
+    // Open Find dialog by clicking Find silk button
+    const searchBtn = screen.getByTitle('Find');
+    fireEvent.click(searchBtn);
+
+    // Enter query into search input
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'Secret' } });
+
+    // Assert that the memo result appears safely without crashing
+    expect(screen.getByText('Memo:')).toBeInTheDocument();
+    expect(screen.getByText('Secret Meeting')).toBeInTheDocument();
+  });
 });

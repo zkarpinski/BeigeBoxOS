@@ -134,20 +134,31 @@ export function PalmDesktop() {
       const todos: { text: string; completed: boolean }[] = JSON.parse(
         localStorage.getItem('palmos-todos') ?? '[]',
       );
-      todos.forEach((t) => {
-        if (t.text.toLowerCase().includes(q))
-          results.push({ app: 'To Do', appId: 'todo', text: t.text });
-      });
+      if (Array.isArray(todos)) {
+        todos.forEach((t) => {
+          if (t && typeof t.text === 'string' && t.text.toLowerCase().includes(q))
+            results.push({ app: 'To Do', appId: 'todo', text: t.text });
+        });
+      }
     } catch {}
 
     try {
-      const memos: { title: string; body: string }[] = JSON.parse(
+      const memos: { title?: string; body?: string }[] = JSON.parse(
         localStorage.getItem('palmos-memos') ?? '[]',
       );
-      memos.forEach((m) => {
-        if (m.title.toLowerCase().includes(q) || m.body.toLowerCase().includes(q))
-          results.push({ app: 'Memo', appId: 'memo', text: m.title || m.body.slice(0, 40) });
-      });
+      if (Array.isArray(memos)) {
+        memos.forEach((m) => {
+          if (m && typeof m.body === 'string') {
+            const body = m.body;
+            const title =
+              typeof m.title === 'string' && m.title.trim()
+                ? m.title
+                : body.split('\n')[0]?.trim() || '';
+            if (title.toLowerCase().includes(q) || body.toLowerCase().includes(q))
+              results.push({ app: 'Memo', appId: 'memo', text: title || body.slice(0, 40) });
+          }
+        });
+      }
     } catch {}
 
     return results;

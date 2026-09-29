@@ -115,6 +115,11 @@ function spawnPopup(mode: 'random' | 'cursor', mx: number, my: number) {
   }
 
   popup.style.cssText = `left:${left}px;top:${top}px;z-index:${9000 + _popupIdx}`;
+  const safeBody = escapeHtml(msg.body)
+    .replace(/&lt;br&gt;/gi, '<br>')
+    .replace(/&lt;b&gt;/gi, '<b>')
+    .replace(/&lt;\/b&gt;/gi, '</b>');
+
   popup.innerHTML = `
     <div class="ps5-popup-title">
       <span>⚠ ${escapeHtml(msg.title)}</span>
@@ -122,7 +127,7 @@ function spawnPopup(mode: 'random' | 'cursor', mx: number, my: number) {
     </div>
     <div class="ps5-popup-body">
       <span class="ps5-popup-body-icon">⚠️</span>
-      <p>${msg.body}</p>
+      <p>${safeBody}</p>
     </div>
     <div class="ps5-popup-footer">
       <button class="ps5-popup-btn">OK</button>

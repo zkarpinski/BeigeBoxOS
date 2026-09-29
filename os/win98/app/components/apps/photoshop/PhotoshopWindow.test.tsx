@@ -60,7 +60,7 @@ describe('PhotoshopWindow', () => {
     expect(screen.getByText('💀')).toBeInTheDocument();
   });
 
-  test('escapes popup title HTML special characters when virus popups spawn', () => {
+  test('escapes popup title and body HTML special characters when virus popups spawn', () => {
     render(
       <Win98TestProviders registry={registry} initialOpenAppId="photoshop">
         <PhotoshopWindow />
@@ -75,7 +75,10 @@ describe('PhotoshopWindow', () => {
     expect(popups.length).toBeGreaterThan(0);
     popups.forEach((popup) => {
       const titleEl = popup.querySelector('.ps5-popup-title span');
+      const bodyEl = popup.querySelector('.ps5-popup-body p');
       expect(titleEl?.innerHTML).not.toMatch(/<script/i);
+      expect(bodyEl?.innerHTML).not.toMatch(/<script/i);
+      expect(bodyEl?.innerHTML).not.toMatch(/<img/i);
     });
   });
 });

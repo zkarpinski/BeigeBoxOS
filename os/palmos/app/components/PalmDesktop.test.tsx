@@ -56,4 +56,34 @@ describe('PalmDesktop Component', () => {
     expect(screen.getByText('Space Trader')).toBeInTheDocument(); // Launcher icon back
     expect(screen.queryByTestId('space-trader')).not.toBeInTheDocument();
   });
+
+  it('handles search queries safely with valid and malformed localStorage data', () => {
+    localStorage.setItem(
+      'palmos-memos',
+      JSON.stringify([
+        { id: '1', body: 'Secret Meeting\nDiscuss security' },
+        { id: '2', title: 'Shopping', body: 'Buy groceries' },
+        null,
+        123,
+        { invalid: true },
+      ]),
+    );
+    localStorage.setItem(
+      'palmos-todos',
+      JSON.stringify([{ id: '1', text: 'Fix bug' }, null, { text: 12345 }]),
+    );
+
+    render(<PalmDesktop />);
+
+    const searchBtn = screen.getByTitle('Find');
+    fireEvent.click(searchBtn);
+
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'Secret' } });
+
+    expect(screen.getByText(/Secret Meeting/)).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'Fix' } });
+    expect(screen.getByText(/Fix bug/)).toBeInTheDocument();
+  });
 });

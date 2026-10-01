@@ -16,8 +16,8 @@ const CANVAS_H = 210;
 function loadNotes(): Note[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed: Note[] = raw ? JSON.parse(raw) : [];
-    return parsed.length > 0 ? parsed : [{ id: '1', dataURL: '' }];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ id: '1', dataURL: '' }];
   } catch {
     return [{ id: '1', dataURL: '' }];
   }

@@ -66,7 +66,9 @@ const DEFAULT_CONTACTS: Contact[] = [
 function load(): Contact[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : DEFAULT_CONTACTS;
+    if (!stored) return DEFAULT_CONTACTS;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : DEFAULT_CONTACTS;
   } catch {
     return DEFAULT_CONTACTS;
   }

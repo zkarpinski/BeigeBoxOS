@@ -31,4 +31,10 @@ describe('DateBookApp Component', () => {
     expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Go To' })).toBeInTheDocument();
   });
+
+  it('handles non-array localStorage data gracefully without throwing TypeError', () => {
+    localStorage.setItem('palmos-datebook', JSON.stringify({ invalid: 'object' }));
+    expect(() => render(<DateBookApp />)).not.toThrow();
+    expect(screen.getByText('Sep 23, 04')).toBeInTheDocument();
+  });
 });

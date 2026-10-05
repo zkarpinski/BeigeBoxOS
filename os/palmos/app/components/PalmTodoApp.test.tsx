@@ -39,6 +39,13 @@ describe('PalmTodoApp Component', () => {
     expect(mockSounds.playSuccess).toHaveBeenCalled();
   });
 
+  it('handles invalid non-array JSON in localStorage gracefully without crashing', () => {
+    localStorage.setItem('palmos-todos', JSON.stringify({ invalid: 'object' }));
+    render(<PalmTodoApp />);
+
+    expect(screen.getByRole('button', { name: 'New' })).toBeInTheDocument();
+  });
+
   it('toggles a todo item completion', () => {
     render(<PalmTodoApp />);
     fireEvent.click(screen.getByText('New'));

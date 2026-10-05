@@ -26,7 +26,10 @@ export function PalmTodoApp({ onRegisterScroll }: PalmTodoAppProps) {
     const saved = localStorage.getItem('palmos-todos');
     if (saved) {
       try {
-        setTodos(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setTodos(parsed);
+        }
       } catch (e) {
         console.error('Failed to load todos', e);
       }

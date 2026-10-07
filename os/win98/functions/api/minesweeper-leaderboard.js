@@ -235,7 +235,7 @@ export async function onRequestPost(context) {
   }
   const name =
     typeof body.player_name === 'string'
-      ? body.player_name.trim().slice(0, MAX_NAME_LENGTH) || 'Anonymous'
+      ? body.player_name.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim().slice(0, MAX_NAME_LENGTH) || 'Anonymous'
       : 'Anonymous';
   try {
     const { error: insertError } = await supabase.from('minesweeper_leaderboard').insert({
